@@ -1,5 +1,5 @@
 # Especificación de Requisitos — Fase 1 (Visión General)
-## Proyecto: "LifeScore" (nombre provisional) — App de auto-evaluación y mejora de vida por categorías
+## Proyecto: "MyLifeMirror" (nombre provisional) — App de auto-evaluación y mejora de vida por categorías
 
 **Versión:** 0.3 (incorpora cierre de hallazgos de la matriz de trazabilidad)
 **Fecha:** Septiembre 2026 (última actualización: 5 de septiembre de 2026)
@@ -95,6 +95,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-19 | El sistema debe permitir al usuario marcar una recomendación como "hecha", "descartada" o "pospuesta". | Should |
 | RF-20 | El sistema debe adaptar las recomendaciones futuras en función de qué recomendaciones ha aceptado o descartado el usuario previamente (personalización básica). | Could |
 | RF-21 | El sistema debe permitir al usuario pedir una recomendación alternativa si la propuesta no le convence. | Could |
+| RF-34 | El sistema debe permitir al usuario consultar el historial completo de sus recomendaciones (en cualquier estado: pendiente de respuesta, hecha, descartada, pospuesta), con filtros por estado, categoría y rango de fechas. | Should |
 
 ### 2.6 Notificaciones
 | ID | Descripción | Prioridad |
@@ -125,6 +126,13 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 |---|---|---|
 | RF-32 | Cuando un usuario mejora significativamente su puntuación en una categoría, el sistema podrá sugerirle —nunca de forma automática— compartir su caso de éxito como recomendación motivacional con un usuario conectado (RF-33) que tenga una puntuación baja sostenida en esa misma categoría. El envío requiere una acción explícita del usuario emisor, y solo llega a usuarios receptores que hayan activado previamente, en sus ajustes de notificación (RF-23), la opción de recibir este tipo de recomendaciones de sus conexiones. El sistema no debe revelar la puntuación exacta de ningún usuario al otro; únicamente el hecho de la mejora y el mensaje que el emisor decida compartir (ver RES-11). | Could |
 | RF-33 | El sistema debe permitir a un usuario enviar y aceptar solicitudes de conexión con otros usuarios (relación mutuamente confirmada por ambas partes), como prerrequisito de las funciones sociales opcionales (RF-32). | Should |
+
+### 2.11 Funcionalidades asistidas por IA
+| ID | Descripción | Prioridad |
+|---|---|---|
+| RF-35 | Al marcar una recomendación como "hecha" (RF-19), el sistema podrá permitir al usuario dejar opcionalmente un comentario reflexivo sobre la experiencia, en texto libre o dictado por voz mediante reconocimiento de voz. | Could |
+| RF-36 | El sistema podrá ofrecer una función de consulta en lenguaje natural sobre el propio historial de evaluaciones y recomendaciones del usuario (p. ej. "¿cómo ha evolucionado mi categoría deporte este trimestre?"), respondida mediante recuperación de los datos del propio usuario (RAG) y nunca datos de otros usuarios. | Could |
+| RF-37 | Al redactar el mensaje de RF-32, el sistema podrá ofrecer ayuda de redacción asistida por IA sobre el borrador del usuario, verificando mediante razonamiento explícito que el texto final no contenga lenguaje diagnóstico (RES-09) ni tono de alarde, antes de mostrarlo al usuario emisor para su aprobación final. | Could |
 
 ---
 
@@ -202,3 +210,5 @@ Para la siguiente fase, propongo:
 - **v0.2 (5 sept. 2026)** — primera ronda de comentarios de revisión: RN-11 (premium, RD-10), RF-26 (catálogo de avatares con IA), sección 2.8 Localización y comunidad (RF-27, RF-28), sección 2.9 Apoyo profesional y bienestar (RF-29, RF-30), RES-09 (sin detección algorítmica de riesgo) y RES-10 (alcance de contenido ilustrativo/ficticio para el TFM), fecha límite explícita (31 oct. 2026) en RES-01.
 - **v0.3 (5 sept. 2026)** — cierre de hallazgos de la matriz de trazabilidad ([03_Matriz_Trazabilidad_Fase1.md](03_Matriz_Trazabilidad_Fase1.md)): RF-31 (resumen mensual, cierra RN-06); RN-08 reescrito y sección 2.10 Conexiones sociales y recomendaciones entre usuarios (RF-32 recomendación entre iguales con doble consentimiento, RF-33 conexiones), RES-11 (salvaguarda de privacidad entre usuarios), RD-11 (entidad `Conexión`).
 - **v0.4 (7 sept. 2026)** — cierre de hallazgos del diagrama de clases ([05_Diagrama_Clases.md](05_Diagrama_Clases.md)): RD-04 ahora incluye explícitamente el usuario destinatario, y el estado pasa a `pendiente de respuesta / hecha / descartada / pospuesta`, alineado con RF-19.
+- **v0.5 (7 sept. 2026)** — RF-34 (historial de recomendaciones con filtros por estado/categoría/fecha), derivado del diagrama de estados ([09_Diagrama_Estados_Recomendacion.md](09_Diagrama_Estados_Recomendacion.md)).
+- **v0.6 (10 sept. 2026)** — nueva sección 2.11 Funcionalidades asistidas por IA: RF-35 (comentario reflexivo por voz al completar una recomendación), RF-36 (consulta en lenguaje natural sobre el propio historial, vía RAG), RF-37 (asistente de redacción del mensaje de RF-32 con verificación explícita anti-diagnóstico/anti-alarde). Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) para la justificación técnica.
