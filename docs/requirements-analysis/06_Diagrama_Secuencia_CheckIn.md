@@ -4,7 +4,9 @@
 **Fecha:** 7 de septiembre de 2026
 **Formato:** Mermaid (renderiza automáticamente en GitHub al ver el archivo .md — sin plugin ni configuración adicional).
 
-Este es el flujo más central del sistema: cubre consentimiento (RF-04), puntuación (RF-10, RF-11), inmutabilidad del registro (RF-12), motor de recomendaciones por umbral (RF-18), respuesta del usuario a la recomendación (RF-19) y el límite ético de no emitir juicios (RES-09).
+Este es el flujo más central del sistema: cubre puntuación (RF-10, RF-11), inmutabilidad del registro (RF-12), motor de recomendaciones por umbral (RF-18), respuesta del usuario a la recomendación (RF-19) y el límite ético de no emitir juicios (RES-09).
+
+> **Nota:** el consentimiento para categorías sensibles (RF-04) **no** ocurre aquí — se resuelve al activar la categoría (onboarding o gestión posterior de categorías, RF-07), ver [08_Diagrama_Secuencia_Consentimiento.md](08_Diagrama_Secuencia_Consentimiento.md). Este flujo asume que solo se puede hacer check-in de categorías ya activas y, si eran sensibles, ya consentidas.
 
 ---
 
@@ -18,16 +20,6 @@ sequenceDiagram
     participant BD as Base de Datos
 
     Usuario->>App: Abre check-in de una categoría activa
-    App->>Sistema: ¿Requiere consentimiento? (categoría sensible)
-
-    alt Categoría sensible sin consentimiento previo
-        Sistema-->>App: Solicita consentimiento (RF-04)
-        App->>Usuario: Muestra pantalla de consentimiento
-        Usuario->>App: Acepta
-        App->>Sistema: Registra consentimiento
-        Sistema->>BD: Guarda Consentimiento (RD-05)
-    end
-
     Usuario->>App: Introduce puntuación (1-10) + nota opcional (RF-10, RF-11)
     App->>Sistema: Envía evaluación
     Sistema->>BD: Guarda Evaluación con timestamp inmutable (RF-12, RD-03)
@@ -71,3 +63,4 @@ Siguiente diagrama: **casos de uso** (mejor candidato para draw.io, por la notac
 ## Historial de cambios
 
 - **v1.0 (7 sept. 2026)** — versión inicial: secuencia completa del check-in, desde apertura hasta actualización del panel, incluyendo consentimiento condicional y respuesta a recomendación.
+- **v1.1 (7 sept. 2026)** — se retira el paso de consentimiento de este flujo: RF-04 dispara al activar la categoría, no en cada check-in (ver hallazgo resuelto en [07_Diagrama_Casos_Uso.md](07_Diagrama_Casos_Uso.md) §4). El flujo de consentimiento pasa a su propio diagrama, [08_Diagrama_Secuencia_Consentimiento.md](08_Diagrama_Secuencia_Consentimiento.md).
