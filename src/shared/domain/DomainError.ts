@@ -18,3 +18,7 @@ export class NotFoundError extends DomainError {
 export class ConflictError extends DomainError {
   readonly code = "CONFLICT";
 }
+
+export class AuthenticationError extends DomainError {
+  readonly code = "AUTHENTICATION_ERROR";
+}

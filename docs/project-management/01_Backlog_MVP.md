@@ -13,17 +13,21 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 Trabajo transversal que no pertenece a ningún RF pero bloquea a todos:
 
-- [ ] Estructura de carpetas mínima por módulo (`domain/`, `application/`, `infrastructure/`) — ADR-03 §3.5.
-- [ ] Configurar Vitest, Zod y alias de módulo en `tsconfig.json`.
-- [ ] Composition Root inicial (`container.ts`) con entorno `dev` → adaptadores en memoria.
-- [ ] Crear un **nuevo Project en MongoDB Atlas** (independiente del existente) + clúster M0 para MyLifeMirror.
-- [ ] **RF-30** (líneas de ayuda en crisis): sin lógica de dominio, contenido estático — se adelanta aquí por ser barato y de máxima prioridad ética (mismo razonamiento que en el Ciclo 1 original).
+- [x] Estructura de carpetas mínima por módulo (`domain/`, `application/`, `infrastructure/`) — ADR-03 §3.5.
+- [x] Configurar Vitest, Zod y alias de módulo en `tsconfig.json`.
+- [x] Composition Root inicial (`container.ts`) con entorno `dev` → adaptadores en memoria.
+- [x] Crear un **nuevo Project en MongoDB Atlas** (independiente del existente) + clúster M0 para MyLifeMirror.
+- [x] **RF-30** (líneas de ayuda en crisis): lógica (`obtenerLineasAyudaCrisis`) hecha con TDD y probada. Pendiente su colocación visual en una pantalla real de "Ayuda" — se hace en cuanto exista navegación real (Sprint 1).
 
 ## Sprint 1 (19-25 sept.) — Cuentas y consentimiento
 
 Todo lo demás depende de que una cuenta exista y de que el consentimiento esté resuelto antes de activar categorías sensibles (RF-04).
 
-- [ ] **RF-01** — Entidad `Usuario`; casos de uso `RegistrarUsuario`, `IniciarSesion`; adaptador en memoria.
+- [x] **RF-01 (registro)** — Entidad `Usuario`, VOs `Email`/`Password`, caso de uso `RegistrarUsuario` sobre `AuthProvider`/Supabase Auth, vista `RegistroForm` (MUI), endpoint `api/registro.ts`. Todo con TDD.
+- [x] **RF-01 (login)** — caso de uso `IniciarSesion`, vista `LoginForm`, endpoint `api/login.ts` con el token de Supabase en cookie httpOnly ([06_Autenticacion.md](../architecture-decisions/06_Autenticacion.md)).
+- [x] **RF-39** — routing real (React Router): Landing pública (`/`), `/registro`, `/login`, Home protegida (`/inicio`) vía `RutaProtegida` + `useSesion`/`api/sesion`, `api/logout`.
+- [x] **RF-38** — recuperación de contraseña: `SolicitarRecuperacion`/`RestablecerPassword`, vistas y endpoints, sin revelar si un email existe.
+- [x] **RNF-10 (i18n)** + navegación — `Breadcrumbs` y `Header` reutilizables ([07_UI.md](../architecture-decisions/07_UI.md) §5), react-i18next con ES/EN ([09_Internacionalizacion.md](../architecture-decisions/09_Internacionalizacion.md)); todas las pantallas de cuentas traducidas.
 - [ ] **RF-04** — Entidad `Consentimiento`; caso de uso `OtorgarConsentimiento`, disparado como extensión al activar una categoría sensible (ver [08_Diagrama_Secuencia_Consentimiento.md](../requirements-analysis/08_Diagrama_Secuencia_Consentimiento.md)).
 - [ ] Tests de dominio de ambos.
 
@@ -60,6 +64,10 @@ Deliberadamente sin nuevas RF asignadas — es el margen de seguridad antes del 
 
 ---
 
+## Recalibración de ritmo
+
+Sprint 0 se completó con margen — pero fue trabajo casi enteramente mecánico (configuración, estructura, una función pura), el tipo de tarea más rápida que hay. Antes de comprimir sprints posteriores o adelantar alcance, mejor esperar al cierre del **Sprint 1** (primera lógica de negocio real, primera decisión de UI) como punto de referencia honesto — decisión pendiente hasta entonces, no descartada.
+
 ## Notas de secuenciación
 
 - El orden no sigue la numeración de RF — sigue dependencias reales: sin cuenta+consentimiento (Sprint 1) no se puede probar nada del resto de forma honesta.
@@ -71,3 +79,8 @@ Deliberadamente sin nuevas RF asignadas — es el margen de seguridad antes del 
 ## Historial de cambios
 
 - **v1.0 (12 sept. 2026)** — versión inicial: 11 RF del Ciclo 1 repartidos en Sprint 0 + 6 sprints semanales, dimensionados a 10-12h/semana con el Sprint 6 como colchón antes del plazo del 31 de octubre.
+- **v1.1 (13 sept. 2026)** — Sprint 0 cerrado (todas las tareas hechas, incluyendo RF-30 con TDD). Se añade nota de recalibración de ritmo, pendiente hasta el cierre del Sprint 1.
+- **v1.2 (13 sept. 2026)** — Sprint 1: RF-01 registro completo (dominio, aplicación, adaptadores, vista, endpoint, todo con TDD). Login queda como tarea separada dentro del mismo Sprint.
+- **v1.3 (13 sept. 2026)** — cambio de base de datos a Supabase ([04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) v2.0); RF-01 login completo sobre Supabase Auth.
+- **v1.4 (14 sept. 2026)** — RF-39 (routing, Landing, Home protegida) y RF-38 (recuperación de contraseña) añadidos y completados dentro del Sprint 1.
+- **v1.5 (14 sept. 2026)** — RNF-10 (i18n ES/EN) implementado con react-i18next; se añaden `Breadcrumbs` y `Header` como componentes de navegación reutilizables en todas las pantallas de cuentas.

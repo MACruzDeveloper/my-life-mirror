@@ -1,0 +1,57 @@
+{
+  "comun": {
+    "email": "Email",
+    "contrasena": "Contraseña",
+    "contrasenaAyuda": "Al menos 8 caracteres",
+    "errorServidor": "No se pudo contactar con el servidor"
+  },
+  "breadcrumbs": {
+    "inicio": "Inicio",
+    "crearCuenta": "Crear cuenta",
+    "iniciarSesion": "Iniciar sesión",
+    "recuperarContrasena": "Recuperar contraseña",
+    "restablecerContrasena": "Restablecer contraseña"
+  },
+  "landing": {
+    "titulo": "MyLifeMirror",
+    "descripcion": "Evalúa cómo va tu vida por categorías, a tu ritmo, y recibe sugerencias concretas para lo que tú decidas mejorar — sin juicios, sin comparaciones con nadie. Un espejo honesto, no un examen.",
+    "crearCuenta": "Crear cuenta",
+    "iniciarSesion": "Iniciar sesión"
+  },
+  "registro": {
+    "titulo": "Crear cuenta",
+    "boton": "Registrarse",
+    "botonEnviando": "Creando cuenta…",
+    "exito": "Cuenta creada para {{email}}.",
+    "irALogin": "Iniciar sesión",
+    "errorGenerico": "No se pudo completar el registro"
+  },
+  "login": {
+    "titulo": "Iniciar sesión",
+    "boton": "Iniciar sesión",
+    "botonEnviando": "Iniciando sesión…",
+    "olvideContrasena": "¿Olvidaste tu contraseña?",
+    "errorGenerico": "No se pudo iniciar sesión"
+  },
+  "olvidePassword": {
+    "titulo": "Recuperar contraseña",
+    "boton": "Enviar enlace",
+    "botonEnviando": "Enviando…",
+    "confirmacion": "Si el email existe, recibirás un enlace de recuperación.",
+    "errorGenerico": "No se pudo procesar la solicitud"
+  },
+  "restablecerPassword": {
+    "titulo": "Elegir nueva contraseña",
+    "nuevaContrasena": "Nueva contraseña",
+    "boton": "Cambiar contraseña",
+    "botonEnviando": "Guardando…",
+    "exito": "Contraseña actualizada. Ya puedes iniciar sesión con ella.",
+    "enlaceInvalido": "Enlace no válido o caducado. Pide uno nuevo desde \"Recuperar contraseña\".",
+    "errorGenerico": "No se pudo cambiar la contraseña"
+  },
+  "panel": {
+    "bienvenida": "Bienvenido",
+    "descripcion": "Tu panel llegará pronto — de momento, esto confirma que tu sesión funciona.",
+    "cerrarSesion": "Cerrar sesión"
+  }
+}
