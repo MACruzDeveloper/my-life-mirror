@@ -2,7 +2,7 @@
 
 **Estado:** Aceptado
 **Fecha:** 10 de septiembre de 2026
-**Relacionado con:** [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md), [02_Principios_Diseño.md](02_Principios_Diseño.md), [03_Arquitectura_Software.md](03_Arquitectura_Software.md), [05_Diagrama_Clases.md](../requirements-analysis/05_Diagrama_Clases.md), RES-03, RES-04, RNF-04, RNF-05, RNF-11, RNF-12, RF-34
+**Relacionado con:** [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md), [02_Principios_Diseño.md](02_Principios_Diseño.md), [03_Arquitectura_Software.md](03_Arquitectura_Software.md), [06_Autenticacion.md](06_Autenticacion.md), [05_Diagrama_Clases.md](../requirements-analysis/05_Diagrama_Clases.md), RES-03, RES-04, RNF-04, RNF-05, RNF-11, RNF-12, RF-34
 
 ---
 
@@ -10,61 +10,59 @@
 
 RES-03 exige capa gratuita, sin excepciones. El modelo de dominio ([05_Diagrama_Clases.md](../requirements-analysis/05_Diagrama_Clases.md)) es bastante relacional (relaciones tipo FK, `Conexión` autorreferencial), y RF-34 necesita filtrar el historial de recomendaciones por estado, categoría y fecha a la vez. RES-04/RD-06 exigen tratamiento reforzado para categorías de datos especial (Art. 9 RGPD); RNF-11 pide auditoría de accesos/modificaciones a esos datos.
 
-Gracias a [03_Arquitectura_Software.md](03_Arquitectura_Software.md) (Clean Architecture, patrón Repository como puerto), esta decisión queda parcialmente protegida: la base de datos concreta vive por completo dentro del adaptador de infraestructura, sin filtrarse al dominio ni a la aplicación. Eso reduce el coste de esta elección frente a lo que sería en una arquitectura menos disciplinada.
+Gracias a [03_Arquitectura_Software.md](03_Arquitectura_Software.md) (Clean Architecture, patrón Repository como puerto), esta decisión queda parcialmente protegida: la base de datos concreta vive por completo dentro del adaptador de infraestructura, sin filtrarse al dominio ni a la aplicación.
 
 ## 2. Alternativas consideradas
 
 | Opción | A favor | En contra |
 |---|---|---|
 | **Firebase (Firestore)** | Tiempo real maduro, Cloud Functions en Node/TS nativo | RF-34 choca con las limitaciones reales de Firestore (no permite combinar filtros de desigualdad en varios campos en una sola consulta) |
-| **Supabase (Postgres)** | Encaje natural con el modelo relacional, RLS potente, SQL resuelve RF-34 sin esfuerzo | Tecnología nueva para el usuario; el proyecto ya asume una arquitectura nueva (Clean Architecture) — apilar dos incertidumbres grandes a la vez es un riesgo innecesario para RES-01 |
-| **MongoDB Atlas** ✅ | El usuario ya lo conoce (experiencia previa con Mongo/Atlas) — reduce riesgo justo donde ADR-01 ya estableció que debía reducirse; capa gratuita M0 permanente, sin fecha de caducidad ni auto-pausa; su lenguaje de consultas sí resuelve RF-34 (a diferencia de Firestore) mediante índices compuestos | Sin esquema forzado por la base de datos, sin RLS/Security Rules equivalente, sin auditoría nativa en el tier gratuito — mitigaciones en §4 |
-| **Autoalojado (Postgres/Mongo en una VM propia)** | Control total | Carga operativa (backups, parches, escalado) desproporcionada para RES-02, mismo argumento ya usado en ADR-03 para descartar infraestructura propia |
+| **MongoDB Atlas** | El usuario ya lo conocía; capa gratuita M0 permanente, sin auto-pausa; su lenguaje de consultas resuelve RF-34 sin problema | Sin autenticación incluida (obligaba a construir hash + sesión a mano, ver [06_Autenticacion.md](06_Autenticacion.md)); sin esquema forzado; sin RLS |
+| **Autoalojado (Postgres/Mongo en una VM propia)** | Control total | Carga operativa (backups, parches, escalado) desproporcionada para RES-02 |
+| **Supabase (Postgres)** ✅ | Encaje natural con el modelo relacional, RLS potente, SQL resuelve RF-34 sin esfuerzo, **incluye autenticación gestionada** (elimina la necesidad de construirla a mano) | Tier gratuito se autopausa tras ~1 semana de inactividad; tecnología nueva para el usuario |
 
-## 3. Decisión: MongoDB Atlas (tier M0, gratuito)
+## 3. Decisión: Supabase (Postgres + Auth gestionada)
 
-La razón de fondo no es técnica, es de gestión de riesgo: el proyecto ya apiló una incertidumbre grande y deliberada (Clean Architecture completa, ADR-03) para aprender. Añadir una segunda incertidumbre grande (una base de datos nueva) sobre la misma fecha fija (RES-01) sería innecesario, cuando la alternativa conocida (MongoDB) cumple perfectamente los requisitos reales del proyecto. Y gracias a esa misma Clean Architecture, el coste de no elegir la opción "más relacionalmente pura" (Postgres) queda contenido dentro del adaptador de infraestructura — no se paga en el resto del sistema.
+Se sustituye MongoDB Atlas por Supabase. El motivo ya no es solo el encaje relacional (siempre lo tuvo mejor) — es que **Supabase incluye autenticación gestionada**, lo que elimina de raíz la necesidad de construir hash de contraseñas y gestión de sesión a mano (ver [06_Autenticacion.md](06_Autenticacion.md)), reduciendo superficie de código sensible a la seguridad justo en la parte del sistema donde eso más importa.
 
-Aclaración importante sobre RF-34: la reserva inicial sobre "NoSQL" en este ADR era en realidad una reserva sobre **Firestore específicamente** (sus filtros de desigualdad no se pueden combinar en varios campos). MongoDB no tiene esa limitación — su framework de consultas/agregación soporta filtros combinados de rango e igualdad con índices compuestos, así que RF-34 se resuelve sin problema.
+El cambio se hace en el punto más barato posible: se decide antes de haber construido el adaptador real de MongoDB (previsto para el Sprint 5, nunca llegó a escribirse) y con el registro (RF-01) todavía cubierto solo por adaptadores en memoria — el patrón Repository/puerto ya aislaba esta decisión del resto del sistema, tal como se pretendía.
 
-Sobre el coste económico, que es el criterio que más pesa ahora mismo: el tier M0 de Atlas es **gratuito de forma permanente** (no es una prueba con caducidad), con 512MB de almacenamiento, cifrado en reposo (AES-256) y TLS en tránsito incluidos de serie — suficiente para el volumen de un piloto de TFM. Además, a diferencia del tier gratuito de Supabase (que pausa el proyecto tras ~1 semana de inactividad), un clúster M0 de Atlas no se autopausa — relevante porque este proyecto se trabaja de forma intermitente, encajado en el calendario del máster.
+Sobre el coste económico: el tier gratuito de Supabase se autopausa tras ~1 semana de inactividad (a diferencia de Atlas) — aceptable dado que el proyecto ya está en fase activa de implementación; un pause ocasional se reactiva con un clic o la primera petición.
 
-## 4. Cómo se mitigan las carencias de MongoDB para este proyecto
+## 4. Cómo se cubren los requisitos con Supabase
 
-| Carencia | Mitigación |
+| Necesidad | Cómo la cubre Supabase |
 |---|---|
-| **Sin esquema forzado por la base de datos** | **Zod se vuelve la fuente de verdad de la estructura de datos** — no es una elección ligada a MongoDB (funcionaría igual con cualquier otra base), pero aquí hace un trabajo que Postgres habría hecho parcialmente gratis. Se valida con Zod tanto al escribir (antes de persistir) como al leer (antes de mapear el documento a una Entidad/Value Object de dominio), por si hay datos ya guardados que no encajan con el esquema actual. |
-| **`Conexión` autorreferencial** | Se modela como colección con referencias (`usuario_a`, `usuario_b` como ObjectId), resuelta con `$lookup` o dos consultas — más manual que una FK de SQL, perfectamente viable al volumen de este proyecto. |
-| **Sin RLS/Security Rules equivalente** | La autorización se aplica íntegramente en la capa de Casos de Uso (Clean Architecture ya lo prefería así — es una decisión explícita de la aplicación, no magia de la base de datos). |
-| **Sin auditoría nativa en el tier gratuito** (RNF-11) | Un caso de uso `RegistrarAuditoria` explícito, disparado como evento de dominio (mismo mecanismo de Outbox ya diseñado en [03_Arquitectura_Software.md](03_Arquitectura_Software.md) §3.4) cada vez que se accede o modifica un dato de categoría especial (RD-06). |
-| **Cifrado de campos sensibles** (RES-04, RD-06) | Cifrado a nivel de aplicación en el adaptador para los campos marcados como sensibles, suficiente para el Ciclo 1. Client-Side Field Level Encryption de MongoDB queda como opción a valorar en una fase posterior si el alcance lo justifica — no se implementa ahora (YAGNI). |
-| **Exportación de datos** (RNF-12) | Los datos ya pasan por DTOs con Zod en la capa de aplicación — exportar a JSON es directo; CSV requiere un mapeo adicional sencillo. |
+| **Esquema de datos** | Postgres fuerza el esquema a nivel de columna — Zod sigue validando en la frontera de la aplicación (DTOs), pero ya no es la única red de seguridad como lo era con MongoDB. |
+| **`Conexión` autorreferencial** | FK estándar de SQL — trivial, sin el rodeo de `$lookup` que hacía falta en MongoDB. |
+| **RF-34** (filtros combinados estado/categoría/fecha) | Una consulta SQL indexada, sin las limitaciones de Firestore ni el modelado manual de MongoDB. |
+| **Autorización** (sustituye la ausencia de RLS de MongoDB) | Row-Level Security de Postgres, nativo de Supabase — refuerza, no sustituye, la autorización ya prevista en la capa de Casos de Uso. |
+| **Auditoría** (RNF-11) | Igual que en la decisión anterior: un caso de uso `RegistrarAuditoria` explícito vía evento de dominio/Outbox ([03_Arquitectura_Software.md](03_Arquitectura_Software.md) §3.4) — Supabase no cambia esta pieza. |
+| **Cifrado de campos sensibles** (RES-04, RD-06) | Cifrado a nivel de aplicación para los campos marcados como sensibles, igual que antes — no se implementa nada adicional específico de Postgres todavía (YAGNI). |
+| **Exportación de datos** (RNF-12) | SQL → JSON/CSV es tooling estándar. |
 
-## 5. Detalle de implementación (para cuando empecemos Ciclo 1)
+## 5. Detalle de implementación
 
-- **Driver:** el driver oficial de `mongodb` para Node, sin Mongoose. Motivo: Mongoose tiene su propio sistema de esquemas/validación, y mantenerlo junto a Zod duplicaría la responsabilidad de validación en dos sitios (viola DRY, [02_Principios_Diseño.md](02_Principios_Diseño.md) §2). Zod es la única fuente de verdad de la forma de los datos.
-- **Una colección por Aggregate Root** (ADR-03 §3.2): `usuarios`, `categorias`, `evaluaciones`, `recomendaciones`, `consentimientos`, `suscripciones`, `conexiones`.
-- **Adaptador de infraestructura:** un `MongoXRepository` por entidad, implementando el puerto `XRepository` ya previsto en ADR-03/[02_Principios_Diseño.md](02_Principios_Diseño.md). Es el único código del proyecto con permiso para importar el driver de `mongodb`.
-- **Entorno de desarrollo/test** (ADR-03 §3.4): un adaptador en memoria (un simple array/Map) implementando el mismo puerto, para no depender de Atlas durante el desarrollo diario ni en los tests — la base real de Atlas se usa en producción y, si hace falta, en tests de contrato puntuales.
+- **Cliente:** `@supabase/supabase-js`, el SDK oficial.
+- **Autenticación:** ver [06_Autenticacion.md](06_Autenticacion.md) — Supabase Auth gestiona contraseñas y sesión; no se toca directamente Postgres para eso.
+- **Datos propios de la app** (perfil, categorías, evaluaciones...): una tabla por Aggregate Root, accedida a través de un `Repository` por puerto, igual disciplina que ya establecía ADR-03 — el adaptador concreto (`SupabaseXRepository`) es el único código con permiso para importar el cliente de Supabase para esos datos.
+- **Entorno de desarrollo/test**: adaptadores en memoria (Fakes) para los tests, según ADR-03 §3.6. Para el desarrollo diario del módulo Cuentas, se usa directamente el proyecto real de Supabase (no hay un sustituto en memoria razonable para autenticación completa) — ver [06_Autenticacion.md](06_Autenticacion.md) §3.
 
 ## 6. Consecuencias
 
-**Positivas:** coste cero de forma permanente y sin sorpresas; velocidad inmediata al usar una tecnología ya conocida; RF-34 resuelto sin fricción; el riesgo real del proyecto (aprender Clean Architecture) no se diluye compitiendo con un segundo aprendizaje simultáneo.
+**Positivas:** autenticación completa sin código propio de hash/sesión; RLS como capa extra de defensa; RF-34 resuelto de forma nativa; menos superficie de código sensible a la seguridad.
 
-**A vigilar:** la disciplina de validar con Zod en cada frontera (escritura y lectura) no es opcional aquí — es lo único que sustituye la garantía de esquema que Postgres habría dado gratis. Bajo presión de fecha (RES-01), es el punto más fácil de saltarse y el más caro de descubrir roto más tarde.
+**A vigilar:** el proyecto de Supabase se autopausa tras inactividad — el primer acceso tras una pausa puede tardar unos segundos en despertar. MongoDB Atlas (ya creado) queda sin uso — no hace falta borrarlo, simplemente no se usa.
 
 ---
 
-## 7. Experimento futuro (si el calendario lo permite)
+## 7. Próximo paso
 
-Si sobra tiempo tras el Ciclo 1, cambiar el adaptador de MongoDB a Supabase/Postgres es una forma de baja incertidumbre de practicar una tecnología nueva: gracias al patrón Repository (ADR-03), el cambio queda contenido en un adaptador nuevo — dominio y aplicación no se tocan. No es un compromiso, solo una opción abierta.
-
-## 8. Próximo paso
-
-Con arquitectura y almacenamiento decididos, ya no quedan bloqueos de diseño previos a empezar. Siguiente paso: las historias de usuario del Ciclo 1 (Nivel 2 Spec Anchored, [10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md)), empezando por el adaptador en memoria antes que la conexión real a Atlas.
+Con el almacenamiento decidido, seguir con RF-01: registro (ya migrado) y login (`IniciarSesion`), ambos vía `AuthProvider` sobre Supabase Auth.
 
 ---
 
 ## Historial de cambios
 
-- **v1.0 (10 sept. 2026)** — versión inicial: se descartan Firestore (limitaciones de consulta reales para RF-34) y Supabase/Postgres (mejor encaje relacional, pero acumular una segunda incertidumbre tecnológica grande junto a Clean Architecture no compensa dado RES-01); se adopta MongoDB Atlas M0 por familiaridad del usuario y por ser gratuito de forma permanente. Carencias mitigadas explícitamente: Zod como sustituto de esquema forzado, auditoría vía caso de uso explícito, autorización en la capa de aplicación, cifrado de campos a nivel de aplicación.
+- **v1.0 (10 sept. 2026)** — versión inicial: MongoDB Atlas M0 elegido por familiaridad y coste, con mitigaciones para sus carencias (sin esquema forzado, sin RLS, sin auditoría nativa).
+- **v2.0 (13 sept. 2026)** — se sustituye MongoDB Atlas por **Supabase (Postgres + Auth gestionada)**, decisión tomada en el punto más barato posible (antes de construir el adaptador real de Mongo). Motivo principal: Supabase elimina la necesidad de construir autenticación a mano, además del mejor encaje relacional ya señalado en la v1.0.

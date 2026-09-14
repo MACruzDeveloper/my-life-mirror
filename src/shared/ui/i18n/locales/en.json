@@ -1,0 +1,57 @@
+{
+  "comun": {
+    "email": "Email",
+    "contrasena": "Password",
+    "contrasenaAyuda": "At least 8 characters",
+    "errorServidor": "Could not reach the server"
+  },
+  "breadcrumbs": {
+    "inicio": "Home",
+    "crearCuenta": "Create account",
+    "iniciarSesion": "Log in",
+    "recuperarContrasena": "Forgot password",
+    "restablecerContrasena": "Reset password"
+  },
+  "landing": {
+    "titulo": "MyLifeMirror",
+    "descripcion": "Assess how your life is going by category, at your own pace, and get concrete suggestions for whatever you choose to improve — no judgment, no comparisons with anyone. An honest mirror, not an exam.",
+    "crearCuenta": "Create account",
+    "iniciarSesion": "Log in"
+  },
+  "registro": {
+    "titulo": "Create account",
+    "boton": "Sign up",
+    "botonEnviando": "Creating account…",
+    "exito": "Account created for {{email}}.",
+    "irALogin": "Log in",
+    "errorGenerico": "Could not complete the registration"
+  },
+  "login": {
+    "titulo": "Log in",
+    "boton": "Log in",
+    "botonEnviando": "Logging in…",
+    "olvideContrasena": "Forgot your password?",
+    "errorGenerico": "Could not log in"
+  },
+  "olvidePassword": {
+    "titulo": "Forgot password",
+    "boton": "Send link",
+    "botonEnviando": "Sending…",
+    "confirmacion": "If the email exists, you will receive a recovery link.",
+    "errorGenerico": "Could not process the request"
+  },
+  "restablecerPassword": {
+    "titulo": "Choose a new password",
+    "nuevaContrasena": "New password",
+    "boton": "Change password",
+    "botonEnviando": "Saving…",
+    "exito": "Password updated. You can now log in with it.",
+    "enlaceInvalido": "Invalid or expired link. Request a new one from \"Forgot password\".",
+    "errorGenerico": "Could not change the password"
+  },
+  "panel": {
+    "bienvenida": "Welcome",
+    "descripcion": "Your dashboard is coming soon — for now, this confirms your session works.",
+    "cerrarSesion": "Log out"
+  }
+}

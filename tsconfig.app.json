@@ -20,7 +20,8 @@
        las rutas de "paths" se escriben relativas a este archivo. */
     "paths": {
       "@shared/*": ["./src/shared/*"],
-      "@modules/*": ["./src/modules/*"]
+      "@modules/*": ["./src/modules/*"],
+      "@pages/*": ["./src/pages/*"]
     },
 
     /* Linting */
