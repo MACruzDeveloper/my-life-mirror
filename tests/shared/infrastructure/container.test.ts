@@ -7,6 +7,8 @@ describe("container", () => {
 
     expect(contexto.entorno).toBe("test");
     expect(contexto.clock.now()).toBeInstanceOf(Date);
+    expect(typeof contexto.registrarUsuario).toBe("function");
+    expect(typeof contexto.iniciarSesion).toBe("function");
   });
 
   it("obtenerAppContext devuelve siempre la misma instancia (singleton por proceso)", () => {

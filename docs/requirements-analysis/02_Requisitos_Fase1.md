@@ -62,6 +62,8 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-04 | El sistema debe solicitar consentimiento explícito y granular antes de activar categorías sensibles (sexo, espiritualidad/religión, salud/deporte). | Must |
 | RF-05 | El sistema debe permitir al usuario exportar y eliminar completamente sus datos ("derecho al olvido"). | Must |
 | RF-26 | El sistema debe ofrecer al usuario, durante el registro, un catálogo cerrado de avatares predefinidos generados con IA y revisados editorialmente por el equipo (el usuario elige entre las opciones existentes, no genera avatares nuevos), evitando estereotipos culturales, de género o de apariencia. Relacionado con RF-25. | Should |
+| RF-38 | El sistema debe permitir a un usuario recuperar el acceso a su cuenta mediante un enlace de restablecimiento de contraseña enviado a su email, sin necesidad de contactar con soporte. | Should |
+| RF-39 | El sistema debe mostrar una página de inicio (landing) pública con una introducción al proyecto, accesible sin necesidad de autenticarse. | Should |
 
 ### 2.2 Configuración de categorías de vida
 | ID | Descripción | Prioridad |
@@ -212,3 +214,4 @@ Para la siguiente fase, propongo:
 - **v0.4 (7 sept. 2026)** — cierre de hallazgos del diagrama de clases ([05_Diagrama_Clases.md](05_Diagrama_Clases.md)): RD-04 ahora incluye explícitamente el usuario destinatario, y el estado pasa a `pendiente de respuesta / hecha / descartada / pospuesta`, alineado con RF-19.
 - **v0.5 (7 sept. 2026)** — RF-34 (historial de recomendaciones con filtros por estado/categoría/fecha), derivado del diagrama de estados ([09_Diagrama_Estados_Recomendacion.md](09_Diagrama_Estados_Recomendacion.md)).
 - **v0.6 (10 sept. 2026)** — nueva sección 2.11 Funcionalidades asistidas por IA: RF-35 (comentario reflexivo por voz al completar una recomendación), RF-36 (consulta en lenguaje natural sobre el propio historial, vía RAG), RF-37 (asistente de redacción del mensaje de RF-32 con verificación explícita anti-diagnóstico/anti-alarde). Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) para la justificación técnica.
+- **v0.7 (14 sept. 2026)** — RF-38 (recuperación de contraseña) y RF-39 (landing pública), ambas extensión de RF-01/Sprint 1.
