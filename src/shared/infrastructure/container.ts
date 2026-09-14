@@ -1,5 +1,16 @@
-import type { Clock } from "@shared/domain/Clock";
-import { SystemClock } from "@shared/infrastructure/SystemClock";
+// Imports relativos, no alias (@shared/@modules): este archivo se alcanza
+// desde api/*.ts, que Vercel bundlea por separado de Vite y no resuelve
+// nuestros alias de tsconfig — ver AGENTS.md.
+import type { Clock } from "../domain/Clock";
+import { SystemClock } from "./SystemClock";
+import type { AuthProvider } from "../../modules/cuentas/domain/AuthProvider";
+import { InMemoryAuthProvider } from "../../modules/cuentas/infrastructure/InMemoryAuthProvider";
+import { SupabaseAuthProvider } from "../../modules/cuentas/infrastructure/SupabaseAuthProvider";
+import { crearRegistrarUsuario } from "../../modules/cuentas/application/RegistrarUsuario";
+import { crearIniciarSesion } from "../../modules/cuentas/application/IniciarSesion";
+import { crearVerificarSesion } from "../../modules/cuentas/application/VerificarSesion";
+import { crearSolicitarRecuperacion } from "../../modules/cuentas/application/SolicitarRecuperacion";
+import { crearRestablecerPassword } from "../../modules/cuentas/application/RestablecerPassword";
 
 /**
  * Composition Root — ADR-03 §3.4. Único lugar del sistema con permiso para
@@ -15,6 +26,22 @@ function detectarEntorno(): Entorno {
   return valor === "test" || valor === "production" ? valor : "dev";
 }
 
+function crearAuthProvider(entorno: Entorno): AuthProvider {
+  // Sin sustituto en memoria razonable para autenticación completa en dev —
+  // se usa el proyecto real de Supabase también ahí (ADR-06 §1). Solo los
+  // tests usan InMemoryAuthProvider.
+  if (entorno === "test") {
+    return new InMemoryAuthProvider();
+  }
+  const url = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const appUrl = process.env.APP_URL;
+  if (!url || !serviceRoleKey || !appUrl) {
+    throw new Error("Faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / APP_URL — ver .env.example");
+  }
+  return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
+}
+
 /**
  * Todo lo que un caso de uso puede necesitar del exterior, inyectado desde
  * aquí. Crece módulo a módulo a medida que se implementan los repositorios
@@ -24,18 +51,27 @@ function detectarEntorno(): Entorno {
 export interface AppContext {
   entorno: Entorno;
   clock: Clock;
-  // Próximos, según avancen los sprints: usuarioRepository, categoriaRepository,
-  // evaluacionRepository... En `dev`/`test` serán adaptadores en memoria; en
-  // `production`, los `Mongo*Repository` de cada módulo (ADR-04).
+  authProvider: AuthProvider;
+  registrarUsuario: ReturnType<typeof crearRegistrarUsuario>;
+  iniciarSesion: ReturnType<typeof crearIniciarSesion>;
+  verificarSesion: ReturnType<typeof crearVerificarSesion>;
+  solicitarRecuperacion: ReturnType<typeof crearSolicitarRecuperacion>;
+  restablecerPassword: ReturnType<typeof crearRestablecerPassword>;
+  // Próximos, según avancen los sprints: categoriaRepository, evaluacionRepository...
 }
 
 export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContext {
-  // Clock es, por ahora, el único servicio real. Los tres entornos comparten
-  // SystemClock hasta que un test necesite tiempo fijo — se añade un
-  // FixedClock entonces, no antes (YAGNI, ADR-02 §2).
+  const authProvider = crearAuthProvider(entorno);
+
   return {
     entorno,
     clock: new SystemClock(),
+    authProvider,
+    registrarUsuario: crearRegistrarUsuario(authProvider),
+    iniciarSesion: crearIniciarSesion(authProvider),
+    verificarSesion: crearVerificarSesion(authProvider),
+    solicitarRecuperacion: crearSolicitarRecuperacion(authProvider),
+    restablecerPassword: crearRestablecerPassword(authProvider),
   };
 }
 

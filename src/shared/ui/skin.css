@@ -1,0 +1,10 @@
+/**
+ * Skin/override global — para tus propios estilos por encima de Material UI.
+ * MUI (Emotion) inyecta sus reglas en tiempo de ejecución, después de que
+ * este archivo se cargue — a igual especificidad, las suyas ganarían. Por
+ * eso las reglas de este archivo usan !important deliberadamente: es una
+ * capa de skin final, no CSS de lógica de negocio, así que aquí sí compensa.
+ *
+ * Ejemplo (borrar cuando pongas los tuyos):
+ * .MuiButton-root { border-radius: 4px !important; }
+ */
