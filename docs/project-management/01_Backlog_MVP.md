@@ -27,6 +27,7 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
+- **Validaciones previas al push con Husky** (idea): `pre-push` con lint, tests, `npm run build` y `npm run check:api`, para no descubrir en Vercel lo que se puede ver en local.
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
 - **Métricas DORA y Flow:** revisión de calidad planificada antes de la validación; se simula DORA por cada PR fusionada a `develop` (producción = `main`, solo al completar el MVP) y se anota fecha de inicio/fin de cada tarea ([02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md)).
 - **Playwright contra `api/`** (RF-01 registro/login): decidir cómo aislar los datos de prueba en Supabase (proyecto dedicado o limpieza tras cada test) antes de automatizar nada que cree cuentas reales. Ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1bis.
