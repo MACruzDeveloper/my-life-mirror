@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { AuthProvider, SesionIniciada, UsuarioAutenticado } from "../domain/AuthProvider";
+import type { AuthProvider, SesionIniciada, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider";
 import { ROL_POR_DEFECTO, leerRolDesdeMetadata } from "../domain/RolUsuario";
 import { AuthenticationError, ConflictError, ValidationError } from "../../../shared/domain/DomainError";
 
@@ -57,6 +57,21 @@ export class SupabaseAuthProvider implements AuthProvider {
       throw new AuthenticationError("Sesión no válida");
     }
     return { id: data.user.id, email: data.user.email ?? "", rol: leerRolDesdeMetadata(data.user.app_metadata) };
+  }
+
+  /** Una sola página de hasta 1000 usuarios: de sobra para el TFM; paginar si algún día hiciera falta. */
+  async listarUsuarios(): Promise<UsuarioResumen[]> {
+    const { data, error } = await this.cliente.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    if (error) {
+      throw new ValidationError(error.message);
+    }
+    return data.users.map((u) => ({
+      id: u.id,
+      email: u.email ?? "",
+      rol: leerRolDesdeMetadata(u.app_metadata),
+      creadoEn: new Date(u.created_at),
+      ultimoAcceso: u.last_sign_in_at ? new Date(u.last_sign_in_at) : undefined,
+    }));
   }
 
   async solicitarRecuperacion(email: string): Promise<void> {

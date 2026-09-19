@@ -38,7 +38,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ autenticado: true, email: resultado.value.email, name }));
+    res.end(JSON.stringify({ autenticado: true, email: resultado.value.email, name, rol: resultado.value.rol }));
   } catch (error) {
     logger.error("Error inesperado en /api/accounts/session", error, { ruta: "/api/accounts/session" });
     res.writeHead(500, { "Content-Type": "application/json" });

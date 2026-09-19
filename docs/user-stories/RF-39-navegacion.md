@@ -23,7 +23,7 @@ Para saber que estoy dentro de la app
 
 3. Given un usuario con sesión válida (cookie httpOnly)
    When entra a `/inicio`
-   Then ve la página Home (contenido mínimo por ahora — el panel completo es RF-14)
+   Then ve la página Home: si todavía no tiene ninguna puntuación (primera vez), una bienvenida con un enlace grande a la entrevista (`/perfil/entrevista`), que es su primer paso; si ya tiene puntuaciones, directamente el panel (por ahora las tarjetas de resultados; los gráficos son RF-14) con un botón "Nueva entrevista"
 
 ## Nota "spec viva"
 
@@ -32,3 +32,4 @@ La sesión vive en una cookie `httpOnly` (ADR-06) — invisible a JS del navegad
 ## Historial de cambios
 
 - **v1.0 (14 sept. 2026)** — versión inicial.
+- **v1.1 (19 sept. 2026)** — Home distingue primera vez (bienvenida + enlace grande a la entrevista) de usuario recurrente (directo al panel). "Primera vez" = ninguna puntuación guardada; no requiere estado nuevo en base de datos.

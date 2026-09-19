@@ -32,6 +32,15 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: /perfil/i })).toHaveAttribute("href", "/perfil");
   });
 
+  it("el enlace de administración solo aparece para un admin", () => {
+    const { unmount } = renderHeader();
+    expect(screen.queryByRole("link", { name: /administración/i })).not.toBeInTheDocument();
+    unmount();
+
+    renderHeader({ isAdmin: true });
+    expect(screen.getByRole("link", { name: /administración/i })).toHaveAttribute("href", "/admin");
+  });
+
   it("el botón de cerrar sesión llama al callback recibido", () => {
     const onCerrarSesion = vi.fn();
     renderHeader({ onCerrarSesion });

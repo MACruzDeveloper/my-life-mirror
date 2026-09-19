@@ -1,6 +1,7 @@
 /**
- * RF-06: catálogo inicial, sembrado en la primera lista de cada usuario
- * (ver ListCategories). Sensibles (RNF-04/RES-04, categoría especial RGPD
+ * RF-06: catálogo inicial. Desde ADM-02 la fuente real es la tabla
+ * `category_catalog` (migración 0005, que repite estos textos); esta lista
+ * solo alimenta el fake en memoria de los tests. Sensibles (RNF-04/RES-04, categoría especial RGPD
  * Art. 9 — sexo/orientación, salud, religión): sexo, deporte, espiritualidad.
  */
 export interface StandardCategoryTemplate {

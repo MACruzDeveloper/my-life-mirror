@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 // Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
 import { obtenerAppContext } from "../../src/shared/infrastructure/container";
+import { cookieDeSesion } from "../../src/shared/infrastructure/cookies";
 import { logger } from "../../src/shared/infrastructure/logger";
 
 type PeticionConCuerpo = IncomingMessage & { body: unknown };
@@ -41,16 +42,7 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
       return;
     }
 
-    const cookie = [
-      `sesion=${resultado.value.token}`,
-      "HttpOnly",
-      "Secure",
-      "SameSite=Lax",
-      "Path=/",
-      `Max-Age=${60 * 60}`,
-    ].join("; ");
-
-    res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": cookie });
+    res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": cookieDeSesion(resultado.value.token) });
     res.end(JSON.stringify({ id: resultado.value.id, email: resultado.value.email }));
   } catch (error) {
     logger.error("Error inesperado en /api/accounts/login", error, { ruta: "/api/accounts/login" });

@@ -53,3 +53,5 @@ Es una respuesta de negocio esperable, no un dato mal formado — de ahí un `Co
 ## Historial de cambios
 
 - **v1.0 (15 sept. 2026)** — versión inicial.
+- **v1.1 (19 sept. 2026)** — la página de categorías desaparece: las categorías se eligen/activan desde la entrevista ([RF-10-entrevista.md](RF-10-entrevista.md)), con el mismo consentimiento para las sensibles. desactivar es desmarcarla ahí. La gestión del catálogo por el administrador se plantea en [ADM-01](ADM-01-panel-administracion.md).
+- **v1.2 (19 sept. 2026)** — el catálogo estándar deja de estar fijo en código: pasa a la tabla `category_catalog` y `ListCategories` sincroniza con ella al listar ([ADM-02](ADM-02-catalogo-categorias.md)); `ActivateCategory` rechaza las retiradas.

@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { createDeactivateCategory } from "@modules/categories/application/DeactivateCategory";
 import { createListCategories } from "@modules/categories/application/ListCategories";
+import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
 import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/InMemoryCategoryRepository";
 
 describe("DeactivateCategory (RF-07)", () => {
   it("desactiva una categoría activa, sensible o no, sin pedir nada más", async () => {
     const repo = new InMemoryCategoryRepository();
-    const listCategories = createListCategories(repo);
+    const listCategories = createListCategories(repo, new InMemoryCategoryCatalogRepository());
     const deactivateCategory = createDeactivateCategory(repo);
     const listado = await listCategories("u1");
     if (!listado.ok) throw new Error("setup falló");
