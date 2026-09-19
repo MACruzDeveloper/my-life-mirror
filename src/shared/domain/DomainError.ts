@@ -22,3 +22,13 @@ export class ConflictError extends DomainError {
 export class AuthenticationError extends DomainError {
   readonly code = "AUTHENTICATION_ERROR";
 }
+
+/**
+ * Respuesta de negocio esperable, no un dato mal formado — RF-04/RF-07:
+ * activar una categoría sensible sin consentimiento otorgado todavía. El
+ * frontend la distingue por `code` para mostrar el modal de consentimiento
+ * en vez de un error genérico (docs/user-stories/RF-06-RF-07-categorias.md).
+ */
+export class ConsentRequiredError extends DomainError {
+  readonly code = "CONSENT_REQUIRED";
+}

@@ -10,7 +10,11 @@
     "crearCuenta": "Crear cuenta",
     "iniciarSesion": "Iniciar sesión",
     "recuperarContrasena": "Recuperar contraseña",
-    "restablecerContrasena": "Restablecer contraseña"
+    "restablecerContrasena": "Restablecer contraseña",
+    "perfil": "Perfil",
+    "categorias": "Categorías",
+    "miPerfil": "Mi perfil",
+    "politicaPrivacidad": "Política de privacidad"
   },
   "landing": {
     "titulo": "MyLifeMirror",
@@ -53,5 +57,47 @@
     "bienvenida": "Bienvenido",
     "descripcion": "Tu panel llegará pronto — de momento, esto confirma que tu sesión funciona.",
     "cerrarSesion": "Cerrar sesión"
+  },
+  "perfil": {
+    "titulo": "Tu perfil",
+    "nombre": "Nombre",
+    "fechaNacimiento": "Fecha de nacimiento",
+    "genero": "Género (opcional)",
+    "generoSinEspecificar": "Prefiero no decirlo ahora",
+    "generoMujer": "Mujer",
+    "generoHombre": "Hombre",
+    "generoNoBinario": "No binario",
+    "generoPrefieroNoDecirlo": "Prefiero no decirlo",
+    "zonaHoraria": "Zona horaria",
+    "boton": "Guardar",
+    "botonEnviando": "Guardando…",
+    "exito": "Perfil guardado.",
+    "errorGenerico": "No se pudo guardar el perfil",
+    "errorCarga": "No se pudo cargar tu perfil"
+  },
+  "categorias": {
+    "titulo": "Tus categorías",
+    "descripcion": "Activa solo las que te interesa seguir — puedes cambiarlo cuando quieras.",
+    "errorCarga": "No se pudieron cargar tus categorías",
+    "errorGenerico": "No se pudo actualizar la categoría",
+    "modalTitulo": "Se necesita tu consentimiento",
+    "modalTexto": "\"{{categoria}}\" incluye datos sensibles. Antes de activarla, confirma que aceptas que se traten según nuestra política de privacidad.",
+    "modalAceptar": "Aceptar y activar",
+    "modalCancelar": "Cancelar",
+    "leerPolitica": "Leer la política de privacidad"
+  },
+  "politicaPrivacidad": {
+    "titulo": "Política de privacidad",
+    "version": "Versión {{version}} — borrador para el TFM, no redactado por asesoría legal.",
+    "queDatosTitulo": "Qué datos recopilamos",
+    "queDatosTexto": "Tu email, el nombre que nos das al registrarte, y las respuestas que registras en las categorías que actives (fecha de nacimiento, género si lo indicas, zona horaria, y tus evaluaciones por categoría).",
+    "datosSensiblesTitulo": "Categorías de datos especialmente protegidas",
+    "datosSensiblesTexto": "Algunas categorías (sexo, deporte/salud, espiritualidad) se consideran datos de categoría especial según el RGPD (art. 9). Solo se activan y registran con tu consentimiento explícito, que puedes retirar en cualquier momento desactivando la categoría.",
+    "paraQueTitulo": "Para qué los usamos",
+    "paraQueTexto": "Únicamente para ofrecerte tu propio panel de seguimiento y sugerencias personalizadas dentro de la app. No se comparten con terceros ni se usan con fines publicitarios.",
+    "tusDerechosTitulo": "Tus derechos",
+    "tusDerechosTexto": "Puedes acceder, corregir o eliminar tus datos en cualquier momento desde tu perfil. Desactivar una categoría no borra tu historial — usa la exportación/eliminación de datos si quieres borrarlo todo.",
+    "contactoTitulo": "Contacto",
+    "contactoTexto": "Este es un proyecto académico (TFM) — para cualquier duda sobre tus datos, contacta directamente con quien desarrolla el proyecto."
   }
 }

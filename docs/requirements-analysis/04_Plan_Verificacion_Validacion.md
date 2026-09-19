@@ -25,7 +25,13 @@ Ambas son necesarias: se puede verificar perfectamente un sistema que resuelve e
 | **Pruebas unitarias** | Con Vitest (ya compatible con el stack Vite/TS/React del repo) sobre la lógica de negocio pura: cálculo de puntuación global (RF-17), disparo de recomendación por umbral (RF-18), lógica de aceptación/descarte (RF-19/RF-20). | RF-17, RF-18, RF-19, RF-20, RES-09 | Alta |
 | **Pruebas de integración** | React Testing Library sobre flujos completos de componente: completar un check-in de principio a fin, activar/desactivar una categoría sensible y comprobar que pide consentimiento (RF-04). | RF-04, RF-10, RF-14 | Media |
 | **UAT dirigido por criterios (Given/When/Then)** | Por cada RF de prioridad Must/Should, redactar 1 criterio de aceptación en formato Given/When/Then (ver plantilla y ejemplos §3) y ejecutarlo manualmente como checklist antes de cada demo. | RF Must/Should | Alta |
-| **Criterios de aceptación ejecutables** | Automatizar con Playwright los escenarios Given/When/Then de **todos los RF de prioridad Must**, etiquetados por ID de RF para trazabilidad directa requisito↔prueba. Should/Could quedan como checklist manual salvo que sobre tiempo. | RF Must | Alta |
+| **Criterios de aceptación ejecutables** | Automatizar con Playwright los escenarios Given/When/Then de **todos los RF de prioridad Must**, etiquetados por ID de RF para trazabilidad directa requisito↔prueba. Should/Could quedan como checklist manual salvo que sobre tiempo. Instalado el 15 sept. (`e2e/`, `npm run test:e2e`); primer test cubre solo páginas públicas — los flujos que tocan `api/` (RF-01 registro/login, el Must más obvio) están pendientes de decidir aislamiento de datos de prueba antes de automatizarse. | RF Must | Alta |
+
+### 1bis. Límite real encontrado: lo que Vitest no puede ver (14 sept. 2026)
+
+Caso concreto, no hipotético: `ProfileRepository` en memoria pasó 100% de sus tests unitarios y de aplicación (Vitest) desde el primer momento, y seguía pasándolos incluso después de descubrirse que estaba roto de verdad. La razón es estructural, no un test mal escrito: **Vitest ejecuta todo dentro de un único proceso Node**, así que un `Map` en memoria compartido entre "casos de uso" en un test *sí* se comparte — exactamente la condición que **no** se cumple en producción/`vercel dev`, donde cada archivo de `api/` es una función serverless aislada sin memoria compartida con las demás. El bug (nombre guardado desde `api/accounts/profile.ts` invisible para `api/accounts/session.ts`) solo era detectable ejecutando la app de verdad contra funciones serverless reales — ninguna cantidad de tests unitarios/de integración corriendo en un solo proceso podía haberlo revelado.
+
+**Lección para el resto del proyecto**: la "Prueba unitaria" de esta tabla verifica lógica de negocio correctamente, pero no verifica *dónde vive el estado entre peticiones* — eso es un problema de arquitectura de despliegue, no de lógica, y necesita su propia categoría de comprobación: probar manualmente (o con Playwright) contra `vercel dev` real antes de dar por cerrado cualquier RF cuyo dato se escriba en un endpoint y se lea en otro. Ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §7bis para la corrección aplicada (persistencia real en Supabase adelantada respecto al plan original).
 
 ---
 
@@ -75,8 +81,8 @@ RF-XX — <resumen>
 
 Dado el alcance real (RES-01, RES-02):
 
-- **Se ejecuta de verdad:** peer review del documento, pruebas unitarias sobre lógica de negocio, checklist Given/When/Then manual, un usability test de 5 personas, un piloto corto con métricas básicas.
-- **Se documenta como diseño/trabajo futuro, sin ejecutar a escala real:** automatización de criterios de aceptación (Playwright), A/B testing con significancia estadística.
+- **Se ejecuta de verdad:** peer review del documento, pruebas unitarias sobre lógica de negocio, checklist Given/When/Then manual, un usability test de 5 personas, un piloto corto con métricas básicas, y Playwright para lo que no toca `api/` (páginas públicas, ver `e2e/`, instalado 15 sept.).
+- **Se documenta como diseño/trabajo futuro, sin ejecutar a escala real:** Playwright contra flujos que sí tocan `api/` (registro, login...) — pendiente decidir cómo aislar los datos de prueba (¿proyecto de Supabase dedicado? ¿limpieza tras cada test?) antes de automatizar nada que cree cuentas reales; A/B testing con significancia estadística.
 
 Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras funcionalidades: priorizar la demostración rigurosa del concepto y del método sobre la cobertura exhaustiva, dado el marco temporal del TFM.
 
@@ -95,3 +101,5 @@ Con este plan aprobado, seguimos con el archivo 3: **justificación del ciclo de
   - Peer review marcado en espera (sin acceso a tutor/compañeros por ahora).
   - Usability testing y pilot testing ajustados a la disponibilidad real (n=1, mi pareja), documentando la limitación frente a la muestra ideal.
   - Automatización con Playwright de los criterios de aceptación pasa de "opcional" a prioridad Alta, específicamente para todos los RF de prioridad Must.
+- **v1.1 (14 sept. 2026)** — §1bis: caso real de un límite estructural de Vitest (no detecta que los datos no sobreviven entre funciones serverless distintas) encontrado al implementar RF-03.
+- **v1.2 (15 sept. 2026)** — Playwright instalado de verdad (§1, §4): primer test cubre solo páginas públicas. Automatizar RF-01 (registro/login) — el caso que motivó §1bis — queda pendiente de decidir aislamiento de datos de prueba en Supabase.

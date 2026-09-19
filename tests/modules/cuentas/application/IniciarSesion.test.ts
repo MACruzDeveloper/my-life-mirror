@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { crearIniciarSesion } from "@modules/cuentas/application/IniciarSesion";
-import { crearRegistrarUsuario } from "@modules/cuentas/application/RegistrarUsuario";
 import { InMemoryAuthProvider } from "@modules/cuentas/infrastructure/InMemoryAuthProvider";
 
+// Usa authProvider.registrar directamente (no el caso de uso RegisterUser):
+// estos tests son sobre login/sesión, no sobre el flujo de registro completo.
 describe("IniciarSesion (RF-01)", () => {
   it("inicia sesión con credenciales correctas y devuelve un token", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await crearRegistrarUsuario(authProvider)({ email: "ana@ejemplo.com", password: "12345678" });
+    await authProvider.registrar("ana@ejemplo.com", "12345678");
     const iniciarSesion = crearIniciarSesion(authProvider);
 
     const resultado = await iniciarSesion({ email: "ana@ejemplo.com", password: "12345678" });
@@ -20,7 +21,7 @@ describe("IniciarSesion (RF-01)", () => {
 
   it("rechaza credenciales incorrectas", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await crearRegistrarUsuario(authProvider)({ email: "ana@ejemplo.com", password: "12345678" });
+    await authProvider.registrar("ana@ejemplo.com", "12345678");
     const iniciarSesion = crearIniciarSesion(authProvider);
 
     const resultado = await iniciarSesion({ email: "ana@ejemplo.com", password: "incorrecta" });

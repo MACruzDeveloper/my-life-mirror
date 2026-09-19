@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
 import type { AuthProvider, SesionIniciada, UsuarioAutenticado } from "../domain/AuthProvider";
+import { ROL_POR_DEFECTO, type RolUsuario } from "../domain/RolUsuario";
 import { AuthenticationError, ConflictError } from "../../../shared/domain/DomainError";
 
 interface RegistroInterno {
   id: string;
   email: string;
   password: string;
+  rol: RolUsuario;
 }
 
 /** Fake para tests — ADR-03 §3.6. No sustituye a Supabase en dev (ADR-06 §1). */
@@ -17,9 +19,9 @@ export class InMemoryAuthProvider implements AuthProvider {
     if (this.usuarios.some((u) => u.email === email)) {
       throw new ConflictError("Ya existe una cuenta con ese email");
     }
-    const usuario: RegistroInterno = { id: randomUUID(), email, password };
+    const usuario: RegistroInterno = { id: randomUUID(), email, password, rol: ROL_POR_DEFECTO };
     this.usuarios.push(usuario);
-    return { id: usuario.id, email: usuario.email };
+    return { id: usuario.id, email: usuario.email, rol: usuario.rol };
   }
 
   async iniciarSesion(email: string, password: string): Promise<SesionIniciada> {
@@ -36,7 +38,7 @@ export class InMemoryAuthProvider implements AuthProvider {
     if (!usuario) {
       throw new AuthenticationError("Sesión no válida");
     }
-    return { id: usuario.id, email: usuario.email };
+    return { id: usuario.id, email: usuario.email, rol: usuario.rol };
   }
 
   async solicitarRecuperacion(email: string): Promise<void> {
@@ -63,5 +65,16 @@ export class InMemoryAuthProvider implements AuthProvider {
       if (correo === email) return token;
     }
     return undefined;
+  }
+
+  /**
+   * Solo para tests — simula la concesión manual de un rol (RNF-13). En
+   * producción esto no tiene equivalente en la app todavía: se hace a mano
+   * en el dashboard de Supabase (`app_metadata.rol`), nunca desde un
+   * endpoint que el propio usuario pueda invocar.
+   */
+  asignarRolParaTest(email: string, rol: RolUsuario): void {
+    const usuario = this.usuarios.find((u) => u.email === email);
+    if (usuario) usuario.rol = rol;
   }
 }

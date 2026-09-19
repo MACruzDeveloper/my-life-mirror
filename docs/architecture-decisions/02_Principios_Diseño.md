@@ -76,7 +76,7 @@ Patrones que merece la pena usar **porque los requisitos reales del proyecto lo 
 | Iterator | `for...of`, generadores nativos |
 | Command / encolado async | `Promise`, `async`/`await` |
 
-**Ejemplo real de esta disciplina, no solo teoría:** al configurar Vitest (Sprint 0, Task 2 del [backlog del MVP](../project-management/01_Backlog_MVP.md)), se instaló primero el plugin `vite-tsconfig-paths` para resolver los alias de módulo. Vitest avisó en su propia salida de que Vite ya trae esa resolución de forma nativa (`resolve.tsconfigPaths: true`). Se quitó el plugin y se usó la opción nativa — una dependencia menos que mantener, mismo resultado.
+**Ejemplo real de esta disciplina, no solo teoría:** al configurar Vitest (configuración inicial, ver el [tablero del MVP](../project-management/01_Backlog_MVP.md)), se instaló primero el plugin `vite-tsconfig-paths` para resolver los alias de módulo. Vitest avisó en su propia salida de que Vite ya trae esa resolución de forma nativa (`resolve.tsconfigPaths: true`). Se quitó el plugin y se usó la opción nativa — una dependencia menos que mantener, mismo resultado.
 
 ## 5. Cómo encaja esto con el flujo de SDD
 

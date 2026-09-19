@@ -63,6 +63,25 @@ describe("InMemoryAuthProvider", () => {
     await expect(provider.verificarSesion("token-inventado")).rejects.toBeInstanceOf(AuthenticationError);
   });
 
+  it("registra con el rol 'usuario' por defecto (RNF-13) — nadie se autoasigna admin/premium", async () => {
+    const provider = new InMemoryAuthProvider();
+
+    const usuario = await provider.registrar("ana@ejemplo.com", "12345678");
+
+    expect(usuario.rol).toBe("usuario");
+  });
+
+  it("asignarRolParaTest permite simular un usuario admin/premium en los tests", async () => {
+    const provider = new InMemoryAuthProvider();
+    await provider.registrar("ana@ejemplo.com", "12345678");
+
+    provider.asignarRolParaTest("ana@ejemplo.com", "admin");
+    const sesion = await provider.iniciarSesion("ana@ejemplo.com", "12345678");
+    const usuario = await provider.verificarSesion(sesion.token);
+
+    expect(usuario.rol).toBe("admin");
+  });
+
   it("solicitarRecuperacion no lanza ni para un email existente ni para uno inexistente", async () => {
     const provider = new InMemoryAuthProvider();
     await provider.registrar("ana@ejemplo.com", "12345678");
