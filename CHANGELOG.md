@@ -45,6 +45,8 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 ### Corregido
 
+- Despliegue en Vercel rechazado por el plan Hobby ("No more than 12 Serverless Functions"): había 16 archivos en `api/`. Los handlers de `accounts/*` y `categories/activate|deactivate` pasan a `src/shared/infrastructure/http/handlers/` y se despachan desde `api/accounts/[action].ts` y `api/categories/[action].ts` con un pequeño `createRouter` (con test); las URLs no cambian. Quedan 9 funciones. `npm run check:api` avisa si se superan 12.
+
 - Despliegue en Vercel fallaba al compilar las funciones de `api/` (TS2591 y TS2835 en `api/categories/index.ts`): Vercel busca el `tsconfig.json` subiendo desde la función y solo encontraba el de la raíz, que no tiene opciones (solo referencias), así que aplicaba su valor por defecto `nodenext` — que exige extensiones en los imports relativos y no localiza los tipos de Node. Se añade `api/tsconfig.json` **autocontenido** (resolución `bundler`, `types: ["node"]`). Un primer intento con `"extends": "../tsconfig.api.json"` no funcionó: Vercel lee el archivo sin resolver `extends`, así que veía un `compilerOptions` vacío y seguía cayendo en `nodenext` (45 errores en todas las funciones). Reproducido en local imitando ese comportamiento y comprobado con la versión autocontenida (0 errores).
 
 - `RegisterUser` no aislaba el guardado del perfil inicial (`updateProfile`) del alta en Supabase Auth: una excepción ahí habría reportado el registro entero como fallido pese a que la cuenta ya existiera. Ahora va en su propio try/catch, sin poder deshacer un registro ya válido.

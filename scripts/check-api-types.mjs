@@ -27,6 +27,13 @@ const archivos = readdirSync(apiDir, { recursive: true })
   .filter((ruta) => ruta.endsWith(".ts"))
   .map((ruta) => join(apiDir, ruta));
 
+// Plan Hobby de Vercel: máx. 12 funciones serverless por despliegue (cada .ts de api/ es una).
+const MAX_FUNCIONES_HOBBY = 12;
+if (archivos.length > MAX_FUNCIONES_HOBBY) {
+  console.error(`api/ tiene ${archivos.length} funciones y el plan Hobby permite ${MAX_FUNCIONES_HOBBY}. Agrupa acciones con createRouter (ver api/accounts/[action].ts).`);
+  process.exit(1);
+}
+
 const programa = ts.createProgram(archivos, { ...options, noEmit: true, allowJs: true });
 const errores = ts.getPreEmitDiagnostics(programa).filter((d) => d.file?.fileName.startsWith(apiDir));
 
@@ -38,4 +45,4 @@ if (errores.length > 0) {
   console.error(`\n${errores.length} error(es): Vercel no compilaría api/ con esta configuración.`);
   process.exit(1);
 }
-console.log(`api/: ${archivos.length} funciones compilan como en Vercel.`);
+console.log(`api/: ${archivos.length} funciones (máx. ${MAX_FUNCIONES_HOBBY} en Hobby) compilan como en Vercel.`);
