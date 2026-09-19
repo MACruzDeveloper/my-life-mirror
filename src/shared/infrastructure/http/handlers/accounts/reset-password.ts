@@ -1,13 +1,12 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../src/shared/infrastructure/container";
-import { logger } from "../../src/shared/infrastructure/logger";
+import { obtenerAppContext } from "../../../container";
+import { logger } from "../../../logger";
 
 type PeticionConCuerpo = IncomingMessage & { body: unknown };
 
-const Schema = z.object({ email: z.string() });
+const Schema = z.object({ token: z.string(), password: z.string() });
 
-/** RF-38. La respuesta es intencionalmente idéntica exista o no el email — solo el formato se valida. */
 export default async function handler(req: PeticionConCuerpo, res: ServerResponse) {
   try {
     if (req.method !== "POST") {
@@ -23,20 +22,21 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
       return;
     }
 
-    const { solicitarRecuperacion } = obtenerAppContext();
-    const resultado = await solicitarRecuperacion(datos.data);
+    const { restablecerPassword } = obtenerAppContext();
+    const resultado = await restablecerPassword(datos.data);
 
     if (!resultado.ok) {
-      res.writeHead(400, { "Content-Type": "application/json" });
+      const status = resultado.error.code === "AUTHENTICATION_ERROR" ? 401 : 400;
+      res.writeHead(status, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: resultado.error.message }));
       return;
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ mensaje: "Si el email existe, recibirás un enlace de recuperación." }));
+    res.end(JSON.stringify({ ok: true }));
   } catch (error) {
-    logger.error("Error inesperado en /api/accounts/request-password-reset", error, {
-      ruta: "/api/accounts/request-password-reset",
+    logger.error("Error inesperado en /api/accounts/reset-password", error, {
+      ruta: "/api/accounts/reset-password",
     });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
