@@ -10,7 +10,11 @@
     "crearCuenta": "Create account",
     "iniciarSesion": "Log in",
     "recuperarContrasena": "Forgot password",
-    "restablecerContrasena": "Reset password"
+    "restablecerContrasena": "Reset password",
+    "perfil": "Profile",
+    "categorias": "Categories",
+    "miPerfil": "My profile",
+    "politicaPrivacidad": "Privacy policy"
   },
   "landing": {
     "titulo": "MyLifeMirror",
@@ -53,5 +57,47 @@
     "bienvenida": "Welcome",
     "descripcion": "Your dashboard is coming soon — for now, this confirms your session works.",
     "cerrarSesion": "Log out"
+  },
+  "perfil": {
+    "titulo": "Your profile",
+    "nombre": "Name",
+    "fechaNacimiento": "Date of birth",
+    "genero": "Gender (optional)",
+    "generoSinEspecificar": "Prefer not to say for now",
+    "generoMujer": "Woman",
+    "generoHombre": "Man",
+    "generoNoBinario": "Non-binary",
+    "generoPrefieroNoDecirlo": "Prefer not to say",
+    "zonaHoraria": "Time zone",
+    "boton": "Save",
+    "botonEnviando": "Saving…",
+    "exito": "Profile saved.",
+    "errorGenerico": "Could not save the profile",
+    "errorCarga": "Could not load your profile"
+  },
+  "categorias": {
+    "titulo": "Your categories",
+    "descripcion": "Turn on only the ones you want to track — change it anytime.",
+    "errorCarga": "Could not load your categories",
+    "errorGenerico": "Could not update the category",
+    "modalTitulo": "Your consent is needed",
+    "modalTexto": "\"{{categoria}}\" includes sensitive data. Before turning it on, confirm you agree to have it handled under our privacy policy.",
+    "modalAceptar": "Agree and turn on",
+    "modalCancelar": "Cancel",
+    "leerPolitica": "Read the privacy policy"
+  },
+  "politicaPrivacidad": {
+    "titulo": "Privacy policy",
+    "version": "Version {{version}} — draft for the master's thesis, not written by legal counsel.",
+    "queDatosTitulo": "What data we collect",
+    "queDatosTexto": "Your email, the name you give us when registering, and the entries you record in the categories you turn on (date of birth, gender if you provide it, time zone, and your per-category check-ins).",
+    "datosSensiblesTitulo": "Specially protected data categories",
+    "datosSensiblesTexto": "Some categories (sex, sport/health, spirituality) count as special category data under GDPR (art. 9). They're only turned on and recorded with your explicit consent, which you can withdraw at any time by turning the category off.",
+    "paraQueTitulo": "What we use it for",
+    "paraQueTexto": "Only to give you your own tracking dashboard and personalized suggestions inside the app. It is never shared with third parties or used for advertising.",
+    "tusDerechosTitulo": "Your rights",
+    "tusDerechosTexto": "You can access, correct, or delete your data at any time from your profile. Turning a category off does not delete its history — use data export/deletion if you want to erase everything.",
+    "contactoTitulo": "Contact",
+    "contactoTexto": "This is an academic project (master's thesis) — for any question about your data, contact the project's developer directly."
   }
 }

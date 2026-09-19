@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { crearVerificarSesion } from "@modules/cuentas/application/VerificarSesion";
-import { crearRegistrarUsuario } from "@modules/cuentas/application/RegistrarUsuario";
 import { crearIniciarSesion } from "@modules/cuentas/application/IniciarSesion";
 import { InMemoryAuthProvider } from "@modules/cuentas/infrastructure/InMemoryAuthProvider";
 
+// Usa authProvider.registrar directamente (no el caso de uso RegisterUser):
+// este test es sobre verificar sesión, no sobre el flujo de registro completo.
 describe("VerificarSesion", () => {
   it("devuelve el usuario cuando el token de sesión es válido", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await crearRegistrarUsuario(authProvider)({ email: "ana@ejemplo.com", password: "12345678" });
+    await authProvider.registrar("ana@ejemplo.com", "12345678");
     const sesion = await crearIniciarSesion(authProvider)({ email: "ana@ejemplo.com", password: "12345678" });
     const verificarSesion = crearVerificarSesion(authProvider);
 
