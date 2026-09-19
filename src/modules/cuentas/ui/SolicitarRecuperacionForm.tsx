@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
-import { Breadcrumbs } from "@shared/ui/Breadcrumbs";
+import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 
 type Estado = { tipo: "inicial" } | { tipo: "enviando" } | { tipo: "enviado" } | { tipo: "error"; mensaje: string };
 
@@ -21,7 +21,7 @@ export function SolicitarRecuperacionForm() {
     setEstado({ tipo: "enviando" });
 
     try {
-      const respuesta = await fetch("/api/solicitar-recuperacion", {
+      const respuesta = await fetch("/api/accounts/request-password-reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

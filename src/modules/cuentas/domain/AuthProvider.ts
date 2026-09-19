@@ -1,3 +1,5 @@
+import type { RolUsuario } from "./RolUsuario";
+
 /**
  * Puerto — ADR-06. El dominio no sabe que detrás hay Supabase; solo pide
  * "registrar" o "iniciar sesión". Lanza ConflictError/ValidationError/
@@ -12,6 +14,7 @@ export interface SesionIniciada {
 export interface UsuarioAutenticado {
   readonly id: string;
   readonly email: string;
+  readonly rol: RolUsuario;
 }
 
 export interface AuthProvider {

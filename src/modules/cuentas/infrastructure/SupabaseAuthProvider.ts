@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { AuthProvider, SesionIniciada, UsuarioAutenticado } from "../domain/AuthProvider";
+import { ROL_POR_DEFECTO, leerRolDesdeMetadata } from "../domain/RolUsuario";
 import { AuthenticationError, ConflictError, ValidationError } from "../../../shared/domain/DomainError";
 
 /**
@@ -21,6 +22,9 @@ export class SupabaseAuthProvider implements AuthProvider {
       email,
       password,
       email_confirm: true, // sin confirmación por email en el Ciclo 1 — ver ADR-06 §1
+      // Rol explícito desde el alta (RNF-13) — nadie se autorregistra como
+      // premium/admin; esos roles se conceden a mano después, vía dashboard.
+      app_metadata: { rol: ROL_POR_DEFECTO },
     });
 
     if (error) {
@@ -30,7 +34,7 @@ export class SupabaseAuthProvider implements AuthProvider {
       throw new ValidationError(error.message);
     }
 
-    return { id: data.user.id, email: data.user.email ?? email };
+    return { id: data.user.id, email: data.user.email ?? email, rol: leerRolDesdeMetadata(data.user.app_metadata) };
   }
 
   async iniciarSesion(email: string, password: string): Promise<SesionIniciada> {
@@ -52,7 +56,7 @@ export class SupabaseAuthProvider implements AuthProvider {
     if (error || !data.user) {
       throw new AuthenticationError("Sesión no válida");
     }
-    return { id: data.user.id, email: data.user.email ?? "" };
+    return { id: data.user.id, email: data.user.email ?? "", rol: leerRolDesdeMetadata(data.user.app_metadata) };
   }
 
   async solicitarRecuperacion(email: string): Promise<void> {

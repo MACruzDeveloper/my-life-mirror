@@ -1,7 +1,7 @@
 # Especificación de Requisitos — Fase 1 (Visión General)
 ## Proyecto: "MyLifeMirror" (nombre provisional) — App de auto-evaluación y mejora de vida por categorías
 
-**Versión:** 0.3 (incorpora cierre de hallazgos de la matriz de trazabilidad)
+**Versión:** 0.9
 **Fecha:** Septiembre 2026 (última actualización: 5 de septiembre de 2026)
 **Estado:** Borrador para validación con tutor/stakeholders — pendiente de Fase 2 (verificación, consistencia, trazabilidad)
 **Fecha límite del proyecto (TFM):** 31 de octubre de 2026 — alcance incremental (MVP → fases adicionales según tiempo disponible).
@@ -147,13 +147,14 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RNF-03 | Disponibilidad | El sistema debe tener una disponibilidad objetivo del 99% (fuera de ventanas de mantenimiento planificado). | Should |
 | RNF-04 | Seguridad | Todos los datos sensibles (categoría 9 RGPD: sexo, salud, religión) deben almacenarse cifrados en reposo y en tránsito (TLS 1.2+, AES-256). | Must |
 | RNF-05 | Privacidad | El sistema debe cumplir el RGPD, incluyendo base legal de consentimiento explícito para datos de categoría especial. | Must |
-| RNF-06 | Compatibilidad | La interfaz debe ser responsive y funcionar correctamente en los navegadores principales (Chrome, Safari, Firefox) en móvil y escritorio. | Must |
+| RNF-06 | Compatibilidad | La interfaz debe ser responsive y funcionar correctamente en los navegadores principales (Chrome, Safari, Firefox), diseñada mobile-first y adaptada explícitamente a móvil, tablet y escritorio (no solo un contenedor que se ensancha). | Must |
 | RNF-07 | Escalabilidad | La arquitectura debe soportar un crecimiento de usuarios sin rediseño mayor (al menos hasta un orden de magnitud sobre el volumen inicial estimado). | Could |
 | RNF-08 | Mantenibilidad | El código debe seguir una arquitectura modular que permita añadir nuevas categorías sin modificar el core del sistema. | Should |
 | RNF-09 | Accesibilidad | La interfaz debe cumplir como mínimo el nivel AA de WCAG 2.1 en las pantallas principales. | Could |
 | RNF-10 | Internacionalización | El sistema debe soportar como mínimo español e inglés desde el lanzamiento. | Could |
 | RNF-11 | Auditabilidad | El sistema debe registrar (log) los accesos y modificaciones a datos sensibles con fines de auditoría de seguridad. | Should |
 | RNF-12 | Portabilidad de datos | El usuario debe poder exportar sus datos en un formato estructurado y legible (JSON/CSV). | Should |
+| RNF-13 | Control de acceso | El sistema debe soportar roles de usuario (estándar, premium, administrador) que diferencien permisos y funcionalidad disponible. El rol de administrador es de uso interno del equipo, no autoasignable; el rol premium es la base de RN-11 (sus ventajas concretas se definen en una fase posterior). | Should |
 
 ---
 
@@ -215,3 +216,5 @@ Para la siguiente fase, propongo:
 - **v0.5 (7 sept. 2026)** — RF-34 (historial de recomendaciones con filtros por estado/categoría/fecha), derivado del diagrama de estados ([09_Diagrama_Estados_Recomendacion.md](09_Diagrama_Estados_Recomendacion.md)).
 - **v0.6 (10 sept. 2026)** — nueva sección 2.11 Funcionalidades asistidas por IA: RF-35 (comentario reflexivo por voz al completar una recomendación), RF-36 (consulta en lenguaje natural sobre el propio historial, vía RAG), RF-37 (asistente de redacción del mensaje de RF-32 con verificación explícita anti-diagnóstico/anti-alarde). Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) para la justificación técnica.
 - **v0.7 (14 sept. 2026)** — RF-38 (recuperación de contraseña) y RF-39 (landing pública), ambas extensión de RF-01/Sprint 1.
+- **v0.8 (14 sept. 2026)** — RNF-13 (control de acceso por roles: estándar/premium/administrador), preparación de RN-11 y de un futuro rol de administrador para el equipo. Se corrige el campo "Versión" de este documento, desactualizado desde v0.3.
+- **v0.9 (14 sept. 2026)** — RNF-06 explicita mobile-first con adaptación real a tablet ([07_UI.md](../architecture-decisions/07_UI.md) §6), no solo "responsive" en abstracto.

@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite --open",
-    "dev:full": "(sleep 2 && open http://localhost:3000) & npx vercel dev",
+    "dev:full": "(sleep 2 && open http://localhost:3000) & npx -y vercel dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^24.13.3",
