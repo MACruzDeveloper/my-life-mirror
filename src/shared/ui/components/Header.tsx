@@ -10,16 +10,18 @@ export interface HeaderProps {
   /** Nombre del usuario con sesión activa (RF-03), o el email si aún no tiene perfil. Ausente mientras useSesion carga. */
   displayName?: string;
   onCerrarSesion: () => void;
+  /** Solo muestra el enlace: la protección real de /admin está en el servidor (ADM-01). */
+  isAdmin?: boolean;
 }
 
 /**
  * Cabecera de las páginas protegidas (RF-39): logo (texto, sin imagen todavía),
- * un único enlace de navegación ("Mi perfil" — Perfil y Categorías viven
- * dentro, como pestañas de AccountPage), usuario con sesión activa,
+ * un enlace de navegación ("Mi perfil" — Perfil, Categorías, Entrevista y
+ * Resultados viven dentro, en el menú lateral de AccountPage), usuario con sesión activa,
  * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 §6):
  * `displayName` se oculta en móvil (`xs`) para dejar sitio a las acciones.
  */
-export function Header({ displayName, onCerrarSesion }: HeaderProps) {
+export function Header({ displayName, onCerrarSesion, isAdmin }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const esEspanol = i18n.language.startsWith("es");
 
@@ -34,6 +36,11 @@ export function Header({ displayName, onCerrarSesion }: HeaderProps) {
           MyLifeMirror
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
+          {isAdmin ? (
+            <Button size="small" component={RouterLink} to="/admin">
+              {t("breadcrumbs.administracion")}
+            </Button>
+          ) : null}
           <Button size="small" component={RouterLink} to="/perfil">
             {t("breadcrumbs.miPerfil")}
           </Button>

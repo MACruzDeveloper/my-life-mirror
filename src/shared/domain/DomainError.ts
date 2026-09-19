@@ -32,3 +32,11 @@ export class AuthenticationError extends DomainError {
 export class ConsentRequiredError extends DomainError {
   readonly code = "CONSENT_REQUIRED";
 }
+
+/**
+ * Sesión válida pero sin permiso para la acción (ADM-01) — distinta de
+ * AuthenticationError ("no sé quién eres"): aquí sí se sabe, y no basta el rol.
+ */
+export class ForbiddenError extends DomainError {
+  readonly code = "FORBIDDEN";
+}

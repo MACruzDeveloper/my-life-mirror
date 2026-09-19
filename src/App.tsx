@@ -10,7 +10,10 @@ import { ProfileForm } from '@modules/cuentas/ui/ProfileForm'
 import { AccountPage } from '@modules/cuentas/ui/AccountPage'
 import { ProtectedRoute } from '@modules/cuentas/ui/ProtectedRoute'
 import { Home } from '@modules/panel/ui/Home'
-import { CategoriesPage } from '@modules/categories/ui/CategoriesPage'
+import { InterviewPage } from '@modules/assessments/ui/InterviewPage'
+import { ResultsPage } from '@modules/assessments/ui/ResultsPage'
+import { AdminPage } from '@modules/admin/ui/AdminPage'
+import { AdminRoute } from '@modules/admin/ui/AdminRoute'
 import { ProtectedLayout } from '@shared/ui/components/ProtectedLayout'
 
 function App() {
@@ -51,8 +54,26 @@ function App() {
           }
         >
           <Route index element={<ProfileForm />} />
-          <Route path="categorias" element={<CategoriesPage />} />
+          <Route path="entrevista" element={<InterviewPage />} />
+          <Route path="resultados" element={<ResultsPage />} />
         </Route>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <ProtectedLayout
+                  breadcrumbs={[
+                    { etiqueta: t('breadcrumbs.inicio'), ruta: '/inicio' },
+                    { etiqueta: t('breadcrumbs.administracion') },
+                  ]}
+                >
+                  <AdminPage />
+                </ProtectedLayout>
+              </AdminRoute>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

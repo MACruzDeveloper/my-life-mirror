@@ -1,32 +1,63 @@
+import { useState } from "react";
 import Box from "@mui/material/Box";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
+import Button from "@mui/material/Button";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
 import { useTranslation } from "react-i18next";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Link as RouterLink, Outlet, useLocation } from "react-router";
 
-const RUTA_PERFIL = "/perfil";
-const RUTA_CATEGORIAS = "/perfil/categorias";
+const ANCHO_MENU = 220;
+
+const SECCIONES = [
+  { ruta: "/perfil", clave: "cuenta.perfil" },
+  { ruta: "/perfil/entrevista", clave: "cuenta.entrevista" },
+  { ruta: "/perfil/resultados", clave: "cuenta.resultados" },
+];
 
 /**
- * Envoltura con pestañas para toda la gestión de cuenta (RF-03, RF-06/RF-07)
- * — antes eran dos enlaces sueltos en el Header ("Perfil", "Categorías");
- * se consolidan aquí porque esta página seguirá creciendo (notificaciones,
- * exportar/eliminar datos...). Rutas anidadas de verdad (no una pestaña por
- * estado local) para que cada una sea recargable/enlazable directamente.
+ * Concentrador de "Mi perfil" con menú lateral (antes eran pestañas): todo lo
+ * que el usuario hace sobre sí mismo — perfil, entrevista y
+ * resultados — vive aquí. En escritorio/tablet (md+) el menú es fijo a la
+ * izquierda; en móvil se abre como cajón con un botón. Rutas anidadas de
+ * verdad para que cada sección sea recargable/enlazable directamente.
  */
 export function AccountPage() {
   const { t } = useTranslation();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const pestanaActiva = location.pathname === RUTA_CATEGORIAS ? RUTA_CATEGORIAS : RUTA_PERFIL;
+  const { pathname } = useLocation();
+  const [abierto, setAbierto] = useState(false);
+
+  const menu = (
+    <List component="nav" aria-label={t("cuenta.menu")} sx={{ width: ANCHO_MENU, pt: 2 }}>
+      {SECCIONES.map(({ ruta, clave }) => (
+        <ListItemButton
+          key={ruta}
+          component={RouterLink}
+          to={ruta}
+          selected={pathname === ruta}
+          aria-current={pathname === ruta ? "page" : undefined}
+          onClick={() => setAbierto(false)}
+          sx={{ borderRadius: 2, mx: 1 }}
+        >
+          <ListItemText primary={t(clave)} />
+        </ListItemButton>
+      ))}
+    </List>
+  );
 
   return (
-    <Box sx={{ maxWidth: { xs: "100%", sm: 560 }, mx: "auto", mt: 2, px: 2 }}>
-      <Tabs value={pestanaActiva} onChange={(_evento, valor: string) => navigate(valor)} variant="fullWidth">
-        <Tab label={t("breadcrumbs.perfil")} value={RUTA_PERFIL} />
-        <Tab label={t("breadcrumbs.categorias")} value={RUTA_CATEGORIAS} />
-      </Tabs>
-      <Outlet />
+    <Box sx={{ display: "flex", alignItems: "flex-start", gap: { md: 3 }, px: 2, mt: 2 }}>
+      <Box sx={{ display: { xs: "none", md: "block" }, flexShrink: 0, borderRight: 1, borderColor: "divider", minHeight: 360 }}>{menu}</Box>
+      <Drawer open={abierto} onClose={() => setAbierto(false)} sx={{ display: { md: "none" } }}>
+        {menu}
+      </Drawer>
+      <Box sx={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
+        <Button onClick={() => setAbierto(true)} sx={{ display: { md: "none" }, mb: 1 }}>
+          {t("cuenta.menu")}
+        </Button>
+        <Outlet />
+      </Box>
     </Box>
   );
 }

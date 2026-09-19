@@ -16,7 +16,6 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 - [ ] **RF-05** — Caso de uso `ExportarYEliminarDatos` (Must, derecho al olvido, RNF-12). No bloquea nada posterior, pero es requisito legal del producto: se hace antes de la línea de corte.
-- [ ] **RF-10** — Value Object `Puntuacion` (rango 1-10 validado en construcción), Aggregate Root `Evaluación`; caso de uso `RegistrarEvaluacion` + sus tests de dominio. Es el núcleo del producto (check-in): desbloquea recomendaciones y panel.
 - [ ] **RF-18** — Entidad `Recomendación`; `EvaluarUmbralYGenerarRecomendacion` (se dispara con el evento de `RegistrarEvaluacion`, ver Outbox en ADR-03 §3.4).
 - [ ] **RF-14** — Caso de uso de solo lectura `ConsultarPanelGeneral`, componiendo Evaluaciones + Recomendaciones (sustituye el placeholder de `Home`).
 - [ ] **Validación** — Usability test (n=1, ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md)) sobre el flujo completo, centrado en RN-04; corregir lo que salga; preparar la demo de cierre del Ciclo 1. Se reserva tiempo para esto **siempre**: es lo último que se recorta, no lo primero.
@@ -28,8 +27,11 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
+- **Validaciones previas al push con Husky** (idea): `pre-push` con lint, tests, `npm run build` y `npm run check:api`, para no descubrir en Vercel lo que se puede ver en local.
+- **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
+- **Métricas DORA y Flow:** revisión de calidad planificada antes de la validación; se simula DORA por cada PR fusionada a `develop` (producción = `main`, solo al completar el MVP) y se anota fecha de inicio/fin de cada tarea ([02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md)).
 - **Playwright contra `api/`** (RF-01 registro/login): decidir cómo aislar los datos de prueba en Supabase (proyecto dedicado o limpieza tras cada test) antes de automatizar nada que cree cuentas reales. Ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1bis.
-- **Header con tres o más enlaces**: hoy hay uno ("Mi perfil"); si llega Evaluaciones, probablemente hace falta un menú (hamburguesa en móvil) en vez de más botones.
+- **Header con tres o más enlaces**: hoy hay uno solo ("Mi perfil", que contiene Perfil, Categorías, Entrevista y Resultados en su menú lateral); al llegar un segundo (panel/recomendaciones) hace falta un menú (hamburguesa en móvil) en vez de más botones.
 - **Mobile-first retroactivo** de Landing/Login/Registro/Recuperar contraseña: funcionan, pero sin adaptación intencionada a tablet/escritorio ([07_UI.md](../architecture-decisions/07_UI.md) §6).
 - **Renombrado a inglés** del código anterior al 14 sept.: solo cuando se toque por otro motivo (AGENTS.md).
 - **Política de privacidad**: borrador de TFM, no revisado legalmente ([PrivacyPolicyPage](../../src/pages/PrivacyPolicyPage.tsx)).
@@ -47,7 +49,10 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - [x] **RNF-13** roles de usuario (`usuario`/`premium`/`admin`) en `app_metadata` de Supabase ([ADR-06](../architecture-decisions/06_Autenticacion.md) §1bis).
 - [x] **RF-03** perfil (nombre, fecha de nacimiento, género opcional, zona horaria) — [historia](../user-stories/RF-03-configurar-perfil.md); `name` se captura en el registro.
 - [x] **RF-06 / RF-07** catálogo de 9 categorías y activación individual — [historia](../user-stories/RF-06-RF-07-categorias.md).
-- [x] **Estructura:** `api/` por capacidad de negocio, `shared/ui/` por tipo, pantalla "Mi perfil" con pestañas (Perfil, Categorías), Playwright instalado (solo páginas públicas).
+- [x] **RF-10** entrevista personal (los requisitos la llaman check-in): `Score` (1-10), `Assessment` inmutable, `RecordAssessments` (todo o nada, con nota opcional, puntuación parcial), `GetLatestScores`, Supabase real (`0004_assessments.sql`), `api/assessments`, pantallas `/perfil/entrevista` (con categorías integradas y ejemplos por pregunta) y `/perfil/resultados` (fondo suave por banda) — [historia](../user-stories/RF-10-entrevista.md). Sin periodos (RF-09) ni recomendaciones (RF-18) todavía.
+- [x] **ADM-01 (propuesto, primer corte)** panel de administración: `/admin` y `GET /api/admin/users` solo para rol `admin` (control de acceso en servidor y en el caso de uso, `ForbiddenError`), lista de usuarios — [historia](../user-stories/ADM-01-panel-administracion.md). Falta registrarlo en los requisitos.
+- [x] **ADM-02** catálogo de categorías gestionable por el admin (añadir / retirar sin borrar), `0005_category_catalog.sql`, pestaña Categorías en `/admin` — [historia](../user-stories/ADM-02-catalogo-categorias.md).
+- [x] **Estructura:** `api/` por capacidad de negocio, `shared/ui/` por tipo, pantalla "Mi perfil" con menú lateral (Perfil, Entrevista, Resultados), Playwright instalado (solo páginas públicas).
 
 ---
 
@@ -64,4 +69,10 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 ## Historial de cambios
 
 - **v1.0-v1.12 (12-15 sept. 2026)** — versión inicial en sprints semanales (Sprint 0 a 6) y su seguimiento hasta cerrar Sprint 1 y RF-03/RF-06/RF-07 del Sprint 2. El detalle de qué se hizo cada día está en el [CHANGELOG](../../CHANGELOG.md).
+- **v2.1 (19 sept. 2026)** — RF-10 (check-in) hecho de extremo a extremo; plan de métricas DORA y Flow añadido como revisión de calidad futura.
 - **v2.0 (19 sept. 2026)** — se abandonan los sprints semanales por Lean/Kanban con línea de corte ([00_Metodologia_Lean.md](00_Metodologia_Lean.md)). Nunca hubo Scrum propiamente dicho (roles, ceremonias, velocidad): los "sprints" eran solo un calendario semanal para una persona. El espiral (ciclo de vida) se mantiene. El colchón del antiguo Sprint 6 pasa a ser la línea de corte + el hueco reservado de validación.
+- **v2.2 (19 sept. 2026)** — RF-10 rediseñada: "Entrevista" (puntuación parcial, seleccionar todas), vista de Resultados con colores, y Mi perfil pasa de pestañas a menú lateral.
+- **v2.3 (19 sept. 2026)** — categorías integradas en la entrevista, ejemplos por pregunta, degradado animado en vez de colores en números, Home distingue primera vez de usuario recurrente.
+- **v2.4 (19 sept. 2026)** — la entrevista pasa a ser editable (sin entrevistas nuevas; cambios como registros nuevos) y absorbe la desactivación de categorías; primer corte del panel de administración (ADM-01, propuesto).
+- **v2.5 (19 sept. 2026)** — registro con sesión iniciada; entrevista en dos columnas con historial de cambios; diseño de ADM-02 (catálogo) propuesto.
+- **v2.6 (19 sept. 2026)** — ADM-02 implementada (decisiones confirmadas).

@@ -38,7 +38,7 @@ Alternativas vistas en clase, evaluadas contra este proyecto (una persona, plazo
 | Decidir lo más tarde posible | Decisiones caras de revertir (persistencia real, roles, Playwright contra `api/`) se aplazan hasta que un caso concreto las exige, y entonces se toman con evidencia. |
 | Entregar lo antes posible | Cortes verticales finos (dominio → aplicación → infraestructura → vista → prueba) que funcionan de extremo a extremo antes de pasar a la siguiente tarea. |
 | Integridad incorporada | TDD obligatorio ([AGENTS.md](../../AGENTS.md)), especificaciones Nivel 2 ([10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md)), tests, lint y build en verde antes de dar algo por hecho. |
-| Mejora continua | Al cerrar una tarea se revisa lo aprendido y se ajustan las "Reglas de flujo" del tablero. |
+| Mejora continua | Al cerrar una tarea se revisa lo aprendido y se ajustan las "Reglas de flujo" del tablero. La revisión con datos (DORA y métricas de Flujo) está planificada en [02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md). |
 
 **Kanban (la mecánica)**
 
@@ -62,4 +62,5 @@ Alternativas vistas en clase, evaluadas contra este proyecto (una persona, plazo
 
 ## Historial de cambios
 
+- **v1.1 (19 sept. 2026)** — enlace al plan de métricas DORA y Flow.
 - **v1.0 (19 sept. 2026)** — versión inicial: Lean + Kanban con apetito fijo, sustituyendo los sprints semanales del backlog original. El espiral se mantiene como modelo de ciclo de vida.

@@ -11,7 +11,8 @@ function renderConRutas(inicial: string) {
       <Routes>
         <Route path="/perfil" element={<AccountPage />}>
           <Route index element={<div>Contenido perfil</div>} />
-          <Route path="categorias" element={<div>Contenido categorías</div>} />
+          <Route path="entrevista" element={<div>Contenido entrevista</div>} />
+          <Route path="resultados" element={<div>Contenido resultados</div>} />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -19,25 +20,33 @@ function renderConRutas(inicial: string) {
 }
 
 describe("AccountPage", () => {
-  it("muestra las pestañas Perfil y Categorías, con Perfil activa por defecto", () => {
+  it("muestra el menú lateral con las tres secciones y el contenido de Perfil por defecto", () => {
     renderConRutas("/perfil");
 
-    expect(screen.getByRole("tab", { name: "Perfil", selected: true })).toBeInTheDocument();
+    for (const nombre of ["Perfil", "Entrevista", "Resultados"]) {
+      expect(screen.getAllByRole("link", { name: nombre })[0]).toBeInTheDocument();
+    }
     expect(screen.getByText("Contenido perfil")).toBeInTheDocument();
   });
 
-  it("cambiar de pestaña navega a /perfil/categorias", async () => {
+  it("elegir una sección navega a su ruta", async () => {
     renderConRutas("/perfil");
 
-    fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
+    fireEvent.click(screen.getAllByRole("link", { name: "Entrevista" })[0]);
 
-    await waitFor(() => expect(screen.getByText("Contenido categorías")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Contenido entrevista")).toBeInTheDocument());
   });
 
-  it("al entrar directamente en /perfil/categorias, esa pestaña ya sale activa", () => {
-    renderConRutas("/perfil/categorias");
+  it("al entrar directamente en una ruta, esa sección sale marcada como actual", () => {
+    renderConRutas("/perfil/resultados");
 
-    expect(screen.getByRole("tab", { name: "Categorías", selected: true })).toBeInTheDocument();
-    expect(screen.getByText("Contenido categorías")).toBeInTheDocument();
+    expect(screen.getByText("Contenido resultados")).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Resultados" })[0]).toHaveAttribute("aria-current", "page");
+  });
+
+  it("ofrece un botón para abrir el menú en móvil", () => {
+    renderConRutas("/perfil");
+
+    expect(screen.getByRole("button", { name: "Menú de mi perfil" })).toBeInTheDocument();
   });
 });
