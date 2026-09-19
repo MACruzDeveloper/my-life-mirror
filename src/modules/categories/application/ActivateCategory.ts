@@ -1,6 +1,7 @@
 import { type Result, err, ok } from "../../../shared/domain/Result";
 import { ConsentRequiredError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError";
 import type { Category } from "../domain/Category";
+import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
 import type { CategoryRepository } from "../domain/CategoryRepository";
 import type { crearVerificarConsentimiento } from "../../consentimiento/application/VerificarConsentimiento";
 
@@ -19,6 +20,7 @@ export interface ActivateCategoryInput {
 export function createActivateCategory(
   categoryRepository: CategoryRepository,
   verifyConsent: ReturnType<typeof crearVerificarConsentimiento>,
+  catalog: CategoryCatalogRepository,
 ) {
   return async function activateCategory(
     input: ActivateCategoryInput,
@@ -33,6 +35,11 @@ export function createActivateCategory(
 
     const category = await categoryRepository.findById(userId, categoryId);
     if (!category) return err(new NotFoundError("Category not found"));
+
+    // Retirada por el admin (ADM-02): ya no se puede activar. Aquí, y no solo
+    // en la lista, para que una llamada directa a la API tampoco pueda.
+    const entrada = (await catalog.findAll()).find((c) => c.name === category.name);
+    if (!entrada || entrada.retiredAt) return err(new NotFoundError("Category not found"));
 
     if (category.isSensitiveData) {
       const consentResult = await verifyConsent({

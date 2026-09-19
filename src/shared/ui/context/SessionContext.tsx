@@ -6,6 +6,8 @@ export interface EstadoSesion {
   email?: string;
   /** `undefined` mientras carga o si el usuario todavía no configuró su perfil (RF-03). */
   name?: string;
+  /** Rol de la sesión. Solo sirve para adaptar la interfaz: la autorización real la hace el servidor (ADM-01). */
+  rol?: "usuario" | "premium" | "admin";
 }
 
 export interface SessionContextValue extends EstadoSesion {
@@ -42,7 +44,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       .then((respuesta) => respuesta.json())
       .then((datos) => {
         if (montado.current) {
-          setEstado({ loading: false, authenticated: !!datos.autenticado, email: datos.email, name: datos.name });
+          setEstado({ loading: false, authenticated: !!datos.autenticado, email: datos.email, name: datos.name, rol: datos.autenticado ? (datos.rol ?? "usuario") : undefined });
         }
       })
       .catch(() => {

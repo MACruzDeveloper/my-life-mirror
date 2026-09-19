@@ -12,9 +12,9 @@
     "recuperarContrasena": "Forgot password",
     "restablecerContrasena": "Reset password",
     "perfil": "Profile",
-    "categorias": "Categories",
     "miPerfil": "My profile",
-    "politicaPrivacidad": "Privacy policy"
+    "politicaPrivacidad": "Privacy policy",
+    "administracion": "Administration"
   },
   "landing": {
     "titulo": "MyLifeMirror",
@@ -56,7 +56,11 @@
   "panel": {
     "bienvenida": "Welcome",
     "descripcion": "Your dashboard is coming soon — for now, this confirms your session works.",
-    "cerrarSesion": "Log out"
+    "cerrarSesion": "Log out",
+    "bienvenidaTitulo": "Let's start by getting to know you",
+    "bienvenidaTexto": "The first step is a relaxed interview: you choose what to talk about and rate yourself from 1 to 10. No judgment, at your own pace.",
+    "empezar": "Start my interview",
+    "nuevaEntrevista": "New interview"
   },
   "perfil": {
     "titulo": "Your profile",
@@ -76,8 +80,6 @@
     "errorCarga": "Could not load your profile"
   },
   "categorias": {
-    "titulo": "Your categories",
-    "descripcion": "Turn on only the ones you want to track — change it anytime.",
     "errorCarga": "Could not load your categories",
     "errorGenerico": "Could not update the category",
     "modalTitulo": "Your consent is needed",
@@ -99,5 +101,133 @@
     "tusDerechosTexto": "You can access, correct, or delete your data at any time from your profile. Turning a category off does not delete its history — use data export/deletion if you want to erase everything.",
     "contactoTitulo": "Contact",
     "contactoTexto": "This is an academic project (master's thesis) — for any question about your data, contact the project's developer directly."
+  },
+  "entrevista": {
+    "titulo": "Your interview",
+    "descripcion": "Let's have a relaxed chat. Tick the categories you want to follow and tell me how you feel in each. You can come back any time to change your categories or your scores: every change is saved as a new record and your history is kept.",
+    "elegirTitulo": "Your categories",
+    "seleccionarTodas": "Select all",
+    "pregunta": "How are you feeling about {{categoria}}?",
+    "escala": "1 = very bad · 10 = very good",
+    "puntuacionDe": "Score for {{categoria}}",
+    "anadirNota": "Add a note",
+    "nota": "Note (optional)",
+    "elegirAlgo": "Tick at least one category to start.",
+    "guardar": "Save changes",
+    "guardando": "Saving…",
+    "exito": "Changes saved. Thanks for looking at yourself honestly.",
+    "verResultados": "See my results",
+    "errorCarga": "Could not load your categories",
+    "errorGenerico": "Could not save the interview",
+    "entrevistador": "Interviewer",
+    "tu": "You",
+    "verEjemplos": "See examples for {{categoria}}",
+    "ejemplosTitulo": "To help you think:",
+    "errorActivar": "Could not activate the category",
+    "sinCambios": "Change a score to be able to save.",
+    "sensiblesTitulo": "Require your consent",
+    "sensiblesExplicacion": "They contain sensitive data. Before turning one on we'll ask for your consent and you can read the privacy policy; you can turn it off any time.",
+    "historialTitulo": "Change history",
+    "historialVacio": "You haven't saved anything yet."
+  },
+  "resultados": {
+    "titulo": "Your results",
+    "descripcion": "Your latest score in each category.",
+    "sinPuntuar": "Not scored yet",
+    "ultima": "Last time: {{fecha}}",
+    "errorCarga": "Could not load your results",
+    "sinCategorias": "No scores yet.",
+    "empezar": "Do an interview",
+    "bandaLow": "Low",
+    "bandaMediumLow": "Almost low",
+    "bandaMedium": "Medium",
+    "bandaHigh": "Good"
+  },
+  "cuenta": {
+    "menu": "My profile menu",
+    "perfil": "Profile",
+    "entrevista": "Interview",
+    "resultados": "Results"
+  },
+  "ejemplos": {
+    "economia": [
+      "How is your salary, and does it last the month?",
+      "Do you save regularly?",
+      "Do you have debts that worry you?",
+      "Do you know where your money goes?"
+    ],
+    "vidaSocial": [
+      "How often do you see your friends?",
+      "Do you have someone to call when you need it?",
+      "Do you feel accompanied or rather alone?"
+    ],
+    "pareja": [
+      "Do you feel understood and supported?",
+      "Can you talk about important things easily?",
+      "Do you spend quality time together?"
+    ],
+    "sexo": [
+      "Are you satisfied with your sex life?",
+      "Are you comfortable with your body and desires?",
+      "Is there open communication about it, if you have a partner?"
+    ],
+    "deporte": [
+      "Do you move regularly?",
+      "How is your energy through the day?",
+      "Do you look after your sleep and food?"
+    ],
+    "aventura": [
+      "When did you last try something new?",
+      "Do you have a trip or challenge in mind?",
+      "Do you break your routine from time to time?"
+    ],
+    "espiritualidad": [
+      "Do you have moments of calm, reflection or meditation?",
+      "Does your life feel meaningful?",
+      "Do you follow a belief that sustains you?"
+    ],
+    "familia": [
+      "How is your relationship with your parents and siblings?",
+      "Do you spend time with family as you would like?",
+      "Are there unresolved conflicts weighing on you?"
+    ],
+    "inversiones": [
+      "Do you have investments or a long-term plan?",
+      "Do you know how much you would need to retire?",
+      "Do you understand where your money is?"
+    ]
+  },
+  "admin": {
+    "titulo": "Administration",
+    "usuarios": "Registered users",
+    "email": "Email",
+    "rol": "Role",
+    "alta": "Joined",
+    "ultimoAcceso": "Last sign-in",
+    "nunca": "—",
+    "sinPermiso": "You don't have permission to view this page.",
+    "errorCarga": "Could not load users",
+    "total": "{{count}} users",
+    "pestanaUsuarios": "Users",
+    "pestanaCategorias": "Categories",
+    "catalogoTitulo": "Category catalog",
+    "catalogoAyuda": "New categories appear, inactive, in every user's interview. Retiring one hides it and deactivates it for everyone, but scores already saved are kept.",
+    "nombre": "Name",
+    "descripcion": "Description",
+    "estado": "Status",
+    "vigente": "Active",
+    "retirada": "Retired",
+    "sensible": "Sensitive",
+    "retirar": "Retire",
+    "anadirTitulo": "Add category",
+    "anadirDatosSensibles": "Contains sensitive data (will ask for consent and can't be changed later)",
+    "anadir": "Add category",
+    "anadiendo": "Adding…",
+    "errorGuardar": "The operation could not be completed",
+    "retirarTitulo": "Retire \"{{nombre}}\"?",
+    "retirarTexto": "It will stop being offered and will be deactivated for all users. Scores already saved are kept.",
+    "retirarConfirmar": "Confirm retirement",
+    "cancelar": "Cancel",
+    "acciones": "Actions"
   }
 }

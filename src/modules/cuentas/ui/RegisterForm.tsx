@@ -7,7 +7,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useNavigate } from "react-router";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 
 type Estado =
@@ -18,11 +18,12 @@ type Estado =
 
 /**
  * Vista de RF-01. Llama a /api/register — nunca importa infraestructura
- * directamente (AGENTS.md). Incluye el nombre desde este primer paso
+ * directamente (AGENTS.md). Tras registrarse la sesión ya está iniciada. Incluye el nombre desde este primer paso
  * (RF-03): así el Header nunca tiene que mostrar el email en bruto.
  */
 export function RegisterForm() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +46,11 @@ export function RegisterForm() {
         return;
       }
 
+      // El servidor deja la sesión iniciada al registrar: directo a la bienvenida (RF-39).
+      if (datos.sesionIniciada) {
+        navigate("/inicio", { replace: true });
+        return;
+      }
       setEstado({ tipo: "exito", email: datos.email });
     } catch {
       setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { AuthProvider, SesionIniciada, UsuarioAutenticado } from "../domain/AuthProvider";
+import type { AuthProvider, SesionIniciada, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider";
 import { ROL_POR_DEFECTO, type RolUsuario } from "../domain/RolUsuario";
 import { AuthenticationError, ConflictError } from "../../../shared/domain/DomainError";
 
@@ -8,6 +8,7 @@ interface RegistroInterno {
   email: string;
   password: string;
   rol: RolUsuario;
+  creadoEn: Date;
 }
 
 /** Fake para tests — ADR-03 §3.6. No sustituye a Supabase en dev (ADR-06 §1). */
@@ -19,7 +20,9 @@ export class InMemoryAuthProvider implements AuthProvider {
     if (this.usuarios.some((u) => u.email === email)) {
       throw new ConflictError("Ya existe una cuenta con ese email");
     }
-    const usuario: RegistroInterno = { id: randomUUID(), email, password, rol: ROL_POR_DEFECTO };
+    // +length ms: altas seguidas en el mismo milisegundo siguen ordenables.
+    const creadoEn = new Date(Date.now() + this.usuarios.length);
+    const usuario: RegistroInterno = { id: randomUUID(), email, password, rol: ROL_POR_DEFECTO, creadoEn };
     this.usuarios.push(usuario);
     return { id: usuario.id, email: usuario.email, rol: usuario.rol };
   }
@@ -39,6 +42,10 @@ export class InMemoryAuthProvider implements AuthProvider {
       throw new AuthenticationError("Sesión no válida");
     }
     return { id: usuario.id, email: usuario.email, rol: usuario.rol };
+  }
+
+  async listarUsuarios(): Promise<UsuarioResumen[]> {
+    return this.usuarios.map((u) => ({ id: u.id, email: u.email, rol: u.rol, creadoEn: u.creadoEn }));
   }
 
   async solicitarRecuperacion(email: string): Promise<void> {

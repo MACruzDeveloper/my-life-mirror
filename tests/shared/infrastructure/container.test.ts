@@ -9,6 +9,7 @@ describe("container", () => {
     expect(contexto.clock.now()).toBeInstanceOf(Date);
     expect(typeof contexto.registerUser).toBe("function");
     expect(typeof contexto.iniciarSesion).toBe("function");
+    expect(typeof contexto.listUsers).toBe("function");
     expect(typeof contexto.otorgarConsentimiento).toBe("function");
     expect(typeof contexto.verificarConsentimiento).toBe("function");
     expect(typeof contexto.updateProfile).toBe("function");
@@ -16,6 +17,8 @@ describe("container", () => {
     expect(typeof contexto.listCategories).toBe("function");
     expect(typeof contexto.activateCategory).toBe("function");
     expect(typeof contexto.deactivateCategory).toBe("function");
+    expect(typeof contexto.recordAssessments).toBe("function");
+    expect(typeof contexto.getLatestScores).toBe("function");
   });
 
   it("obtenerAppContext devuelve siempre la misma instancia (singleton por proceso)", () => {

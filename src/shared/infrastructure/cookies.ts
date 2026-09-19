@@ -7,3 +7,8 @@ export function leerCookie(header: string | undefined, nombre: string): string |
   }
   return undefined;
 }
+
+/** Cookie de sesión httpOnly (ADR-06) — un único sitio para login y registro, para que no diverjan. */
+export function cookieDeSesion(token: string): string {
+  return [`sesion=${token}`, "HttpOnly", "Secure", "SameSite=Lax", "Path=/", `Max-Age=${60 * 60}`].join("; ");
+}
