@@ -4,7 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
 import { theme } from '@shared/ui/theme'
 import './index.css'
-import '@shared/ui/skin.css'
+import '@shared/ui/css/skin.css'
 import '@shared/ui/i18n'
 import App from './App.tsx'
 

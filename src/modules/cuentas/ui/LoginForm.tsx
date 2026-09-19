@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, useNavigate } from "react-router";
-import { Breadcrumbs } from "@shared/ui/Breadcrumbs";
+import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 
 type Estado = { tipo: "inicial" } | { tipo: "enviando" } | { tipo: "error"; mensaje: string };
 
@@ -25,7 +25,7 @@ export function LoginForm() {
     setEstado({ tipo: "enviando" });
 
     try {
-      const respuesta = await fetch("/api/login", {
+      const respuesta = await fetch("/api/accounts/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
