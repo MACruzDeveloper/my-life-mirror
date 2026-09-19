@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { RegisterForm } from "@modules/cuentas/ui/RegisterForm";
 
 function completarYEnviar() {
@@ -17,12 +17,33 @@ describe("RegisterForm (RF-01)", () => {
     vi.restoreAllMocks();
   });
 
-  it("muestra un mensaje de éxito cuando el registro se completa", async () => {
+  it("si el registro deja la sesión iniciada, va directo a /inicio", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ id: "1", email: "ana@ejemplo.com" }),
+      json: async () => ({ id: "1", email: "ana@ejemplo.com", sesionIniciada: true }),
     });
     vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <MemoryRouter initialEntries={["/registro"]}>
+        <Routes>
+          <Route path="/registro" element={<RegisterForm />} />
+          <Route path="/inicio" element={<div>Página de inicio</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    completarYEnviar();
+
+    await waitFor(() => expect(screen.getByText("Página de inicio")).toBeInTheDocument());
+    const cuerpo = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(cuerpo).toEqual({ name: "Ana", email: "ana@ejemplo.com", password: "12345678" });
+  });
+
+  it("si la cuenta se crea pero la sesión no, confirma y ofrece iniciar sesión a mano", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: "1", email: "ana@ejemplo.com", sesionIniciada: false }) }),
+    );
 
     render(
       <MemoryRouter>
@@ -31,13 +52,8 @@ describe("RegisterForm (RF-01)", () => {
     );
     completarYEnviar();
 
-    await waitFor(() => {
-      expect(screen.getByText(/cuenta creada/i)).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText(/cuenta creada/i)).toBeInTheDocument());
     expect(screen.getByRole("link", { name: /iniciar sesión/i })).toHaveAttribute("href", "/login");
-
-    const cuerpo = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(cuerpo).toEqual({ name: "Ana", email: "ana@ejemplo.com", password: "12345678" });
   });
 
   it("muestra el mensaje de error que devuelve el servidor", async () => {

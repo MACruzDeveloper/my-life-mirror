@@ -8,6 +8,7 @@ import { InMemoryAuthProvider } from "../../modules/cuentas/infrastructure/InMem
 import { SupabaseAuthProvider } from "../../modules/cuentas/infrastructure/SupabaseAuthProvider";
 import { createRegisterUser } from "../../modules/cuentas/application/RegisterUser";
 import { crearIniciarSesion } from "../../modules/cuentas/application/IniciarSesion";
+import { createListUsers } from "../../modules/cuentas/application/ListUsers";
 import { crearVerificarSesion } from "../../modules/cuentas/application/VerificarSesion";
 import { crearSolicitarRecuperacion } from "../../modules/cuentas/application/SolicitarRecuperacion";
 import { crearRestablecerPassword } from "../../modules/cuentas/application/RestablecerPassword";
@@ -24,9 +25,21 @@ import { createGetProfile } from "../../modules/cuentas/application/GetProfile";
 import type { CategoryRepository } from "../../modules/categories/domain/CategoryRepository";
 import { InMemoryCategoryRepository } from "../../modules/categories/infrastructure/InMemoryCategoryRepository";
 import { SupabaseCategoryRepository } from "../../modules/categories/infrastructure/SupabaseCategoryRepository";
+import type { CategoryCatalogRepository } from "../../modules/categories/domain/CategoryCatalogRepository";
+import { InMemoryCategoryCatalogRepository } from "../../modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
+import { SupabaseCategoryCatalogRepository } from "../../modules/categories/infrastructure/SupabaseCategoryCatalogRepository";
+import { createListCatalog } from "../../modules/categories/application/ListCatalog";
+import { createAddCatalogCategory } from "../../modules/categories/application/AddCatalogCategory";
+import { createRetireCatalogCategory } from "../../modules/categories/application/RetireCatalogCategory";
 import { createListCategories } from "../../modules/categories/application/ListCategories";
 import { createActivateCategory } from "../../modules/categories/application/ActivateCategory";
 import { createDeactivateCategory } from "../../modules/categories/application/DeactivateCategory";
+import type { AssessmentRepository } from "../../modules/assessments/domain/AssessmentRepository";
+import { InMemoryAssessmentRepository } from "../../modules/assessments/infrastructure/InMemoryAssessmentRepository";
+import { SupabaseAssessmentRepository } from "../../modules/assessments/infrastructure/SupabaseAssessmentRepository";
+import { createRecordAssessments } from "../../modules/assessments/application/RecordAssessments";
+import { createGetAssessmentHistory } from "../../modules/assessments/application/GetAssessmentHistory";
+import { createGetLatestScores } from "../../modules/assessments/application/GetLatestScores";
 
 /**
  * Composition Root — ADR-03 §3.4. Único lugar del sistema con permiso para
@@ -95,6 +108,15 @@ function crearConsentimientoRepository(entorno: Entorno): ConsentimientoReposito
   return new SupabaseConsentimientoRepository(url, serviceRoleKey);
 }
 
+/** Catálogo global de categorías (ADM-02, supabase/migrations/0005_category_catalog.sql). */
+function crearCategoryCatalogRepository(entorno: Entorno): CategoryCatalogRepository {
+  if (entorno === "test") {
+    return new InMemoryCategoryCatalogRepository();
+  }
+  const { url, serviceRoleKey } = credencialesSupabase();
+  return new SupabaseCategoryCatalogRepository(url, serviceRoleKey);
+}
+
 /**
  * Persistencia real desde el principio, sin pasar por en memoria en dev —
  * se escribe desde activar/desactivar y se lee desde listar, funciones
@@ -110,6 +132,18 @@ function crearCategoryRepository(entorno: Entorno): CategoryRepository {
 }
 
 /**
+ * Persistencia real desde el principio — se escribe desde un endpoint y lo
+ * leerán otros (panel, recomendaciones), ver supabase/migrations/0004_assessments.sql.
+ */
+function crearAssessmentRepository(entorno: Entorno): AssessmentRepository {
+  if (entorno === "test") {
+    return new InMemoryAssessmentRepository();
+  }
+  const { url, serviceRoleKey } = credencialesSupabase();
+  return new SupabaseAssessmentRepository(url, serviceRoleKey);
+}
+
+/**
  * Todo lo que un caso de uso puede necesitar del exterior, inyectado desde
  * aquí. Crece módulo a módulo a medida que se implementan los repositorios
  * reales (ver docs/project-management/01_Backlog_MVP.md)
@@ -122,6 +156,7 @@ export interface AppContext {
   registerUser: ReturnType<typeof createRegisterUser>;
   iniciarSesion: ReturnType<typeof crearIniciarSesion>;
   verificarSesion: ReturnType<typeof crearVerificarSesion>;
+  listUsers: ReturnType<typeof createListUsers>;
   solicitarRecuperacion: ReturnType<typeof crearSolicitarRecuperacion>;
   restablecerPassword: ReturnType<typeof crearRestablecerPassword>;
   consentimientoRepository: ConsentimientoRepository;
@@ -131,10 +166,17 @@ export interface AppContext {
   updateProfile: ReturnType<typeof createUpdateProfile>;
   getProfile: ReturnType<typeof createGetProfile>;
   categoryRepository: CategoryRepository;
+  categoryCatalogRepository: CategoryCatalogRepository;
+  listCatalog: ReturnType<typeof createListCatalog>;
+  addCatalogCategory: ReturnType<typeof createAddCatalogCategory>;
+  retireCatalogCategory: ReturnType<typeof createRetireCatalogCategory>;
   listCategories: ReturnType<typeof createListCategories>;
   activateCategory: ReturnType<typeof createActivateCategory>;
   deactivateCategory: ReturnType<typeof createDeactivateCategory>;
-  // Próximos, según se tiren del tablero: evaluacionRepository...
+  assessmentRepository: AssessmentRepository;
+  recordAssessments: ReturnType<typeof createRecordAssessments>;
+  getLatestScores: ReturnType<typeof createGetLatestScores>;
+  getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
 }
 
 export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContext {
@@ -144,7 +186,9 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
   const profileRepository = crearProfileRepository(entorno);
   const updateProfile = createUpdateProfile(profileRepository);
   const categoryRepository = crearCategoryRepository(entorno);
+  const categoryCatalogRepository = crearCategoryCatalogRepository(entorno);
   const verificarConsentimiento = crearVerificarConsentimiento(consentimientoRepository);
+  const assessmentRepository = crearAssessmentRepository(entorno);
 
   return {
     entorno,
@@ -155,6 +199,7 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
     registerUser: createRegisterUser(authProvider, updateProfile),
     iniciarSesion: crearIniciarSesion(authProvider),
     verificarSesion: crearVerificarSesion(authProvider),
+    listUsers: createListUsers(authProvider),
     solicitarRecuperacion: crearSolicitarRecuperacion(authProvider),
     restablecerPassword: crearRestablecerPassword(authProvider),
     consentimientoRepository,
@@ -164,10 +209,18 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
     updateProfile,
     getProfile: createGetProfile(profileRepository),
     categoryRepository,
-    listCategories: createListCategories(categoryRepository),
+    categoryCatalogRepository,
+    listCatalog: createListCatalog(categoryCatalogRepository),
+    addCatalogCategory: createAddCatalogCategory(categoryCatalogRepository),
+    retireCatalogCategory: createRetireCatalogCategory(categoryCatalogRepository, categoryRepository, () => clock.now()),
+    listCategories: createListCategories(categoryRepository, categoryCatalogRepository),
     // activateCategory depende de verificarConsentimiento (RF-04 extiende a RF-07 para categorías sensibles).
-    activateCategory: createActivateCategory(categoryRepository, verificarConsentimiento),
+    activateCategory: createActivateCategory(categoryRepository, verificarConsentimiento, categoryCatalogRepository),
     deactivateCategory: createDeactivateCategory(categoryRepository),
+    assessmentRepository,
+    recordAssessments: createRecordAssessments(assessmentRepository, categoryRepository, clock),
+    getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
+    getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
   };
 }
 

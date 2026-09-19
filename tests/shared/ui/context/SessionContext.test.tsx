@@ -27,6 +27,18 @@ describe("SessionContext", () => {
     expect(result.current.name).toBe("Ana");
   });
 
+  it("expone el rol de la sesión, con 'usuario' si no llega", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ json: async () => ({ autenticado: true, email: "a@b.c", rol: "admin" }) }));
+    const admin = renderHook(() => useSession(), { wrapper });
+    await waitFor(() => expect(admin.result.current.loading).toBe(false));
+    expect(admin.result.current.rol).toBe("admin");
+
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ json: async () => ({ autenticado: true, email: "a@b.c" }) }));
+    const normal = renderHook(() => useSession(), { wrapper });
+    await waitFor(() => expect(normal.result.current.loading).toBe(false));
+    expect(normal.result.current.rol).toBe("usuario");
+  });
+
   it("refleja que no hay sesión", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ json: async () => ({ autenticado: false }) }));
 

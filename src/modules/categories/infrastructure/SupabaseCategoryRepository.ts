@@ -84,9 +84,23 @@ export class SupabaseCategoryRepository implements CategoryRepository {
     }
   }
 
+  async deactivateByName(name: string): Promise<void> {
+    const { error } = await this.cliente.from("categories").update({ status: "inactive" }).eq("name", name);
+    if (error) {
+      throw new Error(`No se pudo desactivar la categoría: ${error.message}`);
+    }
+  }
+
+  /**
+   * Ignora los duplicados por (user_id, name): dos listados a la vez del
+   * mismo usuario intentan sembrar lo mismo y no deben chocar (ListCategories
+   * vuelve a leer después, así que da igual quién gane).
+   */
   async saveMany(categories: Category[]): Promise<void> {
     if (categories.length === 0) return;
-    const { error } = await this.cliente.from("categories").upsert(categories.map(filaDesdeCategoria));
+    const { error } = await this.cliente
+      .from("categories")
+      .upsert(categories.map(filaDesdeCategoria), { onConflict: "user_id,name", ignoreDuplicates: true });
     if (error) {
       throw new Error(`No se pudieron guardar las categorías: ${error.message}`);
     }

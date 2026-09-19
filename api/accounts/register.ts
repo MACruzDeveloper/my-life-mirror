@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 // Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
 import { obtenerAppContext } from "../../src/shared/infrastructure/container";
+import { cookieDeSesion } from "../../src/shared/infrastructure/cookies";
 import { logger } from "../../src/shared/infrastructure/logger";
 
 // Las funciones Node de Vercel son handlers HTTP estándar; req.body ya llega
@@ -39,7 +40,7 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
       return;
     }
 
-    const { registerUser } = obtenerAppContext();
+    const { registerUser, iniciarSesion } = obtenerAppContext();
     const resultado = await registerUser(datos.data);
 
     if (!resultado.ok) {
@@ -49,8 +50,16 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
       return;
     }
 
-    res.writeHead(201, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ id: resultado.value.id, email: resultado.value.email }));
+    // Sesión iniciada al registrarse: el usuario ya dio email y contraseña,
+    // pedírselos otra vez en /login es fricción sin ganancia de seguridad. Si
+    // este paso fallara, la cuenta ya existe: se responde 201 sin cookie y el
+    // frontend le ofrece iniciar sesión a mano.
+    const sesion = await iniciarSesion({ email: datos.data.email, password: datos.data.password });
+    const cabeceras: Record<string, string> = { "Content-Type": "application/json" };
+    if (sesion.ok) cabeceras["Set-Cookie"] = cookieDeSesion(sesion.value.token);
+
+    res.writeHead(201, cabeceras);
+    res.end(JSON.stringify({ id: resultado.value.id, email: resultado.value.email, sesionIniciada: sesion.ok }));
   } catch (error) {
     // Cualquier excepción inesperada (p. ej. variables de entorno de Supabase
     // ausentes en container.ts) debe seguir devolviendo JSON — si no, el

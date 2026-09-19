@@ -12,9 +12,9 @@
     "recuperarContrasena": "Recuperar contraseña",
     "restablecerContrasena": "Restablecer contraseña",
     "perfil": "Perfil",
-    "categorias": "Categorías",
     "miPerfil": "Mi perfil",
-    "politicaPrivacidad": "Política de privacidad"
+    "politicaPrivacidad": "Política de privacidad",
+    "administracion": "Administración"
   },
   "landing": {
     "titulo": "MyLifeMirror",
@@ -56,7 +56,11 @@
   "panel": {
     "bienvenida": "Bienvenido",
     "descripcion": "Tu panel llegará pronto — de momento, esto confirma que tu sesión funciona.",
-    "cerrarSesion": "Cerrar sesión"
+    "cerrarSesion": "Cerrar sesión",
+    "bienvenidaTitulo": "Empecemos por conocerte",
+    "bienvenidaTexto": "El primer paso es una entrevista tranquila: eliges de qué hablar y te puntúas de 1 a 10. Sin juicios, a tu ritmo.",
+    "empezar": "Empezar mi entrevista",
+    "nuevaEntrevista": "Nueva entrevista"
   },
   "perfil": {
     "titulo": "Tu perfil",
@@ -76,8 +80,6 @@
     "errorCarga": "No se pudo cargar tu perfil"
   },
   "categorias": {
-    "titulo": "Tus categorías",
-    "descripcion": "Activa solo las que te interesa seguir — puedes cambiarlo cuando quieras.",
     "errorCarga": "No se pudieron cargar tus categorías",
     "errorGenerico": "No se pudo actualizar la categoría",
     "modalTitulo": "Se necesita tu consentimiento",
@@ -99,5 +101,133 @@
     "tusDerechosTexto": "Puedes acceder, corregir o eliminar tus datos en cualquier momento desde tu perfil. Desactivar una categoría no borra tu historial — usa la exportación/eliminación de datos si quieres borrarlo todo.",
     "contactoTitulo": "Contacto",
     "contactoTexto": "Este es un proyecto académico (TFM) — para cualquier duda sobre tus datos, contacta directamente con quien desarrolla el proyecto."
+  },
+  "entrevista": {
+    "titulo": "Tu entrevista",
+    "descripcion": "Vamos a charlar un rato, sin prisa. Marca las categorías que quieres seguir y cuéntame cómo te sientes en cada una. Puedes volver cuando quieras a cambiar tus categorías o tus puntuaciones: cada cambio se guarda como un registro nuevo y tu historial se conserva.",
+    "elegirTitulo": "Tus categorías",
+    "seleccionarTodas": "Seleccionar todas",
+    "pregunta": "¿Cómo te sientes con {{categoria}}?",
+    "escala": "1 = muy mal · 10 = muy bien",
+    "puntuacionDe": "Puntuación de {{categoria}}",
+    "anadirNota": "Añadir una nota",
+    "nota": "Nota (opcional)",
+    "elegirAlgo": "Marca al menos una categoría para empezar.",
+    "guardar": "Guardar cambios",
+    "guardando": "Guardando…",
+    "exito": "Cambios guardados. Gracias por mirarte con honestidad.",
+    "verResultados": "Ver mis resultados",
+    "errorCarga": "No se pudieron cargar tus categorías",
+    "errorGenerico": "No se pudo guardar la entrevista",
+    "entrevistador": "Entrevistador",
+    "tu": "Tú",
+    "verEjemplos": "Ver ejemplos de {{categoria}}",
+    "ejemplosTitulo": "Para ayudarte a pensar:",
+    "errorActivar": "No se pudo activar la categoría",
+    "sinCambios": "Cambia alguna puntuación para poder guardar.",
+    "sensiblesTitulo": "Requieren tu consentimiento",
+    "sensiblesExplicacion": "Contienen datos sensibles. Antes de activar una te pediremos tu consentimiento y podrás leer la política de privacidad; puedes desactivarla cuando quieras.",
+    "historialTitulo": "Historial de cambios",
+    "historialVacio": "Todavía no has guardado nada."
+  },
+  "resultados": {
+    "titulo": "Tus resultados",
+    "descripcion": "Tu última puntuación en cada categoría.",
+    "sinPuntuar": "Sin puntuar todavía",
+    "ultima": "Última vez: {{fecha}}",
+    "errorCarga": "No se pudieron cargar tus resultados",
+    "sinCategorias": "Todavía no hay puntuaciones.",
+    "empezar": "Hacer una entrevista",
+    "bandaLow": "Bajo",
+    "bandaMediumLow": "Casi bajo",
+    "bandaMedium": "Medio",
+    "bandaHigh": "Bueno"
+  },
+  "cuenta": {
+    "menu": "Menú de mi perfil",
+    "perfil": "Perfil",
+    "entrevista": "Entrevista",
+    "resultados": "Resultados"
+  },
+  "ejemplos": {
+    "economia": [
+      "¿Cómo es tu salario y te llega para el mes?",
+      "¿Ahorras algo de forma regular?",
+      "¿Tienes deudas que te preocupen?",
+      "¿Sabes en qué gastas tu dinero?"
+    ],
+    "vidaSocial": [
+      "¿Con qué frecuencia ves a tus amistades?",
+      "¿Tienes a quién llamar cuando lo necesitas?",
+      "¿Te sientes acompañado/a o más bien solo/a?"
+    ],
+    "pareja": [
+      "¿Te sientes comprendido/a y apoyado/a?",
+      "¿Habláis con facilidad de lo importante?",
+      "¿Dedicáis tiempo de calidad juntos?"
+    ],
+    "sexo": [
+      "¿Estás satisfecho/a con tu vida sexual?",
+      "¿Te sientes a gusto con tu cuerpo y tus deseos?",
+      "¿Hay comunicación sobre ello, si tienes pareja?"
+    ],
+    "deporte": [
+      "¿Te mueves con regularidad?",
+      "¿Cómo está tu energía durante el día?",
+      "¿Cuidas tu sueño y tu alimentación?"
+    ],
+    "aventura": [
+      "¿Cuándo fue la última vez que probaste algo nuevo?",
+      "¿Tienes algún viaje o reto en mente?",
+      "¿Sales de tu rutina de vez en cuando?"
+    ],
+    "espiritualidad": [
+      "¿Tienes momentos de calma, reflexión o meditación?",
+      "¿Sientes que tu vida tiene sentido o propósito?",
+      "¿Practicas alguna creencia que te sostenga?"
+    ],
+    "familia": [
+      "¿Cómo es tu relación con tus padres y hermanos?",
+      "¿Pasas tiempo con tu familia como te gustaría?",
+      "¿Hay conflictos pendientes que te pesen?"
+    ],
+    "inversiones": [
+      "¿Tienes inversiones o un plan para el largo plazo?",
+      "¿Sabes cuánto necesitarías para tu jubilación?",
+      "¿Entiendes bien dónde está tu dinero?"
+    ]
+  },
+  "admin": {
+    "titulo": "Administración",
+    "usuarios": "Usuarios registrados",
+    "email": "Email",
+    "rol": "Rol",
+    "alta": "Alta",
+    "ultimoAcceso": "Último acceso",
+    "nunca": "—",
+    "sinPermiso": "No tienes permiso para ver esta página.",
+    "errorCarga": "No se pudieron cargar los usuarios",
+    "total": "{{count}} usuarios",
+    "pestanaUsuarios": "Usuarios",
+    "pestanaCategorias": "Categorías",
+    "catalogoTitulo": "Catálogo de categorías",
+    "catalogoAyuda": "Las categorías nuevas aparecen, sin activar, en la entrevista de todos los usuarios. Retirar una la oculta y la desactiva para todos, pero las puntuaciones ya guardadas se conservan.",
+    "nombre": "Nombre",
+    "descripcion": "Descripción",
+    "estado": "Estado",
+    "vigente": "Vigente",
+    "retirada": "Retirada",
+    "sensible": "Sensible",
+    "retirar": "Retirar",
+    "anadirTitulo": "Añadir categoría",
+    "anadirDatosSensibles": "Contiene datos sensibles (pedirá consentimiento y no se podrá cambiar después)",
+    "anadir": "Añadir categoría",
+    "anadiendo": "Añadiendo…",
+    "errorGuardar": "No se pudo completar la operación",
+    "retirarTitulo": "¿Retirar \"{{nombre}}\"?",
+    "retirarTexto": "Dejará de ofrecerse y se desactivará para todos los usuarios. Las puntuaciones ya guardadas se conservan.",
+    "retirarConfirmar": "Confirmar retirada",
+    "cancelar": "Cancelar",
+    "acciones": "Acciones"
   }
 }

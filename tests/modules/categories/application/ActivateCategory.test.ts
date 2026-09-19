@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createActivateCategory } from "@modules/categories/application/ActivateCategory";
 import { createListCategories } from "@modules/categories/application/ListCategories";
+import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
 import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/InMemoryCategoryRepository";
 import { crearOtorgarConsentimiento } from "@modules/consentimiento/application/OtorgarConsentimiento";
 import { crearVerificarConsentimiento } from "@modules/consentimiento/application/VerificarConsentimiento";
@@ -15,8 +16,9 @@ async function setup() {
   const consentRepository = new InMemoryConsentimientoRepository();
   const verifyConsent = crearVerificarConsentimiento(consentRepository);
   const grantConsent = crearOtorgarConsentimiento(consentRepository, relojFijo);
-  const listCategories = createListCategories(categoryRepository);
-  const activateCategory = createActivateCategory(categoryRepository, verifyConsent);
+  const catalog = new InMemoryCategoryCatalogRepository();
+  const listCategories = createListCategories(categoryRepository, catalog);
+  const activateCategory = createActivateCategory(categoryRepository, verifyConsent, catalog);
 
   const listado = await listCategories("u1");
   if (!listado.ok) throw new Error("setup falló");
@@ -24,7 +26,7 @@ async function setup() {
   const noSensible = categorias.find((c) => !c.isSensitiveData)!;
   const sensible = categorias.find((c) => c.isSensitiveData)!;
 
-  return { activateCategory, grantConsent, noSensible, sensible };
+  return { activateCategory, grantConsent, noSensible, sensible, catalog };
 }
 
 describe("ActivateCategory (RF-07/RF-04)", () => {
@@ -82,5 +84,16 @@ describe("ActivateCategory (RF-07/RF-04)", () => {
 
     expect(resultado.ok).toBe(false);
     if (!resultado.ok) expect(resultado.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("rechaza activar una categoría que el admin ya retiró del catálogo", async () => {
+    const { activateCategory, noSensible, catalog } = await setup();
+    const entrada = (await catalog.findAll()).find((c) => c.name === noSensible.name)!;
+    await catalog.save({ ...entrada, retiredAt: new Date("2026-09-19T10:00:00Z") });
+
+    const resultado = await activateCategory({ userId: "u1", categoryId: noSensible.id, policyVersion: POLICY_VERSION });
+
+    expect(resultado.ok).toBe(false);
+    if (!resultado.ok) expect(resultado.error.code).toBe("NOT_FOUND");
   });
 });
