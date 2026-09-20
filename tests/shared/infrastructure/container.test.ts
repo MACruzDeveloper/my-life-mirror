@@ -10,6 +10,8 @@ describe("container", () => {
     expect(typeof contexto.registerUser).toBe("function");
     expect(typeof contexto.iniciarSesion).toBe("function");
     expect(typeof contexto.listUsers).toBe("function");
+    expect(typeof contexto.listRecommendations).toBe("function");
+    expect(typeof contexto.adminUsers.changeRole).toBe("function");
     expect(typeof contexto.otorgarConsentimiento).toBe("function");
     expect(typeof contexto.verificarConsentimiento).toBe("function");
     expect(typeof contexto.updateProfile).toBe("function");

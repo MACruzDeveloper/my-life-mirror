@@ -73,3 +73,4 @@ Con el stack confirmado, las historias de usuario del Ciclo 1 (Nivel 2 Spec Anch
 
 - **v1.0 (9 sept. 2026)** — versión inicial: confirmación del stack, explicación de por qué JS/TS/Node son multiparadigma (no funcionales puros), alternativas consideradas, relación con la incertidumbre técnica deliberada del ciclo de vida.
 - **v1.1 (9 sept. 2026)** — se añade §7: uso acotado de Python como herramienta offline para generar el catálogo de avatares de RF-26 (no forma parte del runtime de producción, no cambia el stack de la app).
+- **v1.2 (20 sept. 2026)** — se añade `@tanstack/react-query` para la caché de datos del servidor en el frontend (ver [07_UI.md](07_UI.md) v1.14).

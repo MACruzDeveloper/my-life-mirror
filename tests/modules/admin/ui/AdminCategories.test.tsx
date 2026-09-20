@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
+import { withClient } from "../../../helpers/queryClient";
 import { AdminCategories } from "@modules/admin/ui/AdminCategories";
 
 const CATALOGO = [
@@ -28,7 +29,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("AdminCategories (ADM-02)", () => {
   it("lista el catálogo marcando las sensibles y las retiradas", async () => {
     stubFetch();
-    render(<AdminCategories />);
+    render(withClient(<AdminCategories />));
 
     expect(await screen.findByText("Economía")).toBeInTheDocument();
     const filaSexo = screen.getByText("Sexo").closest("tr")!;
@@ -42,7 +43,7 @@ describe("AdminCategories (ADM-02)", () => {
     const fetchMock = stubFetch((url, init) =>
       url === "/api/admin/categories" && init?.method === "POST" ? { ok: true, status: 201, json: async () => ({}) } : undefined,
     );
-    render(<AdminCategories />);
+    render(withClient(<AdminCategories />));
     await screen.findByText("Economía");
 
     fireEvent.change(screen.getByLabelText(/^nombre/i), { target: { value: "Creatividad" } });
@@ -63,7 +64,7 @@ describe("AdminCategories (ADM-02)", () => {
         ? { ok: false, status: 409, json: async () => ({ error: "A category with that name already exists" }) }
         : undefined,
     );
-    render(<AdminCategories />);
+    render(withClient(<AdminCategories />));
     await screen.findByText("Economía");
 
     fireEvent.change(screen.getByLabelText(/^nombre/i), { target: { value: "Economía" } });
@@ -75,7 +76,7 @@ describe("AdminCategories (ADM-02)", () => {
 
   it("retirar pide confirmación y solo entonces llama a la API", async () => {
     const fetchMock = stubFetch();
-    render(<AdminCategories />);
+    render(withClient(<AdminCategories />));
     await screen.findByText("Economía");
 
     fireEvent.click(within(screen.getByText("Economía").closest("tr")!).getByRole("button", { name: /retirar/i }));
@@ -92,7 +93,7 @@ describe("AdminCategories (ADM-02)", () => {
 
   it("cancelar la confirmación no retira nada", async () => {
     const fetchMock = stubFetch();
-    render(<AdminCategories />);
+    render(withClient(<AdminCategories />));
     await screen.findByText("Economía");
 
     fireEvent.click(within(screen.getByText("Economía").closest("tr")!).getByRole("button", { name: /retirar/i }));
@@ -104,7 +105,7 @@ describe("AdminCategories (ADM-02)", () => {
 
   it("con un 403 no muestra datos", async () => {
     stubFetch(() => undefined, { error: "Forbidden" }, false);
-    render(<AdminCategories />);
+    render(withClient(<AdminCategories />));
 
     expect(await screen.findByText(/no tienes permiso/i)).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();

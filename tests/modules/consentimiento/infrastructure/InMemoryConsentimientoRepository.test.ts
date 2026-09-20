@@ -2,41 +2,27 @@ import { describe, expect, it } from "vitest";
 import { InMemoryConsentimientoRepository } from "@modules/consentimiento/infrastructure/InMemoryConsentimientoRepository";
 import type { Consentimiento } from "@modules/consentimiento/domain/Consentimiento";
 
-function crearConsentimiento(overrides: Partial<Consentimiento> = {}): Consentimiento {
-  return {
-    id: "c1",
-    usuarioId: "u1",
-    categoriaId: "salud",
-    versionPolitica: "2026-01",
-    otorgadoEn: new Date("2026-09-14T00:00:00Z"),
-    ...overrides,
-  };
+function consentimiento(overrides: Partial<Consentimiento> = {}): Consentimiento {
+  return { id: "1", usuarioId: "u1", categoriaId: "c1", versionPolitica: "2026-09", otorgadoEn: new Date("2026-09-19T10:00:00Z"), ...overrides };
 }
 
-describe("InMemoryConsentimientoRepository", () => {
-  it("no encuentra nada antes de guardar", async () => {
+describe("InMemoryConsentimientoRepository (RF-05)", () => {
+  it("buscarPorUsuario devuelve solo los del usuario", async () => {
     const repo = new InMemoryConsentimientoRepository();
+    await repo.guardar(consentimiento({ id: "1" }));
+    await repo.guardar(consentimiento({ id: "2", usuarioId: "u2" }));
 
-    const encontrado = await repo.buscar("u1", "salud", "2026-01");
-
-    expect(encontrado).toBeUndefined();
+    expect((await repo.buscarPorUsuario("u1")).map((c) => c.id)).toEqual(["1"]);
   });
 
-  it("encuentra un consentimiento guardado por usuario+categoría+versión exactos", async () => {
+  it("eliminarPorUsuario borra los de ese usuario y no los de los demás", async () => {
     const repo = new InMemoryConsentimientoRepository();
-    await repo.guardar(crearConsentimiento());
+    await repo.guardar(consentimiento({ id: "1" }));
+    await repo.guardar(consentimiento({ id: "2", usuarioId: "u2" }));
 
-    const encontrado = await repo.buscar("u1", "salud", "2026-01");
+    await repo.eliminarPorUsuario("u1");
 
-    expect(encontrado?.id).toBe("c1");
-  });
-
-  it("no encuentra un consentimiento de otra versión de política", async () => {
-    const repo = new InMemoryConsentimientoRepository();
-    await repo.guardar(crearConsentimiento({ versionPolitica: "2026-01" }));
-
-    const encontrado = await repo.buscar("u1", "salud", "2026-02");
-
-    expect(encontrado).toBeUndefined();
+    expect(await repo.buscarPorUsuario("u1")).toEqual([]);
+    expect(await repo.buscarPorUsuario("u2")).toHaveLength(1);
   });
 });

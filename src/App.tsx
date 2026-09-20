@@ -6,6 +6,7 @@ import { RegisterForm } from '@modules/cuentas/ui/RegisterForm'
 import { LoginForm } from '@modules/cuentas/ui/LoginForm'
 import { SolicitarRecuperacionForm } from '@modules/cuentas/ui/SolicitarRecuperacionForm'
 import { RestablecerPasswordForm } from '@modules/cuentas/ui/RestablecerPasswordForm'
+import { DataPrivacyPage } from '@modules/cuentas/ui/DataPrivacyPage'
 import { ProfileForm } from '@modules/cuentas/ui/ProfileForm'
 import { AccountPage } from '@modules/cuentas/ui/AccountPage'
 import { ProtectedRoute } from '@modules/cuentas/ui/ProtectedRoute'
@@ -28,20 +29,19 @@ function App() {
         <Route path="/olvide-password" element={<SolicitarRecuperacionForm />} />
         <Route path="/restablecer-password" element={<RestablecerPasswordForm />} />
         <Route path="/politica-privacidad" element={<PrivacyPolicyPage />} />
-        <Route
-          path="/inicio"
-          element={
-            <ProtectedRoute>
+        {/* Ruta de diseño: un único SessionProvider para todas las pantallas protegidas (no se remonta al navegar). */}
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/inicio"
+            element={
               <ProtectedLayout>
                 <Home />
               </ProtectedLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/perfil"
-          element={
-            <ProtectedRoute>
+            }
+          />
+          <Route
+            path="/perfil"
+            element={
               <ProtectedLayout
                 breadcrumbs={[
                   { etiqueta: t('breadcrumbs.inicio'), ruta: '/inicio' },
@@ -50,17 +50,16 @@ function App() {
               >
                 <AccountPage />
               </ProtectedLayout>
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<ProfileForm />} />
-          <Route path="entrevista" element={<InterviewPage />} />
-          <Route path="resultados" element={<ResultsPage />} />
-        </Route>
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
+            }
+          >
+            <Route index element={<ProfileForm />} />
+            <Route path="entrevista" element={<InterviewPage />} />
+            <Route path="resultados" element={<ResultsPage />} />
+            <Route path="datos" element={<DataPrivacyPage />} />
+          </Route>
+          <Route
+            path="/admin"
+            element={
               <AdminRoute>
                 <ProtectedLayout
                   breadcrumbs={[
@@ -71,9 +70,9 @@ function App() {
                   <AdminPage />
                 </ProtectedLayout>
               </AdminRoute>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   )

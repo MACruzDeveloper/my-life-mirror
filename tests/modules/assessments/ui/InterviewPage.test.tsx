@@ -4,6 +4,8 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { InterviewPage } from "@modules/assessments/ui/InterviewPage";
+import { createTestClient, withClient } from "../../../helpers/queryClient";
+import type { QueryClient } from "@tanstack/react-query";
 
 const CATEGORIAS = [
   { id: "c1", name: "Economía", description: "...", status: "active", isSensitiveData: false },
@@ -55,11 +57,14 @@ function stubFetch({ latest = LATEST, history = HISTORIAL, guardar }: Opciones =
   return fetchMock;
 }
 
-function renderPage() {
+function renderPage(client: QueryClient = createTestClient()) {
   return render(
-    <MemoryRouter>
-      <InterviewPage />
-    </MemoryRouter>,
+    withClient(
+      <MemoryRouter>
+        <InterviewPage />
+      </MemoryRouter>,
+      client,
+    ),
   );
 }
 
@@ -280,5 +285,80 @@ describe("InterviewPage (RF-10)", () => {
 
     await waitFor(() => expect(screen.getByText(/only active categories/i)).toBeInTheDocument());
     expect(screen.getByRole("button", { name: /guardar cambios/i })).toBeEnabled();
+  });
+
+  it("marcar una categoría no sensible se refleja al instante, sin esperar al servidor", async () => {
+    let responder: (v: unknown) => void = () => {};
+    const fetchMock = stubFetch();
+    const original = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+      url === "/api/categories/activate"
+        ? new Promise((resolve) => {
+            responder = resolve;
+          })
+        : original(url, init),
+    );
+    renderPage();
+    await cargada();
+
+    marcar("pareja");
+
+    expect(screen.getByRole("checkbox", { name: /pareja/i })).toBeChecked();
+    expect(screen.getByRole("group", { name: /pareja/i })).toBeInTheDocument();
+    responder({ ok: true, json: async () => ({ ...CATEGORIAS[2], status: "active" }) });
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /pareja/i })).toBeChecked());
+  });
+
+  it("si el servidor rechaza el cambio optimista, se deshace y se avisa", async () => {
+    const fetchMock = stubFetch();
+    const original = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+      url === "/api/categories/activate"
+        ? Promise.resolve({ ok: false, json: async () => ({ error: "No se pudo activar" }) })
+        : original(url, init),
+    );
+    renderPage();
+    await cargada();
+
+    marcar("pareja");
+    expect(screen.getByRole("checkbox", { name: /pareja/i })).toBeChecked();
+
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /pareja/i })).not.toBeChecked());
+    expect(screen.getByText(/no se pudo activar/i)).toBeInTheDocument();
+  });
+
+  it("una categoría sensible muestra que está trabajando hasta que el servidor responde", async () => {
+    let responder: (v: unknown) => void = () => {};
+    const fetchMock = stubFetch();
+    const original = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+      url === "/api/categories/activate"
+        ? new Promise((resolve) => {
+            responder = resolve;
+          })
+        : original(url, init),
+    );
+    renderPage();
+    await cargada();
+
+    marcar("sexo");
+
+    expect(screen.getByRole("progressbar", { name: /sexo/i })).toBeInTheDocument();
+    responder({ ok: true, json: async () => ({ ...CATEGORIAS[3], status: "active" }) });
+    await waitFor(() => expect(screen.queryByRole("progressbar", { name: /sexo/i })).not.toBeInTheDocument());
+  });
+
+  it("al volver a la pantalla usa la caché: no repite las llamadas de lectura", async () => {
+    const fetchMock = stubFetch();
+    const client = createTestClient();
+    const primera = renderPage(client);
+    await cargada();
+    primera.unmount();
+
+    renderPage(client);
+
+    expect(screen.getByRole("checkbox", { name: /economía/i })).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([u]) => u === "/api/categories")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([u, i]) => u === "/api/assessments" && !i?.method)).toHaveLength(1);
   });
 });

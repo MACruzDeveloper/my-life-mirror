@@ -126,4 +126,16 @@ describe("UpdateProfile (RF-03/RF-01)", () => {
     expect(resultado.ok).toBe(false);
     if (!resultado.ok) expect(resultado.error.code).toBe("VALIDATION_ERROR");
   });
+
+  it("deleteByUserId del repositorio borra el perfil de ese usuario (RF-05)", async () => {
+    const repo = new InMemoryProfileRepository();
+    const updateProfile = createUpdateProfile(repo);
+    await updateProfile({ userId: "u1", name: "Ana" });
+    await updateProfile({ userId: "u2", name: "Luis" });
+
+    await repo.deleteByUserId("u1");
+
+    expect(await repo.findByUserId("u1")).toBeUndefined();
+    expect(await repo.findByUserId("u2")).toBeDefined();
+  });
 });

@@ -14,12 +14,13 @@ const SECCIONES = [
   { ruta: "/perfil", clave: "cuenta.perfil" },
   { ruta: "/perfil/entrevista", clave: "cuenta.entrevista" },
   { ruta: "/perfil/resultados", clave: "cuenta.resultados" },
+  { ruta: "/perfil/datos", clave: "cuenta.datos" },
 ];
 
 /**
  * Concentrador de "Mi perfil" con menú lateral (antes eran pestañas): todo lo
- * que el usuario hace sobre sí mismo — perfil, entrevista y
- * resultados — vive aquí. En escritorio/tablet (md+) el menú es fijo a la
+ * que el usuario hace sobre sí mismo — perfil, entrevista,
+ * resultados y privacidad/datos (RF-05) — vive aquí. En escritorio/tablet (md+) el menú es fijo a la
  * izquierda; en móvil se abre como cajón con un botón. Rutas anidadas de
  * verdad para que cada sección sea recargable/enlazable directamente.
  */

@@ -29,3 +29,4 @@ Cuando existan más endpoints, añadir un id de correlación por petición (camp
 ## Historial de cambios
 
 - **v1.0 (13 sept. 2026)** — versión inicial: logger estructurado en JSON, sin SaaS externo, usado en los endpoints de `api/`.
+- **v1.1 (20 sept. 2026)** — la auditoría de acciones de administración (ADM-03) va a una tabla de base de datos, no a estos logs: los logs de Vercel Hobby se conservan poco y no están protegidos contra modificación (OWASP A09). Aquí solo queda el aviso operativo `Acceso de administración denegado`.

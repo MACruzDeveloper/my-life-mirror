@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { BandBackground } from "./BandBackground";
 import { scoreBand, type ScoreBand } from "./scoreBand";
@@ -22,9 +23,10 @@ const BAND_KEYS: Record<ScoreBand, string> = {
 /**
  * Tarjetas con la última puntuación por categoría. RN-04: el número va en el
  * color de texto normal y solo el fondo lleva un degradado muy suave por
- * banda; la banda también se escribe (el color nunca es la única señal).
+ * banda; `extraFor` deja a la pantalla añadir algo bajo cada tarjeta (las
+ * recomendaciones, RF-18, sin que este componente conozca ese módulo). La banda también se escribe (el color nunca es la única señal).
  */
-export function ScoreCards({ resultados }: { resultados: LatestScoreDto[] }) {
+export function ScoreCards({ resultados, extraFor }: { resultados: LatestScoreDto[]; extraFor?: (categoryId: string) => ReactNode }) {
   const { t, i18n } = useTranslation();
 
   return (
@@ -61,6 +63,7 @@ export function ScoreCards({ resultados }: { resultados: LatestScoreDto[] }) {
                   {t("resultados.sinPuntuar")}
                 </Typography>
               )}
+              {extraFor?.(resultado.categoryId)}
             </Box>
           </Box>
         );

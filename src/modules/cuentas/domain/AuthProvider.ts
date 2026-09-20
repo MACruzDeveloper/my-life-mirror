@@ -24,6 +24,8 @@ export interface UsuarioResumen {
   readonly rol: RolUsuario;
   readonly creadoEn: Date;
   readonly ultimoAcceso?: Date;
+  /** Bloqueada por un administrador: no puede iniciar sesión ni usar una sesión abierta (ADM-03). */
+  readonly suspendido: boolean;
 }
 
 export interface AuthProvider {
@@ -33,6 +35,15 @@ export interface AuthProvider {
   verificarSesion(token: string): Promise<UsuarioAutenticado>;
   /** Todos los usuarios registrados. Quien lo llama debe haber comprobado ya que es admin (ver ListUsers). */
   listarUsuarios(): Promise<UsuarioResumen[]>;
+  /** Cambia el rol (ADM-03). Quien lo llama debe haber comprobado que es admin y las reglas del último admin. */
+  cambiarRol(id: string, rol: RolUsuario): Promise<void>;
+  /** Cambia el email de acceso (ADM-03). Lanza ConflictError si ya está en uso. */
+  actualizarEmail(id: string, email: string): Promise<void>;
+  /** Bloquea / desbloquea la cuenta sin borrar nada (ADM-03). */
+  suspender(id: string): Promise<void>;
+  reactivar(id: string): Promise<void>;
+  /** Elimina la cuenta de acceso (RF-05). Repetible: no falla si ya no existe. */
+  eliminarUsuario(id: string): Promise<void>;
   /** Nunca revela si el email existe (RF-38) — siempre resuelve, no lanza por email desconocido. */
   solicitarRecuperacion(email: string): Promise<void>;
   /** Lanza AuthenticationError si el token de recuperación no es válido. */

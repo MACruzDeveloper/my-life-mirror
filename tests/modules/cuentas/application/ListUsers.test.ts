@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createListUsers } from "@modules/cuentas/application/ListUsers";
 import { InMemoryAuthProvider } from "@modules/cuentas/infrastructure/InMemoryAuthProvider";
+import { InMemoryProfileRepository } from "@modules/cuentas/infrastructure/InMemoryProfileRepository";
 import { ForbiddenError } from "@shared/domain/DomainError";
 
 async function escenario() {
@@ -9,7 +10,9 @@ async function escenario() {
   auth.asignarRolParaTest("admin@ejemplo.com", "admin");
   const usuario = await auth.registrar("ana@ejemplo.com", "12345678");
   await auth.registrar("luis@ejemplo.com", "12345678");
-  return { listUsers: createListUsers(auth), admin: { ...admin, rol: "admin" as const }, usuario };
+  const profiles = new InMemoryProfileRepository();
+  await profiles.save({ userId: usuario.id, name: "Ana" });
+  return { listUsers: createListUsers(auth, profiles), admin: { ...admin, rol: "admin" as const }, usuario };
 }
 
 describe("ListUsers (ADM-01)", () => {
@@ -41,5 +44,19 @@ describe("ListUsers (ADM-01)", () => {
     const resultado = await listUsers({ ...usuario, rol: "premium" });
 
     expect(resultado.ok).toBe(false);
+  });
+
+  it("incluye el nombre del perfil cuando existe y si la cuenta está suspendida", async () => {
+    const { listUsers, admin, usuario } = await escenario();
+
+    const resultado = await listUsers(admin);
+
+    expect(resultado.ok).toBe(true);
+    if (resultado.ok) {
+      const ana = resultado.value.find((u) => u.id === usuario.id);
+      expect(ana?.name).toBe("Ana");
+      expect(ana?.suspendido).toBe(false);
+      expect(resultado.value.find((u) => u.email === "luis@ejemplo.com")?.name).toBeUndefined();
+    }
   });
 });

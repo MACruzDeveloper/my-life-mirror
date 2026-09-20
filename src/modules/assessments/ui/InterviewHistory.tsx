@@ -1,47 +1,17 @@
-import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
-
-interface HistoryEntryDto {
-  categoryId: string;
-  categoryName: string;
-  score: number;
-  previousScore?: number;
-  note?: string;
-}
-
-interface HistorySessionDto {
-  recordedAt: string;
-  entries: HistoryEntryDto[];
-}
+import { useAssessmentHistory } from "./queries";
 
 /**
  * Registro de cambios del usuario, en un lateral junto a la entrevista: qué
  * guardó y cuándo, con "antes → ahora" cuando cambió una puntuación. No es la
- * evolución gráfica (RF-14): solo una lista. `refreshKey` cambia tras cada
- * guardado para volver a pedirla.
+ * evolución gráfica (RF-14): solo una lista. Se refresca cuando la entrevista
+ * invalida la caché de `assessments` tras guardar.
  */
-export function InterviewHistory({ refreshKey }: { refreshKey: number }) {
+export function InterviewHistory() {
   const { t, i18n } = useTranslation();
-  const [sesiones, setSesiones] = useState<HistorySessionDto[] | undefined>();
-
-  useEffect(() => {
-    let cancelado = false;
-
-    fetch("/api/assessments/history")
-      .then((respuesta) => respuesta.json() as Promise<HistorySessionDto[]>)
-      .then((datos) => {
-        if (!cancelado) setSesiones(datos);
-      })
-      .catch(() => {
-        if (!cancelado) setSesiones([]);
-      });
-
-    return () => {
-      cancelado = true;
-    };
-  }, [refreshKey]);
+  const { data: sesiones } = useAssessmentHistory();
 
   const fecha = (iso: string) => new Date(iso).toLocaleDateString(i18n.language, { month: "long", year: "numeric", day: "numeric" });
 

@@ -1,49 +1,49 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { Link, MemoryRouter, Route, Routes } from "react-router";
 import { ProtectedRoute } from "@modules/cuentas/ui/ProtectedRoute";
 
-function renderConRuta(inicial: string) {
-  return render(
-    <MemoryRouter initialEntries={[inicial]}>
-      <Routes>
-        <Route
-          path="/inicio"
-          element={
-            <ProtectedRoute>
-              <div>Contenido protegido</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/login" element={<div>Pantalla de login</div>} />
-      </Routes>
-    </MemoryRouter>,
-  );
-}
+afterEach(() => vi.unstubAllGlobals());
 
-describe("ProtectedRoute", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
+describe("ProtectedRoute como ruta de diseño", () => {
+  it("consulta la sesión una sola vez al navegar entre pantallas protegidas", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ json: async () => ({ autenticado: true, email: "a@b.c" }) });
+    vi.stubGlobal("fetch", fetchMock);
 
-  it("muestra el contenido si hay sesión", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com" }) }),
+    render(
+      <MemoryRouter initialEntries={["/inicio"]}>
+        <Routes>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/inicio" element={<Link to="/perfil">ir a perfil</Link>} />
+            <Route path="/perfil" element={<div>Perfil</div>} />
+          </Route>
+          <Route path="/login" element={<div>Login</div>} />
+        </Routes>
+      </MemoryRouter>,
     );
 
-    renderConRuta("/inicio");
+    fireEvent.click(await screen.findByText("ir a perfil"));
 
-    await waitFor(() => expect(screen.getByText("Contenido protegido")).toBeInTheDocument());
+    expect(await screen.findByText("Perfil")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("redirige a /login si no hay sesión", async () => {
+  it("sin sesión redirige a /login", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ json: async () => ({ autenticado: false }) }));
 
-    renderConRuta("/inicio");
+    render(
+      <MemoryRouter initialEntries={["/inicio"]}>
+        <Routes>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/inicio" element={<div>Inicio</div>} />
+          </Route>
+          <Route path="/login" element={<div>Login</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
 
-    await waitFor(() => expect(screen.getByText("Pantalla de login")).toBeInTheDocument());
+    expect(await screen.findByText("Login")).toBeInTheDocument();
   });
 });
