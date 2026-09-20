@@ -32,4 +32,10 @@ export class InMemoryCategoryRepository implements CategoryRepository {
       if (category.name === name) this.categories.set(clave, { ...category, status: "inactive" });
     }
   }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    for (const [clave, category] of this.categories) {
+      if (category.userId === userId) this.categories.delete(clave);
+    }
+  }
 }

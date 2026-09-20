@@ -4,6 +4,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { LoginForm } from "@modules/cuentas/ui/LoginForm";
+import type { QueryClient } from "@tanstack/react-query";
+import { createTestClient, withClient } from "../../../helpers/queryClient";
 
 function completarYEnviar() {
   fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "ana@ejemplo.com" } });
@@ -11,14 +13,17 @@ function completarYEnviar() {
   fireEvent.click(screen.getByRole("button", { name: /iniciar sesión/i }));
 }
 
-function renderConRutas() {
+function renderConRutas(client: QueryClient = createTestClient()) {
   return render(
-    <MemoryRouter initialEntries={["/login"]}>
-      <Routes>
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/inicio" element={<div>Pantalla de inicio</div>} />
-      </Routes>
-    </MemoryRouter>,
+    withClient(
+      <MemoryRouter initialEntries={["/login"]}>
+        <Routes>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/inicio" element={<div>Pantalla de inicio</div>} />
+        </Routes>
+      </MemoryRouter>,
+      client,
+    ),
   );
 }
 
@@ -70,5 +75,17 @@ describe("LoginForm (RF-01)", () => {
     await waitFor(() => {
       expect(screen.getByText(/email o contraseña incorrectos/i)).toBeInTheDocument();
     });
+  });
+
+  it("al iniciar sesión vacía la caché de datos: otro usuario en el mismo navegador nunca ve los del anterior", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: "1", email: "ana@ejemplo.com" }) }));
+    const client = createTestClient();
+    client.setQueryData(["categories"], [{ id: "de-otro-usuario" }]);
+    renderConRutas(client);
+
+    completarYEnviar();
+
+    await waitFor(() => expect(screen.getByText("Pantalla de inicio")).toBeInTheDocument());
+    expect(client.getQueryData(["categories"])).toBeUndefined();
   });
 });

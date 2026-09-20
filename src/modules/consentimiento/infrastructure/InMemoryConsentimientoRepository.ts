@@ -17,4 +17,14 @@ export class InMemoryConsentimientoRepository implements ConsentimientoRepositor
       (c) => c.usuarioId === usuarioId && c.categoriaId === categoriaId && c.versionPolitica === versionPolitica,
     );
   }
+
+  async buscarPorUsuario(usuarioId: string): Promise<Consentimiento[]> {
+    return this.consentimientos.filter((c) => c.usuarioId === usuarioId);
+  }
+
+  async eliminarPorUsuario(usuarioId: string): Promise<void> {
+    for (let i = this.consentimientos.length - 1; i >= 0; i--) {
+      if (this.consentimientos[i].usuarioId === usuarioId) this.consentimientos.splice(i, 1);
+    }
+  }
 }

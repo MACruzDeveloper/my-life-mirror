@@ -8,6 +8,19 @@ import { InMemoryAuthProvider } from "../../modules/cuentas/infrastructure/InMem
 import { SupabaseAuthProvider } from "../../modules/cuentas/infrastructure/SupabaseAuthProvider";
 import { createRegisterUser } from "../../modules/cuentas/application/RegisterUser";
 import { crearIniciarSesion } from "../../modules/cuentas/application/IniciarSesion";
+import { createDeleteAccount } from "../../modules/cuentas/application/DeleteAccount";
+import { createExportUserData } from "../../modules/cuentas/application/ExportUserData";
+import { createGenerateRecommendations } from "../../modules/recommendations/application/GenerateRecommendations";
+import { createListRecommendations } from "../../modules/recommendations/application/ListRecommendations";
+import { parseThreshold } from "../../modules/recommendations/domain/recommendationCatalog";
+import type { RecommendationRepository } from "../../modules/recommendations/domain/RecommendationRepository";
+import { InMemoryRecommendationRepository } from "../../modules/recommendations/infrastructure/InMemoryRecommendationRepository";
+import { SupabaseRecommendationRepository } from "../../modules/recommendations/infrastructure/SupabaseRecommendationRepository";
+import { logger } from "./logger";
+import { createAdminUserActions } from "../../modules/cuentas/application/AdminUserActions";
+import type { AdminAuditRepository } from "../../modules/cuentas/domain/AdminAuditRepository";
+import { InMemoryAdminAuditRepository } from "../../modules/cuentas/infrastructure/InMemoryAdminAuditRepository";
+import { SupabaseAdminAuditRepository } from "../../modules/cuentas/infrastructure/SupabaseAdminAuditRepository";
 import { createListUsers } from "../../modules/cuentas/application/ListUsers";
 import { crearVerificarSesion } from "../../modules/cuentas/application/VerificarSesion";
 import { crearSolicitarRecuperacion } from "../../modules/cuentas/application/SolicitarRecuperacion";
@@ -108,6 +121,15 @@ function crearConsentimientoRepository(entorno: Entorno): ConsentimientoReposito
   return new SupabaseConsentimientoRepository(url, serviceRoleKey);
 }
 
+/** Registro de auditoría de acciones de administración (ADM-03, supabase/migrations/0006_admin_audit_log.sql). */
+function crearAdminAuditRepository(entorno: Entorno): AdminAuditRepository {
+  if (entorno === "test") {
+    return new InMemoryAdminAuditRepository();
+  }
+  const { url, serviceRoleKey } = credencialesSupabase();
+  return new SupabaseAdminAuditRepository(url, serviceRoleKey);
+}
+
 /** Catálogo global de categorías (ADM-02, supabase/migrations/0005_category_catalog.sql). */
 function crearCategoryCatalogRepository(entorno: Entorno): CategoryCatalogRepository {
   if (entorno === "test") {
@@ -143,6 +165,15 @@ function crearAssessmentRepository(entorno: Entorno): AssessmentRepository {
   return new SupabaseAssessmentRepository(url, serviceRoleKey);
 }
 
+/** Recomendaciones (RF-18, supabase/migrations/0007_recommendations.sql): real desde el principio, como evaluaciones. */
+function crearRecommendationRepository(entorno: Entorno): RecommendationRepository {
+  if (entorno === "test") {
+    return new InMemoryRecommendationRepository();
+  }
+  const { url, serviceRoleKey } = credencialesSupabase();
+  return new SupabaseRecommendationRepository(url, serviceRoleKey);
+}
+
 /**
  * Todo lo que un caso de uso puede necesitar del exterior, inyectado desde
  * aquí. Crece módulo a módulo a medida que se implementan los repositorios
@@ -157,6 +188,9 @@ export interface AppContext {
   iniciarSesion: ReturnType<typeof crearIniciarSesion>;
   verificarSesion: ReturnType<typeof crearVerificarSesion>;
   listUsers: ReturnType<typeof createListUsers>;
+  adminUsers: ReturnType<typeof createAdminUserActions>;
+  exportUserData: ReturnType<typeof createExportUserData>;
+  deleteAccount: ReturnType<typeof createDeleteAccount>;
   solicitarRecuperacion: ReturnType<typeof crearSolicitarRecuperacion>;
   restablecerPassword: ReturnType<typeof crearRestablecerPassword>;
   consentimientoRepository: ConsentimientoRepository;
@@ -177,6 +211,8 @@ export interface AppContext {
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
   getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
+  recommendationRepository: RecommendationRepository;
+  listRecommendations: ReturnType<typeof createListRecommendations>;
 }
 
 export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContext {
@@ -189,6 +225,15 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
   const categoryCatalogRepository = crearCategoryCatalogRepository(entorno);
   const verificarConsentimiento = crearVerificarConsentimiento(consentimientoRepository);
   const assessmentRepository = crearAssessmentRepository(entorno);
+  const registerUser = createRegisterUser(authProvider, updateProfile);
+  const recommendationRepository = crearRecommendationRepository(entorno);
+  // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
+  const generateRecommendations = createGenerateRecommendations({
+    recommendationRepository,
+    categoryRepository,
+    clock,
+    threshold: parseThreshold(process.env.RECOMMENDATION_THRESHOLD),
+  });
 
   return {
     entorno,
@@ -196,10 +241,24 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
     authProvider,
     // registerUser depende de updateProfile (guarda el nombre como perfil
     // inicial en la misma operación, RF-03) — de ahí construirlo después.
-    registerUser: createRegisterUser(authProvider, updateProfile),
+    registerUser,
     iniciarSesion: crearIniciarSesion(authProvider),
     verificarSesion: crearVerificarSesion(authProvider),
-    listUsers: createListUsers(authProvider),
+    listUsers: createListUsers(authProvider, profileRepository),
+    adminUsers: createAdminUserActions({
+      authProvider,
+      profileRepository,
+      categoryRepository,
+      consentimientoRepository,
+      assessmentRepository,
+      recommendationRepository,
+      auditRepository: crearAdminAuditRepository(entorno),
+      registerUser,
+      updateProfile,
+      clock,
+    }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentimientoRepository, assessmentRepository, recommendationRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentimientoRepository, assessmentRepository, recommendationRepository }),
     solicitarRecuperacion: crearSolicitarRecuperacion(authProvider),
     restablecerPassword: crearRestablecerPassword(authProvider),
     consentimientoRepository,
@@ -218,9 +277,18 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
     activateCategory: createActivateCategory(categoryRepository, verificarConsentimiento, categoryCatalogRepository),
     deactivateCategory: createDeactivateCategory(categoryRepository),
     assessmentRepository,
-    recordAssessments: createRecordAssessments(assessmentRepository, categoryRepository, clock),
+    // Las recomendaciones son secundarias: un fallo se registra pero nunca deshace el guardado de la entrevista.
+    recordAssessments: createRecordAssessments(assessmentRepository, categoryRepository, clock, async (userId, guardadas) => {
+      try {
+        await generateRecommendations(userId, guardadas);
+      } catch (error) {
+        logger.error("No se pudieron generar las recomendaciones (el guardado sigue siendo válido)", error, { usuario: userId });
+      }
+    }),
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
     getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
+    recommendationRepository,
+    listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
   };
 }
 

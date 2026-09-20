@@ -4,6 +4,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { ProfileForm } from "@modules/cuentas/ui/ProfileForm";
 import { SessionProvider } from "@shared/ui/context/SessionContext";
+import type { QueryClient } from "@tanstack/react-query";
+import { createTestClient, withClient } from "../../../helpers/queryClient";
 
 // ProfileForm vive dentro de SessionProvider en la app real (ProtectedRoute
 // lo instala) y ahora llama a refresh() al guardar — así que además de
@@ -22,11 +24,14 @@ function stubFetch(perfil: unknown) {
   return fetchMock;
 }
 
-function renderProfileForm() {
+function renderProfileForm(client: QueryClient = createTestClient()) {
   return render(
-    <SessionProvider>
-      <ProfileForm />
-    </SessionProvider>,
+    withClient(
+      <SessionProvider>
+        <ProfileForm />
+      </SessionProvider>,
+      client,
+    ),
   );
 }
 
@@ -99,5 +104,21 @@ describe("ProfileForm (RF-03)", () => {
     fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
 
     await waitFor(() => expect(screen.getByText(/la fecha no es válida/i)).toBeInTheDocument());
+  });
+
+  it("al volver a la pantalla no repite la llamada, y lo guardado queda en la caché", async () => {
+    const fetchMock = stubFetch({ name: "Ana" });
+    const client = createTestClient();
+    const primera = renderProfileForm(client);
+    await waitFor(() => expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana"));
+    fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: "Ana María" } });
+    fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
+    await waitFor(() => expect(screen.getByText(/perfil guardado|guardado/i)).toBeInTheDocument());
+    primera.unmount();
+
+    renderProfileForm(client);
+
+    expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana María");
+    expect(fetchMock.mock.calls.filter(([u, i]) => u === "/api/accounts/profile" && !i?.method)).toHaveLength(1);
   });
 });

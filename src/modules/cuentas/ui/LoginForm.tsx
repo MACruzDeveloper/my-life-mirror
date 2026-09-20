@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -19,6 +20,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [estado, setEstado] = useState<Estado>({ tipo: "inicial" });
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   async function manejarEnvio(evento: React.FormEvent) {
     evento.preventDefault();
@@ -37,6 +39,8 @@ export function LoginForm() {
         return;
       }
 
+      // Otro usuario podría haber usado este navegador: nada de su caché.
+      queryClient.clear();
       navigate("/inicio", { replace: true });
     } catch {
       setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -6,9 +5,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
-import { ScoreCards, type LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
-
-type Estado = { tipo: "cargando" } | { tipo: "listo"; resultados: LatestScoreDto[] } | { tipo: "error" };
+import { ScoreCards } from "@modules/assessments/ui/ScoreCards";
+import { useLatestScores } from "@modules/assessments/ui/queries";
+import { RecommendationDisclaimer, RecommendationNote } from "@modules/recommendations/ui/RecommendationNote";
+import { useRecommendations } from "@modules/recommendations/ui/queries";
 
 /**
  * Página de inicio tras el login (RF-39). Primera vez (todavía sin ninguna
@@ -18,29 +18,10 @@ type Estado = { tipo: "cargando" } | { tipo: "listo"; resultados: LatestScoreDto
  */
 export function Home() {
   const { t } = useTranslation();
-  const [estado, setEstado] = useState<Estado>({ tipo: "cargando" });
+  const { data: resultados, isPending, isError } = useLatestScores();
+  const recomendaciones = useRecommendations().data ?? [];
 
-  useEffect(() => {
-    let cancelado = false;
-
-    fetch("/api/assessments")
-      .then(async (respuesta) => {
-        if (!respuesta.ok) throw new Error("fallo");
-        return (await respuesta.json()) as LatestScoreDto[];
-      })
-      .then((resultados) => {
-        if (!cancelado) setEstado({ tipo: "listo", resultados });
-      })
-      .catch(() => {
-        if (!cancelado) setEstado({ tipo: "error" });
-      });
-
-    return () => {
-      cancelado = true;
-    };
-  }, []);
-
-  if (estado.tipo === "cargando") {
+  if (isPending) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
         <CircularProgress />
@@ -48,9 +29,9 @@ export function Home() {
     );
   }
 
-  const primeraVez = estado.tipo === "listo" && !estado.resultados.some((r) => r.score !== undefined);
+  const primeraVez = resultados !== undefined && !resultados.some((r) => r.score !== undefined);
 
-  if (estado.tipo === "error" || primeraVez) {
+  if (isError || primeraVez) {
     return (
       <Box sx={{ maxWidth: 560, mx: "auto", mt: { xs: 4, sm: 8 }, textAlign: "center", px: 2 }}>
         <Typography variant="h4" component="h1" gutterBottom>
@@ -59,7 +40,7 @@ export function Home() {
         <Typography variant="body1" sx={{ mb: 4 }}>
           {t("panel.bienvenidaTexto")}
         </Typography>
-        {estado.tipo === "error" && (
+        {isError && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {t("resultados.errorCarga")}
           </Alert>
@@ -81,7 +62,14 @@ export function Home() {
           {t("panel.nuevaEntrevista")}
         </Button>
       </Box>
-      <ScoreCards resultados={estado.resultados} />
+      <ScoreCards
+        resultados={resultados ?? []}
+        extraFor={(id) => {
+          const r = recomendaciones.find((x) => x.categoryId === id);
+          return r ? <RecommendationNote templateKey={r.templateKey} categoryName={r.categoryName} /> : null;
+        }}
+      />
+      {recomendaciones.length > 0 && <RecommendationDisclaimer />}
     </Box>
   );
 }

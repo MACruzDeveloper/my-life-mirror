@@ -15,8 +15,6 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
-- [ ] **RF-05** — Caso de uso `ExportarYEliminarDatos` (Must, derecho al olvido, RNF-12). No bloquea nada posterior, pero es requisito legal del producto: se hace antes de la línea de corte.
-- [ ] **RF-18** — Entidad `Recomendación`; `EvaluarUmbralYGenerarRecomendacion` (se dispara con el evento de `RegistrarEvaluacion`, ver Outbox en ADR-03 §3.4).
 - [ ] **RF-14** — Caso de uso de solo lectura `ConsultarPanelGeneral`, componiendo Evaluaciones + Recomendaciones (sustituye el placeholder de `Home`).
 - [ ] **Validación** — Usability test (n=1, ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md)) sobre el flujo completo, centrado en RN-04; corregir lo que salga; preparar la demo de cierre del Ciclo 1. Se reserva tiempo para esto **siempre**: es lo último que se recorta, no lo primero.
 
@@ -27,6 +25,8 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
+- **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
+- **Rendimiento del servidor** (medir antes de tocar): (a) alinear la región de las funciones de Vercel con la de Supabase (`regions` en `vercel.json`; Hobby permite una) — hoy por defecto es EE. UU. este; (b) validar la sesión sin llamar a Supabase en cada petición (`getClaims`/JWKS): ahorra un salto por llamada pero un usuario borrado o bloqueado seguiría siendo válido hasta que caduque el token (1 h) — decisión de seguridad, no solo de velocidad; (c) un endpoint que devuelva de una vez lo que la entrevista pide en tres llamadas; (d) menos funciones = menos arranques en frío ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis).
 - **Validaciones previas al push con Husky** (idea): `pre-push` con lint, tests, `npm run build` y `npm run check:api`, para no descubrir en Vercel lo que se puede ver en local.
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
 - **Métricas DORA y Flow:** revisión de calidad planificada antes de la validación; se simula DORA por cada PR fusionada a `develop` (producción = `main`, solo al completar el MVP) y se anota fecha de inicio/fin de cada tarea ([02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md)).
@@ -50,8 +50,11 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - [x] **RF-03** perfil (nombre, fecha de nacimiento, género opcional, zona horaria) — [historia](../user-stories/RF-03-configurar-perfil.md); `name` se captura en el registro.
 - [x] **RF-06 / RF-07** catálogo de 9 categorías y activación individual — [historia](../user-stories/RF-06-RF-07-categorias.md).
 - [x] **RF-10** entrevista personal (los requisitos la llaman check-in): `Score` (1-10), `Assessment` inmutable, `RecordAssessments` (todo o nada, con nota opcional, puntuación parcial), `GetLatestScores`, Supabase real (`0004_assessments.sql`), `api/assessments`, pantallas `/perfil/entrevista` (con categorías integradas y ejemplos por pregunta) y `/perfil/resultados` (fondo suave por banda) — [historia](../user-stories/RF-10-entrevista.md). Sin periodos (RF-09) ni recomendaciones (RF-18) todavía.
+- [x] **RF-05** exportar y eliminar mis datos (Must, derecho al olvido; RNF-12): `ExportUserData` (JSON con todo, con nombres) y `DeleteAccount` (exige la contraseña, borra datos y luego la cuenta de acceso, repetible), sección "Privacidad y datos" en Mi perfil — [historia](../user-stories/RF-05-exportar-eliminar-datos.md).
+- [x] **RF-18** recomendaciones (Must): módulo `recommendations` (entidad, catálogo curado de plantillas por categoría con generales de reserva, umbral configurable `RECOMMENDATION_THRESHOLD`, `GenerateRecommendations` como oyente de `RecordAssessments`, `ListRecommendations`), Supabase real (`0007_recommendations.sql`), `GET /api/recommendations`, nota "Una idea para ti" en Inicio y Resultados con el aviso de RES-05; cubierta por RF-05 — [historia](../user-stories/RF-18-recomendaciones.md). Sin marcar como hecha/descartada/pospuesta (RF-19).
 - [x] **ADM-01 (propuesto, primer corte)** panel de administración: `/admin` y `GET /api/admin/users` solo para rol `admin` (control de acceso en servidor y en el caso de uso, `ForbiddenError`), lista de usuarios — [historia](../user-stories/ADM-01-panel-administracion.md). Falta registrarlo en los requisitos.
 - [x] **ADM-02** catálogo de categorías gestionable por el admin (añadir / retirar sin borrar), `0005_category_catalog.sql`, pestaña Categorías en `/admin` — [historia](../user-stories/ADM-02-catalogo-categorias.md).
+- [x] **ADM-03** gestión de usuarios por el admin: cambiar rol, suspender/reactivar, eliminar, crear (contraseña temporal), cambiar email/nombre, enviar enlace de recuperación; contraseña del admin en lo sensible, regla "siempre un administrador", auditoría en `admin_audit_log` (`0006_admin_audit_log.sql`) — [historia](../user-stories/ADM-03-gestion-usuarios.md).
 - [x] **Estructura:** `api/` por capacidad de negocio, `shared/ui/` por tipo, pantalla "Mi perfil" con menú lateral (Perfil, Entrevista, Resultados), Playwright instalado (solo páginas públicas).
 
 ---
@@ -76,3 +79,8 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.4 (19 sept. 2026)** — la entrevista pasa a ser editable (sin entrevistas nuevas; cambios como registros nuevos) y absorbe la desactivación de categorías; primer corte del panel de administración (ADM-01, propuesto).
 - **v2.5 (19 sept. 2026)** — registro con sesión iniciada; entrevista en dos columnas con historial de cambios; diseño de ADM-02 (catálogo) propuesto.
 - **v2.6 (19 sept. 2026)** — ADM-02 implementada (decisiones confirmadas).
+- **v2.7 (20 sept. 2026)** — caché de lecturas en el cliente, interfaz optimista en categorías, sesión única entre pantallas; límites de Vercel Hobby documentados; rendimiento del servidor anotado como pendiente.
+- **v2.8 (20 sept. 2026)** — RF-05 hecha (exportar y eliminar datos, con confirmación por contraseña).
+- **v2.9 (20 sept. 2026)** — regla "siempre debe existir un administrador" en el borrado de cuenta; diseño de ADM-03 propuesto.
+- **v2.10 (20 sept. 2026)** — ADM-03 implementada.
+- **v2.11 (20 sept. 2026)** — RF-18 hecha (recomendaciones al puntuar bajo); RF-19 anotada como siguiente paso natural.

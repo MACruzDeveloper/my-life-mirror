@@ -12,3 +12,8 @@ export function leerCookie(header: string | undefined, nombre: string): string |
 export function cookieDeSesion(token: string): string {
   return [`sesion=${token}`, "HttpOnly", "Secure", "SameSite=Lax", "Path=/", `Max-Age=${60 * 60}`].join("; ");
 }
+
+/** Borra la cookie de sesión (mismo formato que `cookieDeSesion`, con `Max-Age=0`). */
+export function cookieDeSesionBorrada(): string {
+  return ["sesion=", "HttpOnly", "Secure", "SameSite=Lax", "Path=/", "Max-Age=0"].join("; ");
+}

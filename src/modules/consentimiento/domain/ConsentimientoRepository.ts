@@ -7,5 +7,9 @@ import type { Consentimiento } from "./Consentimiento";
  */
 export interface ConsentimientoRepository {
   guardar(consentimiento: Consentimiento): Promise<void>;
+  /** Todos los consentimientos del usuario (RF-05, exportación). */
+  buscarPorUsuario(usuarioId: string): Promise<Consentimiento[]>;
+  /** Borra todos los consentimientos del usuario (RF-05). Repetible. */
+  eliminarPorUsuario(usuarioId: string): Promise<void>;
   buscar(usuarioId: string, categoriaId: string, versionPolitica: string): Promise<Consentimiento | undefined>;
 }

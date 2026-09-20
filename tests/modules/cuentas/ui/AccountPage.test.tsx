@@ -13,6 +13,7 @@ function renderConRutas(inicial: string) {
           <Route index element={<div>Contenido perfil</div>} />
           <Route path="entrevista" element={<div>Contenido entrevista</div>} />
           <Route path="resultados" element={<div>Contenido resultados</div>} />
+          <Route path="datos" element={<div>Contenido datos</div>} />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -20,10 +21,10 @@ function renderConRutas(inicial: string) {
 }
 
 describe("AccountPage", () => {
-  it("muestra el menú lateral con las tres secciones y el contenido de Perfil por defecto", () => {
+  it("muestra el menú lateral con las cuatro secciones y el contenido de Perfil por defecto", () => {
     renderConRutas("/perfil");
 
-    for (const nombre of ["Perfil", "Entrevista", "Resultados"]) {
+    for (const nombre of ["Perfil", "Entrevista", "Resultados", "Privacidad y datos"]) {
       expect(screen.getAllByRole("link", { name: nombre })[0]).toBeInTheDocument();
     }
     expect(screen.getByText("Contenido perfil")).toBeInTheDocument();

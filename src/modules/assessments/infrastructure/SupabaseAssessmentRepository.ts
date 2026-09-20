@@ -59,4 +59,9 @@ export class SupabaseAssessmentRepository implements AssessmentRepository {
     if (error) throw new Error(`No se pudieron leer las evaluaciones: ${error.message}`);
     return (data as AssessmentRow[]).map(toAssessment);
   }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    const { error } = await this.client.from("assessments").delete().eq("user_id", userId);
+    if (error) throw new Error(`No se pudieron borrar las evaluaciones: ${error.message}`);
+  }
 }

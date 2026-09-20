@@ -9,6 +9,7 @@ interface RegistroInterno {
   password: string;
   rol: RolUsuario;
   creadoEn: Date;
+  suspendido: boolean;
 }
 
 /** Fake para tests — ADR-03 §3.6. No sustituye a Supabase en dev (ADR-06 §1). */
@@ -22,14 +23,14 @@ export class InMemoryAuthProvider implements AuthProvider {
     }
     // +length ms: altas seguidas en el mismo milisegundo siguen ordenables.
     const creadoEn = new Date(Date.now() + this.usuarios.length);
-    const usuario: RegistroInterno = { id: randomUUID(), email, password, rol: ROL_POR_DEFECTO, creadoEn };
+    const usuario: RegistroInterno = { id: randomUUID(), email, password, rol: ROL_POR_DEFECTO, creadoEn, suspendido: false };
     this.usuarios.push(usuario);
     return { id: usuario.id, email: usuario.email, rol: usuario.rol };
   }
 
   async iniciarSesion(email: string, password: string): Promise<SesionIniciada> {
     const usuario = this.usuarios.find((u) => u.email === email && u.password === password);
-    if (!usuario) {
+    if (!usuario || usuario.suspendido) {
       throw new AuthenticationError("Email o contraseña incorrectos");
     }
     return { id: usuario.id, email: usuario.email, token: `fake-token:${usuario.id}` };
@@ -38,14 +39,14 @@ export class InMemoryAuthProvider implements AuthProvider {
   async verificarSesion(token: string): Promise<UsuarioAutenticado> {
     const id = token.startsWith("fake-token:") ? token.slice("fake-token:".length) : undefined;
     const usuario = id ? this.usuarios.find((u) => u.id === id) : undefined;
-    if (!usuario) {
+    if (!usuario || usuario.suspendido) {
       throw new AuthenticationError("Sesión no válida");
     }
     return { id: usuario.id, email: usuario.email, rol: usuario.rol };
   }
 
   async listarUsuarios(): Promise<UsuarioResumen[]> {
-    return this.usuarios.map((u) => ({ id: u.id, email: u.email, rol: u.rol, creadoEn: u.creadoEn }));
+    return this.usuarios.map((u) => ({ id: u.id, email: u.email, rol: u.rol, creadoEn: u.creadoEn, suspendido: u.suspendido }));
   }
 
   async solicitarRecuperacion(email: string): Promise<void> {
@@ -83,5 +84,33 @@ export class InMemoryAuthProvider implements AuthProvider {
   asignarRolParaTest(email: string, rol: RolUsuario): void {
     const usuario = this.usuarios.find((u) => u.email === email);
     if (usuario) usuario.rol = rol;
+  }
+
+  async cambiarRol(id: string, rol: RolUsuario): Promise<void> {
+    const usuario = this.usuarios.find((u) => u.id === id);
+    if (usuario) usuario.rol = rol;
+  }
+
+  async actualizarEmail(id: string, email: string): Promise<void> {
+    if (this.usuarios.some((u) => u.email === email && u.id !== id)) {
+      throw new ConflictError("Ya existe una cuenta con ese email");
+    }
+    const usuario = this.usuarios.find((u) => u.id === id);
+    if (usuario) usuario.email = email;
+  }
+
+  async suspender(id: string): Promise<void> {
+    const usuario = this.usuarios.find((u) => u.id === id);
+    if (usuario) usuario.suspendido = true;
+  }
+
+  async reactivar(id: string): Promise<void> {
+    const usuario = this.usuarios.find((u) => u.id === id);
+    if (usuario) usuario.suspendido = false;
+  }
+
+  async eliminarUsuario(id: string): Promise<void> {
+    const indice = this.usuarios.findIndex((u) => u.id === id);
+    if (indice >= 0) this.usuarios.splice(indice, 1);
   }
 }
