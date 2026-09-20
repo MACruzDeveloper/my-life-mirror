@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { RegisterForm } from "@modules/cuentas/ui/RegisterForm";
+import { createTestClient, withClient } from "../../../helpers/queryClient";
 
 function completarYEnviar() {
   fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: "Ana" } });
@@ -25,12 +26,12 @@ describe("RegisterForm (RF-01)", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(
-      <MemoryRouter initialEntries={["/registro"]}>
+      withClient(<MemoryRouter initialEntries={["/registro"]}>
         <Routes>
           <Route path="/registro" element={<RegisterForm />} />
           <Route path="/inicio" element={<div>Página de inicio</div>} />
         </Routes>
-      </MemoryRouter>,
+      </MemoryRouter>),
     );
     completarYEnviar();
 
@@ -46,9 +47,9 @@ describe("RegisterForm (RF-01)", () => {
     );
 
     render(
-      <MemoryRouter>
+      withClient(<MemoryRouter>
         <RegisterForm />
-      </MemoryRouter>,
+      </MemoryRouter>),
     );
     completarYEnviar();
 
@@ -66,14 +67,36 @@ describe("RegisterForm (RF-01)", () => {
     );
 
     render(
-      <MemoryRouter>
+      withClient(<MemoryRouter>
         <RegisterForm />
-      </MemoryRouter>,
+      </MemoryRouter>),
     );
     completarYEnviar();
 
     await waitFor(() => {
       expect(screen.getByText(/ya existe una cuenta/i)).toBeInTheDocument();
     });
+  });
+
+  it("al registrarse con sesión iniciada vacía la caché de datos", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: "1", email: "ana@ejemplo.com", sesionIniciada: true }) }));
+    const client = createTestClient();
+    client.setQueryData(["categories"], [{ id: "de-otro-usuario" }]);
+
+    render(
+      withClient(
+        <MemoryRouter initialEntries={["/registro"]}>
+          <Routes>
+            <Route path="/registro" element={<RegisterForm />} />
+            <Route path="/inicio" element={<div>Página de inicio</div>} />
+          </Routes>
+        </MemoryRouter>,
+        client,
+      ),
+    );
+    completarYEnviar();
+
+    await waitFor(() => expect(screen.getByText("Página de inicio")).toBeInTheDocument());
+    expect(client.getQueryData(["categories"])).toBeUndefined();
   });
 });

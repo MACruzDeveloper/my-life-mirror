@@ -147,7 +147,8 @@
     "menu": "My profile menu",
     "perfil": "Profile",
     "entrevista": "Interview",
-    "resultados": "Results"
+    "resultados": "Results",
+    "datos": "Privacy & data"
   },
   "ejemplos": {
     "economia": [
@@ -228,6 +229,131 @@
     "retirarTexto": "It will stop being offered and will be deactivated for all users. Scores already saved are kept.",
     "retirarConfirmar": "Confirm retirement",
     "cancelar": "Cancel",
-    "acciones": "Actions"
+    "acciones": "Actions",
+    "crearUsuario": "Create user",
+    "crear": "Create",
+    "cerrar": "Close",
+    "copiar": "Copy",
+    "confirmar": "Confirm",
+    "activa": "Active",
+    "suspendida": "Suspended",
+    "accionesDe": "Actions for {{email}}",
+    "cambiarRol": "Change role",
+    "cambiarEmail": "Change email",
+    "cambiarNombre": "Change name",
+    "enlaceRecuperacion": "Send recovery link",
+    "suspender": "Suspend",
+    "reactivar": "Reactivate",
+    "eliminar": "Delete",
+    "nuevoEmail": "New email",
+    "nuevoNombre": "New name",
+    "tuContrasena": "Your password (to confirm)",
+    "pestanaAuditoria": "Audit",
+    "dialogo": {
+      "role": "Change the role of {{email}}",
+      "email": "Change the email of {{email}}",
+      "name": "Change the name of {{email}}",
+      "suspend": "Suspend the account of {{email}}?",
+      "delete": "Delete the account of {{email}}?",
+      "recovery": "Send a recovery link to {{email}}"
+    },
+    "dialogoTexto": {
+      "role": "The role determines what they can do in the app. You can only change other people's role, never your own.",
+      "email": "Changes the email they sign in with (for example, to fix a typo). It will be recorded in the audit log.",
+      "name": "Fixes the name shown on their profile.",
+      "suspend": "They won't be able to sign in or use an open session, but all their data is kept. You can reactivate the account any time.",
+      "delete": "Their profile, categories, consents, scores and login account will be erased. This can't be undone.",
+      "recovery": "An email is sent with a link to choose a new password. You never see or set their password.",
+      "create": "The account is created with a random temporary password that you'll see only once. Hand it to the person; they should change it with “Forgot my password”."
+    },
+    "contrasenaTemporalAviso": "Temporary password: shown only now. Copy it before closing, it can't be shown again.",
+    "contrasenaTemporalConsejo": "Advise the person to change it as soon as they can.",
+    "errorContrasena": "Your password is not correct.",
+    "errorEmailEnUso": "That email is already in use.",
+    "errorRegla": "Action not allowed: there must always be an administrator, and you can't act on yourself or on another administrator without demoting them first.",
+    "errorNoEncontrado": "That user was not found (they may no longer exist).",
+    "errorDatos": "Check the data: something is not valid.",
+    "auditoriaAyuda": "Latest admin actions. Only ids and the action are stored, never passwords or emails.",
+    "auditoriaVacia": "No actions recorded yet.",
+    "fecha": "Date",
+    "quien": "Who",
+    "accion": "Action",
+    "sobre": "On",
+    "detalle": "Detail",
+    "acciones_role_changed": "Role change",
+    "acciones_user_suspended": "Suspension",
+    "acciones_user_reactivated": "Reactivation",
+    "acciones_user_deleted": "Deletion",
+    "acciones_user_created": "Creation",
+    "acciones_user_email_changed": "Email change",
+    "acciones_user_name_changed": "Name change",
+    "acciones_user_recovery_sent": "Recovery link sent",
+    "acciones_reauth_failed": "Wrong confirmation password"
+  },
+  "datos": {
+    "titulo": "Privacy & data",
+    "exportarTitulo": "Download my data",
+    "exportarTexto": "A JSON file with everything we hold about you: your account, profile, categories, consents and all your scores with their notes.",
+    "exportar": "Download my data",
+    "exportando": "Preparing…",
+    "errorExportar": "Your data could not be exported",
+    "eliminarTitulo": "Delete my account",
+    "eliminarTexto": "Deletes your account and everything linked to it: profile, categories, consents and scores. It's your right and free of charge, but it can't be undone.",
+    "eliminar": "Delete my account",
+    "dialogoTitulo": "Delete your account forever?",
+    "dialogoTexto": "This can't be undone. Your profile, categories, consents and all your scores and notes will be erased, and you won't be able to sign in with this email again. If you want to keep anything, download your data first.",
+    "contrasena": "Your password (to confirm)",
+    "confirmar": "Delete permanently",
+    "eliminando": "Deleting…",
+    "cancelar": "Cancel",
+    "errorEliminar": "The account could not be deleted",
+    "errorUltimoAdmin": "You are the only administrator and there must always be one: you can't delete your account until you create another administrator (by granting the role to another account)."
+  },
+  "recomendaciones": {
+    "titulo": "An idea for you",
+    "aviso": "These ideas are general wellbeing suggestions and do not replace professional medical, financial or psychological advice.",
+    "plantillas": {
+      "economia": {
+        "1": "If you feel like it, note down where your money goes for a week, without judging yourself: just looking already helps.",
+        "2": "Try setting aside a small amount as soon as you're paid, even a symbolic one. The habit is what matters."
+      },
+      "vidaSocial": {
+        "1": "Write today to someone you haven't spoken to in a while: a short message is enough to reconnect.",
+        "2": "Suggest a simple plan this week, like a coffee or a walk with someone you feel good around."
+      },
+      "pareja": {
+        "1": "Set aside a screen-free moment this week to be together, even if it's only twenty minutes.",
+        "2": "Tell your partner something you've appreciated about them lately; small details add up."
+      },
+      "sexo": {
+        "1": "Talking calmly about what you like or feel uncomfortable with often helps; pick a moment with no rush and no pressure.",
+        "2": "Take some time to look after yourself and find out what feels good, with no goals or expectations."
+      },
+      "deporte": {
+        "1": "Go for a twenty-minute walk today: starting small beats not starting.",
+        "2": "Pick an activity you enjoy and put it in your calendar twice this week."
+      },
+      "aventura": {
+        "1": "Change one small routine this week: a different route, a new dish, a place you don't know.",
+        "2": "Write down a plan you're excited about, even a small one, and give it a date."
+      },
+      "espiritualidad": {
+        "1": "Give yourself five minutes of silence a day, phone away, to be with yourself.",
+        "2": "Write down what gives you meaning lately and what you'd like to nurture more."
+      },
+      "familia": {
+        "1": "Call someone in your family this week just to ask how they are.",
+        "2": "Suggest a meal or some time together: sometimes a small initiative is enough."
+      },
+      "inversiones": {
+        "1": "Spend half an hour reviewing where your money is and what each part is for.",
+        "2": "Read up from reliable sources on one basic idea, like diversification, before deciding anything."
+      },
+      "general": {
+        "1": "Pick one small action related to {{categoria}} that you can do this week and write it down.",
+        "2": "Think about what weighs on you most in {{categoria}} and which small change would ease it.",
+        "3": "Ask yourself what would help most right now in {{categoria}} and take a first step, however small."
+      }
+    }
   }
 }

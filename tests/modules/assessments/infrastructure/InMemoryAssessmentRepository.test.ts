@@ -34,4 +34,14 @@ describe("InMemoryAssessmentRepository", () => {
 
     expect(await repo.findByUserId("u1")).toHaveLength(2);
   });
+
+  it("deleteByUserId borra todas las de ese usuario (derecho al olvido, RF-05) y ninguna de los demás", async () => {
+    const repo = new InMemoryAssessmentRepository();
+    await repo.saveMany([assessment({ id: "a1" }), assessment({ id: "a2", userId: "u2" })]);
+
+    await repo.deleteByUserId("u1");
+
+    expect(await repo.findByUserId("u1")).toEqual([]);
+    expect((await repo.findByUserId("u2")).map((a) => a.id)).toEqual(["a2"]);
+  });
 });

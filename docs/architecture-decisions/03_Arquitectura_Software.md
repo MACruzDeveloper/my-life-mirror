@@ -95,6 +95,18 @@ Esto es más aparato del que un MVP en solitario necesitaría por pura eficienci
 
 ---
 
+## 6bis. Limitaciones conocidas del proyecto
+
+Restricciones del entorno gratuito (Vercel Hobby, Supabase Free) que condicionan el diseño; no son fallos, son límites asumidos.
+
+- **Máximo 12 funciones serverless por despliegue (Vercel Hobby).** Cada archivo `.ts` de `api/` es una función; un despliegue con más falla al construir ("No more than 12 Serverless Functions…"). Estado a 20 sept. 2026: **10 de 12** usadas (las de `accounts`, `admin`, `assessments`, `categories`, `consent` y `recommendations`).
+  - *Regla:* una función por capacidad, no por acción. Las acciones nuevas de una capacidad existente se añaden a su `[action].ts` (`createRouter`), no como archivo nuevo en `api/`.
+  - *Aviso:* `npm run check:api` falla si hay más de 12.
+  - *Plan si se acerca al límite (~11):* una sola función con la tabla de rutas completa (`api/[...path].ts` o `api/index.ts` + reescritura en `vercel.json`). Coste bajo (todas las funciones ya importan el mismo contenedor) pero hay que verificar en un Preview cómo llega `req.url`, y se pierde el aislamiento de logs/tiempos por endpoint. Ventaja añadida: una sola función se mantiene "caliente" con más frecuencia (menos arranques en frío).
+  - *Descartado:* pasar a Pro (coste) y mover la API a otro proveedor (reescribir handlers pensados para Vercel) — antes de tener usuarios reales.
+- **Arranques en frío y latencia entre regiones** (Vercel Hobby + Supabase Free): cada llamada a la API paga, como mínimo, el salto navegador → función → Supabase (y otro más para validar la sesión con `getUser`). Ver [07_UI.md](07_UI.md) v1.14 para cómo se mitiga en el cliente y los pendientes en el servidor.
+- **Supabase Free pausa el proyecto tras una semana sin actividad**: la primera llamada tras la pausa falla o tarda mucho hasta que se reactiva desde el panel.
+
 ## 7. Próximo paso
 
 Con arquitectura y almacenamiento de datos ya decididos ([04_Almacenamiento_Datos.md](04_Almacenamiento_Datos.md)), el siguiente paso son las historias de usuario del Ciclo 1, módulo por módulo, cada una como un Caso de Uso — empezando por el adaptador en memoria antes que la conexión real a MongoDB Atlas.
@@ -108,3 +120,5 @@ Con arquitectura y almacenamiento de datos ya decididos ([04_Almacenamiento_Dato
 - **v2.1 (12 sept. 2026)** — limpieza editorial: se retira la narrativa de revisión del cuerpo principal (queda solo aquí), se corrigen referencias desactualizadas a Firebase/Supabase por MongoDB Atlas (ya decidido en ADR-04), se actualiza §7.
 - **v2.2 (19 sept. 2026)** — `api/tsconfig.json` es necesario y debe ser **autocontenido, sin `extends`** (Vercel no lo resuelve; mantenerlo alineado a mano con `tsconfig.api.json`): Vercel compila cada función con el `tsconfig.json` más cercano hacia arriba; sin él usa el de la raíz (solo referencias, sin opciones) y cae en `nodenext`, que rompe los imports sin extensión. No lo cubre `tsc -b` local porque este usa `tsconfig.api.json` directamente. Para vigilarlo: `npm run check:api`, que imita esa compilación.
 - **v2.3 (19 sept. 2026)** — límite de 12 funciones serverless del plan Hobby de Vercel: regla **una función por capacidad, no por acción**. Cada capacidad con varias acciones usa `api/<capacidad>/[action].ts` + `createRouter`, con los handlers en `src/shared/infrastructure/http/handlers/<capacidad>/` (URLs sin cambios). `api/<capacidad>/index.ts` sigue sirviendo la ruta base. Se pasó de 16 a 9 funciones; `check:api` falla si hay más de 12.
+- **v2.4 (20 sept. 2026)** — nueva §6bis "Limitaciones conocidas del proyecto": límite de 12 funciones de Vercel Hobby (con regla, aviso y plan de escape), latencia y pausa de Supabase Free.
+- **v2.5 (20 sept. 2026)** — el disparo de RF-18 se resuelve sin Outbox: `RecordAssessments` avisa a un oyente opcional después de persistir (evento de dominio en proceso, best effort). Outbox queda para cuando haya varios oyentes o hagan falta garantías entre procesos. Funciones serverless: 10 de 12.

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -24,6 +25,7 @@ type Estado =
 export function RegisterForm() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,6 +50,7 @@ export function RegisterForm() {
 
       // El servidor deja la sesión iniciada al registrar: directo a la bienvenida (RF-39).
       if (datos.sesionIniciada) {
+        queryClient.clear();
         navigate("/inicio", { replace: true });
         return;
       }

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -23,7 +24,10 @@ import { Link as RouterLink } from "react-router";
 import interviewerAvatar from "../../../assets/avatars/interviewer.svg";
 import userAvatar from "../../../assets/avatars/user.svg";
 import { BandBackground } from "./BandBackground";
+import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
 import { InterviewHistory } from "./InterviewHistory";
+import { ASSESSMENTS_KEY, LATEST_SCORES_KEY, useLatestScores } from "./queries";
+import type { LatestScoreDto } from "./ScoreCards";
 import { scoreBand, type ScoreBand } from "./scoreBand";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -41,20 +45,7 @@ const EXAMPLES_KEY: Record<string, string> = {
   Inversiones: "inversiones",
 };
 
-interface LatestDto {
-  score?: number;
-}
-
-interface CategoryDto {
-  id: string;
-  name: string;
-  description?: string;
-  isSensitiveData?: boolean;
-  status: "active" | "inactive";
-}
-
 type Estado =
-  | { tipo: "cargando" }
   | { tipo: "listo" }
   | { tipo: "guardando" }
   | { tipo: "guardado" }
@@ -127,41 +118,24 @@ function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNo
  */
 export function InterviewPage() {
   const { t } = useTranslation();
-  const [categorias, setCategorias] = useState<CategoryDto[]>([]);
-  const [ultimas, setUltimas] = useState<Record<string, LatestDto>>({});
-  const [scores, setScores] = useState<Record<string, number>>({});
+  const queryClient = useQueryClient();
+  const categoriasQuery = useCategories();
+  const ultimasQuery = useLatestScores();
+  const categorias = categoriasQuery.data ?? [];
+  // Solo lo que el usuario ha cambiado en esta pantalla; el resto sale de la última puntuación guardada.
+  const [borradores, setBorradores] = useState<Record<string, number>>({});
   const [notas, setNotas] = useState<Record<string, string>>({});
   const [notasAbiertas, setNotasAbiertas] = useState<Record<string, boolean>>({});
   const [ejemplosAbiertos, setEjemplosAbiertos] = useState<Record<string, boolean>>({});
   const [pendienteConsentimiento, setPendienteConsentimiento] = useState<CategoryDto | null>(null);
   const [enviandoConsentimiento, setEnviandoConsentimiento] = useState(false);
-  const [guardados, setGuardados] = useState(0);
-  const [estado, setEstado] = useState<Estado>({ tipo: "cargando" });
+  // Categorías con una petición en curso: evita dobles clics contradictorios y enseña un indicador en las sensibles.
+  const [enCurso, setEnCurso] = useState<Set<string>>(new Set());
+  const [estado, setEstado] = useState<Estado>({ tipo: "listo" });
 
-  useEffect(() => {
-    let cancelado = false;
-
-    Promise.all([
-      fetch("/api/categories").then((respuesta) => respuesta.json() as Promise<CategoryDto[]>),
-      fetch("/api/assessments").then((respuesta) => respuesta.json() as Promise<{ categoryId: string; score?: number }[]>),
-    ])
-      .then(([datos, ultimasPuntuaciones]) => {
-        if (cancelado) return;
-        const previas: Record<string, number> = {};
-        for (const u of ultimasPuntuaciones) if (u.score !== undefined) previas[u.categoryId] = u.score;
-        setCategorias(datos);
-        setUltimas(Object.fromEntries(Object.entries(previas).map(([id, score]) => [id, { score }])));
-        setScores(previas);
-        setEstado({ tipo: "listo" });
-      })
-      .catch(() => {
-        if (!cancelado) setEstado({ tipo: "error", mensaje: t("entrevista.errorCarga") });
-      });
-
-    return () => {
-      cancelado = true;
-    };
-  }, [t]);
+  const ultimas: Record<string, number> = {};
+  for (const u of ultimasQuery.data ?? []) if (u.score !== undefined) ultimas[u.categoryId] = u.score;
+  const scores: Record<string, number> = { ...ultimas, ...borradores };
 
   const activas = categorias.filter((c) => c.status === "active");
   const libres = categorias.filter((c) => !c.isSensitiveData);
@@ -169,19 +143,45 @@ export function InterviewPage() {
   const todasActivas = libres.length > 0 && libres.every((c) => c.status === "active");
   const algunaActiva = activas.length > 0;
   const algunaLibreActiva = libres.some((c) => c.status === "active");
-  const cambios = activas.filter((c) => scores[c.id] !== undefined && (scores[c.id] !== ultimas[c.id]?.score || notas[c.id]?.trim()));
+  const cambios = activas.filter((c) => scores[c.id] !== undefined && (scores[c.id] !== ultimas[c.id] || notas[c.id]?.trim()));
 
   function fijarEstado(id: string, status: "active" | "inactive") {
-    setCategorias((actuales) => actuales.map((c) => (c.id === id ? { ...c, status } : c)));
+    queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (actuales) => actuales?.map((c) => (c.id === id ? { ...c, status } : c)));
   }
 
-  /** Elegir una categoría que aún no se sigue la activa (RF-07); las sensibles piden consentimiento antes (RF-04). */
+  function marcarEnCurso(id: string, activo: boolean) {
+    setEnCurso((actuales) => {
+      const siguiente = new Set(actuales);
+      if (activo) siguiente.add(id);
+      else siguiente.delete(id);
+      return siguiente;
+    });
+  }
+
+  /** Activar/desactivar cambia qué categorías cuentan en resultados: se pide de nuevo en segundo plano. */
+  function refrescarResultados() {
+    void queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
+  }
+
+  /**
+   * Elegir una categoría que aún no se sigue la activa (RF-07). Las no
+   * sensibles se marcan al instante y se deshacen si el servidor falla (la
+   * API tarda cientos de ms; esperar para pintar un clic parece que no
+   * funciona). Las sensibles no pueden ser optimistas — el servidor puede
+   * pedir consentimiento (RF-04) — y muestran un indicador mientras tanto.
+   */
   async function activar(categoria: CategoryDto) {
+    if (enCurso.has(categoria.id)) return;
+    marcarEnCurso(categoria.id, true);
+    const optimista = !categoria.isSensitiveData;
+    if (optimista) fijarEstado(categoria.id, "active");
+
     try {
       const respuesta = await fetch("/api/categories/activate", POST(categoria.id));
       const datos = await respuesta.json();
 
       if (!respuesta.ok) {
+        if (optimista) fijarEstado(categoria.id, "inactive");
         if (datos.code === "CONSENT_REQUIRED") {
           setPendienteConsentimiento(categoria);
         } else {
@@ -191,27 +191,39 @@ export function InterviewPage() {
       }
 
       fijarEstado(categoria.id, "active");
+      refrescarResultados();
       return true;
     } catch {
+      if (optimista) fijarEstado(categoria.id, "inactive");
       setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });
       return false;
+    } finally {
+      marcarEnCurso(categoria.id, false);
     }
   }
 
   async function desactivar(categoria: CategoryDto) {
+    if (enCurso.has(categoria.id)) return;
+    marcarEnCurso(categoria.id, true);
+    fijarEstado(categoria.id, "inactive");
+    // Lo que estaba a medias de esa categoría se descarta; las evaluaciones ya guardadas se conservan.
+    setBorradores((actuales) => omitir(actuales, categoria.id));
+    setNotas((actuales) => omitir(actuales, categoria.id));
+
     try {
       const respuesta = await fetch("/api/categories/deactivate", POST(categoria.id));
       if (!respuesta.ok) {
         const datos = await respuesta.json();
+        fijarEstado(categoria.id, "active");
         setEstado({ tipo: "error", mensaje: datos.error ?? t("entrevista.errorActivar") });
         return;
       }
-      fijarEstado(categoria.id, "inactive");
-      // Lo que estaba a medias de esa categoría se descarta; las evaluaciones ya guardadas se conservan.
-      setScores((actuales) => (ultimas[categoria.id]?.score !== undefined ? { ...actuales, [categoria.id]: ultimas[categoria.id].score as number } : omitir(actuales, categoria.id)));
-      setNotas((actuales) => omitir(actuales, categoria.id));
+      refrescarResultados();
     } catch {
+      fijarEstado(categoria.id, "active");
       setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });
+    } finally {
+      marcarEnCurso(categoria.id, false);
     }
   }
 
@@ -275,10 +287,14 @@ export function InterviewPage() {
         return;
       }
 
-      setUltimas((actuales) => ({ ...actuales, ...Object.fromEntries(cambios.map((c) => [c.id, { score: scores[c.id] }])) }));
+      // La caché se actualiza al momento con lo guardado (Resultados/Inicio ya lo ven) y se confirma en segundo plano.
+      queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (actuales) =>
+        actuales?.map((u) => (borradores[u.categoryId] !== undefined && cambios.some((c) => c.id === u.categoryId) ? { ...u, score: borradores[u.categoryId] } : u)),
+      );
+      setBorradores({});
       setNotas({});
       setNotasAbiertas({});
-      setGuardados((n) => n + 1);
+      void queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
       setEstado({ tipo: "guardado" });
     } catch {
       setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });
@@ -286,8 +302,8 @@ export function InterviewPage() {
   }
 
   const filaCategoria = (categoria: CategoryDto) => (
+    <Box key={categoria.id} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
     <FormControlLabel
-      key={categoria.id}
       control={<Checkbox checked={categoria.status === "active"} onChange={() => alternar(categoria)} />}
       label={
         <Box>
@@ -302,9 +318,13 @@ export function InterviewPage() {
         </Box>
       }
     />
+  {enCurso.has(categoria.id) && categoria.isSensitiveData && (
+      <CircularProgress size={16} aria-label={categoria.name} />
+    )}
+    </Box>
   );
 
-  if (estado.tipo === "cargando") {
+  if (categoriasQuery.isPending || ultimasQuery.isPending) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
         <CircularProgress />
@@ -337,6 +357,7 @@ export function InterviewPage() {
         </Typography>
       </Bubble>
 
+      {(categoriasQuery.isError || ultimasQuery.isError) && <Alert severity="error">{t("entrevista.errorCarga")}</Alert>}
       {estado.tipo === "error" && <Alert severity="error">{estado.mensaje}</Alert>}
       {estado.tipo === "guardado" && (
         <Alert severity="success">
@@ -409,7 +430,7 @@ export function InterviewPage() {
                     value={valor}
                     size="small"
                     selected={scores[categoria.id] === valor}
-                    onChange={() => setScores((actuales) => ({ ...actuales, [categoria.id]: valor }))}
+                    onChange={() => setBorradores((actuales) => ({ ...actuales, [categoria.id]: valor }))}
                     sx={{ minWidth: 40, "&.Mui-selected": { fontWeight: 700 } }}
                   >
                     {valor}
@@ -461,7 +482,7 @@ export function InterviewPage() {
         </DialogActions>
       </Dialog>
     </Box>
-    <InterviewHistory refreshKey={guardados} />
+    <InterviewHistory />
     </Box>
   );
 }

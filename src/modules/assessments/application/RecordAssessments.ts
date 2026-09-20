@@ -32,6 +32,13 @@ export function createRecordAssessments(
   assessmentRepository: AssessmentRepository,
   categoryRepository: CategoryRepository,
   clock: Clock,
+  /**
+   * Oyente opcional, avisado DESPUÉS de persistir (RF-18: recomendaciones). Es
+   * el equivalente en proceso del evento de dominio del ADR-03 §3.4, sin Outbox.
+   * Es secundario: quien lo cablea es responsable de capturar sus propios
+   * fallos; aquí, si aun así lanza, no se deshace un guardado ya hecho.
+   */
+  onRecorded?: (userId: string, assessments: Assessment[]) => Promise<unknown>,
 ) {
   return async function recordAssessments(
     input: RecordAssessmentsInput,
@@ -77,6 +84,11 @@ export function createRecordAssessments(
     }));
 
     await assessmentRepository.saveMany(assessments);
+    try {
+      await onRecorded?.(userId, assessments);
+    } catch {
+      // El guardado ya es firme; ver la nota de `onRecorded`.
+    }
     return ok(assessments);
   };
 }

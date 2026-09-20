@@ -9,7 +9,7 @@ export type RolUsuario = "usuario" | "premium" | "admin";
 
 export const ROL_POR_DEFECTO: RolUsuario = "usuario";
 
-const ROLES_VALIDOS: readonly RolUsuario[] = ["usuario", "premium", "admin"];
+export const ROLES_VALIDOS: readonly RolUsuario[] = ["usuario", "premium", "admin"];
 
 /**
  * Traduce el `app_metadata` de Supabase a un RolUsuario válido, con

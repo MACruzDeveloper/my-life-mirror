@@ -80,6 +80,7 @@ describe("RegisterUser (RF-01)", () => {
         throw new Error("fallo técnico simulado del repositorio");
       },
       findByUserId: async () => undefined,
+      deleteByUserId: async () => undefined,
     };
     const updateProfile = createUpdateProfile(profileRepositoryQueFalla);
     const registerUser = createRegisterUser(authProvider, updateProfile);

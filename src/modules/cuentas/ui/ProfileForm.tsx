@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
@@ -9,6 +10,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import type { Gender } from "@modules/cuentas/domain/Profile";
+import { getJson } from "@shared/ui/api/getJson";
 import { useSession } from "@shared/ui/context/SessionContext";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
@@ -21,8 +23,9 @@ interface ProfileResponse {
   timeZone?: string;
 }
 
+const PROFILE_KEY = ["profile"] as const;
+
 type Estado =
-  | { tipo: "cargando" }
   | { tipo: "listo" }
   | { tipo: "guardando" }
   | { tipo: "guardado" }
@@ -38,36 +41,33 @@ type Estado =
  */
 export function ProfileForm() {
   const { t } = useTranslation();
+  // `null` = el usuario todavía no tiene perfil (react-query no admite `undefined` como dato).
+  const { data, isPending, isError } = useQuery({
+    queryKey: PROFILE_KEY,
+    queryFn: () => getJson<ProfileResponse | null>("/api/accounts/profile"),
+  });
+
+  if (isPending) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // El formulario se monta ya con los datos: sus campos arrancan de ahí, sin efectos que los copien.
+  return <ProfileFields inicial={data ?? undefined} errorCarga={isError ? t("perfil.errorCarga") : undefined} />;
+}
+
+function ProfileFields({ inicial, errorCarga }: { inicial?: ProfileResponse; errorCarga?: string }) {
+  const { t } = useTranslation();
   const { refresh } = useSession();
-  const [name, setName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [gender, setGender] = useState<Gender | "">("");
-  const [timeZone, setTimeZone] = useState(DETECTED_TIME_ZONE);
-  const [estado, setEstado] = useState<Estado>({ tipo: "cargando" });
-
-  useEffect(() => {
-    let cancelado = false;
-
-    fetch("/api/accounts/profile")
-      .then((respuesta) => respuesta.json())
-      .then((datos: ProfileResponse | null) => {
-        if (cancelado) return;
-        if (datos) {
-          setName(datos.name);
-          setBirthDate(datos.birthDate ?? "");
-          setGender(datos.gender ?? "");
-          setTimeZone(datos.timeZone ?? DETECTED_TIME_ZONE);
-        }
-        setEstado({ tipo: "listo" });
-      })
-      .catch(() => {
-        if (!cancelado) setEstado({ tipo: "error", mensaje: t("perfil.errorCarga") });
-      });
-
-    return () => {
-      cancelado = true;
-    };
-  }, [t]);
+  const queryClient = useQueryClient();
+  const [name, setName] = useState(inicial?.name ?? "");
+  const [birthDate, setBirthDate] = useState(inicial?.birthDate ?? "");
+  const [gender, setGender] = useState<Gender | "">(inicial?.gender ?? "");
+  const [timeZone, setTimeZone] = useState(inicial?.timeZone ?? DETECTED_TIME_ZONE);
+  const [estado, setEstado] = useState<Estado>(errorCarga ? { tipo: "error", mensaje: errorCarga } : { tipo: "listo" });
 
   async function manejarEnvio(evento: React.FormEvent) {
     evento.preventDefault();
@@ -91,6 +91,14 @@ export function ProfileForm() {
         return;
       }
 
+      // La caché refleja lo guardado: al volver a esta pantalla no hace falta pedirlo otra vez.
+      const guardado: ProfileResponse = {
+        name,
+        ...(birthDate ? { birthDate } : {}),
+        ...(gender ? { gender } : {}),
+        timeZone,
+      };
+      queryClient.setQueryData<ProfileResponse | null>(PROFILE_KEY, guardado);
       setEstado({ tipo: "guardado" });
       // El Header lee name/email de SessionContext, no de este formulario —
       // sin esto seguiría mostrando lo de antes hasta navegar fuera y volver.
@@ -98,14 +106,6 @@ export function ProfileForm() {
     } catch {
       setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });
     }
-  }
-
-  if (estado.tipo === "cargando") {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
-    );
   }
 
   return (

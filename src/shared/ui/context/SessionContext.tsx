@@ -68,3 +68,9 @@ export function useSession(): SessionContextValue {
   }
   return contexto;
 }
+
+/** Como `useSession` pero sin lanzar fuera de un `SessionProvider` (pantallas que solo la usan para pulir la interfaz). */
+// eslint-disable-next-line react-refresh/only-export-components -- hook de contexto, convención habitual junto a su Provider.
+export function useOptionalSession(): SessionContextValue | undefined {
+  return useContext(SessionContext);
+}

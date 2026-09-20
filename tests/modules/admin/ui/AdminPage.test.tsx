@@ -2,6 +2,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
+import type { QueryClient } from "@tanstack/react-query";
+import { createTestClient, withClient } from "../../../helpers/queryClient";
 import { MemoryRouter } from "react-router";
 import { AdminPage } from "@modules/admin/ui/AdminPage";
 
@@ -9,11 +11,14 @@ function stub(ok: boolean, status: number, body: unknown) {
   vi.stubGlobal("fetch", vi.fn(() => Promise.resolve({ ok, status, json: async () => body })));
 }
 
-function renderPage() {
+function renderPage(client: QueryClient = createTestClient()) {
   return render(
-    <MemoryRouter>
-      <AdminPage />
-    </MemoryRouter>,
+    withClient(
+      <MemoryRouter>
+        <AdminPage />
+      </MemoryRouter>,
+      client,
+    ),
   );
 }
 
@@ -64,5 +69,31 @@ describe("AdminPage (ADM-01)", () => {
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
 
     expect(await screen.findByText("Economía")).toBeInTheDocument();
+  });
+
+  it("al volver a /admin no repite la llamada de usuarios ni la de categorías (caché)", async () => {
+    const fetchMock = vi.fn((url: string) =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => (url === "/api/admin/categories" ? [{ id: "k1", name: "Economía", description: "d", isSensitiveData: false }] : [{ id: "1", email: "ana@ejemplo.com", rol: "usuario", createdAt: "2026-09-18T10:00:00.000Z" }]),
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const client = createTestClient();
+    const primera = renderPage(client);
+    await screen.findByText("ana@ejemplo.com");
+    fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
+    await screen.findByText("Economía");
+    fireEvent.click(screen.getByRole("tab", { name: "Usuarios" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
+    primera.unmount();
+
+    renderPage(client);
+    fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
+
+    expect(screen.getByText("Economía")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([u]) => u === "/api/admin/categories")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([u]) => u === "/api/admin/users")).toHaveLength(1);
   });
 });

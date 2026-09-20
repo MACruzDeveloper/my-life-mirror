@@ -70,4 +70,14 @@ describe("InMemoryCategoryRepository", () => {
     expect((await repo.findById("u2", "b"))?.status).toBe("inactive");
     expect((await repo.findById("u1", "c"))?.status).toBe("active");
   });
+
+  it("deleteByUserId borra las categorías de ese usuario y no las de los demás (RF-05)", async () => {
+    const repo = new InMemoryCategoryRepository();
+    await repo.saveMany([createCategory({ id: "a", userId: "u1" }), createCategory({ id: "b", userId: "u2" })]);
+
+    await repo.deleteByUserId("u1");
+
+    expect(await repo.findByUserId("u1")).toEqual([]);
+    expect(await repo.findByUserId("u2")).toHaveLength(1);
+  });
 });
