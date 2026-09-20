@@ -1,4 +1,6 @@
 import { createRouter } from "../../src/shared/infrastructure/http/router";
+import deleteAccount from "../../src/shared/infrastructure/http/handlers/accounts/delete-account";
+import exportData from "../../src/shared/infrastructure/http/handlers/accounts/export-data";
 import login from "../../src/shared/infrastructure/http/handlers/accounts/login";
 import logout from "../../src/shared/infrastructure/http/handlers/accounts/logout";
 import profile from "../../src/shared/infrastructure/http/handlers/accounts/profile";
@@ -13,6 +15,8 @@ import session from "../../src/shared/infrastructure/http/handlers/accounts/sess
  * `src/shared/infrastructure/http/handlers/accounts/`.
  */
 export default createRouter("/api/accounts/", {
+  "delete-account": deleteAccount,
+  "export-data": exportData,
   login,
   logout,
   profile,

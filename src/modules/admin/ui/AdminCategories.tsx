@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -20,6 +21,9 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
+import { getJson, HttpError } from "@shared/ui/api/getJson";
+import { CATEGORIES_KEY } from "@modules/categories/ui/queries";
+import { ASSESSMENTS_KEY } from "@modules/assessments/ui/queries";
 
 interface CatalogDto {
   id: string;
@@ -29,7 +33,7 @@ interface CatalogDto {
   retiredAt?: string;
 }
 
-type Estado = { tipo: "cargando" } | { tipo: "listo"; catalogo: CatalogDto[] } | { tipo: "sinPermiso" } | { tipo: "error" };
+const ADMIN_CATALOG_KEY = ["admin", "catalog"] as const;
 
 const POST = (cuerpo: unknown) => ({
   method: "POST",
@@ -43,7 +47,8 @@ const POST = (cuerpo: unknown) => ({
  */
 export function AdminCategories() {
   const { t } = useTranslation();
-  const [estado, setEstado] = useState<Estado>({ tipo: "cargando" });
+  const queryClient = useQueryClient();
+  const catalogo = useQuery({ queryKey: ADMIN_CATALOG_KEY, queryFn: () => getJson<CatalogDto[]>("/api/admin/categories") });
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isSensitiveData, setIsSensitiveData] = useState(false);
@@ -51,24 +56,14 @@ export function AdminCategories() {
   const [errorAccion, setErrorAccion] = useState<string | undefined>();
   const [aRetirar, setARetirar] = useState<CatalogDto | null>(null);
 
-  const cargar = useCallback(async () => {
-    try {
-      const respuesta = await fetch("/api/admin/categories");
-      if (respuesta.status === 403) {
-        setEstado({ tipo: "sinPermiso" });
-        return;
-      }
-      if (!respuesta.ok) throw new Error("fallo");
-      setEstado({ tipo: "listo", catalogo: (await respuesta.json()) as CatalogDto[] });
-    } catch {
-      setEstado({ tipo: "error" });
-    }
-  }, []);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos remotos.
-    void cargar();
-  }, [cargar]);
+  /** Añadir/retirar cambia el catálogo y lo que ven los usuarios (la caché de esta misma sesión incluida). */
+  async function refrescar() {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ADMIN_CATALOG_KEY }),
+      queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY }),
+      queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY }),
+    ]);
+  }
 
   async function anadir(evento: React.FormEvent) {
     evento.preventDefault();
@@ -84,7 +79,7 @@ export function AdminCategories() {
       setName("");
       setDescription("");
       setIsSensitiveData(false);
-      await cargar();
+      await refrescar();
     } catch {
       setErrorAccion(t("admin.errorGuardar"));
     } finally {
@@ -104,21 +99,21 @@ export function AdminCategories() {
         setErrorAccion(datos.error ?? t("admin.errorGuardar"));
         return;
       }
-      await cargar();
+      await refrescar();
     } catch {
       setErrorAccion(t("admin.errorGuardar"));
     }
   }
 
-  if (estado.tipo === "cargando") {
+  if (catalogo.isPending) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
         <CircularProgress />
       </Box>
     );
   }
-  if (estado.tipo === "sinPermiso") return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;
-  if (estado.tipo === "error") return <Alert severity="error">{t("admin.errorCarga")}</Alert>;
+  if (catalogo.error instanceof HttpError && catalogo.error.status === 403) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;
+  if (catalogo.isError) return <Alert severity="error">{t("admin.errorCarga")}</Alert>;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -141,7 +136,7 @@ export function AdminCategories() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {estado.catalogo.map((categoria) => (
+            {(catalogo.data ?? []).map((categoria) => (
               <TableRow key={categoria.id} sx={categoria.retiredAt ? { opacity: 0.6 } : undefined}>
                 <TableCell>
                   {categoria.name}{" "}

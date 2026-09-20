@@ -4,10 +4,10 @@ import { leerCookie } from "../../src/shared/infrastructure/cookies";
 import { logger } from "../../src/shared/infrastructure/logger";
 
 /**
- * Controlador HTTP — ADM-01. El rol sale de la sesión verificada en el
- * servidor (nunca del cliente) y `listUsers` lo vuelve a comprobar: 401 sin
- * sesión, 403 si no es admin. Solo lectura y sin datos de contenido de los
- * usuarios (evaluaciones, notas, categorías).
+ * Controlador HTTP — RF-18. Devuelve las recomendaciones visibles del usuario
+ * de la sesión (abiertas, de categorías activas y con la puntuación aún por
+ * debajo del umbral). El `userId` sale siempre de la cookie. Las acciones
+ * sobre ellas (hecha/descartada/pospuesta, RF-19) irán en esta misma función.
  */
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
@@ -18,26 +18,25 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, listUsers } = obtenerAppContext();
+    const { verificarSesion, listRecommendations } = obtenerAppContext();
     const sesion = await verificarSesion(token);
-
     if (!sesion.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));
       return;
     }
 
-    const resultado = await listUsers(sesion.value);
+    const resultado = await listRecommendations(sesion.value.id);
     if (!resultado.ok) {
-      res.writeHead(403, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Forbidden", code: resultado.error.code }));
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: resultado.error.message }));
       return;
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(resultado.value));
   } catch (error) {
-    logger.error("Error inesperado en /api/admin/users", error, { ruta: "/api/admin/users" });
+    logger.error("Error inesperado en /api/recommendations", error, { ruta: "/api/recommendations" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

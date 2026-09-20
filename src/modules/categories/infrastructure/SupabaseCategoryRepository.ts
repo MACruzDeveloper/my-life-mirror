@@ -105,4 +105,11 @@ export class SupabaseCategoryRepository implements CategoryRepository {
       throw new Error(`No se pudieron guardar las categorías: ${error.message}`);
     }
   }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    const { error } = await this.cliente.from("categories").delete().eq("user_id", userId);
+    if (error) {
+      throw new Error(`No se pudieron borrar las categorías: ${error.message}`);
+    }
+  }
 }

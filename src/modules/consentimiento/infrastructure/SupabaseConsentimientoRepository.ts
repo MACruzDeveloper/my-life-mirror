@@ -66,4 +66,23 @@ export class SupabaseConsentimientoRepository implements ConsentimientoRepositor
     if (!data) return undefined;
     return consentimientoDesdeFila(data as FilaConsentimiento);
   }
+
+  async buscarPorUsuario(usuarioId: string): Promise<Consentimiento[]> {
+    const { data, error } = await this.cliente
+      .from("consentimientos")
+      .select("id, usuario_id, categoria_id, version_politica, otorgado_en")
+      .eq("usuario_id", usuarioId);
+
+    if (error) {
+      throw new Error(`No se pudieron leer los consentimientos: ${error.message}`);
+    }
+    return (data as FilaConsentimiento[]).map(consentimientoDesdeFila);
+  }
+
+  async eliminarPorUsuario(usuarioId: string): Promise<void> {
+    const { error } = await this.cliente.from("consentimientos").delete().eq("usuario_id", usuarioId);
+    if (error) {
+      throw new Error(`No se pudieron borrar los consentimientos: ${error.message}`);
+    }
+  }
 }

@@ -147,7 +147,8 @@
     "menu": "Menú de mi perfil",
     "perfil": "Perfil",
     "entrevista": "Entrevista",
-    "resultados": "Resultados"
+    "resultados": "Resultados",
+    "datos": "Privacidad y datos"
   },
   "ejemplos": {
     "economia": [
@@ -228,6 +229,131 @@
     "retirarTexto": "Dejará de ofrecerse y se desactivará para todos los usuarios. Las puntuaciones ya guardadas se conservan.",
     "retirarConfirmar": "Confirmar retirada",
     "cancelar": "Cancelar",
-    "acciones": "Acciones"
+    "acciones": "Acciones",
+    "crearUsuario": "Crear usuario",
+    "crear": "Crear",
+    "cerrar": "Cerrar",
+    "copiar": "Copiar",
+    "confirmar": "Confirmar",
+    "activa": "Activa",
+    "suspendida": "Suspendida",
+    "accionesDe": "Acciones de {{email}}",
+    "cambiarRol": "Cambiar rol",
+    "cambiarEmail": "Cambiar email",
+    "cambiarNombre": "Cambiar nombre",
+    "enlaceRecuperacion": "Enviar enlace de recuperación",
+    "suspender": "Suspender",
+    "reactivar": "Reactivar",
+    "eliminar": "Eliminar",
+    "nuevoEmail": "Nuevo email",
+    "nuevoNombre": "Nuevo nombre",
+    "tuContrasena": "Tu contraseña (para confirmar)",
+    "pestanaAuditoria": "Auditoría",
+    "dialogo": {
+      "role": "Cambiar el rol de {{email}}",
+      "email": "Cambiar el email de {{email}}",
+      "name": "Cambiar el nombre de {{email}}",
+      "suspend": "¿Suspender la cuenta de {{email}}?",
+      "delete": "¿Eliminar la cuenta de {{email}}?",
+      "recovery": "Enviar enlace de recuperación a {{email}}"
+    },
+    "dialogoTexto": {
+      "role": "El rol determina lo que puede hacer en la aplicación. Solo puedes cambiar el rol de otras personas, nunca el tuyo.",
+      "email": "Cambia el email con el que inicia sesión (por ejemplo, para corregir un error al escribirlo). Quedará anotado en la auditoría.",
+      "name": "Corrige el nombre que se muestra en su perfil.",
+      "suspend": "No podrá iniciar sesión ni usar su sesión abierta, pero se conservan todos sus datos. Puedes reactivarla cuando quieras.",
+      "delete": "Se borrarán su perfil, categorías, consentimientos, puntuaciones y su cuenta de acceso. Esto no se puede deshacer.",
+      "recovery": "Se envía un correo con un enlace para que elija una contraseña nueva. Tú no ves ni fijas su contraseña.",
+      "create": "Se crea la cuenta con una contraseña temporal aleatoria que verás una sola vez. Entrégasela a la persona; conviene que la cambie con «He olvidado mi contraseña»."
+    },
+    "contrasenaTemporalAviso": "Contraseña temporal: solo se muestra ahora. Cópiala antes de cerrar, no se puede volver a ver.",
+    "contrasenaTemporalConsejo": "Recomienda a la persona que la cambie en cuanto pueda.",
+    "errorContrasena": "Tu contraseña no es correcta.",
+    "errorEmailEnUso": "Ese email ya está en uso.",
+    "errorRegla": "Acción no permitida: siempre debe existir un administrador, y no se puede actuar sobre uno mismo ni sobre otro administrador sin degradarlo antes.",
+    "errorNoEncontrado": "No se encontró a ese usuario (puede que ya no exista).",
+    "errorDatos": "Revisa los datos: alguno no es válido.",
+    "auditoriaAyuda": "Últimas acciones de administración. Solo se guardan ids y la acción, nunca contraseñas ni emails.",
+    "auditoriaVacia": "Todavía no hay acciones registradas.",
+    "fecha": "Fecha",
+    "quien": "Quién",
+    "accion": "Acción",
+    "sobre": "Sobre",
+    "detalle": "Detalle",
+    "acciones_role_changed": "Cambio de rol",
+    "acciones_user_suspended": "Suspensión",
+    "acciones_user_reactivated": "Reactivación",
+    "acciones_user_deleted": "Eliminación",
+    "acciones_user_created": "Creación",
+    "acciones_user_email_changed": "Cambio de email",
+    "acciones_user_name_changed": "Cambio de nombre",
+    "acciones_user_recovery_sent": "Enlace de recuperación enviado",
+    "acciones_reauth_failed": "Contraseña de confirmación incorrecta"
+  },
+  "datos": {
+    "titulo": "Privacidad y datos",
+    "exportarTitulo": "Descargar mis datos",
+    "exportarTexto": "Un archivo JSON con todo lo que hay sobre ti: tu cuenta, tu perfil, tus categorías, tus consentimientos y todas tus puntuaciones con sus notas.",
+    "exportar": "Descargar mis datos",
+    "exportando": "Preparando…",
+    "errorExportar": "No se pudieron exportar tus datos",
+    "eliminarTitulo": "Eliminar mi cuenta",
+    "eliminarTexto": "Borra tu cuenta y todo lo asociado: perfil, categorías, consentimientos y puntuaciones. Es tu derecho y no tiene coste, pero no se puede deshacer.",
+    "eliminar": "Eliminar mi cuenta",
+    "dialogoTitulo": "¿Eliminar tu cuenta para siempre?",
+    "dialogoTexto": "Esto no se puede deshacer. Se borrarán tu perfil, tus categorías, tus consentimientos y todas tus puntuaciones y notas, y no podrás volver a entrar con este email. Si quieres conservar algo, descarga tus datos antes.",
+    "contrasena": "Tu contraseña (para confirmar)",
+    "confirmar": "Eliminar definitivamente",
+    "eliminando": "Eliminando…",
+    "cancelar": "Cancelar",
+    "errorEliminar": "No se pudo eliminar la cuenta",
+    "errorUltimoAdmin": "Eres el único administrador y siempre debe existir uno: no puedes eliminar tu cuenta hasta que crees otro administrador (concediendo el rol a otra cuenta)."
+  },
+  "recomendaciones": {
+    "titulo": "Una idea para ti",
+    "aviso": "Estas ideas son sugerencias generales de bienestar y no sustituyen el asesoramiento médico, financiero o psicológico profesional.",
+    "plantillas": {
+      "economia": {
+        "1": "Si te apetece, anota durante una semana en qué se va tu dinero, sin juzgarte: solo mirarlo ya ayuda.",
+        "2": "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica. Lo importante es el hábito."
+      },
+      "vidaSocial": {
+        "1": "Escribe hoy a alguien con quien hace tiempo que no hablas: un mensaje corto basta para reconectar.",
+        "2": "Propón un plan sencillo esta semana, como un café o un paseo con alguien con quien te sientas a gusto."
+      },
+      "pareja": {
+        "1": "Reserva un rato sin pantallas esta semana para estar juntos, aunque sean veinte minutos.",
+        "2": "Cuéntale a tu pareja algo que hayas agradecido de ella últimamente; los detalles pequeños suman."
+      },
+      "sexo": {
+        "1": "Hablar con calma sobre lo que os apetece o os incomoda suele ayudar; elige un momento sin prisas y sin presión.",
+        "2": "Dedica un rato a cuidarte y a conocer qué te sienta bien, sin objetivos ni expectativas."
+      },
+      "deporte": {
+        "1": "Sal a caminar veinte minutos hoy: empezar en pequeño es mejor que no empezar.",
+        "2": "Elige una actividad que te resulte agradable y ponla en el calendario dos veces esta semana."
+      },
+      "aventura": {
+        "1": "Cambia una pequeña rutina esta semana: un camino distinto, un plato nuevo, un sitio que no conozcas.",
+        "2": "Apunta un plan que te haga ilusión, aunque sea pequeño, y ponle una fecha."
+      },
+      "espiritualidad": {
+        "1": "Regálate cinco minutos de silencio al día, sin móvil, para estar contigo.",
+        "2": "Escribe qué te da sentido últimamente y qué te gustaría cuidar más."
+      },
+      "familia": {
+        "1": "Llama a alguien de tu familia esta semana solo para preguntarle cómo está.",
+        "2": "Propón una comida o un rato compartido: a veces basta con una pequeña iniciativa."
+      },
+      "inversiones": {
+        "1": "Dedica media hora a revisar dónde está tu dinero y qué objetivo tiene cada parte.",
+        "2": "Infórmate en fuentes fiables sobre una idea básica, como diversificar, antes de decidir nada."
+      },
+      "general": {
+        "1": "Elige una acción pequeña relacionada con {{categoria}} que puedas hacer esta semana y anótala.",
+        "2": "Piensa qué es lo que más te pesa de {{categoria}} y qué cambio pequeño lo aliviaría.",
+        "3": "Pregúntate qué te ayudaría más ahora mismo en {{categoria}} y da un primer paso, por pequeño que sea."
+      }
+    }
   }
 }

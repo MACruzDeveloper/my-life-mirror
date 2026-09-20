@@ -62,4 +62,11 @@ export class SupabaseProfileRepository implements ProfileRepository {
     if (!data) return undefined;
     return perfilDesdeFila(data as FilaPerfil);
   }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    const { error } = await this.cliente.from("profiles").delete().eq("user_id", userId);
+    if (error) {
+      throw new Error(`No se pudo borrar el perfil: ${error.message}`);
+    }
+  }
 }

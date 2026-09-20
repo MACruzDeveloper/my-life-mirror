@@ -1,19 +1,27 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
+import { withClient } from "../../../helpers/queryClient";
 import { Home } from "@modules/panel/ui/Home";
 
-function stub(body: unknown, ok = true) {
-  vi.stubGlobal("fetch", vi.fn(() => Promise.resolve({ ok, json: async () => body })));
+function stub(body: unknown, ok = true, recomendaciones: unknown = []) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((url: string) =>
+      url === "/api/recommendations" ? Promise.resolve({ ok: true, json: async () => recomendaciones }) : Promise.resolve({ ok, json: async () => body }),
+    ),
+  );
 }
 
 function renderHome() {
   return render(
-    <MemoryRouter>
-      <Home />
-    </MemoryRouter>,
+    withClient(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>,
+    ),
   );
 }
 
@@ -45,5 +53,18 @@ describe("Home (RF-39 / RF-14)", () => {
     expect(await screen.findByText("Economía")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /empezar mi entrevista/i })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /nueva entrevista/i })).toHaveAttribute("href", "/perfil/entrevista");
+  });
+
+  it("el panel del usuario recurrente enseña la recomendación de una categoría baja", async () => {
+    stub(
+      [{ categoryId: "c1", categoryName: "Economía", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" }],
+      true,
+      [{ id: "r1", categoryId: "c1", categoryName: "Economía", templateKey: "economia.1", status: "pending" }],
+    );
+    renderHome();
+
+    const tarjeta = (await screen.findByText("Economía")).closest("div[class]")!.parentElement!;
+    expect(await within(tarjeta).findByText(/una idea para ti/i)).toBeInTheDocument();
+    expect(screen.getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
   });
 });

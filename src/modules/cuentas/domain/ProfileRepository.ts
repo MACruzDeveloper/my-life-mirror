@@ -4,4 +4,6 @@ import type { Profile } from "./Profile";
 export interface ProfileRepository {
   save(profile: Profile): Promise<void>;
   findByUserId(userId: string): Promise<Profile | undefined>;
+  /** Borra el perfil del usuario (RF-05). Repetible. */
+  deleteByUserId(userId: string): Promise<void>;
 }
