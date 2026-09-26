@@ -9,24 +9,25 @@ import { Link as RouterLink } from "react-router";
 export interface HeaderProps {
   /** Nombre del usuario con sesión activa (RF-03), o el email si aún no tiene perfil. Ausente mientras useSesion carga. */
   displayName?: string;
-  onCerrarSesion: () => void;
+  onLogout: () => void;
   /** Solo muestra el enlace: la protección real de /admin está en el servidor (ADM-01). */
   isAdmin?: boolean;
 }
 
 /**
  * Cabecera de las páginas protegidas (RF-39): logo (texto, sin imagen todavía),
- * un enlace de navegación ("Mi perfil" — Perfil, Categorías, Entrevista y
- * Resultados viven dentro, en el menú lateral de AccountPage), usuario con sesión activa,
+ * enlaces de navegación ("Inicio" — el panel —, "Administración" solo para
+ * admin, y "Mi perfil" — Perfil, Entrevista, Resultados y Privacidad viven
+ * dentro, en el menú lateral de AccountPage), usuario con sesión activa,
  * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 §6):
  * `displayName` se oculta en móvil (`xs`) para dejar sitio a las acciones.
  */
-export function Header({ displayName, onCerrarSesion, isAdmin }: HeaderProps) {
+export function Header({ displayName, onLogout: onLogout, isAdmin }: HeaderProps) {
   const { t, i18n } = useTranslation();
-  const esEspanol = i18n.language.startsWith("es");
+  const isSpanish = i18n.language.startsWith("es");
 
-  function alternarIdioma() {
-    void i18n.changeLanguage(esEspanol ? "en" : "es");
+  function toggleLanguage() {
+    void i18n.changeLanguage(isSpanish ? "en" : "es");
   }
 
   return (
@@ -36,6 +37,9 @@ export function Header({ displayName, onCerrarSesion, isAdmin }: HeaderProps) {
           MyLifeMirror
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
+          <Button size="small" component={RouterLink} to="/inicio">
+            {t("breadcrumbs.inicio")}
+          </Button>
           {isAdmin ? (
             <Button size="small" component={RouterLink} to="/admin">
               {t("breadcrumbs.administracion")}
@@ -49,10 +53,10 @@ export function Header({ displayName, onCerrarSesion, isAdmin }: HeaderProps) {
               {displayName}
             </Typography>
           ) : null}
-          <Button size="small" onClick={alternarIdioma}>
-            {esEspanol ? "EN" : "ES"}
+          <Button size="small" onClick={toggleLanguage}>
+            {isSpanish ? "EN" : "ES"}
           </Button>
-          <Button size="small" variant="outlined" onClick={onCerrarSesion}>
+          <Button size="small" variant="outlined" onClick={onLogout}>
             {t("panel.cerrarSesion")}
           </Button>
         </Box>

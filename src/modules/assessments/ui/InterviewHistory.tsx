@@ -11,30 +11,30 @@ import { useAssessmentHistory } from "./queries";
  */
 export function InterviewHistory() {
   const { t, i18n } = useTranslation();
-  const { data: sesiones } = useAssessmentHistory();
+  const { data: sessions } = useAssessmentHistory();
 
-  const fecha = (iso: string) => new Date(iso).toLocaleDateString(i18n.language, { month: "long", year: "numeric", day: "numeric" });
+  const formatSessionDate = (isoDate: string) => new Date(isoDate).toLocaleDateString(i18n.language, { month: "long", year: "numeric", day: "numeric" });
 
   return (
     <Box component="aside" aria-labelledby="historial-titulo" sx={{ bgcolor: "#FFFFFF", border: "1px solid #E4EAE8", borderRadius: 3, p: 2 }}>
       <Typography id="historial-titulo" variant="subtitle1" component="h2" sx={{ mb: 1 }}>
         {t("entrevista.historialTitulo")}
       </Typography>
-      {sesiones && sesiones.length === 0 && (
+      {sessions && sessions.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           {t("entrevista.historialVacio")}
         </Typography>
       )}
       <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 2 }}>
-        {(sesiones ?? []).map((sesion) => (
-          <Box component="li" key={sesion.recordedAt}>
+        {(sessions ?? []).map((session) => (
+          <Box component="li" key={session.recordedAt}>
             <Typography variant="caption" color="text.secondary">
-              {fecha(sesion.recordedAt)}
+              {formatSessionDate(session.recordedAt)}
             </Typography>
-            {sesion.entries.map((entrada) => (
-              <Typography key={entrada.categoryId} variant="body2">
-                {entrada.categoryName}:{" "}
-                {entrada.previousScore !== undefined ? `${entrada.previousScore} → ${entrada.score}` : entrada.score}
+            {session.entries.map((entry) => (
+              <Typography key={entry.categoryId} variant="body2">
+                {entry.categoryName}:{" "}
+                {entry.previousScore !== undefined ? `${entry.previousScore} → ${entry.score}` : entry.score}
               </Typography>
             ))}
           </Box>

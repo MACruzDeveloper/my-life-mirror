@@ -25,6 +25,10 @@ Para saber que estoy dentro de la app
    When entra a `/inicio`
    Then ve la página Home: si todavía no tiene ninguna puntuación (primera vez), una bienvenida con un enlace grande a la entrevista (`/perfil/entrevista`), que es su primer paso; si ya tiene puntuaciones, directamente el panel (por ahora las tarjetas de resultados; los gráficos son RF-14) con un botón "Nueva entrevista"
 
+## Cabecera
+
+La cabecera de las pantallas protegidas enlaza a Inicio (el panel), a Administración (solo admin) y a Mi perfil, en ese orden.
+
 ## Nota "spec viva"
 
 La sesión vive en una cookie `httpOnly` (ADR-06) — invisible a JS del navegador a propósito. Hace falta un endpoint propio (`/api/accounts/session`) que la compruebe en el servidor y le diga al frontend si hay sesión o no; no se puede leer la cookie directamente desde React.
@@ -33,3 +37,4 @@ La sesión vive en una cookie `httpOnly` (ADR-06) — invisible a JS del navegad
 
 - **v1.0 (14 sept. 2026)** — versión inicial.
 - **v1.1 (19 sept. 2026)** — Home distingue primera vez (bienvenida + enlace grande a la entrevista) de usuario recurrente (directo al panel). "Primera vez" = ninguna puntuación guardada; no requiere estado nuevo en base de datos.
+- **v1.2 (26 sept. 2026)** — enlace "Inicio" en la cabecera, a la izquierda de Administración.
