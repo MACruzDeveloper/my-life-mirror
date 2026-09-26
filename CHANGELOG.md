@@ -18,6 +18,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 - Plan de métricas DORA y Flow para la revisión de calidad ([02_Metricas_DORA_y_Flujo.md](docs/project-management/02_Metricas_DORA_y_Flujo.md)); solo planificación.
 - `PrivacyPolicyPage` (`/politica-privacidad`, pública, RNF-05): antes del modal de consentimiento no había nada real que leer. Enlazada desde el modal; muestra la misma `VERSION_POLITICA_ACTUAL` que valida el backend. Contenido de borrador razonable para un TFM, no redactado por asesoría legal.
 
+### Añadido (infraestructura)
+
+- `.github/workflows/supabase-keep-alive.yml`: una consulta diaria mínima (solo lectura, clave pública *anon*, sin permisos sobre el repositorio) para que Supabase Free no pause el proyecto por inactividad; si Supabase no responde 200, el job falla y GitHub avisa. Necesita los secretos `SUPABASE_URL` y `SUPABASE_ANON_KEY` y que la rama por defecto sea `develop` (ver ADR-03 §6bis).
+
 ### Cambiado (estructura y nombres)
 
 - Gráficos reorganizados como plantillas genéricas en `src/shared/ui/charts/`: `TimeLineChart` (configurable por props), `useEChart`, `echarts.ts`, `timeWindow.ts`, `ChartDataTable`. Lo específico de la evolución, en `assessments/ui/evolution/` (`EvolutionPanel`, `PeriodSelector`, `CategoryEvolutionCard`, `scoreHistory`). Inicio dividido en `panel/ui/home/` (`Home`, `FirstTimeWelcome`, `LoadErrorState`, `Dashboard`).

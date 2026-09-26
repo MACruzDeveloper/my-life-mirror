@@ -15,6 +15,7 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
+- [ ] **RF-15** — radar de equilibrio entre categorías en el panel (Should, comprometido: hay tiempo). Nueva plantilla hermana de `TimeLineChart` en `shared/ui/charts/`, reutilizando `useEChart`. Antes de la validación, para que el test de usabilidad cubra el panel definitivo.
 - [ ] **Validación** — Usability test (n=1, ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md)) sobre el flujo completo, centrado en RN-04; corregir lo que salga; preparar la demo de cierre del Ciclo 1. Se reserva tiempo para esto **siempre**: es lo último que se recorta, no lo primero.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
@@ -25,7 +26,7 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
 - **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
-- **RF-15 / RF-17** (radar de equilibrio, puntuación global ponderada — Should/Could): siguiente extensión natural del panel. Sin planificar; decidir según el tiempo que quede tras la validación.
+- **RF-17** (puntuación global ponderada, Could): sin planificar; decidir según el tiempo que quede tras la validación. RF-15 ya está en "Listo".
 - **Rendimiento del servidor** (medir antes de tocar): (a) alinear la región de las funciones de Vercel con la de Supabase (`regions` en `vercel.json`; Hobby permite una) — hoy por defecto es EE. UU. este; (b) validar la sesión sin llamar a Supabase en cada petición (`getClaims`/JWKS): ahorra un salto por llamada pero un usuario borrado o bloqueado seguiría siendo válido hasta que caduque el token (1 h) — decisión de seguridad, no solo de velocidad; (c) un endpoint que devuelva de una vez lo que la entrevista pide en tres llamadas; (d) menos funciones = menos arranques en frío ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis).
 - **Validaciones previas al push con Husky** (idea): `pre-push` con lint, tests, `npm run build` y `npm run check:api`, para no descubrir en Vercel lo que se puede ver en local.
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
@@ -37,6 +38,8 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 - **Política de privacidad**: borrador de TFM, no revisado legalmente ([PrivacyPolicyPage](../../src/pages/PrivacyPolicyPage.tsx)).
 
 ## Hecho
+
+- [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow diario de GitHub Actions contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis). Requiere dos secretos y la rama por defecto en `develop`.
 
 Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHANGELOG.md); aquí solo el resumen.
 
@@ -88,3 +91,5 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.11 (20 sept. 2026)** — RF-18 hecha (recomendaciones al puntuar bajo); RF-19 anotada como siguiente paso natural.
 - **v2.12 (26 sept. 2026)** — RF-14 hecha (panel general: estado actual + recomendación por categoría, sin caso de uso combinado); RF-15/RF-16/RF-17 anotadas como extensión futura sin planificar.
 - **v2.13 (26 sept. 2026)** — RF-16 hecha (evolución temporal); con ella quedan cerrados todos los Must del Ciclo 1 salvo la validación. RF-15/RF-17 siguen sin planificar.
+- **v2.14 (26 sept. 2026)** — RF-15 (radar) pasa a "Listo", por encima de la validación: hay tiempo y así el test de usabilidad cubre el panel definitivo.
+- **v2.15 (26 sept. 2026)** — keep-alive de Supabase (GitHub Actions).
