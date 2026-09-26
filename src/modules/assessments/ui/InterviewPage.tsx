@@ -32,6 +32,30 @@ import { scoreBand, type ScoreBand } from "./scoreBand";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+/**
+ * Categorías activas todavía sin respuesta: un tono lila suave, para recordar
+ * sin alarmar (RN-04) — ni rojo ni icono de aviso. Colores planos.
+ */
+const PENDING_COLORS = { bg: "#EEEAFB", fg: "#4B3F8F", border: "#C9BDF2" };
+
+/** Lleva a la pregunta de una categoría; sin animación si el usuario prefiere menos movimiento. */
+function scrollToQuestion(categoryId: string) {
+  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  document.getElementById(`pregunta-${categoryId}`)?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+}
+
+/** Etiqueta pequeña "Sin responder". */
+function PendingBadge({ label }: { label: string }) {
+  return (
+    <Box
+      component="span"
+      sx={{ px: 1, py: 0.25, borderRadius: 999, fontSize: "0.75rem", fontWeight: 600, bgcolor: PENDING_COLORS.bg, color: PENDING_COLORS.fg, whiteSpace: "nowrap" }}
+    >
+      {label}
+    </Box>
+  );
+}
+
 /** El catálogo estándar no tiene slug; se enlaza por nombre con las claves de `ejemplos.*` en i18n. */
 const EXAMPLES_KEY: Record<string, string> = {
   Economía: "economia",
@@ -45,11 +69,11 @@ const EXAMPLES_KEY: Record<string, string> = {
   Inversiones: "inversiones",
 };
 
-type Estado =
-  | { tipo: "listo" }
-  | { tipo: "guardando" }
-  | { tipo: "guardado" }
-  | { tipo: "error"; mensaje: string };
+type SaveState =
+  | { kind: "idle" }
+  | { kind: "saving" }
+  | { kind: "saved" }
+  | { kind: "error"; message: string };
 
 /** Icono "i" en círculo (Material) inline — evita añadir la dependencia @mui/icons-material solo para uno. */
 function InfoIcon() {
@@ -60,13 +84,13 @@ function InfoIcon() {
   );
 }
 
-function omitir<T>(registro: Record<string, T>, clave: string): Record<string, T> {
-  const { [clave]: _descartada, ...resto } = registro;
-  void _descartada;
-  return resto;
+function omitKey<T>(record: Record<string, T>, key: string): Record<string, T> {
+  const { [key]: _omitted, ...rest } = record;
+  void _omitted;
+  return rest;
 }
 
-const POST = (categoryId: string) => ({
+const categoryRequest = (categoryId: string) => ({
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ categoryId }),
@@ -74,23 +98,23 @@ const POST = (categoryId: string) => ({
 
 /** Burbuja de conversación — el entrevistador a la izquierda, el usuario a la derecha. */
 function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNode; side: "left" | "right"; avatar: string; alt: string; band?: ScoreBand }) {
-  const left = side === "left";
+  const isLeft = side === "left";
   return (
-    <Box sx={{ display: "flex", flexDirection: left ? "row" : "row-reverse", alignItems: "flex-start", gap: 1.5 }}>
+    <Box sx={{ display: "flex", flexDirection: isLeft ? "row" : "row-reverse", alignItems: "flex-start", gap: 1.5 }}>
       <Avatar src={avatar} alt={alt} sx={{ width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, flexShrink: 0 }} />
       <Box
         data-band={band}
         sx={{
           position: "relative",
           overflow: "hidden",
-          bgcolor: left ? "#FFFFFF" : "#F3EFFB",
+          bgcolor: isLeft ? "#FFFFFF" : "#F3EFFB",
           border: "1px solid",
-          borderColor: left ? "#D9ECE8" : "#E2DAF3",
-          borderRadius: left ? "4px 20px 20px 20px" : "20px 4px 20px 20px",
+          borderColor: isLeft ? "#D9ECE8" : "#E2DAF3",
+          borderRadius: isLeft ? "4px 20px 20px 20px" : "20px 4px 20px 20px",
           px: 2,
           py: 1.5,
           minWidth: 0,
-          flex: left ? "0 1 auto" : 1,
+          flex: isLeft ? "0 1 auto" : 1,
         }}
       >
         <BandBackground band={band} />
@@ -119,47 +143,48 @@ function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNo
 export function InterviewPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const categoriasQuery = useCategories();
-  const ultimasQuery = useLatestScores();
-  const categorias = categoriasQuery.data ?? [];
+  const categoriesQuery = useCategories();
+  const latestScoresQuery = useLatestScores();
+  const categories = categoriesQuery.data ?? [];
   // Solo lo que el usuario ha cambiado en esta pantalla; el resto sale de la última puntuación guardada.
-  const [borradores, setBorradores] = useState<Record<string, number>>({});
-  const [notas, setNotas] = useState<Record<string, string>>({});
-  const [notasAbiertas, setNotasAbiertas] = useState<Record<string, boolean>>({});
-  const [ejemplosAbiertos, setEjemplosAbiertos] = useState<Record<string, boolean>>({});
-  const [pendienteConsentimiento, setPendienteConsentimiento] = useState<CategoryDto | null>(null);
-  const [enviandoConsentimiento, setEnviandoConsentimiento] = useState(false);
+  const [draftScores, setDraftScores] = useState<Record<string, number>>({});
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
+  const [openExamples, setOpenExamples] = useState<Record<string, boolean>>({});
+  const [categoryAwaitingConsent, setCategoryAwaitingConsent] = useState<CategoryDto | null>(null);
+  const [isSendingConsent, setIsSendingConsent] = useState(false);
   // Categorías con una petición en curso: evita dobles clics contradictorios y enseña un indicador en las sensibles.
-  const [enCurso, setEnCurso] = useState<Set<string>>(new Set());
-  const [estado, setEstado] = useState<Estado>({ tipo: "listo" });
+  const [pendingCategoryIds, setPendingCategoryIds] = useState<Set<string>>(new Set());
+  const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" });
 
-  const ultimas: Record<string, number> = {};
-  for (const u of ultimasQuery.data ?? []) if (u.score !== undefined) ultimas[u.categoryId] = u.score;
-  const scores: Record<string, number> = { ...ultimas, ...borradores };
+  const savedScores: Record<string, number> = {};
+  for (const latestScore of latestScoresQuery.data ?? []) if (latestScore.score !== undefined) savedScores[latestScore.categoryId] = latestScore.score;
+  const scores: Record<string, number> = { ...savedScores, ...draftScores };
+  const hasSavedAnswers = Object.keys(savedScores).length > 0;
 
-  const activas = categorias.filter((c) => c.status === "active");
-  const libres = categorias.filter((c) => !c.isSensitiveData);
-  const sensibles = categorias.filter((c) => c.isSensitiveData);
-  const todasActivas = libres.length > 0 && libres.every((c) => c.status === "active");
-  const algunaActiva = activas.length > 0;
-  const algunaLibreActiva = libres.some((c) => c.status === "active");
-  const cambios = activas.filter((c) => scores[c.id] !== undefined && (scores[c.id] !== ultimas[c.id] || notas[c.id]?.trim()));
+  const activeCategories = categories.filter((category) => category.status === "active");
+  const regularCategories = categories.filter((category) => !category.isSensitiveData);
+  const sensitiveCategories = categories.filter((category) => category.isSensitiveData);
+  const allRegularActive = regularCategories.length > 0 && regularCategories.every((category) => category.status === "active");
+  const anyActive = activeCategories.length > 0;
+  const anyRegularActive = regularCategories.some((category) => category.status === "active");
+  const changedCategories = activeCategories.filter((category) => scores[category.id] !== undefined && (scores[category.id] !== savedScores[category.id] || notes[category.id]?.trim()));
 
-  function fijarEstado(id: string, status: "active" | "inactive") {
-    queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (actuales) => actuales?.map((c) => (c.id === id ? { ...c, status } : c)));
+  function setCategoryStatus(id: string, status: "active" | "inactive") {
+    queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, status } : category)));
   }
 
-  function marcarEnCurso(id: string, activo: boolean) {
-    setEnCurso((actuales) => {
-      const siguiente = new Set(actuales);
-      if (activo) siguiente.add(id);
-      else siguiente.delete(id);
-      return siguiente;
+  function markPending(id: string, isPending: boolean) {
+    setPendingCategoryIds((current) => {
+      const next = new Set(current);
+      if (isPending) next.add(id);
+      else next.delete(id);
+      return next;
     });
   }
 
   /** Activar/desactivar cambia qué categorías cuentan en resultados: se pide de nuevo en segundo plano. */
-  function refrescarResultados() {
+  function refreshResults() {
     void queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
   }
 
@@ -170,84 +195,84 @@ export function InterviewPage() {
    * funciona). Las sensibles no pueden ser optimistas — el servidor puede
    * pedir consentimiento (RF-04) — y muestran un indicador mientras tanto.
    */
-  async function activar(categoria: CategoryDto) {
-    if (enCurso.has(categoria.id)) return;
-    marcarEnCurso(categoria.id, true);
-    const optimista = !categoria.isSensitiveData;
-    if (optimista) fijarEstado(categoria.id, "active");
+  async function activateCategory(category: CategoryDto) {
+    if (pendingCategoryIds.has(category.id)) return;
+    markPending(category.id, true);
+    const isOptimistic = !category.isSensitiveData;
+    if (isOptimistic) setCategoryStatus(category.id, "active");
 
     try {
-      const respuesta = await fetch("/api/categories/activate", POST(categoria.id));
-      const datos = await respuesta.json();
+      const response = await fetch("/api/categories/activate", categoryRequest(category.id));
+      const data = await response.json();
 
-      if (!respuesta.ok) {
-        if (optimista) fijarEstado(categoria.id, "inactive");
-        if (datos.code === "CONSENT_REQUIRED") {
-          setPendienteConsentimiento(categoria);
+      if (!response.ok) {
+        if (isOptimistic) setCategoryStatus(category.id, "inactive");
+        if (data.code === "CONSENT_REQUIRED") {
+          setCategoryAwaitingConsent(category);
         } else {
-          setEstado({ tipo: "error", mensaje: datos.error ?? t("entrevista.errorActivar") });
+          setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorActivar") });
         }
         return false;
       }
 
-      fijarEstado(categoria.id, "active");
-      refrescarResultados();
+      setCategoryStatus(category.id, "active");
+      refreshResults();
       return true;
     } catch {
-      if (optimista) fijarEstado(categoria.id, "inactive");
-      setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });
+      if (isOptimistic) setCategoryStatus(category.id, "inactive");
+      setSaveState({ kind: "error", message: t("comun.errorServidor") });
       return false;
     } finally {
-      marcarEnCurso(categoria.id, false);
+      markPending(category.id, false);
     }
   }
 
-  async function desactivar(categoria: CategoryDto) {
-    if (enCurso.has(categoria.id)) return;
-    marcarEnCurso(categoria.id, true);
-    fijarEstado(categoria.id, "inactive");
+  async function deactivateCategory(category: CategoryDto) {
+    if (pendingCategoryIds.has(category.id)) return;
+    markPending(category.id, true);
+    setCategoryStatus(category.id, "inactive");
     // Lo que estaba a medias de esa categoría se descarta; las evaluaciones ya guardadas se conservan.
-    setBorradores((actuales) => omitir(actuales, categoria.id));
-    setNotas((actuales) => omitir(actuales, categoria.id));
+    setDraftScores((current) => omitKey(current, category.id));
+    setNotes((current) => omitKey(current, category.id));
 
     try {
-      const respuesta = await fetch("/api/categories/deactivate", POST(categoria.id));
-      if (!respuesta.ok) {
-        const datos = await respuesta.json();
-        fijarEstado(categoria.id, "active");
-        setEstado({ tipo: "error", mensaje: datos.error ?? t("entrevista.errorActivar") });
+      const response = await fetch("/api/categories/deactivate", categoryRequest(category.id));
+      if (!response.ok) {
+        const data = await response.json();
+        setCategoryStatus(category.id, "active");
+        setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorActivar") });
         return;
       }
-      refrescarResultados();
+      refreshResults();
     } catch {
-      fijarEstado(categoria.id, "active");
-      setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });
+      setCategoryStatus(category.id, "active");
+      setSaveState({ kind: "error", message: t("comun.errorServidor") });
     } finally {
-      marcarEnCurso(categoria.id, false);
+      markPending(category.id, false);
     }
   }
 
-  function alternar(categoria: CategoryDto) {
-    if (categoria.status === "active") void desactivar(categoria);
-    else void activar(categoria);
+  function toggleCategory(category: CategoryDto) {
+    if (category.status === "active") void deactivateCategory(category);
+    else void activateCategory(category);
   }
 
-  async function confirmarConsentimiento() {
-    if (!pendienteConsentimiento) return;
-    const categoria = pendienteConsentimiento;
-    setEnviandoConsentimiento(true);
+  async function confirmConsent() {
+    if (!categoryAwaitingConsent) return;
+    const category = categoryAwaitingConsent;
+    setIsSendingConsent(true);
 
     try {
-      const respuesta = await fetch("/api/consent/grant", POST(categoria.id));
-      if (!respuesta.ok) {
-        const datos = await respuesta.json();
-        setEstado({ tipo: "error", mensaje: datos.error ?? t("entrevista.errorActivar") });
+      const response = await fetch("/api/consent/grant", categoryRequest(category.id));
+      if (!response.ok) {
+        const data = await response.json();
+        setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorActivar") });
         return;
       }
-      await activar(categoria);
+      await activateCategory(category);
     } finally {
-      setEnviandoConsentimiento(false);
-      setPendienteConsentimiento(null);
+      setIsSendingConsent(false);
+      setCategoryAwaitingConsent(null);
     }
   }
 
@@ -256,75 +281,75 @@ export function InterviewPage() {
    * sensibles se marcan una a una (el consentimiento, RF-04, es por
    * categoría). Con todas marcadas, desmarcar las desactiva.
    */
-  async function alternarTodas() {
-    if (todasActivas) {
-      await Promise.all(libres.map(desactivar));
+  async function toggleAllRegular() {
+    if (allRegularActive) {
+      await Promise.all(regularCategories.map(deactivateCategory));
       return;
     }
-    await Promise.all(libres.filter((c) => c.status === "inactive").map(activar));
+    await Promise.all(regularCategories.filter((category) => category.status === "inactive").map(activateCategory));
   }
 
-  async function guardar(evento: React.FormEvent) {
-    evento.preventDefault();
-    setEstado({ tipo: "guardando" });
+  async function saveChanges(event: React.FormEvent) {
+    event.preventDefault();
+    setSaveState({ kind: "saving" });
 
     try {
-      const respuesta = await fetch("/api/assessments", {
+      const response = await fetch("/api/assessments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          entries: cambios.map((c) => ({
-            categoryId: c.id,
-            score: scores[c.id],
-            ...(notas[c.id]?.trim() ? { note: notas[c.id].trim() } : {}),
+          entries: changedCategories.map((category) => ({
+            categoryId: category.id,
+            score: scores[category.id],
+            ...(notes[category.id]?.trim() ? { note: notes[category.id].trim() } : {}),
           })),
         }),
       });
-      const datos = await respuesta.json();
+      const data = await response.json();
 
-      if (!respuesta.ok) {
-        setEstado({ tipo: "error", mensaje: datos.error ?? t("entrevista.errorGenerico") });
+      if (!response.ok) {
+        setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorGenerico") });
         return;
       }
 
       // La caché se actualiza al momento con lo guardado (Resultados/Inicio ya lo ven) y se confirma en segundo plano.
-      queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (actuales) =>
-        actuales?.map((u) => (borradores[u.categoryId] !== undefined && cambios.some((c) => c.id === u.categoryId) ? { ...u, score: borradores[u.categoryId] } : u)),
+      queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (current) =>
+        current?.map((latestScore) => (draftScores[latestScore.categoryId] !== undefined && changedCategories.some((category) => category.id === latestScore.categoryId) ? { ...latestScore, score: draftScores[latestScore.categoryId] } : latestScore)),
       );
-      setBorradores({});
-      setNotas({});
-      setNotasAbiertas({});
+      setDraftScores({});
+      setNotes({});
+      setOpenNotes({});
       void queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
-      setEstado({ tipo: "guardado" });
+      setSaveState({ kind: "saved" });
     } catch {
-      setEstado({ tipo: "error", mensaje: t("comun.errorServidor") });
+      setSaveState({ kind: "error", message: t("comun.errorServidor") });
     }
   }
 
-  const filaCategoria = (categoria: CategoryDto) => (
-    <Box key={categoria.id} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+  const renderCategoryRow = (category: CategoryDto) => (
+    <Box key={category.id} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
     <FormControlLabel
-      control={<Checkbox checked={categoria.status === "active"} onChange={() => alternar(categoria)} />}
+      control={<Checkbox checked={category.status === "active"} onChange={() => toggleCategory(category)} />}
       label={
         <Box>
           <Typography variant="body1" component="span">
-            {categoria.name}
+            {category.name}
           </Typography>
-          {categoria.description && (
+          {category.description && (
             <Typography variant="caption" color="text.secondary" component="span" sx={{ display: "block" }}>
-              {categoria.description}
+              {category.description}
             </Typography>
           )}
         </Box>
       }
     />
-  {enCurso.has(categoria.id) && categoria.isSensitiveData && (
-      <CircularProgress size={16} aria-label={categoria.name} />
+  {pendingCategoryIds.has(category.id) && category.isSensitiveData && (
+      <CircularProgress size={16} aria-label={category.name} />
     )}
     </Box>
   );
 
-  if (categoriasQuery.isPending || ultimasQuery.isPending) {
+  if (categoriesQuery.isPending || latestScoresQuery.isPending) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
         <CircularProgress />
@@ -336,30 +361,31 @@ export function InterviewPage() {
     <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) 300px" }, alignItems: "start", mt: { xs: 1, sm: 3 } }}>
     <Box
       component="form"
-      onSubmit={guardar}
+      onSubmit={saveChanges}
       sx={{
         p: { xs: 2, sm: 4 },
         borderRadius: 4,
-        background: "linear-gradient(180deg, #F2F9F7 0%, #F7F5FC 100%)",
+        bgcolor: "#F5F7F6",
         display: "flex",
         flexDirection: "column",
         gap: 3,
       }}
     >
+      {/* La entrevista es la primera vez; con respuestas guardadas, la misma pantalla se presenta como "actualizarlas". */}
       <Typography variant="h5" component="h1">
-        {t("entrevista.titulo")}
+        {hasSavedAnswers ? t("entrevista.tituloActualizar") : t("entrevista.titulo")}
       </Typography>
 
       <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
-        <Typography variant="body1">{t("entrevista.descripcion")}</Typography>
+        <Typography variant="body1">{hasSavedAnswers ? t("entrevista.descripcionActualizar") : t("entrevista.descripcion")}</Typography>
         <Typography variant="caption" color="text.secondary">
           {t("entrevista.escala")}
         </Typography>
       </Bubble>
 
-      {(categoriasQuery.isError || ultimasQuery.isError) && <Alert severity="error">{t("entrevista.errorCarga")}</Alert>}
-      {estado.tipo === "error" && <Alert severity="error">{estado.mensaje}</Alert>}
-      {estado.tipo === "guardado" && (
+      {(categoriesQuery.isError || latestScoresQuery.isError) && <Alert severity="error">{t("entrevista.errorCarga")}</Alert>}
+      {saveState.kind === "error" && <Alert severity="error">{saveState.message}</Alert>}
+      {saveState.kind === "saved" && (
         <Alert severity="success">
           {t("entrevista.exito")}{" "}
           <Link component={RouterLink} to="/perfil/resultados">
@@ -374,10 +400,10 @@ export function InterviewPage() {
             {t("entrevista.elegirTitulo")}
           </Typography>
           <FormControlLabel
-            control={<Checkbox checked={todasActivas} indeterminate={algunaLibreActiva && !todasActivas} onChange={() => void alternarTodas()} />}
+            control={<Checkbox checked={allRegularActive} indeterminate={anyRegularActive && !allRegularActive} onChange={() => void toggleAllRegular()} />}
             label={t("entrevista.seleccionarTodas")}
           />
-          <Box sx={{ display: "flex", flexDirection: "column", pl: 3 }}>{libres.map(filaCategoria)}</Box>
+          <Box sx={{ display: "flex", flexDirection: "column", pl: 3 }}>{regularCategories.map(renderCategoryRow)}</Box>
         </Box>
         <Box role="group" aria-labelledby="columna-sensibles" sx={{ bgcolor: "#FBF8FF", borderRadius: 3, border: "1px solid #E2DAF3", p: 2 }}>
           <Typography id="columna-sensibles" variant="subtitle1" sx={{ mb: 0.5 }}>
@@ -386,70 +412,125 @@ export function InterviewPage() {
           <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
             {t("entrevista.sensiblesExplicacion")}
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>{sensibles.map(filaCategoria)}</Box>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>{sensitiveCategories.map(renderCategoryRow)}</Box>
         </Box>
       </Box>
 
-      {activas.map((categoria) => (
-        <Box key={categoria.id} sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+      {activeCategories.length > 0 && (
+        <Box component="nav" aria-label={t("entrevista.irA")} sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {activeCategories.map((category) => {
+            const isUnanswered = scores[category.id] === undefined;
+            return (
+              <Box
+                key={category.id}
+                component="a"
+                href={`#pregunta-${category.id}`}
+                onClick={(event: React.MouseEvent) => {
+                  event.preventDefault();
+                  scrollToQuestion(category.id);
+                }}
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.75,
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 999,
+                  border: "1px solid",
+                  borderColor: isUnanswered ? PENDING_COLORS.border : "#DDE3E1",
+                  bgcolor: isUnanswered ? PENDING_COLORS.bg : "#FFFFFF",
+                  color: isUnanswered ? PENDING_COLORS.fg : "text.primary",
+                  fontSize: "0.875rem",
+                  textDecoration: "none",
+                  "&:hover, &:focus-visible": { borderColor: isUnanswered ? PENDING_COLORS.fg : "text.secondary" },
+                }}
+              >
+                {category.name}
+                {isUnanswered && (
+                  <Box component="span" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                    · {t("entrevista.sinResponder")}
+                  </Box>
+                )}
+              </Box>
+            );
+          })}
+        </Box>
+      )}
+
+      {activeCategories.map((category) => (
+        <Box
+          key={category.id}
+          id={`pregunta-${category.id}`}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.5,
+            scrollMarginTop: 16,
+            pl: 1.5,
+            // Mismo ancho de borde siempre, para que contestar no desplace nada.
+            borderLeft: "3px solid",
+            borderColor: scores[category.id] === undefined ? PENDING_COLORS.border : "transparent",
+          }}
+        >
           <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <Typography variant="body1">{t("entrevista.pregunta", { categoria: categoria.name })}</Typography>
-              {EXAMPLES_KEY[categoria.name] && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
+              <Typography variant="body1">{t("entrevista.pregunta", { categoria: category.name })}</Typography>
+              {scores[category.id] === undefined && <PendingBadge label={t("entrevista.sinResponder")} />}
+              {EXAMPLES_KEY[category.name] && (
                 <IconButton
                   size="small"
-                  aria-label={t("entrevista.verEjemplos", { categoria: categoria.name })}
-                  aria-expanded={ejemplosAbiertos[categoria.id] === true}
-                  onClick={() => setEjemplosAbiertos((actuales) => ({ ...actuales, [categoria.id]: !actuales[categoria.id] }))}
+                  aria-label={t("entrevista.verEjemplos", { categoria: category.name })}
+                  aria-expanded={openExamples[category.id] === true}
+                  onClick={() => setOpenExamples((current) => ({ ...current, [category.id]: !current[category.id] }))}
                 >
                   <InfoIcon />
                 </IconButton>
               )}
             </Box>
-            {EXAMPLES_KEY[categoria.name] && (
-              <Collapse in={ejemplosAbiertos[categoria.id] === true}>
+            {EXAMPLES_KEY[category.name] && (
+              <Collapse in={openExamples[category.id] === true}>
                 <Typography variant="caption" color="text.secondary">
                   {t("entrevista.ejemplosTitulo")}
                 </Typography>
                 <Box component="ul" sx={{ m: 0, pl: 2.5, mt: 0.5 }}>
-                  {(t(`ejemplos.${EXAMPLES_KEY[categoria.name]}`, { returnObjects: true }) as string[]).map((ejemplo) => (
-                    <Typography key={ejemplo} component="li" variant="body2">
-                      {ejemplo}
+                  {(t(`ejemplos.${EXAMPLES_KEY[category.name]}`, { returnObjects: true }) as string[]).map((example) => (
+                    <Typography key={example} component="li" variant="body2">
+                      {example}
                     </Typography>
                   ))}
                 </Box>
               </Collapse>
             )}
           </Bubble>
-          <Bubble side="right" avatar={userAvatar} alt={t("entrevista.tu")} band={scores[categoria.id] !== undefined ? scoreBand(scores[categoria.id]) : undefined}>
-            <Box role="group" aria-label={t("entrevista.puntuacionDe", { categoria: categoria.name })} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {SCORES.map((valor) => {
+          <Bubble side="right" avatar={userAvatar} alt={t("entrevista.tu")} band={scores[category.id] !== undefined ? scoreBand(scores[category.id]) : undefined}>
+            <Box role="group" aria-label={t("entrevista.puntuacionDe", { categoria: category.name })} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+              {SCORES.map((score) => {
                 return (
                   <ToggleButton
-                    key={valor}
-                    value={valor}
+                    key={score}
+                    value={score}
                     size="small"
-                    selected={scores[categoria.id] === valor}
-                    onChange={() => setBorradores((actuales) => ({ ...actuales, [categoria.id]: valor }))}
+                    selected={scores[category.id] === score}
+                    onChange={() => setDraftScores((current) => ({ ...current, [category.id]: score }))}
                     sx={{ minWidth: 40, "&.Mui-selected": { fontWeight: 700 } }}
                   >
-                    {valor}
+                    {score}
                   </ToggleButton>
                 );
               })}
             </Box>
-            {notasAbiertas[categoria.id] ? (
+            {openNotes[category.id] ? (
               <TextField
                 label={t("entrevista.nota")}
-                value={notas[categoria.id] ?? ""}
-                onChange={(e) => setNotas((actuales) => ({ ...actuales, [categoria.id]: e.target.value }))}
+                value={notes[category.id] ?? ""}
+                onChange={(event) => setNotes((current) => ({ ...current, [category.id]: event.target.value }))}
                 slotProps={{ htmlInput: { maxLength: 500 } }}
                 size="small"
                 fullWidth
                 sx={{ mt: 1.5 }}
               />
             ) : (
-              <Button size="small" onClick={() => setNotasAbiertas((actuales) => ({ ...actuales, [categoria.id]: true }))} sx={{ mt: 0.5 }}>
+              <Button size="small" onClick={() => setOpenNotes((current) => ({ ...current, [category.id]: true }))} sx={{ mt: 0.5 }}>
                 {t("entrevista.anadirNota")}
               </Button>
             )}
@@ -457,26 +538,26 @@ export function InterviewPage() {
         </Box>
       ))}
 
-      {cambios.length === 0 && (
+      {changedCategories.length === 0 && (
         <Typography variant="caption" color="text.secondary">
-          {algunaActiva ? t("entrevista.sinCambios") : t("entrevista.elegirAlgo")}
+          {anyActive ? t("entrevista.sinCambios") : t("entrevista.elegirAlgo")}
         </Typography>
       )}
-      <Button type="submit" variant="contained" size="large" fullWidth disabled={cambios.length === 0 || estado.tipo === "guardando"}>
-        {estado.tipo === "guardando" ? t("entrevista.guardando") : t("entrevista.guardar")}
+      <Button type="submit" variant="contained" size="large" fullWidth disabled={changedCategories.length === 0 || saveState.kind === "saving"}>
+        {saveState.kind === "saving" ? t("entrevista.guardando") : t("entrevista.guardar")}
       </Button>
 
-      <Dialog open={pendienteConsentimiento !== null} onClose={() => setPendienteConsentimiento(null)}>
+      <Dialog open={categoryAwaitingConsent !== null} onClose={() => setCategoryAwaitingConsent(null)}>
         <DialogTitle>{t("categorias.modalTitulo")}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t("categorias.modalTexto", { categoria: pendienteConsentimiento?.name ?? "" })}</DialogContentText>
+          <DialogContentText>{t("categorias.modalTexto", { categoria: categoryAwaitingConsent?.name ?? "" })}</DialogContentText>
           <Link href="/politica-privacidad" target="_blank" rel="noopener noreferrer">
             {t("categorias.leerPolitica")}
           </Link>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPendienteConsentimiento(null)}>{t("categorias.modalCancelar")}</Button>
-          <Button onClick={confirmarConsentimiento} variant="contained" disabled={enviandoConsentimiento}>
+          <Button onClick={() => setCategoryAwaitingConsent(null)}>{t("categorias.modalCancelar")}</Button>
+          <Button onClick={confirmConsent} variant="contained" disabled={isSendingConsent}>
             {t("categorias.modalAceptar")}
           </Button>
         </DialogActions>

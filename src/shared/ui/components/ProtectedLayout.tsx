@@ -35,7 +35,7 @@ export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps)
   return (
     <>
       {/* name (RF-03) tiene prioridad sobre el email en cuanto existe — ver api/sesion.ts. */}
-      <Header displayName={name ?? email} onCerrarSesion={handleLogout} isAdmin={rol === "admin"} />
+      <Header displayName={name ?? email} onLogout={handleLogout} isAdmin={rol === "admin"} />
       {breadcrumbs ? <Breadcrumbs items={breadcrumbs} /> : null}
       {children}
     </>

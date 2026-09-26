@@ -19,8 +19,10 @@ Para tener un registro honesto de mi vida, sin juicios y a mi ritmo
 - **Ubicación:** dentro de "Mi perfil", en un menú lateral (cajón fijo en md+, desplegable en móvil) junto a Perfil y Resultados, que sustituye a las pestañas. Rutas `/perfil/entrevista` y `/perfil/resultados`.
 - **Categorías dentro de la entrevista** (RF-06/RF-07): sin página aparte. Se listan **todas** para tener una vista general; **marcar** una la activa (las sensibles piden consentimiento en un modal, RF-04) y **desmarcarla** la desactiva — es la interfaz de desactivación que faltaba. Las evaluaciones ya guardadas de una categoría desactivada se conservan. "Seleccionar todas" solo activa las no sensibles: el consentimiento es por categoría.
 - **Dos columnas y aside de historial:** a la izquierda las categorías sin consentimiento (con "Seleccionar todas", que solo actúa sobre ellas); a la derecha las que requieren consentimiento, con una explicación breve — se marcan una a una. En un aside a la derecha, el **historial de cambios** del usuario: cada guardado con su fecha y, por categoría, "antes → ahora" (`GetAssessmentHistory`, `GET /api/assessments/history`). Es una lista, no la evolución gráfica (RF-14). El diseño móvil de estas dos zonas se afina después (se apilan por ahora).
+- **Primera vez vs. actualizar:** la pantalla es la misma, pero sin respuestas guardadas se presenta como "Tu entrevista" y, con alguna guardada, como "Actualiza tus respuestas" (con otro texto del entrevistador). En Inicio y Resultados el acceso es "Actualizar mis respuestas", no "Nueva entrevista": no se hacen entrevistas nuevas, se actualiza la existente.
+- **Categorías sin responder:** cada categoría activa sin puntuación guardada ni elegida lleva una etiqueta "Sin responder" junto a su pregunta y un borde lateral suave (lila, no de alarma: RN-04). Encima de las preguntas hay una fila de accesos directos, uno por categoría activa (los pendientes destacados), que llevan a su pregunta (`#pregunta-<id>`, desplazamiento suave salvo `prefers-reduced-motion`).
 - **Ayuda por pregunta:** un icono "i" junto a cada pregunta despliega ejemplos para ayudar a pensar (p. ej. Economía: salario, ahorro, deudas). Se eligió un desplegable en línea frente a modal o panel lateral: no tapa la pregunta, funciona igual en móvil y escritorio y permite abrir varios a la vez.
-- **Color:** el número y los botones no se colorean; solo la respuesta recibe un degradado de fondo muy suave por banda (transparente → rojo/naranja/amarillo/verde), con fundido animado y respeto a `prefers-reduced-motion`. En resultados, igual: número neutro, texto de la banda y fondo suave.
+- **Color:** el número y los botones no se colorean; solo la respuesta recibe un fondo **plano** y suave por banda (rojo/naranja/amarillo/verde claros, sin degradados), con transición de color y respeto a `prefers-reduced-motion`. En resultados, igual: número neutro, texto de la banda y fondo suave.
 - **Aspecto:** conversación con avatares por defecto (SVG propios; el catálogo real llega con RF-26), paleta suave y mucho aire.
 - **Nota opcional** (RD-03; RF-11 es Should): el modelo, el caso de uso y la pantalla ya la admiten; longitud máx. 500.
 - **Registro inmutable** (RF-12, Should): solo se insertan evaluaciones; la ventana de corrección de 24 h **no** se implementa todavía.
@@ -65,6 +67,14 @@ Para tener un registro honesto de mi vida, sin juicios y a mi ritmo
    When abre la entrevista
    Then ve a la derecha el historial de cambios, del más reciente al más antiguo, con "antes → ahora" por categoría
 
+8c. Given categorías activas sin responder
+   When el usuario abre la entrevista
+   Then cada una aparece marcada como "Sin responder" en su pregunta y en su acceso directo, y la marca desaparece en cuanto elige una puntuación; el acceso directo lleva a esa pregunta
+
+8d. Given un usuario con respuestas guardadas
+   When abre la entrevista
+   Then la pantalla se presenta como "Actualiza tus respuestas", no como una entrevista nueva
+
 9. Given una pregunta de categoría
    When el usuario pulsa el icono de ejemplos
    Then se despliega (o se oculta) una lista de ejemplos para ayudarle a pensar
@@ -87,3 +97,4 @@ Para tener un registro honesto de mi vida, sin juicios y a mi ritmo
 - **v1.2 (19 sept. 2026)** — categorías integradas en la entrevista (sin página aparte), icono de ejemplos por pregunta, degradado animado en lugar de números coloreados.
 - **v1.3 (19 sept. 2026)** — la entrevista pasa a ser editable: estado actual precargado, cambios como registros nuevos, marcar/desmarcar activa/desactiva categorías. Ya no hay que "hacer una entrevista nueva".
 - **v1.4 (19 sept. 2026)** — categorías en dos columnas (sensibles aparte, con explicación) y aside con el historial de cambios.
+- **v1.5 (26 sept. 2026)** — marca "Sin responder" y accesos directos por categoría; "Tu entrevista" solo la primera vez, luego "Actualiza tus respuestas"; colores planos en vez de degradados.

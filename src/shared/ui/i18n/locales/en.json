@@ -3,7 +3,8 @@
     "email": "Email",
     "contrasena": "Password",
     "contrasenaAyuda": "At least 8 characters",
-    "errorServidor": "Could not reach the server"
+    "errorServidor": "Could not reach the server",
+    "reintentar": "Retry"
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -55,12 +56,10 @@
   },
   "panel": {
     "bienvenida": "Welcome",
-    "descripcion": "Your dashboard is coming soon — for now, this confirms your session works.",
     "cerrarSesion": "Log out",
     "bienvenidaTitulo": "Let's start by getting to know you",
     "bienvenidaTexto": "The first step is a relaxed interview: you choose what to talk about and rate yourself from 1 to 10. No judgment, at your own pace.",
-    "empezar": "Start my interview",
-    "nuevaEntrevista": "New interview"
+    "empezar": "Start my interview"
   },
   "perfil": {
     "titulo": "Your profile",
@@ -128,7 +127,12 @@
     "sensiblesTitulo": "Require your consent",
     "sensiblesExplicacion": "They contain sensitive data. Before turning one on we'll ask for your consent and you can read the privacy policy; you can turn it off any time.",
     "historialTitulo": "Change history",
-    "historialVacio": "You haven't saved anything yet."
+    "historialVacio": "You haven't saved anything yet.",
+    "actualizarRespuestas": "Update my answers",
+    "tituloActualizar": "Update your answers",
+    "descripcionActualizar": "Has anything changed since last time? Review your answers and change only what you want. Every change is saved as a new record and your history is kept.",
+    "irA": "Go to a category",
+    "sinResponder": "Not answered"
   },
   "resultados": {
     "titulo": "Your results",
@@ -354,6 +358,30 @@
         "2": "Think about what weighs on you most in {{categoria}} and which small change would ease it.",
         "3": "Ask yourself what would help most right now in {{categoria}} and take a first step, however small."
       }
-    }
+    },
+    "dialogoTitulo": "An idea for {{categoria}}",
+    "cerrar": "Close"
+  },
+  "evolucion": {
+    "titulo": "Your evolution",
+    "descripcion": "How each category has changed across your answers, month by month. Every chart shows the same period.",
+    "sinPuntuar": "Not scored yet",
+    "unaSola": "The evolution appears from the second answer onwards.",
+    "actual": "Now",
+    "resumen": "{{categoria}} evolution: {{primera}} on {{fechaPrimera}} and {{ultima}} on {{fechaUltima}}, {{count}} answers",
+    "resumenUno": "{{categoria}}: {{score}} on {{fecha}}, a single answer",
+    "verDetalle": "See the details in Results",
+    "errorCarga": "The evolution could not be loaded.",
+    "verDatos": "Show data",
+    "ocultarDatos": "Hide data",
+    "tablaDe": "Scores for {{categoria}}",
+    "fecha": "Date",
+    "puntuacion": "Score",
+    "periodo": "Period shown",
+    "periodo6": "6 months",
+    "periodo12": "12 months",
+    "periodoTodo": "All",
+    "anterior": "Previous period",
+    "siguiente": "Next period"
   }
 }
