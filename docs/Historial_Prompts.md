@@ -137,6 +137,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **26 sept. 2026** — *"Remember to put all the code in english (and clear), for example primeraVez should be: firstTimeUser… Divide better the Home in sub-components. Also for the charts they should have an independent folder. Each chart type should have a template and receive props… the recommendations from 'Una idea para ti' should be in a modal showed only by clicking, but the user has to see highlighted this link…"*
 → **Inglés también en variables locales** (regla que ya existía y no se estaba cumpliendo): renombrado todo lo tocado con el servicio de lenguaje de TypeScript. **Plantillas de gráficos** en `src/shared/ui/charts/` (`TimeLineChart` configurable por props, `useEChart` común para futuros tipos como el radar), lo específico en `assessments/ui/evolution/`, **Inicio dividido** en `panel/ui/home/`. **Recomendación**: botón destacado (amarillo suave con bombilla) que abre una ventana con la idea y el aviso de RES-05. Reglas añadidas a AGENTS.md.
 
+**26 sept. 2026** — *"We will have time for the Radar chart so don't put it as optional… I received this email from Supabase [aviso de pausa por inactividad]… Does it change something about the project?"*
+→ No cambia la arquitectura (limitación ya documentada), pero importa por el calendario: la evaluación del TFM tras el 31 oct. Se elige un **workflow diario de GitHub Actions** (clave anon, solo lectura, también sirve de alarma) frente a reactivar a mano o pagar Pro; como GitHub solo programa desde la rama por defecto y `main` dispara producción, la rama por defecto pasa a `develop` hasta el MVP. **RF-15 (radar) comprometido**, antes de la validación.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*
