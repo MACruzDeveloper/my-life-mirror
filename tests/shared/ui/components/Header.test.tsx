@@ -9,7 +9,7 @@ import { Header } from "@shared/ui/components/Header";
 function renderHeader(props: Partial<React.ComponentProps<typeof Header>> = {}) {
   return render(
     <MemoryRouter>
-      <Header displayName="ana@ejemplo.com" onCerrarSesion={() => {}} {...props} />
+      <Header displayName="ana@ejemplo.com" onLogout={() => {}} {...props} />
     </MemoryRouter>,
   );
 }
@@ -32,6 +32,15 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: /perfil/i })).toHaveAttribute("href", "/perfil");
   });
 
+  it("incluye un enlace a /inicio, a la izquierda de Administración", () => {
+    renderHeader({ isAdmin: true });
+
+    const homeLink = screen.getByRole("link", { name: /inicio/i });
+    expect(homeLink).toHaveAttribute("href", "/inicio");
+    const adminLink = screen.getByRole("link", { name: /administración/i });
+    expect(homeLink.compareDocumentPosition(adminLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("el enlace de administración solo aparece para un admin", () => {
     const { unmount } = renderHeader();
     expect(screen.queryByRole("link", { name: /administración/i })).not.toBeInTheDocument();
@@ -42,12 +51,12 @@ describe("Header", () => {
   });
 
   it("el botón de cerrar sesión llama al callback recibido", () => {
-    const onCerrarSesion = vi.fn();
-    renderHeader({ onCerrarSesion });
+    const onLogout = vi.fn();
+    renderHeader({ onLogout });
 
     fireEvent.click(screen.getByRole("button", { name: /cerrar sesión/i }));
 
-    expect(onCerrarSesion).toHaveBeenCalledTimes(1);
+    expect(onLogout).toHaveBeenCalledTimes(1);
   });
 
   it("el selector de idioma cambia el idioma activo", async () => {

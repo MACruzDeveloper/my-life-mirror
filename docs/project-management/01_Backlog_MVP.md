@@ -15,7 +15,6 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
-- [ ] **RF-14** — Caso de uso de solo lectura `ConsultarPanelGeneral`, componiendo Evaluaciones + Recomendaciones (sustituye el placeholder de `Home`).
 - [ ] **Validación** — Usability test (n=1, ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md)) sobre el flujo completo, centrado en RN-04; corregir lo que salga; preparar la demo de cierre del Ciclo 1. Se reserva tiempo para esto **siempre**: es lo último que se recorta, no lo primero.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
@@ -26,12 +25,13 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
 - **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
+- **RF-15 / RF-17** (radar de equilibrio, puntuación global ponderada — Should/Could): siguiente extensión natural del panel. Sin planificar; decidir según el tiempo que quede tras la validación.
 - **Rendimiento del servidor** (medir antes de tocar): (a) alinear la región de las funciones de Vercel con la de Supabase (`regions` en `vercel.json`; Hobby permite una) — hoy por defecto es EE. UU. este; (b) validar la sesión sin llamar a Supabase en cada petición (`getClaims`/JWKS): ahorra un salto por llamada pero un usuario borrado o bloqueado seguiría siendo válido hasta que caduque el token (1 h) — decisión de seguridad, no solo de velocidad; (c) un endpoint que devuelva de una vez lo que la entrevista pide en tres llamadas; (d) menos funciones = menos arranques en frío ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis).
 - **Validaciones previas al push con Husky** (idea): `pre-push` con lint, tests, `npm run build` y `npm run check:api`, para no descubrir en Vercel lo que se puede ver en local.
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
 - **Métricas DORA y Flow:** revisión de calidad planificada antes de la validación; se simula DORA por cada PR fusionada a `develop` (producción = `main`, solo al completar el MVP) y se anota fecha de inicio/fin de cada tarea ([02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md)).
 - **Playwright contra `api/`** (RF-01 registro/login): decidir cómo aislar los datos de prueba en Supabase (proyecto dedicado o limpieza tras cada test) antes de automatizar nada que cree cuentas reales. Ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1bis.
-- **Header con tres o más enlaces**: hoy hay uno solo ("Mi perfil", que contiene Perfil, Categorías, Entrevista y Resultados en su menú lateral); al llegar un segundo (panel/recomendaciones) hace falta un menú (hamburguesa en móvil) en vez de más botones.
+- **Header con tres o más enlaces**: hoy hay "Inicio" y "Mi perfil" (y "Administración" para el admin), más idioma y cerrar sesión; en móvil puede quedar justo. Con uno más (o si se ve mal en la validación) hace falta un menú (hamburguesa en móvil) en vez de más botones.
 - **Mobile-first retroactivo** de Landing/Login/Registro/Recuperar contraseña: funcionan, pero sin adaptación intencionada a tablet/escritorio ([07_UI.md](../architecture-decisions/07_UI.md) §6).
 - **Renombrado a inglés** del código anterior al 14 sept.: solo cuando se toque por otro motivo (AGENTS.md).
 - **Política de privacidad**: borrador de TFM, no revisado legalmente ([PrivacyPolicyPage](../../src/pages/PrivacyPolicyPage.tsx)).
@@ -55,6 +55,8 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - [x] **ADM-01 (propuesto, primer corte)** panel de administración: `/admin` y `GET /api/admin/users` solo para rol `admin` (control de acceso en servidor y en el caso de uso, `ForbiddenError`), lista de usuarios — [historia](../user-stories/ADM-01-panel-administracion.md). Falta registrarlo en los requisitos.
 - [x] **ADM-02** catálogo de categorías gestionable por el admin (añadir / retirar sin borrar), `0005_category_catalog.sql`, pestaña Categorías en `/admin` — [historia](../user-stories/ADM-02-catalogo-categorias.md).
 - [x] **ADM-03** gestión de usuarios por el admin: cambiar rol, suspender/reactivar, eliminar, crear (contraseña temporal), cambiar email/nombre, enviar enlace de recuperación; contraseña del admin en lo sensible, regla "siempre un administrador", auditoría en `admin_audit_log` (`0006_admin_audit_log.sql`) — [historia](../user-stories/ADM-03-gestion-usuarios.md).
+- [x] **RF-14** panel general (`/inicio`): una tarjeta por categoría activa con su última puntuación, compuesta con su recomendación abierta si la hay (RF-18); sin caso de uso combinado en el servidor, se compone en `Home.tsx` (ver nota de diseño de la historia); corrige además un fallo real: un error al cargar las puntuaciones se mostraba con el texto de "primera vez" — [historia](../user-stories/RF-14-panel-general.md). RF-15 (radar), RF-16 (evolución) y RF-17 (puntuación global) quedan fuera, a planificar aparte.
+- [x] **RF-16** evolución temporal (cierra **RN-03**, Must): en Inicio, una tarjeta por categoría activa con su puntuación actual y un gráfico de líneas con Apache ECharts (carga diferida; pequeños múltiplos en dos columnas, eje 1-10 y ventana de meses común con selector 6/12 meses/Todo), tooltip, descripción textual y tabla "Ver datos"; reutiliza `GET /api/assessments/history` (sin funciones nuevas). Inicio y Resultados dejan de ser iguales — [historia](../user-stories/RF-16-evolucion-temporal.md).
 - [x] **Estructura:** `api/` por capacidad de negocio, `shared/ui/` por tipo, pantalla "Mi perfil" con menú lateral (Perfil, Entrevista, Resultados), Playwright instalado (solo páginas públicas).
 
 ---
@@ -84,3 +86,5 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.9 (20 sept. 2026)** — regla "siempre debe existir un administrador" en el borrado de cuenta; diseño de ADM-03 propuesto.
 - **v2.10 (20 sept. 2026)** — ADM-03 implementada.
 - **v2.11 (20 sept. 2026)** — RF-18 hecha (recomendaciones al puntuar bajo); RF-19 anotada como siguiente paso natural.
+- **v2.12 (26 sept. 2026)** — RF-14 hecha (panel general: estado actual + recomendación por categoría, sin caso de uso combinado); RF-15/RF-16/RF-17 anotadas como extensión futura sin planificar.
+- **v2.13 (26 sept. 2026)** — RF-16 hecha (evolución temporal); con ella quedan cerrados todos los Must del Ciclo 1 salvo la validación. RF-15/RF-17 siguen sin planificar.

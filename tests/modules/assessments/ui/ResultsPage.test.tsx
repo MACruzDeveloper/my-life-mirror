@@ -1,16 +1,16 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { withClient } from "../../../helpers/queryClient";
 import { ResultsPage } from "@modules/assessments/ui/ResultsPage";
 
-function stub(ok: boolean, body: unknown, recomendaciones: unknown = []) {
+function stub(ok: boolean, body: unknown, recommendations: unknown = []) {
   vi.stubGlobal(
     "fetch",
     vi.fn((url: string) =>
-      url === "/api/recommendations" ? Promise.resolve({ ok: true, json: async () => recomendaciones }) : Promise.resolve({ ok, json: async () => body }),
+      url === "/api/recommendations" ? Promise.resolve({ ok: true, json: async () => recommendations }) : Promise.resolve({ ok, json: async () => body }),
     ),
   );
 }
@@ -76,12 +76,14 @@ describe("ResultsPage", () => {
     );
     renderPage();
 
-    const tarjeta = (await screen.findByText("Deporte")).closest("div[class]")!.parentElement!;
-    expect(await within(tarjeta).findByText(/una idea para ti/i)).toBeInTheDocument();
-    expect(within(tarjeta).getByText(/sal a caminar/i)).toBeInTheDocument();
-    expect(screen.getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
-    const tarjetaEconomia = screen.getByText("Economía").closest("div[class]")!.parentElement!;
-    expect(within(tarjetaEconomia).queryByText(/una idea para ti/i)).not.toBeInTheDocument();
+    const sportCard = (await screen.findByText("Deporte")).closest("div[class]")!.parentElement!;
+    const ideaButton = await within(sportCard).findByRole("button", { name: /una idea para ti/i });
+    const economyCard = screen.getByText("Economía").closest("div[class]")!.parentElement!;
+    expect(within(economyCard).queryByRole("button", { name: /una idea para ti/i })).not.toBeInTheDocument();
+    fireEvent.click(ideaButton);
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText(/sal a caminar/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
   });
 
   it("sin recomendaciones no muestra el aviso; y si la carga de recomendaciones falla, la pantalla sigue funcionando", async () => {
@@ -98,4 +100,13 @@ describe("ResultsPage", () => {
     expect(await screen.findByText("Economía")).toBeInTheDocument();
     expect(screen.queryByText(/no sustituyen el asesoramiento/i)).not.toBeInTheDocument();
   });
+
+  it("con puntuaciones guardadas ofrece actualizar las respuestas, no hacer otra entrevista", async () => {
+    stub(true, [{ categoryId: "c1", categoryName: "Economía", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+    renderPage();
+
+    expect(await screen.findByRole("link", { name: /actualizar mis respuestas/i })).toHaveAttribute("href", "/perfil/entrevista");
+    expect(screen.queryByRole("link", { name: /hacer una entrevista/i })).not.toBeInTheDocument();
+  });
 });
+

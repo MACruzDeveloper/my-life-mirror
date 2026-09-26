@@ -11,7 +11,7 @@ Para tener un primer paso pequeño, sin que la aplicación me juzgue ni me agobi
 
 - **Generación (RF-18):** al guardar puntuaciones, por cada categoría con puntuación **por debajo del umbral** se crea una recomendación con **una acción concreta** de un catálogo curado (no generado por IA: RES-09/RD-09). Categorías sin plantillas propias (p. ej. las que cree el admin, ADM-02) usan plantillas generales con el nombre de la categoría.
 - **Entidad `Recomendación` (RD-04):** usuario, categoría, plantilla (clave del texto), umbral con el que se disparó, estado y fecha. El estado existe ya en el modelo (`pending`, `done`, `discarded`, `postponed`), pero **en este corte solo se crea `pending`**: marcar como hecha/descartada/pospuesta es **RF-19** (Should), siguiente paso natural.
-- **Dónde se ve:** una nota discreta "Una idea para ti" dentro de la tarjeta de la categoría, en Inicio y en Resultados, con el aviso de RES-05. No hay ventanas emergentes ni avisos: el usuario la ve cuando mira sus resultados (RN-04, RES-07: sin "dark patterns").
+- **Dónde se ve:** en la tarjeta de la categoría (Inicio y Resultados) aparece un **botón destacado "Una idea para ti"** (amarillo suave con una bombilla: se nota sin sonar a aviso). La idea y el aviso de RES-05 se leen en una **ventana que solo se abre al pulsarlo** — nunca sola (RN-04, RES-07: sin "dark patterns"). Así el usuario sabe de un vistazo qué categorías tienen propuestas sin que la pantalla se llene de texto.
 - **Solo mientras la condición se mantiene:** la nota se muestra únicamente mientras la última puntuación de esa categoría siga por debajo del umbral y la categoría esté activa. Si el usuario mejora (o desactiva la categoría), la nota desaparece sola; el registro se conserva para el historial (RF-34).
 - **Tono:** los textos son sugerencias en positivo ("si te apetece…", "un paso pequeño"), nunca reproches ni diagnósticos (RES-07/RES-09).
 - **Aviso legal (RES-05):** junto a las recomendaciones, un texto fijo: son ideas generales de bienestar, no sustituyen el asesoramiento médico, financiero o psicológico profesional.
@@ -43,7 +43,7 @@ Para tener un primer paso pequeño, sin que la aplicación me juzgue ni me agobi
 
 6. Given una recomendación pendiente
    When el usuario mira sus resultados (Inicio o Resultados)
-   Then la ve dentro de la tarjeta de esa categoría, junto al aviso de RES-05, y solo mientras la última puntuación siga por debajo del umbral y la categoría esté activa
+   Then ve en la tarjeta de esa categoría el botón destacado "Una idea para ti", y al pulsarlo lee la idea junto al aviso de RES-05, y solo mientras la última puntuación siga por debajo del umbral y la categoría esté activa
 
 7. Given un fallo al generar recomendaciones
    When se guardan las puntuaciones
@@ -63,3 +63,4 @@ Para tener un primer paso pequeño, sin que la aplicación me juzgue ni me agobi
 ## Historial de cambios
 
 - **v1.0 (20 sept. 2026)** — versión inicial.
+- **v1.1 (26 sept. 2026)** — la recomendación pasa de nota en la tarjeta a botón destacado que abre una ventana con la idea y el aviso de RES-05 (`RecommendationButton`).
