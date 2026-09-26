@@ -29,6 +29,8 @@ export function createListCategories(repository: CategoryRepository, catalog: Ca
         userId: id,
         name: entrada.name,
         description: entrada.description,
+        ...(entrada.nameEn ? { nameEn: entrada.nameEn } : {}),
+        ...(entrada.descriptionEn ? { descriptionEn: entrada.descriptionEn } : {}),
         type: "standard",
         status: "inactive",
         isSensitiveData: entrada.isSensitiveData,

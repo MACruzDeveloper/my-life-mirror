@@ -6,6 +6,8 @@ interface FilaCatalogo {
   id: string;
   name: string;
   description: string;
+  name_en: string | null;
+  description_en: string | null;
   is_sensitive_data: boolean;
   retired_at: string | null;
 }
@@ -19,7 +21,7 @@ export class SupabaseCategoryCatalogRepository implements CategoryCatalogReposit
   }
 
   async findAll(): Promise<CatalogCategory[]> {
-    const { data, error } = await this.cliente.from("category_catalog").select("id, name, description, is_sensitive_data, retired_at");
+    const { data, error } = await this.cliente.from("category_catalog").select("id, name, description, name_en, description_en, is_sensitive_data, retired_at");
     if (error) {
       throw new Error(`No se pudo leer el catálogo: ${error.message}`);
     }
@@ -27,6 +29,8 @@ export class SupabaseCategoryCatalogRepository implements CategoryCatalogReposit
       id: fila.id,
       name: fila.name,
       description: fila.description,
+      ...(fila.name_en ? { nameEn: fila.name_en } : {}),
+      ...(fila.description_en ? { descriptionEn: fila.description_en } : {}),
       isSensitiveData: fila.is_sensitive_data,
       ...(fila.retired_at ? { retiredAt: new Date(fila.retired_at) } : {}),
     }));
@@ -37,6 +41,8 @@ export class SupabaseCategoryCatalogRepository implements CategoryCatalogReposit
       id: category.id,
       name: category.name,
       description: category.description,
+      name_en: category.nameEn ?? null,
+      description_en: category.descriptionEn ?? null,
       is_sensitive_data: category.isSensitiveData,
       retired_at: category.retiredAt ? category.retiredAt.toISOString() : null,
     });

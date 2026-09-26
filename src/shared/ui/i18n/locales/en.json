@@ -4,7 +4,8 @@
     "contrasena": "Password",
     "contrasenaAyuda": "At least 8 characters",
     "errorServidor": "Could not reach the server",
-    "reintentar": "Retry"
+    "reintentar": "Retry",
+    "idioma": "Language"
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -383,5 +384,52 @@
     "periodoTodo": "All",
     "anterior": "Previous period",
     "siguiente": "Next period"
+  },
+  "equilibrio": {
+    "titulo": "Your balance",
+    "descripcion": "Each axis is a category with your latest score, all on the same 0 to 10 scale.",
+    "resumen": "Current balance by category: {{lista}}",
+    "pocasCategorias": "Your balance appears once three categories are scored.",
+    "faltan": "Not scored yet: {{lista}}",
+    "categoria": "Category",
+    "tabla": "Latest score by category"
+  },
+  "categoriasEstandar": {
+    "economia": {
+      "nombre": "Finances",
+      "descripcion": "Your personal finances: savings, spending, debts."
+    },
+    "vidaSocial": {
+      "nombre": "Social life",
+      "descripcion": "Friendships and time with other people."
+    },
+    "pareja": {
+      "nombre": "Relationship",
+      "descripcion": "Your relationship with your partner, if you have one."
+    },
+    "sexo": {
+      "nombre": "Sex",
+      "descripcion": "Your sex life."
+    },
+    "deporte": {
+      "nombre": "Sport",
+      "descripcion": "Physical activity and health."
+    },
+    "aventura": {
+      "nombre": "Adventure",
+      "descripcion": "New experiences, travel, challenges."
+    },
+    "espiritualidad": {
+      "nombre": "Spirituality",
+      "descripcion": "Beliefs, religion or spiritual practice."
+    },
+    "familia": {
+      "nombre": "Family",
+      "descripcion": "Your relationship with your family."
+    },
+    "inversiones": {
+      "nombre": "Investments",
+      "descripcion": "Investing and long-term financial planning."
+    }
   }
 }

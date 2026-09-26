@@ -9,6 +9,9 @@ export interface CatalogCategory {
   readonly id: string;
   readonly name: string;
   readonly description: string;
+  /** Inglés (RNF-10): obligatorio al crear desde el panel de administración; ausente en las 9 estándar, que se traducen en la interfaz. */
+  readonly nameEn?: string;
+  readonly descriptionEn?: string;
   readonly isSensitiveData: boolean;
   readonly retiredAt?: Date;
 }

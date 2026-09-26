@@ -32,7 +32,18 @@ void i18n.use(initReactI18next).init({
   initAsync: false,
 });
 
+/**
+ * El atributo `lang` de la página sigue al idioma elegido: sin esto,
+ * `index.html` declaraba siempre un idioma y los lectores de pantalla leían el
+ * español con pronunciación inglesa.
+ */
+function syncDocumentLanguage(language: string) {
+  if (typeof document !== "undefined") document.documentElement.lang = language;
+}
+syncDocumentLanguage(i18n.language);
+
 i18n.on("languageChanged", (idioma) => {
+  syncDocumentLanguage(idioma);
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(CLAVE_IDIOMA_GUARDADO, idioma);

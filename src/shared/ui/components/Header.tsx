@@ -5,6 +5,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export interface HeaderProps {
   /** Nombre del usuario con sesión activa (RF-03), o el email si aún no tiene perfil. Ausente mientras useSesion carga. */
@@ -23,12 +24,7 @@ export interface HeaderProps {
  * `displayName` se oculta en móvil (`xs`) para dejar sitio a las acciones.
  */
 export function Header({ displayName, onLogout: onLogout, isAdmin }: HeaderProps) {
-  const { t, i18n } = useTranslation();
-  const isSpanish = i18n.language.startsWith("es");
-
-  function toggleLanguage() {
-    void i18n.changeLanguage(isSpanish ? "en" : "es");
-  }
+  const { t } = useTranslation();
 
   return (
     <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -53,9 +49,7 @@ export function Header({ displayName, onLogout: onLogout, isAdmin }: HeaderProps
               {displayName}
             </Typography>
           ) : null}
-          <Button size="small" onClick={toggleLanguage}>
-            {isSpanish ? "EN" : "ES"}
-          </Button>
+          <LanguageSwitcher />
           <Button size="small" variant="outlined" onClick={onLogout}>
             {t("panel.cerrarSesion")}
           </Button>

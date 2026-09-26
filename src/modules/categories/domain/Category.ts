@@ -13,6 +13,9 @@ export interface Category {
   readonly userId: string;
   readonly name: string;
   readonly description: string;
+  /** Traducción al inglés (RNF-10) de las categorías creadas por el admin; las estándar se traducen en la interfaz. */
+  readonly nameEn?: string;
+  readonly descriptionEn?: string;
   readonly type: CategoryType;
   readonly status: CategoryStatus;
   readonly isSensitiveData: boolean;

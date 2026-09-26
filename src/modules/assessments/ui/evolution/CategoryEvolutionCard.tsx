@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { ChartDataTable } from "@shared/ui/charts/ChartDataTable";
 import { TimeLineChart } from "@shared/ui/charts/TimeLineChart/TimeLineChart";
 import { formatDate } from "@shared/ui/charts/timeWindow";
+import { useCategoryLabels } from "@modules/categories/ui/categoryLabels";
 import type { ScorePoint } from "./scoreHistory";
 
 /** Las puntuaciones van de 1 a 10: eje fijo en todas las tarjetas para que sean comparables. */
@@ -32,6 +33,7 @@ interface CategoryEvolutionCardProps {
  */
 export function CategoryEvolutionCard({ categoryName, currentScore, points, historyError, window, extra }: CategoryEvolutionCardProps) {
   const { t, i18n } = useTranslation();
+  const displayName = useCategoryLabels().name(categoryName);
   const titleId = `evolution-${categoryName.replace(/\s+/g, "-")}`;
   const formatScoreDate = (date: Date) => formatDate(date, i18n.language);
 
@@ -43,7 +45,7 @@ export function CategoryEvolutionCard({ categoryName, currentScore, points, hist
     >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 1 }}>
         <Typography id={titleId} variant="subtitle1" component="h3">
-          {categoryName}
+          {displayName}
         </Typography>
         {currentScore !== undefined && (
           <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75 }}>
@@ -75,7 +77,7 @@ export function CategoryEvolutionCard({ categoryName, currentScore, points, hist
             points={points.map((point) => ({ date: point.recordedAt, value: point.score }))}
             window={window}
             yAxis={SCORE_AXIS}
-            ariaLabel={describeEvolution(categoryName, points, formatScoreDate, t)}
+            ariaLabel={describeEvolution(displayName, points, formatScoreDate, t)}
             formatTooltip={(point) => `${point.value} · ${formatScoreDate(point.date)}`}
           />
           {points.length === 1 && (
@@ -84,7 +86,7 @@ export function CategoryEvolutionCard({ categoryName, currentScore, points, hist
             </Typography>
           )}
           <ChartDataTable
-            caption={t("evolucion.tablaDe", { categoria: categoryName })}
+            caption={t("evolucion.tablaDe", { categoria: displayName })}
             headers={[t("evolucion.fecha"), t("evolucion.puntuacion")]}
             rows={points.map((point) => ({ key: String(point.recordedAt.getTime()), cells: [formatScoreDate(point.recordedAt), point.score] }))}
             showLabel={t("evolucion.verDatos")}

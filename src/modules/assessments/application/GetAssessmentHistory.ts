@@ -6,6 +6,7 @@ import type { AssessmentRepository } from "../domain/AssessmentRepository";
 export interface HistoryEntry {
   categoryId: string;
   categoryName: string;
+  categoryNameEn?: string;
   score: number;
   /** Puntuación inmediatamente anterior de esa categoría; `undefined` si es la primera. */
   previousScore?: number;
@@ -36,6 +37,7 @@ export function createGetAssessmentHistory(assessmentRepository: AssessmentRepos
       assessmentRepository.findByUserId(id),
     ]);
     const names = new Map(categories.map((c) => [c.id, c.name]));
+    const englishNames = new Map(categories.filter((c) => c.nameEn).map((c) => [c.id, c.nameEn as string]));
 
     const ascending = [...assessments].sort((a, b) => a.recordedAt.getTime() - b.recordedAt.getTime());
     const previousByCategory = new Map<string, number>();
@@ -48,6 +50,7 @@ export function createGetAssessmentHistory(assessmentRepository: AssessmentRepos
       session.entries.push({
         categoryId: assessment.categoryId,
         categoryName: names.get(assessment.categoryId) ?? "",
+        ...(englishNames.has(assessment.categoryId) ? { categoryNameEn: englishNames.get(assessment.categoryId) } : {}),
         score: assessment.score,
         ...(previousScore !== undefined ? { previousScore } : {}),
         ...(assessment.note ? { note: assessment.note } : {}),

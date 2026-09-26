@@ -22,6 +22,13 @@ async function setup() {
   return { record, getLatestScores, a, b, c, avanzar: (d: Date) => (ahora = d) };
 }
 
+async function setupWithEnglish(categoryId: string) {
+  const categoryRepository = new InMemoryCategoryRepository();
+  const assessmentRepository = new InMemoryAssessmentRepository();
+  await categoryRepository.save({ id: categoryId, userId: "u1", name: "Economía", description: "d", nameEn: "Finances (custom)", descriptionEn: "d", type: "standard", status: "active", isSensitiveData: false });
+  return { getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository) };
+}
+
 describe("GetLatestScores (RF-10, consulta de resultados)", () => {
   it("devuelve cada categoría activa sin puntuar todavía con score undefined", async () => {
     const { getLatestScores, a, b } = await setup();
@@ -70,5 +77,14 @@ describe("GetLatestScores (RF-10, consulta de resultados)", () => {
 
     expect(resultado.ok).toBe(false);
     if (!resultado.ok) expect(resultado.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("incluye el nombre en inglés cuando la categoría lo tiene (categorías creadas por el admin)", async () => {
+    const { a } = await setup();
+    const withEnglish = await setupWithEnglish(a.id);
+
+    const resultado = await withEnglish.getLatestScores("u1");
+
+    expect(resultado.ok && resultado.value.find((r) => r.categoryId === a.id)?.categoryNameEn).toBe("Finances (custom)");
   });
 });
