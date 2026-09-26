@@ -11,12 +11,11 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-_(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
+- [ ] **Validación** (desde el 26 sept.) — preparada: [guion](../validation/01_Guion_Test_Usabilidad.md) y [hoja de resultados](../validation/02_Resultados_Test_Usabilidad.md). Pendiente: realizar la sesión, clasificar los problemas por gravedad y arreglar los de gravedad 3-4 (y todo lo que toque RN-04). La demo de cierre va después.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
-- [ ] **RF-15** — radar de equilibrio entre categorías en el panel (Should, comprometido: hay tiempo). Nueva plantilla hermana de `TimeLineChart` en `shared/ui/charts/`, reutilizando `useEChart`. Antes de la validación, para que el test de usabilidad cubra el panel definitivo.
-- [ ] **Validación** — Usability test (n=1, ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md)) sobre el flujo completo, centrado en RN-04; corregir lo que salga; preparar la demo de cierre del Ciclo 1. Se reserva tiempo para esto **siempre**: es lo último que se recorta, no lo primero.
+- [ ] **Demo de cierre del Ciclo 1** — tras corregir lo que salga de la validación. Se reserva tiempo para validación y demo **siempre**: es lo último que se recorta, no lo primero.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
 
@@ -26,7 +25,7 @@ _(vacío — se tira la siguiente tarea de "Listo" cuando se decide empezar)_
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
 - **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
-- **RF-17** (puntuación global ponderada, Could): sin planificar; decidir según el tiempo que quede tras la validación. RF-15 ya está en "Listo".
+- **RF-17** (puntuación global ponderada, Could): sin planificar; decidir según el tiempo que quede tras la validación. (RF-15 ya está hecho.)
 - **Rendimiento del servidor** (medir antes de tocar): (a) alinear la región de las funciones de Vercel con la de Supabase (`regions` en `vercel.json`; Hobby permite una) — hoy por defecto es EE. UU. este; (b) validar la sesión sin llamar a Supabase en cada petición (`getClaims`/JWKS): ahorra un salto por llamada pero un usuario borrado o bloqueado seguiría siendo válido hasta que caduque el token (1 h) — decisión de seguridad, no solo de velocidad; (c) un endpoint que devuelva de una vez lo que la entrevista pide en tres llamadas; (d) menos funciones = menos arranques en frío ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis).
 - **Validaciones previas al push con Husky** (idea): `pre-push` con lint, tests, `npm run build` y `npm run check:api`, para no descubrir en Vercel lo que se puede ver en local.
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
@@ -59,6 +58,7 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - [x] **ADM-02** catálogo de categorías gestionable por el admin (añadir / retirar sin borrar), `0005_category_catalog.sql`, pestaña Categorías en `/admin` — [historia](../user-stories/ADM-02-catalogo-categorias.md).
 - [x] **ADM-03** gestión de usuarios por el admin: cambiar rol, suspender/reactivar, eliminar, crear (contraseña temporal), cambiar email/nombre, enviar enlace de recuperación; contraseña del admin en lo sensible, regla "siempre un administrador", auditoría en `admin_audit_log` (`0006_admin_audit_log.sql`) — [historia](../user-stories/ADM-03-gestion-usuarios.md).
 - [x] **RF-14** panel general (`/inicio`): una tarjeta por categoría activa con su última puntuación, compuesta con su recomendación abierta si la hay (RF-18); sin caso de uso combinado en el servidor, se compone en `Home.tsx` (ver nota de diseño de la historia); corrige además un fallo real: un error al cargar las puntuaciones se mostraba con el texto de "primera vez" — [historia](../user-stories/RF-14-panel-general.md). RF-15 (radar), RF-16 (evolución) y RF-17 (puntuación global) quedan fuera, a planificar aparte.
+- [x] **RF-15** radar de equilibrio: tarjeta "Tu equilibrio" encima de la evolución en Inicio; plantilla genérica `RadarChart` (hermana de `TimeLineChart`), orden fijo de ejes (catálogo), escala 0-10, mínimo tres categorías puntuadas, descripción textual y "Ver datos", nombres escapados en el tooltip — [historia](../user-stories/RF-15-radar-equilibrio.md).
 - [x] **RF-16** evolución temporal (cierra **RN-03**, Must): en Inicio, una tarjeta por categoría activa con su puntuación actual y un gráfico de líneas con Apache ECharts (carga diferida; pequeños múltiplos en dos columnas, eje 1-10 y ventana de meses común con selector 6/12 meses/Todo), tooltip, descripción textual y tabla "Ver datos"; reutiliza `GET /api/assessments/history` (sin funciones nuevas). Inicio y Resultados dejan de ser iguales — [historia](../user-stories/RF-16-evolucion-temporal.md).
 - [x] **Estructura:** `api/` por capacidad de negocio, `shared/ui/` por tipo, pantalla "Mi perfil" con menú lateral (Perfil, Entrevista, Resultados), Playwright instalado (solo páginas públicas).
 
@@ -93,3 +93,5 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.13 (26 sept. 2026)** — RF-16 hecha (evolución temporal); con ella quedan cerrados todos los Must del Ciclo 1 salvo la validación. RF-15/RF-17 siguen sin planificar.
 - **v2.14 (26 sept. 2026)** — RF-15 (radar) pasa a "Listo", por encima de la validación: hay tiempo y así el test de usabilidad cubre el panel definitivo.
 - **v2.15 (26 sept. 2026)** — keep-alive de Supabase (GitHub Actions).
+- **v2.16 (26 sept. 2026)** — RF-15 hecha (radar de equilibrio). Solo queda la validación por encima de la línea de corte.
+- **v2.17 (26 sept. 2026)** — Validación pasa a "En curso", con guion y hoja de resultados preparados; la demo de cierre queda como tarea aparte en "Listo".

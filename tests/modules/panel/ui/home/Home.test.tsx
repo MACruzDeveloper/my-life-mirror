@@ -130,5 +130,20 @@ describe("Home (RF-39 / RF-14)", () => {
     expect(screen.queryByText(/última vez/i)).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /ver el detalle en resultados/i })).toHaveAttribute("href", "/perfil/resultados");
   });
+
+  it("el panel empieza por el equilibrio (RF-15) y sigue con la evolución (RF-16)", async () => {
+    stub(
+      [
+        { categoryId: "c1", categoryName: "Economía", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" },
+        { categoryId: "c2", categoryName: "Deporte", score: 3, recordedAt: "2026-09-18T10:00:00.000Z" },
+        { categoryId: "c3", categoryName: "Aventura", score: 9, recordedAt: "2026-09-18T10:00:00.000Z" },
+      ],
+    );
+    renderHome();
+
+    const balance = await screen.findByRole("heading", { name: /tu equilibrio/i });
+    const evolution = screen.getByRole("heading", { name: /tu evolución/i });
+    expect(balance.compareDocumentPosition(evolution) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });
 

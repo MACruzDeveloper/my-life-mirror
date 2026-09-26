@@ -7,6 +7,7 @@ import type { RecommendationRepository } from "../domain/RecommendationRepositor
 
 export interface VisibleRecommendation extends Recommendation {
   categoryName: string;
+  categoryNameEn?: string;
 }
 
 interface Dependencies {
@@ -39,13 +40,18 @@ export function createListRecommendations({ recommendationRepository, categoryRe
       if (!actual || a.recordedAt.getTime() > actual.at) latest.set(a.categoryId, { score: a.score, at: a.recordedAt.getTime() });
     }
     const activas = new Map(categories.filter((c) => c.status === "active").map((c) => [c.id, c.name]));
+    const englishNames = new Map(categories.filter((c) => c.nameEn).map((c) => [c.id, c.nameEn as string]));
 
     return ok(
       recommendations
         .filter(isOpen)
         .filter((r) => activas.has(r.categoryId) && (latest.get(r.categoryId)?.score ?? Infinity) < r.threshold)
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        .map((r) => ({ ...r, categoryName: activas.get(r.categoryId) as string })),
+        .map((r) => ({
+          ...r,
+          categoryName: activas.get(r.categoryId) as string,
+          ...(englishNames.has(r.categoryId) ? { categoryNameEn: englishNames.get(r.categoryId) } : {}),
+        })),
     );
   };
 }

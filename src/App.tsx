@@ -16,6 +16,7 @@ import { ResultsPage } from '@modules/assessments/ui/ResultsPage'
 import { AdminPage } from '@modules/admin/ui/AdminPage'
 import { AdminRoute } from '@modules/admin/ui/AdminRoute'
 import { ProtectedLayout } from '@shared/ui/components/ProtectedLayout'
+import { PublicLayout } from '@shared/ui/components/PublicLayout'
 
 function App() {
   const { t } = useTranslation()
@@ -23,12 +24,15 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/registro" element={<RegisterForm />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/olvide-password" element={<SolicitarRecuperacionForm />} />
-        <Route path="/restablecer-password" element={<RestablecerPasswordForm />} />
-        <Route path="/politica-privacidad" element={<PrivacyPolicyPage />} />
+        {/* Páginas públicas: selector de idioma disponible antes de tener cuenta (RNF-10). */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Landing />} />
+          <Route path="/registro" element={<RegisterForm />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/olvide-password" element={<SolicitarRecuperacionForm />} />
+          <Route path="/restablecer-password" element={<RestablecerPasswordForm />} />
+          <Route path="/politica-privacidad" element={<PrivacyPolicyPage />} />
+        </Route>
         {/* Ruta de diseño: un único SessionProvider para todas las pantallas protegidas (no se remonta al navegar). */}
         <Route element={<ProtectedRoute />}>
           <Route

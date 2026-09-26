@@ -4,7 +4,8 @@
     "contrasena": "Contraseña",
     "contrasenaAyuda": "Al menos 8 caracteres",
     "errorServidor": "No se pudo contactar con el servidor",
-    "reintentar": "Reintentar"
+    "reintentar": "Reintentar",
+    "idioma": "Idioma"
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -383,5 +384,52 @@
     "periodoTodo": "Todo",
     "anterior": "Periodo anterior",
     "siguiente": "Periodo siguiente"
+  },
+  "equilibrio": {
+    "titulo": "Tu equilibrio",
+    "descripcion": "Cada eje es una categoría con tu última puntuación, todas en la misma escala de 0 a 10.",
+    "resumen": "Equilibrio actual por categoría: {{lista}}",
+    "pocasCategorias": "El equilibrio aparece a partir de la tercera categoría puntuada.",
+    "faltan": "Faltan por puntuar: {{lista}}",
+    "categoria": "Categoría",
+    "tabla": "Última puntuación por categoría"
+  },
+  "categoriasEstandar": {
+    "economia": {
+      "nombre": "Economía",
+      "descripcion": "Tus finanzas personales: ahorro, gasto, deudas."
+    },
+    "vidaSocial": {
+      "nombre": "Vida social",
+      "descripcion": "Amistades y tiempo con otras personas."
+    },
+    "pareja": {
+      "nombre": "Pareja",
+      "descripcion": "Tu relación de pareja, si la tienes."
+    },
+    "sexo": {
+      "nombre": "Sexo",
+      "descripcion": "Tu vida sexual."
+    },
+    "deporte": {
+      "nombre": "Deporte",
+      "descripcion": "Actividad física y salud."
+    },
+    "aventura": {
+      "nombre": "Aventura",
+      "descripcion": "Nuevas experiencias, viajes, retos."
+    },
+    "espiritualidad": {
+      "nombre": "Espiritualidad",
+      "descripcion": "Creencias, religión o práctica espiritual."
+    },
+    "familia": {
+      "nombre": "Familia",
+      "descripcion": "Tu relación con tu familia."
+    },
+    "inversiones": {
+      "nombre": "Inversiones",
+      "descripcion": "Inversión y planificación financiera a largo plazo."
+    }
   }
 }

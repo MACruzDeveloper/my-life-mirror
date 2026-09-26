@@ -185,4 +185,16 @@ describe("ListRecommendations (RF-18)", () => {
     expect((await list("u1")).ok && (await list("u1"))).toMatchObject({ value: [] });
     expect((await list(" ")).ok).toBe(false);
   });
+
+describe("ListRecommendations — nombre en inglés", () => {
+  it("lleva el nombre en inglés cuando la categoría lo tiene", async () => {
+    const { record, list, categoryRepository, economia } = await setup();
+    await categoryRepository.save({ ...economia, status: "active", nameEn: "Custom name", descriptionEn: "d" });
+    await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 3 }] });
+
+    const resultado = await list("u1");
+
+    expect(resultado.ok && resultado.value[0].categoryNameEn).toBe("Custom name");
+  });
+});
 });

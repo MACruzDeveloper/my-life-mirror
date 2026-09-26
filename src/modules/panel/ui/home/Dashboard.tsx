@@ -15,11 +15,20 @@ import { useRecommendations } from "@modules/recommendations/ui/queries";
  * Los gráficos (Apache ECharts) se cargan solo al llegar al panel: son la mayor
  * parte del peso de la app y la portada, el login o el registro no los usan.
  */
+const BalanceCard = lazy(() => import("@modules/assessments/ui/balance/BalanceCard").then((module) => ({ default: module.BalanceCard })));
 const EvolutionPanel = lazy(() => import("@modules/assessments/ui/evolution/EvolutionPanel").then((module) => ({ default: module.EvolutionPanel })));
 
+function ChartsFallback() {
+  return (
+    <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+      <CircularProgress size={24} />
+    </Box>
+  );
+}
+
 /**
- * El panel (RF-14 + RF-16): una tarjeta por categoría activa con su puntuación
- * actual y su evolución, y el botón de la recomendación abierta si la hay
+ * El panel (RF-14 + RF-15 + RF-16): primero el equilibrio de hoy (radar) y
+ * después, una tarjeta por categoría activa con su puntuación actual y su evolución, y el botón de la recomendación abierta si la hay
  * (RF-18). La composición evaluaciones + recomendaciones se hace aquí, no en
  * un caso de uso combinado del servidor (ver la historia de RF-14). Las
  * tarjetas de detalle viven en Resultados.
@@ -40,7 +49,10 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
           {t("entrevista.actualizarRespuestas")}
         </Button>
       </Box>
-      <Box>
+      <Suspense fallback={<ChartsFallback />}>
+        <BalanceCard latestScores={latestScores} />
+      </Suspense>
+      <Box sx={{ mt: 1 }}>
         <Typography variant="h6" component="h2">
           {t("evolucion.titulo")}
         </Typography>
@@ -48,13 +60,7 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
           {t("evolucion.descripcion")}
         </Typography>
       </Box>
-      <Suspense
-        fallback={
-          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-            <CircularProgress size={24} />
-          </Box>
-        }
-      >
+      <Suspense fallback={<ChartsFallback />}>
         <EvolutionPanel
           latestScores={latestScores}
           sessions={history.data}

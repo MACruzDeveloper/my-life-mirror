@@ -6,7 +6,7 @@ import { createRetireCatalogCategory } from "@modules/categories/application/Ret
 import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
 import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/InMemoryCategoryRepository";
 import { STANDARD_CATEGORIES } from "@modules/categories/domain/standardCategories";
-import { ForbiddenError } from "@shared/domain/DomainError";
+import { ForbiddenError, ValidationError } from "@shared/domain/DomainError";
 
 const admin = { rol: "admin" };
 const usuario = { rol: "usuario" };
@@ -36,7 +36,7 @@ describe("Catálogo de categorías — administración (ADM-02)", () => {
   it("un admin añade una categoría y aparece en el catálogo, vigente", async () => {
     const { add, listCatalog } = setup();
 
-    const resultado = await add(admin, { name: " Creatividad ", description: "Arte y hobbies.", isSensitiveData: false });
+    const resultado = await add(admin, { name: " Creatividad ", description: "Arte y hobbies.", nameEn: " Creativity ", descriptionEn: " Art and hobbies. ", isSensitiveData: false });
 
     expect(resultado.ok).toBe(true);
     const catalogo = await listCatalog(admin);
@@ -48,21 +48,21 @@ describe("Catálogo de categorías — administración (ADM-02)", () => {
   it("rechaza nombre o descripción vacíos o demasiado largos", async () => {
     const { add } = setup();
 
-    expect((await add(admin, { name: "  ", description: "x", isSensitiveData: false })).ok).toBe(false);
-    expect((await add(admin, { name: "X", description: " ", isSensitiveData: false })).ok).toBe(false);
-    expect((await add(admin, { name: "N".repeat(61), description: "x", isSensitiveData: false })).ok).toBe(false);
-    expect((await add(admin, { name: "X", description: "d".repeat(201), isSensitiveData: false })).ok).toBe(false);
+    expect((await add(admin, { name: "  ", description: "x", nameEn: "Y", descriptionEn: "y", isSensitiveData: false })).ok).toBe(false);
+    expect((await add(admin, { name: "X", description: " ", nameEn: "Y", descriptionEn: "y", isSensitiveData: false })).ok).toBe(false);
+    expect((await add(admin, { name: "N".repeat(61), description: "x", nameEn: "Y", descriptionEn: "y", isSensitiveData: false })).ok).toBe(false);
+    expect((await add(admin, { name: "X", description: "d".repeat(201), nameEn: "Y", descriptionEn: "y", isSensitiveData: false })).ok).toBe(false);
   });
 
   it("rechaza un nombre duplicado, sin distinguir mayúsculas (también si está retirada)", async () => {
     const { add, retire, catalog } = setup();
-    const duplicada = await add(admin, { name: "economía", description: "x", isSensitiveData: false });
+    const duplicada = await add(admin, { name: "economía", description: "x", nameEn: "Y", descriptionEn: "y", isSensitiveData: false });
     expect(duplicada.ok).toBe(false);
     if (!duplicada.ok) expect(duplicada.error.code).toBe("CONFLICT");
 
     const economia = (await catalog.findAll()).find((c) => c.name === "Economía")!;
     await retire(admin, economia.id);
-    expect((await add(admin, { name: "Economía", description: "x", isSensitiveData: false })).ok).toBe(false);
+    expect((await add(admin, { name: "Economía", description: "x", nameEn: "Y", descriptionEn: "y", isSensitiveData: false })).ok).toBe(false);
   });
 
   it("retirar la marca como retirada y desactiva la categoría de todos los usuarios sin borrar nada", async () => {
@@ -97,7 +97,7 @@ describe("Catálogo de categorías — administración (ADM-02)", () => {
 
     for (const resultado of [
       await listCatalog(usuario),
-      await add(usuario, { name: "Hack", description: "x", isSensitiveData: false }),
+      await add(usuario, { name: "Hack", description: "x", nameEn: "Y", descriptionEn: "y", isSensitiveData: false }),
       await retire({ rol: "premium" }, cualquiera.id),
     ]) {
       expect(resultado.ok).toBe(false);
@@ -105,5 +105,36 @@ describe("Catálogo de categorías — administración (ADM-02)", () => {
     }
     expect((await catalog.findAll()).length).toBe(antes);
     expect((await catalog.findAll())[0].retiredAt).toBeUndefined();
+  });
+
+  it("guarda el nombre y la descripción en inglés (RNF-10), recortados", async () => {
+    const { add, catalog } = setup();
+
+    const resultado = await add(admin, { name: "Creatividad", description: "Arte y hobbies.", nameEn: " Creativity ", descriptionEn: " Art and hobbies. ", isSensitiveData: false });
+
+    expect(resultado.ok).toBe(true);
+    const nueva = (await catalog.findAll()).find((c) => c.name === "Creatividad");
+    expect(nueva).toMatchObject({ nameEn: "Creativity", descriptionEn: "Art and hobbies." });
+  });
+
+  it("el nombre y la descripción en inglés son obligatorios y tienen los mismos límites", async () => {
+    const { add } = setup();
+    const base = { name: "Creatividad", description: "Arte.", isSensitiveData: false };
+
+    for (const english of [{ nameEn: " ", descriptionEn: "x" }, { nameEn: "X", descriptionEn: " " }, { nameEn: "N".repeat(61), descriptionEn: "x" }, { nameEn: "X", descriptionEn: "d".repeat(201) }]) {
+      const resultado = await add(admin, { ...base, ...english });
+      expect(resultado.ok, JSON.stringify(english)).toBe(false);
+      if (!resultado.ok) expect(resultado.error).toBeInstanceOf(ValidationError);
+    }
+  });
+
+  it("rechaza un nombre en inglés que ya use otra categoría, sin distinguir mayúsculas", async () => {
+    const { add } = setup();
+    await add(admin, { name: "Creatividad", description: "Arte.", nameEn: "Creativity", descriptionEn: "Art.", isSensitiveData: false });
+
+    const repetida = await add(admin, { name: "Arte", description: "Arte.", nameEn: "creativity", descriptionEn: "Art.", isSensitiveData: false });
+
+    expect(repetida.ok).toBe(false);
+    if (!repetida.ok) expect(repetida.error.code).toBe("CONFLICT");
   });
 });

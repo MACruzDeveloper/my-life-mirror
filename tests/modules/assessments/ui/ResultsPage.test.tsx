@@ -108,5 +108,17 @@ describe("ResultsPage", () => {
     expect(await screen.findByRole("link", { name: /actualizar mis respuestas/i })).toHaveAttribute("href", "/perfil/entrevista");
     expect(screen.queryByRole("link", { name: /hacer una entrevista/i })).not.toBeInTheDocument();
   });
-});
 
+  it("en inglés, las tarjetas de detalle usan el nombre traducido", async () => {
+    const i18n = (await import("@shared/ui/i18n")).default;
+    await i18n.changeLanguage("en");
+    try {
+      stub(true, [{ categoryId: "c1", categoryName: "Vida social", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+      renderPage();
+
+      expect(await screen.findByText("Social life")).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage("es");
+    }
+  });
+});

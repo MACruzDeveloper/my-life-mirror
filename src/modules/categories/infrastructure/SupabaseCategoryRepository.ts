@@ -7,6 +7,8 @@ interface FilaCategoria {
   user_id: string;
   name: string;
   description: string;
+  name_en: string | null;
+  description_en: string | null;
   type: string;
   status: string;
   is_sensitive_data: boolean;
@@ -18,6 +20,8 @@ function categoriaDesdeFila(fila: FilaCategoria): Category {
     userId: fila.user_id,
     name: fila.name,
     description: fila.description,
+    ...(fila.name_en ? { nameEn: fila.name_en } : {}),
+    ...(fila.description_en ? { descriptionEn: fila.description_en } : {}),
     type: fila.type as CategoryType,
     status: fila.status as CategoryStatus,
     isSensitiveData: fila.is_sensitive_data,
@@ -30,6 +34,8 @@ function filaDesdeCategoria(category: Category): Omit<FilaCategoria, never> {
     user_id: category.userId,
     name: category.name,
     description: category.description,
+    name_en: category.nameEn ?? null,
+    description_en: category.descriptionEn ?? null,
     type: category.type,
     status: category.status,
     is_sensitive_data: category.isSensitiveData,
@@ -53,7 +59,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   async findByUserId(userId: string): Promise<Category[]> {
     const { data, error } = await this.cliente
       .from("categories")
-      .select("id, user_id, name, description, type, status, is_sensitive_data")
+      .select("id, user_id, name, description, name_en, description_en, type, status, is_sensitive_data")
       .eq("user_id", userId);
 
     if (error) {
@@ -65,7 +71,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   async findById(userId: string, categoryId: string): Promise<Category | undefined> {
     const { data, error } = await this.cliente
       .from("categories")
-      .select("id, user_id, name, description, type, status, is_sensitive_data")
+      .select("id, user_id, name, description, name_en, description_en, type, status, is_sensitive_data")
       .eq("user_id", userId)
       .eq("id", categoryId)
       .maybeSingle();

@@ -47,4 +47,20 @@ describe("RecommendationButton (RF-18)", () => {
       }
     }
   });
+
+  it("en inglés, el título usa el nombre traducido; una categoría del admin conserva el suyo", async () => {
+    await i18n.changeLanguage("en");
+    try {
+      const { unmount } = render(<RecommendationButton templateKey="economia.1" categoryName="Economía" />);
+      fireEvent.click(screen.getByRole("button", { name: /an idea for you/i }));
+      expect(screen.getByRole("dialog", { name: "An idea for Finances" })).toBeInTheDocument();
+      unmount();
+
+      render(<RecommendationButton templateKey="general.1" categoryName="Creatividad" />);
+      fireEvent.click(screen.getByRole("button", { name: /an idea for you/i }));
+      expect(screen.getByRole("dialog", { name: "An idea for Creatividad" })).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage("es");
+    }
+  });
 });

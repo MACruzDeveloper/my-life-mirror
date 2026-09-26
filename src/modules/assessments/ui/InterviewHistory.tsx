@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
+import { useCategoryLabels } from "@modules/categories/ui/categoryLabels";
 import { useAssessmentHistory } from "./queries";
 
 /**
@@ -12,6 +13,7 @@ import { useAssessmentHistory } from "./queries";
 export function InterviewHistory() {
   const { t, i18n } = useTranslation();
   const { data: sessions } = useAssessmentHistory();
+  const labels = useCategoryLabels();
 
   const formatSessionDate = (isoDate: string) => new Date(isoDate).toLocaleDateString(i18n.language, { month: "long", year: "numeric", day: "numeric" });
 
@@ -33,7 +35,7 @@ export function InterviewHistory() {
             </Typography>
             {session.entries.map((entry) => (
               <Typography key={entry.categoryId} variant="body2">
-                {entry.categoryName}:{" "}
+                {labels.name(entry.categoryName)}:{" "}
                 {entry.previousScore !== undefined ? `${entry.previousScore} → ${entry.score}` : entry.score}
               </Typography>
             ))}

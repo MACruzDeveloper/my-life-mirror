@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { useCategoryLabels } from "@modules/categories/ui/categoryLabels";
 import { BandBackground } from "./BandBackground";
 import { scoreBand, type ScoreBand } from "./scoreBand";
 
@@ -28,6 +29,7 @@ const BAND_KEYS: Record<ScoreBand, string> = {
  */
 export function ScoreCards({ latestScores, renderCardExtra }: { latestScores: LatestScoreDto[]; renderCardExtra?: (categoryId: string) => ReactNode }) {
   const { t, i18n } = useTranslation();
+  const labels = useCategoryLabels();
 
   return (
     <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" } }}>
@@ -40,7 +42,7 @@ export function ScoreCards({ latestScores, renderCardExtra }: { latestScores: La
           >
             <BandBackground band={band} />
             <Box sx={{ position: "relative", display: "flex", flexDirection: "column", gap: 0.5 }}>
-              <Typography variant="subtitle1">{latestScore.categoryName}</Typography>
+              <Typography variant="subtitle1">{labels.name(latestScore.categoryName)}</Typography>
               {band && latestScore.score !== undefined ? (
                 <>
                   <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>

@@ -70,4 +70,14 @@ describe("GetAssessmentHistory (RF-10, historial de cambios)", () => {
 
     expect((await history("  ")).ok).toBe(false);
   });
+
+  it("cada entrada lleva el nombre en inglés cuando la categoría lo tiene", async () => {
+    const { record, history, categoryRepository, a } = await setup();
+    await categoryRepository.save({ ...a, nameEn: "Custom name", descriptionEn: "d" });
+    await record({ userId: "u1", entries: [{ categoryId: a.id, score: 6 }] });
+
+    const resultado = await history("u1");
+
+    expect(resultado.ok && resultado.value[0].entries[0].categoryNameEn).toBe("Custom name");
+  });
 });

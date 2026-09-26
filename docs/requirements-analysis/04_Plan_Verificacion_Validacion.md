@@ -81,7 +81,7 @@ RF-XX — <resumen>
 
 Dado el alcance real (RES-01, RES-02):
 
-- **Se ejecuta de verdad:** peer review del documento, pruebas unitarias sobre lógica de negocio, checklist Given/When/Then manual, un usability test de 5 personas, un piloto corto con métricas básicas, y Playwright para lo que no toca `api/` (páginas públicas, ver `e2e/`, instalado 15 sept.).
+- **Se ejecuta de verdad:** peer review del documento, pruebas unitarias sobre lógica de negocio, checklist Given/When/Then manual, un usability test con n = 1 (ver §2; [guion](../validation/01_Guion_Test_Usabilidad.md) y [resultados](../validation/02_Resultados_Test_Usabilidad.md)), un piloto corto con métricas básicas, y Playwright para lo que no toca `api/` (páginas públicas, ver `e2e/`, instalado 15 sept.).
 - **Se documenta como diseño/trabajo futuro, sin ejecutar a escala real:** Playwright contra flujos que sí tocan `api/` (registro, login...) — pendiente decidir cómo aislar los datos de prueba (¿proyecto de Supabase dedicado? ¿limpieza tras cada test?) antes de automatizar nada que cree cuentas reales; A/B testing con significancia estadística.
 
 Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras funcionalidades: priorizar la demostración rigurosa del concepto y del método sobre la cobertura exhaustiva, dado el marco temporal del TFM.
@@ -103,3 +103,4 @@ Con este plan aprobado, seguimos con el archivo 3: **justificación del ciclo de
   - Automatización con Playwright de los criterios de aceptación pasa de "opcional" a prioridad Alta, específicamente para todos los RF de prioridad Must.
 - **v1.1 (14 sept. 2026)** — §1bis: caso real de un límite estructural de Vitest (no detecta que los datos no sobreviven entre funciones serverless distintas) encontrado al implementar RF-03.
 - **v1.2 (15 sept. 2026)** — Playwright instalado de verdad (§1, §4): primer test cubre solo páginas públicas. Automatizar RF-01 (registro/login) — el caso que motivó §1bis — queda pendiente de decidir aislamiento de datos de prueba en Supabase.
+- **v1.3 (26 sept. 2026)** — §4 corregido: decía "usability test de 5 personas", contradiciendo el ajuste a n = 1 de §2. Enlaces al guion y a la hoja de resultados del test del MVP.

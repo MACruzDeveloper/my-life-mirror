@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { InterviewPage } from "@modules/assessments/ui/InterviewPage";
+import i18n from "@shared/ui/i18n";
 import { createTestClient, withClient } from "../../../helpers/queryClient";
 import type { QueryClient } from "@tanstack/react-query";
 
@@ -405,5 +406,21 @@ describe("InterviewPage (RF-10)", () => {
     renderPage();
     expect(await screen.findByRole("heading", { level: 1, name: /actualiza tus respuestas/i })).toBeInTheDocument();
   });
-});
 
+  it("en inglés, los nombres y descripciones de las categorías estándar salen traducidos (RNF-10)", async () => {
+    await i18n.changeLanguage("en");
+    try {
+      stubFetch();
+      renderPage();
+
+      expect(await screen.findByRole("checkbox", { name: /finances/i })).toBeInTheDocument();
+      expect(screen.getByText("How are you feeling about Finances?")).toBeInTheDocument();
+      expect(screen.getByRole("group", { name: "Score for Finances" })).toBeInTheDocument();
+      expect(screen.queryByText(/economía/i)).not.toBeInTheDocument();
+      // Los ejemplos siguen funcionando: se buscan por el nombre guardado, no por el traducido.
+      expect(screen.getByRole("button", { name: /see examples for finances/i })).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage("es");
+    }
+  });
+});

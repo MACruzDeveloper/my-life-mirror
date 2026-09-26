@@ -76,4 +76,15 @@ describe("ListCategories (RF-06)", () => {
     expect(resultado.ok && resultado.value.some((c) => c.name === "Economía")).toBe(false);
     expect((await repo.findByUserId("u1")).some((c) => c.name === "Economía")).toBe(true);
   });
+
+  it("la copia de cada usuario recibe también el nombre y la descripción en inglés del catálogo", async () => {
+    const repo = new InMemoryCategoryRepository();
+    const catalog = new InMemoryCategoryCatalogRepository();
+    await catalog.save({ id: "nueva", name: "Creatividad", description: "Arte y hobbies.", nameEn: "Creativity", descriptionEn: "Art and hobbies.", isSensitiveData: false });
+
+    const resultado = await createListCategories(repo, catalog)("u1");
+
+    const nueva = resultado.ok ? resultado.value.find((c) => c.name === "Creatividad") : undefined;
+    expect(nueva).toMatchObject({ nameEn: "Creativity", descriptionEn: "Art and hobbies." });
+  });
 });
