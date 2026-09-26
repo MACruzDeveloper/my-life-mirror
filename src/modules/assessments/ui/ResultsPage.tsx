@@ -5,17 +5,21 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
-import { RecommendationDisclaimer, RecommendationNote } from "@modules/recommendations/ui/RecommendationNote";
+import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
 import { ScoreCards } from "./ScoreCards";
 import { useLatestScores } from "./queries";
 
-/** Última puntuación de cada categoría activa (precursor mínimo de RF-14). */
+/**
+ * Resultados (dentro de Mi perfil): las tarjetas de detalle de cada categoría
+ * activa — última puntuación, nota, fecha y banda — con el botón de la
+ * recomendación si la hay. La vista gráfica (evolución) está en Inicio (RF-16).
+ */
 export function ResultsPage() {
   const { t } = useTranslation();
-  const { data: resultados, isPending, isError } = useLatestScores();
+  const { data: latestScores, isPending, isError } = useLatestScores();
   // Secundarias: si fallan o tardan, los resultados se ven igual.
-  const recomendaciones = useRecommendations().data ?? [];
+  const recommendations = useRecommendations().data ?? [];
 
   if (isPending) {
     return (
@@ -29,6 +33,8 @@ export function ResultsPage() {
     return <Alert severity="error">{t("resultados.errorCarga")}</Alert>;
   }
 
+  const hasAnswers = latestScores.some((latestScore) => latestScore.score !== undefined);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Typography variant="h5" component="h1">
@@ -37,20 +43,20 @@ export function ResultsPage() {
       <Typography variant="body2" color="text.secondary">
         {t("resultados.descripcion")}
       </Typography>
-      {resultados.length === 0 ? (
+      {latestScores.length === 0 ? (
         <Typography>{t("resultados.sinCategorias")}</Typography>
       ) : (
         <ScoreCards
-          resultados={resultados}
-          extraFor={(id) => {
-            const r = recomendaciones.find((x) => x.categoryId === id);
-            return r ? <RecommendationNote templateKey={r.templateKey} categoryName={r.categoryName} /> : null;
+          latestScores={latestScores}
+          renderCardExtra={(categoryId) => {
+            const recommendation = recommendations.find((candidate) => candidate.categoryId === categoryId);
+            return recommendation ? <RecommendationButton templateKey={recommendation.templateKey} categoryName={recommendation.categoryName} /> : null;
           }}
         />
       )}
-      {recomendaciones.length > 0 && <RecommendationDisclaimer />}
       <Link component={RouterLink} to="/perfil/entrevista">
-        {t("resultados.empezar")}
+        {/* La entrevista es la primera vez; después se actualizan las respuestas, no se "hace otra". */}
+        {hasAnswers ? t("entrevista.actualizarRespuestas") : t("resultados.empezar")}
       </Link>
     </Box>
   );

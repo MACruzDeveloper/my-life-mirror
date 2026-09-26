@@ -3,7 +3,8 @@
     "email": "Email",
     "contrasena": "Contraseña",
     "contrasenaAyuda": "Al menos 8 caracteres",
-    "errorServidor": "No se pudo contactar con el servidor"
+    "errorServidor": "No se pudo contactar con el servidor",
+    "reintentar": "Reintentar"
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -55,12 +56,10 @@
   },
   "panel": {
     "bienvenida": "Bienvenido",
-    "descripcion": "Tu panel llegará pronto — de momento, esto confirma que tu sesión funciona.",
     "cerrarSesion": "Cerrar sesión",
     "bienvenidaTitulo": "Empecemos por conocerte",
     "bienvenidaTexto": "El primer paso es una entrevista tranquila: eliges de qué hablar y te puntúas de 1 a 10. Sin juicios, a tu ritmo.",
-    "empezar": "Empezar mi entrevista",
-    "nuevaEntrevista": "Nueva entrevista"
+    "empezar": "Empezar mi entrevista"
   },
   "perfil": {
     "titulo": "Tu perfil",
@@ -128,7 +127,12 @@
     "sensiblesTitulo": "Requieren tu consentimiento",
     "sensiblesExplicacion": "Contienen datos sensibles. Antes de activar una te pediremos tu consentimiento y podrás leer la política de privacidad; puedes desactivarla cuando quieras.",
     "historialTitulo": "Historial de cambios",
-    "historialVacio": "Todavía no has guardado nada."
+    "historialVacio": "Todavía no has guardado nada.",
+    "actualizarRespuestas": "Actualizar mis respuestas",
+    "tituloActualizar": "Actualiza tus respuestas",
+    "descripcionActualizar": "¿Ha cambiado algo desde la última vez? Revisa tus respuestas y cambia solo lo que quieras. Cada cambio se guarda como un registro nuevo y tu historial se conserva.",
+    "irA": "Ir a una categoría",
+    "sinResponder": "Sin responder"
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -354,6 +358,30 @@
         "2": "Piensa qué es lo que más te pesa de {{categoria}} y qué cambio pequeño lo aliviaría.",
         "3": "Pregúntate qué te ayudaría más ahora mismo en {{categoria}} y da un primer paso, por pequeño que sea."
       }
-    }
+    },
+    "dialogoTitulo": "Una idea para {{categoria}}",
+    "cerrar": "Cerrar"
+  },
+  "evolucion": {
+    "titulo": "Tu evolución",
+    "descripcion": "Cómo ha cambiado cada categoría en tus respuestas, mes a mes. Todas las gráficas muestran el mismo periodo.",
+    "sinPuntuar": "Sin puntuar todavía",
+    "unaSola": "La evolución aparece a partir de la segunda respuesta.",
+    "actual": "Ahora",
+    "resumen": "Evolución de {{categoria}}: {{primera}} el {{fechaPrimera}} y {{ultima}} el {{fechaUltima}}, {{count}} respuestas",
+    "resumenUno": "{{categoria}}: {{score}} el {{fecha}}, una sola respuesta",
+    "verDetalle": "Ver el detalle en Resultados",
+    "errorCarga": "No se pudo cargar la evolución.",
+    "verDatos": "Ver datos",
+    "ocultarDatos": "Ocultar datos",
+    "tablaDe": "Puntuaciones de {{categoria}}",
+    "fecha": "Fecha",
+    "puntuacion": "Puntuación",
+    "periodo": "Periodo mostrado",
+    "periodo6": "6 meses",
+    "periodo12": "12 meses",
+    "periodoTodo": "Todo",
+    "anterior": "Periodo anterior",
+    "siguiente": "Periodo siguiente"
   }
 }

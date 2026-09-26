@@ -18,6 +18,36 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 - Plan de métricas DORA y Flow para la revisión de calidad ([02_Metricas_DORA_y_Flujo.md](docs/project-management/02_Metricas_DORA_y_Flujo.md)); solo planificación.
 - `PrivacyPolicyPage` (`/politica-privacidad`, pública, RNF-05): antes del modal de consentimiento no había nada real que leer. Enlazada desde el modal; muestra la misma `VERSION_POLITICA_ACTUAL` que valida el backend. Contenido de borrador razonable para un TFM, no redactado por asesoría legal.
 
+### Cambiado (estructura y nombres)
+
+- Gráficos reorganizados como plantillas genéricas en `src/shared/ui/charts/`: `TimeLineChart` (configurable por props), `useEChart`, `echarts.ts`, `timeWindow.ts`, `ChartDataTable`. Lo específico de la evolución, en `assessments/ui/evolution/` (`EvolutionPanel`, `PeriodSelector`, `CategoryEvolutionCard`, `scoreHistory`). Inicio dividido en `panel/ui/home/` (`Home`, `FirstTimeWelcome`, `LoadErrorState`, `Dashboard`).
+- Recomendaciones (RF-18): la nota en la tarjeta pasa a un botón destacado "Una idea para ti" que abre una ventana con la idea y el aviso de RES-05 (`RecommendationButton`; se elimina `RecommendationNote`).
+- Identificadores en inglés en todo lo tocado: `InterviewPage` (≈60 nombres, p. ej. `borradores` → `draftScores`, estados `listo/guardando/guardado` → `idle/saving/saved`), `InterviewHistory`, `Header` (`onCerrarSesion` → `onLogout`), `ResultsPage`, `ScoreCards` (`resultados/extraFor` → `latestScores/renderCardExtra`) y sus tests. Renombrado con el servicio de lenguaje de TypeScript (solo identificadores reales, respetando el ámbito).
+
+### Añadido (RF-16)
+
+- **RF-16** — evolución temporal de cada categoría ([historia](docs/user-stories/RF-16-evolucion-temporal.md)), que cierra RN-03 (Must). En Inicio, `EvolutionCards` (dos columnas): una tarjeta por categoría activa con su puntuación actual y un gráfico de líneas con **Apache ECharts** (`CategoryTrendChart`; nueva dependencia `echarts`, importación por partes y carga diferida: ~175 kB comprimidos solo en Inicio). Eje 1-10 fijo y eje por meses con la misma ventana para todas las tarjetas, elegida con un selector 6 meses / 12 meses / Todo y flechas de periodo (6 meses por defecto en móvil). Tooltip con puntuación y fecha, descripción textual y tabla "Ver datos" como alternativa accesible. Lógica pura en `trendChart.ts` (`periodWindow`, `buildTrendOption`). `buildCategoryTimeSeries` transforma el historial existente (`GET /api/assessments/history`): sin endpoint nuevo, 10 de 12 funciones. Resultados conserva las tarjetas de detalle y se enlaza desde Inicio.
+
+### Añadido (RF-14)
+
+- **RF-14** — panel general en `/inicio` ([historia](docs/user-stories/RF-14-panel-general.md)): formaliza y cierra lo ya construido durante RF-18 — una tarjeta por categoría activa con su última puntuación, compuesta con su recomendación abierta si la hay. Sin caso de uso `ConsultarPanelGeneral` combinado en el servidor a propósito (ver "Nota de diseño" de la historia): se compone en `Home.tsx` a partir de `GetLatestScores` y `ListRecommendations`, ya independientes y cacheados. RF-15 (radar), RF-16 (evolución) y RF-17 (puntuación global) quedan fuera — RN-03 (evolución histórica) traza a RF-16, no a RF-14.
+
+### Corregido (RF-14)
+
+- `Home`: un fallo al cargar las puntuaciones se mostraba con el texto de bienvenida de "primera vez" ("Empecemos por conocerte"), confundiendo un error técnico con un usuario nuevo. Ahora tiene su propio estado, con aviso y botón para reintentar.
+
+### Cambiado (RF-10 / RF-14 / RF-39)
+
+- Entrevista: cada categoría activa sin responder lleva la etiqueta "Sin responder" (lila suave, sin tono de alarma) y hay una fila de accesos directos a cada pregunta; la pantalla se titula "Tu entrevista" solo la primera vez y "Actualiza tus respuestas" después. En Inicio y Resultados el acceso pasa de "Nueva entrevista"/"Hacer una entrevista" a "Actualizar mis respuestas" cuando ya hay respuestas.
+- Colores planos en vez de degradados (bandas de puntuación y fondo de la entrevista); `BAND_GRADIENTS` eliminado.
+- Cabecera: enlace "Inicio", a la izquierda de "Administración".
+
+### Eliminado
+
+- `panel.nuevaEntrevista` (i18n), sustituida por `entrevista.actualizarRespuestas`.
+
+- `panel.descripcion` (i18n): texto residual del placeholder de `Home` anterior a RF-14 ("Tu panel llegará pronto…"), sin ningún uso ya en el código.
+
 ### Añadido (RF-18)
 
 - **RF-18** — recomendaciones ([historia](docs/user-stories/RF-18-recomendaciones.md)). Módulo `recommendations`: entidad `Recommendation` (RD-04, estado ya modelado; solo se crea `pending`), catálogo curado de plantillas por categoría estándar (2 cada una) y generales de reserva para las que cree el admin, umbral por variable de entorno `RECOMMENDATION_THRESHOLD` (defecto 5), `GenerateRecommendations` (como mucho una abierta por categoría, rotación de plantillas) y `ListRecommendations` (solo mientras la categoría está activa y la puntuación sigue bajo el umbral). `RecordAssessments` avisa a un oyente opcional después de persistir (equivalente en proceso del evento de dominio, sin Outbox); un fallo se registra y no deshace el guardado. Tabla `recommendations` (`supabase/migrations/0007_recommendations.sql`), `GET /api/recommendations` (10 de 12 funciones), nota discreta "Una idea para ti" en las tarjetas de Inicio y Resultados con el aviso de RES-05 y textos ES/EN. Cubierta por RF-05: se exporta y se borra con la cuenta.
