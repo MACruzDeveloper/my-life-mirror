@@ -39,7 +39,13 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - `<html lang>` fijo en `en` con la app en español: ahora sigue al idioma elegido (lectores de pantalla).
 
+### Corregido (despliegue)
+
+- Login, registro y el resto de la API devolvían 500 en la *preview* de Vercel: `Cannot find module …/http/router`. Las funciones corren como ESM nativo de Node, que no resuelve imports relativos sin extensión, y ni los tipos (`bundler`) ni `vercel dev` lo detectaban. Imports con `.js` en todo lo alcanzable desde `api/`, `api/tsconfig.json` en `nodenext`, y `npm run check:api` (también en el pre-push) comprueba ahora los archivos de `src/` que `api/` alcanza y carga cada función en Node.
+
 ### Cambiado (rendimiento y móvil)
+
+- Iconos de `@mui/icons-material` (importados por ruta) en lugar de cinco SVG copiados a mano; sin cambio de tamaño en el paquete.
 
 - Funciones de Vercel en Dublín (`vercel.json`, `"regions": ["dub1"]`), junto a la base de datos de Supabase (Irlanda); antes corrían en Washington y cada consulta cruzaba el Atlántico.
 - **UX-03** — cabecera en móvil con menú (Inicio, Administración si es admin, Mi perfil, nombre, Cerrar sesión) en lugar de cinco botones; desde `sm`, sin cambios.

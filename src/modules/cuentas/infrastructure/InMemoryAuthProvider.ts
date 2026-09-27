@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import type { AuthProvider, SesionIniciada, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider";
-import { ROL_POR_DEFECTO, type RolUsuario } from "../domain/RolUsuario";
-import { AuthenticationError, ConflictError } from "../../../shared/domain/DomainError";
+import type { AuthProvider, SesionIniciada, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider.js";
+import { ROL_POR_DEFECTO, type RolUsuario } from "../domain/RolUsuario.js";
+import { AuthenticationError, ConflictError } from "../../../shared/domain/DomainError.js";
 
 interface RegistroInterno {
   id: string;

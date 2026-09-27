@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { AdminAuditEntry } from "../domain/AdminAuditEntry";
-import type { AdminAuditRepository } from "../domain/AdminAuditRepository";
+import type { AdminAuditEntry } from "../domain/AdminAuditEntry.js";
+import type { AdminAuditRepository } from "../domain/AdminAuditRepository.js";
 
 interface FilaAuditoria {
   id: string;

@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { AuthProvider, SesionIniciada, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider";
-import { ROL_POR_DEFECTO, leerRolDesdeMetadata, type RolUsuario } from "../domain/RolUsuario";
-import { AuthenticationError, ConflictError, ValidationError } from "../../../shared/domain/DomainError";
+import type { AuthProvider, SesionIniciada, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider.js";
+import { ROL_POR_DEFECTO, leerRolDesdeMetadata, type RolUsuario } from "../domain/RolUsuario.js";
+import { AuthenticationError, ConflictError, ValidationError } from "../../../shared/domain/DomainError.js";
 
 function estaSuspendido(bannedUntil?: string): boolean {
   return !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();

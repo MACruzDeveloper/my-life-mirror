@@ -1,10 +1,10 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { type ConflictError, DomainError, ValidationError } from "../../../shared/domain/DomainError";
-import { Email } from "../domain/Email";
-import { Password } from "../domain/Password";
-import type { Usuario } from "../domain/Usuario";
-import type { AuthProvider } from "../domain/AuthProvider";
-import type { createUpdateProfile } from "./UpdateProfile";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { type ConflictError, DomainError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { Email } from "../domain/Email.js";
+import { Password } from "../domain/Password.js";
+import type { Usuario } from "../domain/Usuario.js";
+import type { AuthProvider } from "../domain/AuthProvider.js";
+import type { createUpdateProfile } from "./UpdateProfile.js";
 
 export interface RegisterUserInput {
   email: string;

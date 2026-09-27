@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Category, CategoryStatus, CategoryType } from "../domain/Category";
-import type { CategoryRepository } from "../domain/CategoryRepository";
+import type { Category, CategoryStatus, CategoryType } from "../domain/Category.js";
+import type { CategoryRepository } from "../domain/CategoryRepository.js";
 
 interface FilaCategoria {
   id: string;

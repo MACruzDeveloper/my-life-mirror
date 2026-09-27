@@ -1,5 +1,5 @@
-import type { Consentimiento } from "../domain/Consentimiento";
-import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository";
+import type { Consentimiento } from "../domain/Consentimiento.js";
+import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository.js";
 
 /**
  * Fake solo para tests — ADR-03 §3.6. En dev/producción se usa

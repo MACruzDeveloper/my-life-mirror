@@ -1,5 +1,5 @@
-import type { Category } from "../domain/Category";
-import type { CategoryRepository } from "../domain/CategoryRepository";
+import type { Category } from "../domain/Category.js";
+import type { CategoryRepository } from "../domain/CategoryRepository.js";
 
 /** Fake para tests — ADR-03 §3.6. */
 export class InMemoryCategoryRepository implements CategoryRepository {

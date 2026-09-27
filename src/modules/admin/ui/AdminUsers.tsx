@@ -13,7 +13,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import SvgIcon from "@mui/material/SvgIcon";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -40,14 +40,6 @@ const ENDPOINT: Record<TipoAccion, string> = {
   recovery: "user-recovery",
 };
 const ROLES = ["usuario", "premium", "admin"] as const;
-
-function MoreIcon() {
-  return (
-    <SvgIcon fontSize="small">
-      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-    </SvgIcon>
-  );
-}
 
 /**
  * Gestión de usuarios por el admin (ADM-03). La interfaz solo desactiva lo que
@@ -218,7 +210,7 @@ export function AdminUsers() {
                 <TableCell>{fecha(usuario.lastSignInAt)}</TableCell>
                 <TableCell>
                   <IconButton size="small" aria-label={t("admin.accionesDe", { email: usuario.email })} onClick={(e) => setMenu({ ancla: e.currentTarget, usuario })}>
-                    <MoreIcon />
+                    <MoreVertIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
               </TableRow>

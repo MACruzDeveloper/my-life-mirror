@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
-import type { Profile } from "../domain/Profile";
-import type { ProfileRepository } from "../domain/ProfileRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
+import type { Profile } from "../domain/Profile.js";
+import type { ProfileRepository } from "../domain/ProfileRepository.js";
 
 /** Caso de uso de solo lectura — RF-03. `undefined` significa "todavía sin perfil", no un error. */
 export function createGetProfile(repository: ProfileRepository) {

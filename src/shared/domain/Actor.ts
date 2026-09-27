@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "./Result";
-import { ForbiddenError } from "./DomainError";
+import { type Result, err, ok } from "./Result.js";
+import { ForbiddenError } from "./DomainError.js";
 
 /**
  * Quien ejecuta un caso de uso, tal y como lo verificó el servidor (nunca

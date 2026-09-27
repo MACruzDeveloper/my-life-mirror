@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Gender, Profile } from "../domain/Profile";
-import type { ProfileRepository } from "../domain/ProfileRepository";
+import type { Gender, Profile } from "../domain/Profile.js";
+import type { ProfileRepository } from "../domain/ProfileRepository.js";
 
 interface FilaPerfil {
   user_id: string;

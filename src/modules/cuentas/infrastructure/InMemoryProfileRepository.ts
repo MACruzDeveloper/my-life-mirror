@@ -1,5 +1,5 @@
-import type { Profile } from "../domain/Profile";
-import type { ProfileRepository } from "../domain/ProfileRepository";
+import type { Profile } from "../domain/Profile.js";
+import type { ProfileRepository } from "../domain/ProfileRepository.js";
 
 /**
  * Fake solo para tests — ADR-03 §3.6. En dev/producción se usa

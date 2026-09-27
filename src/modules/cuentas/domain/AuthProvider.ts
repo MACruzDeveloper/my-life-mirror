@@ -1,4 +1,4 @@
-import type { RolUsuario } from "./RolUsuario";
+import type { RolUsuario } from "./RolUsuario.js";
 
 /**
  * Puerto — ADR-06. El dominio no sabe que detrás hay Supabase; solo pide

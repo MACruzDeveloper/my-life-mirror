@@ -1,8 +1,8 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { type Actor, requireAdmin } from "../../../shared/domain/Actor";
-import { type ForbiddenError, NotFoundError } from "../../../shared/domain/DomainError";
-import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
-import type { CategoryRepository } from "../domain/CategoryRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { type Actor, requireAdmin } from "../../../shared/domain/Actor.js";
+import { type ForbiddenError, NotFoundError } from "../../../shared/domain/DomainError.js";
+import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
+import type { CategoryRepository } from "../domain/CategoryRepository.js";
 
 /**
  * Caso de uso — ADM-02. Retira una categoría: se marca `retiredAt` (no se
