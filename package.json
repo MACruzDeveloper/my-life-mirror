@@ -9,10 +9,14 @@
     "build": "tsc -b && vite build",
     "check:api": "node scripts/check-api-types.mjs",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "prepare": "husky",
+    "verify": "npm run lint && npm run test:coverage && npm run build && npm run check:api && npm run test:e2e"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -37,10 +41,12 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "@vitest/coverage-v8": "^5.0.0",
     "eslint": "^10.9.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.4",
     "globals": "^17.11.0",
+    "husky": "^9.1.7",
     "jsdom": "^28.1.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.67.0",

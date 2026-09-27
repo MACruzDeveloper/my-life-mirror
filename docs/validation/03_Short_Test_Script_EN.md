@@ -21,11 +21,11 @@ Read each one as written. Don't point at buttons; if she asks "what now?", reply
 
 | # | Read this | What success looks like | Notes (done ✅ / with help 🟡 / not done ❌, what she said) |
 |---|---|---|---|
-| 1 | "Create an account, then tell the app how you're doing right now in about five areas of your life. Include sport." ⏱️ *time the part from opening the interview to saving* | Account created; five categories scored and saved (sport asks for consent). **Goal: under 2 minutes** for the scoring. | |
-| 2 | "Go back to the main screen. According to the app, how are you doing? What's your best area and your worst?" | Finds both in the balance chart or the cards. | |
-| 3 | "Does the app suggest anything for one of your areas?" *(If all her scores were 5 or higher, skip it and ask again after task 4.)* | Finds and opens "An idea for you" on a low area. | |
-| 4 | "Imagine a month has passed. Update two areas — make one of them go down — and check how it changed." | Updates and saves; sees the change (the two answers are from the same day, so in the chart they fall on the same spot — note if that confuses her). | |
-| 5 | "You don't want to use the app anymore and want nothing of yours left. Do it." | Deletes the account (asks for her password). | |
+| 1 | "Create an account, then tell the app how you're doing right now in about five areas of your life. Include sport." ⏱️ *time the part from opening the interview to saving* | Account created; five categories scored and saved (sport asks for consent). **Goal: under 2 minutes** for the scoring. | with help| 
+| 2 | "Go back to the main screen. According to the app, how are you doing? What's your best area and your worst?" | Finds both in the balance chart or the cards. | with help| 
+| 3 | "Does the app suggest anything for one of your areas?" *(If all her scores were 5 or higher, skip it and ask again after task 4.)* | Finds and opens "An idea for you" on a low area. |done | 
+| 4 | "Imagine a month has passed. Update two areas — make one of them go down — and check how it changed." | Updates and saves; sees the change (the two answers are from the same day, so in the chart they fall on the same spot — note if that confuses her). | done| 
+| 5 | "You don't want to use the app anymore and want nothing of yours left. Do it." | Deletes the account (asks for her password). | not done |
 
 Keep an eye out, in any task, for moments where she looks **uneasy, judged or watched** — write down exactly what she said.
 
@@ -35,16 +35,16 @@ Keep an eye out, in any task, for moments where she looks **uneasy, judged or wa
 
 | Question | 1-5 |
 |---|---|
-| The app was easy to use. | |
-| I never felt judged by my answers. | |
-| I felt comfortable answering honestly, even about areas where I'm not doing well. | |
-| The ideas the app suggested felt kind and useful. | |
-| I'd come back in a few weeks to update my answers. | |
+| The app was easy to use. | 3 |
+| I never felt judged by my answers. | 4 |
+| I felt comfortable answering honestly, even about areas where I'm not doing well. | 4 |
+| The ideas the app suggested felt kind and useful. | 4 |
+| I'd come back in a few weeks to update my answers. | 5 |
 
 And two open ones:
 
-1. "Was there any moment you felt uncomfortable, watched or judged?"
-2. "What's the first thing you'd change? What would you tell a friend before she tried it?"
+1. "Was there any moment you felt uncomfortable, watched or judged?" No
+2. "What's the first thing you'd change? What would you tell a friend before she tried it?" Consider the app as something that you can trust to share a part of you to not to be judged but to be guided in the areas of your life that you think you are weak.
 
 ## After she leaves (you)
 
@@ -54,3 +54,15 @@ And two open ones:
 ---
 
 *Change history — v1.0 (26 Sept 2026): initial version, at the author's request (the participant doesn't speak Spanish; shorter session). Written in English on purpose, as an exception to the Spanish-docs convention. v1.1 (26 Sept 2026): language switch now on the landing page. v1.2 (26 Sept 2026): category names are now translated too, so the whole app is in English.*
+
+
+## Suggestions from user:
+
+After creating a user account, there must be another section where the user will provide her personal details such as birthdate (age), weight, height, gender, hobbies (party, hiking, biking, etc.), health issues and/or special needs, religion, marital status (under marital status must be an option if single, in a relationship, married, divorced, etc.), number of children and ages (if there are children with special needs), current location, etc.
+
+Create a calculator that shows how good or bad is the level of the user´s level in each category. If too low, make an inspirational quotes or suggestions on how to improve the level of the user´s category.
+
+Under each category, create another question so the user can share more specific details such as ¨What is the best adventure he/she ever experienced?¨and let the user explain.
+
+With more specific details, it would be easier to understand each user´s point of view and it would be easier to give a personalized suggestion to each users.
+

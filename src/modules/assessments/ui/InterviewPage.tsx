@@ -368,6 +368,16 @@ export function InterviewPage() {
 
       <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
         <Typography variant="body1">{hasSavedAnswers ? t("entrevista.descripcionActualizar") : t("entrevista.descripcion")}</Typography>
+        {/* UX-01: la primera vez, los pasos concretos de esta pantalla; al actualizar ya se conocen. */}
+        {!hasSavedAnswers && (
+          <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ my: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+            {(t("entrevista.pasosPrimeraVez", { returnObjects: true, boton: t("entrevista.guardar") }) as string[]).map((step) => (
+              <Typography component="li" variant="body2" key={step}>
+                {step}
+              </Typography>
+            ))}
+          </Box>
+        )}
         <Typography variant="caption" color="text.secondary">
           {t("entrevista.escala")}
         </Typography>

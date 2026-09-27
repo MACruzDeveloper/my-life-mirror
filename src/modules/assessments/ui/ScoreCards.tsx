@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { BandBackground } from "./BandBackground";
-import { scoreBand, type ScoreBand } from "./scoreBand";
+import { BAND_LABEL_KEYS, scoreBand } from "./scoreBand";
 
 export interface LatestScoreDto {
   categoryId: string;
@@ -15,13 +15,6 @@ export interface LatestScoreDto {
   note?: string;
   recordedAt?: string;
 }
-
-const BAND_KEYS: Record<ScoreBand, string> = {
-  low: "resultados.bandaLow",
-  mediumLow: "resultados.bandaMediumLow",
-  medium: "resultados.bandaMedium",
-  high: "resultados.bandaHigh",
-};
 
 /**
  * Tarjetas con la última puntuación por categoría. RN-04: el número va en el
@@ -52,7 +45,7 @@ export function ScoreCards({ latestScores, renderCardExtra }: { latestScores: La
                       {latestScore.score}
                     </Typography>
                     <Typography variant="body2" component="span" color="text.secondary" data-band={band}>
-                      {t(BAND_KEYS[band])}
+                      {t(BAND_LABEL_KEYS[band])}
                     </Typography>
                   </Box>
                   {latestScore.note && <Typography variant="body2">{latestScore.note}</Typography>}

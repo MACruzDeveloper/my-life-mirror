@@ -31,7 +31,10 @@ function renderHome() {
   );
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  window.localStorage.clear();
+});
 
 // Header/sesión/cerrar-sesión los cubre ProtectedLayout; Home solo decide
 // entre la bienvenida de primera vez y el panel (RF-14, por ahora los resultados).
@@ -43,6 +46,8 @@ describe("Home (RF-39 / RF-14)", () => {
     const link = await screen.findByRole("link", { name: /empezar mi entrevista/i });
     expect(link).toHaveAttribute("href", "/perfil/entrevista");
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+    // UX-01: justo después de registrarse, los mismos pasos que en la portada.
+    expect(screen.getByRole("region", { name: /cómo funciona/i })).toBeInTheDocument();
   });
 
   it("un usuario que aún no tiene ninguna categoría también ve la bienvenida", async () => {
@@ -173,5 +178,77 @@ describe("Home (RF-39 / RF-14)", () => {
       await i18n.changeLanguage("es");
     }
   });
-});
 
+  describe("resumen de ideas (UX-02)", () => {
+    const SCORES = [
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" },
+      { categoryId: "c2", catalogId: "k-familia", categoryName: "Familia", score: 9, recordedAt: "2026-09-19T10:00:00.000Z" },
+    ];
+
+    it("con recomendaciones abiertas, las resume arriba con un botón por categoría que abre la idea", async () => {
+      stub(SCORES, true, [{ id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", templateKey: "economia.1", status: "pending" }]);
+      renderHome();
+
+      const summary = await screen.findByRole("region", { name: /ideas para ti/i });
+      const button = await within(summary).findByRole("button", { name: /idea para economía/i });
+      expect(within(summary).queryByRole("button", { name: /familia/i })).not.toBeInTheDocument();
+      fireEvent.click(button);
+      const dialog = screen.getByRole("dialog");
+      expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+      expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
+    });
+
+    it("sin recomendaciones no aparece", async () => {
+      stub(SCORES);
+      renderHome();
+
+      await screen.findByRole("region", { name: "Economía" });
+      expect(screen.queryByRole("region", { name: /ideas para ti/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("guía del panel (UX-01)", () => {
+    const SCORED = [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }];
+
+    it("explica cada parte del panel, nombrando los botones con su texto real", async () => {
+      stub(SCORED);
+      renderHome();
+
+      const guide = await screen.findByRole("region", { name: /cómo leer esta página/i });
+      expect(guide).toHaveTextContent(/tu equilibrio/i);
+      expect(guide).toHaveTextContent(/tu evolución/i);
+      expect(guide).toHaveTextContent(/una idea para ti/i);
+      expect(guide).toHaveTextContent(/actualizar mis respuestas/i);
+    });
+
+    it("'Entendido' la cierra, no vuelve al volver a Inicio y se puede abrir otra vez", async () => {
+      stub(SCORED);
+      const firstVisit = renderHome();
+      fireEvent.click(await screen.findByRole("button", { name: /entendido/i }));
+      expect(screen.queryByRole("region", { name: /cómo leer esta página/i })).not.toBeInTheDocument();
+      firstVisit.unmount();
+
+      renderHome();
+      await screen.findByText("Economía");
+      expect(screen.queryByRole("region", { name: /cómo leer esta página/i })).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: /cómo leer esta página/i }));
+      expect(screen.getByRole("region", { name: /cómo leer esta página/i })).toBeInTheDocument();
+    });
+
+    it("sin localStorage (modo privado estricto) se cierra igualmente, sin errores", async () => {
+      vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+        throw new Error("SecurityError");
+      });
+      vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+        throw new Error("SecurityError");
+      });
+      stub(SCORED);
+      renderHome();
+
+      fireEvent.click(await screen.findByRole("button", { name: /entendido/i }));
+      expect(screen.queryByRole("region", { name: /cómo leer esta página/i })).not.toBeInTheDocument();
+      vi.restoreAllMocks();
+    });
+  });
+});

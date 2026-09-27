@@ -11,7 +11,7 @@
 | RN | RF relacionados | RNF relacionados | RES relacionados | RD relacionados | Cobertura |
 |---|---|---|---|---|---|
 | RN-01 | RF-06, RF-07, RF-09, RF-10 | RNF-01 | — | RD-01, RD-02, RD-03 | ✅ |
-| RN-02 | RF-18, RF-19, RF-20, RF-21, RF-34, RF-35 | — | — | RD-04, RD-09 | ✅ |
+| RN-02 | RF-18, RF-19, RF-20, RF-21, RF-34, RF-35, RF-40 | — | — | RD-04, RD-09 | ✅ |
 | RN-03 | RF-12, RF-16, RF-36 | — | — | RD-07 | ✅ |
 | RN-04 | RF-19, RF-21 | — | RES-07, RES-09 | — | ✅ |
 | RN-05 | RF-07, RF-08 | — | — | RD-02 | ✅ |
@@ -68,3 +68,4 @@ Con los dos hallazgos cerrados, seguimos con el **Plan de Verificación y Valida
 - **v1.1 (7 sept. 2026)** — se añade RF-34 (historial de recomendaciones) a la fila de RN-02, derivado de `09_Diagrama_Estados_Recomendacion.md`. Se corrige el enlace/versión de cabecera tras la renumeración de archivos.
 - **v1.2 (10 sept. 2026)** — se añaden RF-35 (RN-02), RF-36 (RN-03) y RF-37 (RN-08), la nueva sección 2.11 de funcionalidades asistidas por IA. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md).
 - **v1.3 (14 sept. 2026)** — se añaden RF-38 y RF-39 como infraestructura de cuenta transversal (§3).
+- **v1.4 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA) en la fila de RN-02.

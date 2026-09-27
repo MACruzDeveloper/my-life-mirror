@@ -37,6 +37,18 @@ Antes de enviar cada prompt de imagen al modelo de avatares, un paso de razonami
 ### 4.2 Chain-of-Thought + test-time compute en RF-37 (asistente de redacción)
 Este es el ejemplo más completo, porque cierra el círculo con una decisión ya tomada: RF-32 nació precisamente de rechazar un diseño que sonaba a "alarde" (ver el historial de decisiones de RN-08). RF-37 usa un paso de razonamiento estructurado que comprueba explícitamente, antes de mostrar cualquier borrador al usuario emisor: (1) ¿contiene lenguaje diagnóstico o clínico? (RES-09), (2) ¿suena a alarde en vez de a apoyo? (el motivo original del rediseño de RF-32). Aquí es donde el **test-time compute** gana su sitio, y no en todas partes: al ser una comprobación de seguridad con consecuencias reales si falla, repetir el juicio más de una vez (autoconsistencia) o usar un modelo con más capacidad de razonamiento específicamente en este punto está justificado — no como política general del proyecto, sino en el único checkpoint donde un falso negativo importa de verdad.
 
+### 4.3 RF-40: recomendaciones personalizadas con IA, ancladas al catálogo (27 sept. 2026)
+
+Esta sección matiza la decisión de §3 de que el motor de recomendaciones sea "no generativo". La validación mostró que el usuario echa de menos sugerencias más personales, y el autor quiere que eso sea el corazón del producto. **Se mantiene el control editorial que protege RES-09, pero ahora lo hace una verificación automática en vez de un catálogo inmóvil:**
+
+1. **Anclaje:** el modelo no inventa ideas. Recibe la categoría, la puntuación, la tendencia y las 2-3 ideas del catálogo curado de esa categoría; elige una y la reescribe en 2-3 frases. La salida es estructurada (JSON: clave de la plantilla elegida + texto), no texto libre.
+2. **Verificación automática** (CoT + *test-time compute*, igual que RF-37): una lista de términos determinista y una segunda pasada del modelo comprueban que no hay lenguaje diagnóstico (RES-09), consejo médico/financiero/psicológico (RES-05) ni tono de juicio (RN-04).
+3. **Caída segura:** si la verificación falla, el proveedor no responde o no hay consentimiento, se muestra el texto del catálogo. El usuario nunca ve texto sin verificar y **nunca espera a un moderador humano**: no hay ninguno en el bucle; la persona que decide es el propio usuario (activar o no la personalización).
+4. **Privacidad:** enviar datos a un proveedor externo lo convierte en encargado del tratamiento. Por eso es *opt-in* (desactivado por defecto), se explica qué se envía, y la primera versión **excluye las notas de texto libre y las categorías sensibles** (RGPD art. 9). Se amplía solo tras evaluar el comportamiento.
+5. **Arquitectura:** puerto de dominio (p. ej. `IdeaWriter`) con un *Fake* para los tests y el adaptador de Anthropic en infraestructura; clave de API solo en el servidor. Se desarrolla primero contra el *Fake*; el adaptador real llega cuando haya crédito de API (la suscripción de claude.ai no incluye uso de la API).
+6. **Evaluación:** un conjunto de ~20 casos (incluidos casos límite) con lo que se espera de cada uno, reutilizable como evidencia en la memoria del TFM.
+7. **Coste:** con un modelo pequeño (Haiku), del orden de una décima de céntimo por idea; se genera una vez y se guarda con la recomendación (entra en la exportación de RF-05), no en cada visita.
+
 ## 5. Resumen de lo añadido a los requisitos
 
 | RF | Qué añade | Prioridad | Plataforma |
@@ -44,6 +56,7 @@ Este es el ejemplo más completo, porque cierra el círculo con una decisión ya
 | RF-35 | Comentario reflexivo por voz al completar una recomendación | Could | Whisper |
 | RF-36 | Consulta en lenguaje natural sobre el propio historial (RAG) | Could | Claude API + embeddings, sin LangChain |
 | RF-37 | Asistente de redacción del mensaje de RF-32, con verificación CoT + test-time compute | Could | Claude API |
+| RF-40 | Recomendaciones personalizadas con IA, ancladas al catálogo, con verificación y caída segura (§4.3) | Should (Ciclo 2) | Claude API (Haiku) |
 
 Los tres quedan como Could — candidatos de Ciclo 3 o posteriores, no del MVP. Dado el alcance real del proyecto (RES-01, RES-02), es razonable que alguno de los tres no llegue a implementarse a tiempo; quedan documentados igualmente para la memoria del TFM como parte del razonamiento arquitectónico, se construyan o no.
 
@@ -69,3 +82,4 @@ Con arquitectura, almacenamiento y fundamentos de IA decididos, no quedan bloque
 
 - **v1.0 (10 sept. 2026)** — versión inicial: plataformas por modalidad (HuggingFace/Google AI Studio para avatares, Claude API para texto, Whisper para voz), veredicto sobre RAG/fine-tuning/LangChain (RAG solo en RF-36, fine-tuning descartado, LangChain innecesario a esta escala), dos ejemplos reales de Chain-of-Thought/test-time compute (RF-26, RF-37). Se documentan RF-35, RF-36, RF-37 como Could, y se registra la idea de niveles de habilidad como aplazada, no añadida.
 - **v1.1 (10 sept. 2026)** — se añade §7: agentes autónomos y MCP considerados y descartados explícitamente, con la razón principal ligada a RES-09 (no autonomía sin persona en el bucle) más que al coste.
+- **v1.2 (27 sept. 2026)** — nueva §4.3 (RF-40): la IA reescribe ideas del catálogo con verificación automática y caída al texto curado, sin moderación humana. Matiza §3 ("motor no generativo"): el control editorial se mantiene, pero automatizado.

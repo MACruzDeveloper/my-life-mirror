@@ -39,9 +39,25 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - `<html lang>` fijo en `en` con la app en español: ahora sigue al idioma elegido (lectores de pantalla).
 
+### Añadido (calidad)
+
+- Quality gates con Husky: `pre-commit` ejecuta lint y `typecheck`; `pre-push` ejecuta `npm run verify` (lint, tests con cobertura, build, `check:api` y e2e). Cobertura con `@vitest/coverage-v8` y umbral solo sobre la lógica de negocio (dominio + aplicación: 90/80/95/95; medido 95/87/99/98). Nuevos scripts `typecheck`, `test:coverage`, `verify`.
+
+### Añadido (UX-02, destacar las propuestas)
+
+- Cada tarjeta del panel escribe la banda de su puntuación ("Bajo", "Casi bajo", "Medio", "Bueno") junto al número, con los mismos textos que Resultados (`BAND_LABEL_KEYS` en `scoreBand.ts`, compartido).
+- Resumen "Ideas para ti" arriba del panel (`IdeasSummary`) con un botón por recomendación abierta ("Idea para Economía"), que abre la misma ventana con el aviso de RES-05. `RecommendationButton` acepta una etiqueta opcional.
+
+### Añadido (UX-01, guía de primer uso)
+
+- "Cómo funciona" en tres pasos numerados (`HowItWorks`, `shared/ui/components/`) en la portada y en la bienvenida de Inicio de primera vez.
+- La primera entrevista explica los pasos de la pantalla en la burbuja del entrevistador, con el nombre real del botón de guardar; al actualizar respuestas no se repiten.
+- "Cómo leer esta página" en el panel (`DashboardGuide`): explica equilibrio, evolución, "Una idea para ti" y "Actualizar mis respuestas"; se cierra con "Entendido", se recuerda en `localStorage` (a salvo si el navegador lo bloquea) y se puede reabrir.
+
 ### Añadido (validación)
 
 - Guion del test de usabilidad del MVP ([docs/validation/01_Guion_Test_Usabilidad.md](docs/validation/01_Guion_Test_Usabilidad.md)): preparación, cómo dirigir la sesión (pensar en voz alta, sesgo de cercanía), 8 tareas del flujo completo con lo que observar en cada una, SUS, preguntas sobre el tono (RN-04/RES-07) y regla de decisión por gravedad. Hoja de resultados lista para rellenar ([02_Resultados_Test_Usabilidad.md](docs/validation/02_Resultados_Test_Usabilidad.md)). Versión corta en inglés para la sesión real (~20 min, 5 tareas, 5 preguntas): [03_Short_Test_Script_EN.md](docs/validation/03_Short_Test_Script_EN.md).
+- Resultados de la sesión de validación (27 sept.): RN-04 se cumple según lo declarado; un problema de gravedad 3 (guía de primer uso, corregido con UX-01); T5 no se intentó por decisión de la participante; tres ideas para el Ciclo 2.
 
 ### Añadido (RF-15)
 
