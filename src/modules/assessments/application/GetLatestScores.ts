@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository";
-import type { AssessmentRepository } from "../domain/AssessmentRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
+import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
 
 export interface LatestScore {
   categoryId: string;

@@ -3,8 +3,12 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
+import { HowItWorks } from "@shared/ui/components/HowItWorks";
 
-/** Primera vez (todavía sin ninguna puntuación): en vez de un panel vacío, una invitación grande a la entrevista. */
+/**
+ * Primera vez (todavía sin ninguna puntuación): en vez de un panel vacío, una invitación grande a la entrevista,
+ * con los mismos pasos que la portada (UX-01: justo después de registrarse es donde más hacía falta).
+ */
 export function FirstTimeWelcome() {
   const { t } = useTranslation();
 
@@ -19,6 +23,9 @@ export function FirstTimeWelcome() {
       <Button component={RouterLink} to="/perfil/entrevista" variant="contained" size="large" sx={{ px: 5, py: 1.5, fontSize: "1.1rem", borderRadius: 3 }}>
         {t("panel.empezar")}
       </Button>
+      <Box sx={{ mt: { xs: 5, sm: 6 }, mb: 4 }}>
+        <HowItWorks />
+      </Box>
     </Box>
   );
 }

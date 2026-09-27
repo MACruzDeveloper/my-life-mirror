@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 // Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
-import { obtenerAppContext } from "../../../container";
-import { leerCookie } from "../../../cookies";
-import { logger } from "../../../logger";
+import { obtenerAppContext } from "../../../container.js";
+import { leerCookie } from "../../../cookies.js";
+import { logger } from "../../../logger.js";
 
 type PeticionConCuerpo = IncomingMessage & { body: unknown };
 

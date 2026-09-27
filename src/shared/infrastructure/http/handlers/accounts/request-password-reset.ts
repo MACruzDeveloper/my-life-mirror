@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../container";
-import { logger } from "../../../logger";
+import { obtenerAppContext } from "../../../container.js";
+import { logger } from "../../../logger.js";
 
 type PeticionConCuerpo = IncomingMessage & { body: unknown };
 

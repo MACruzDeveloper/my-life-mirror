@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { obtenerAppContext } from "../../src/shared/infrastructure/container";
-import { leerCookie } from "../../src/shared/infrastructure/cookies";
-import { logger } from "../../src/shared/infrastructure/logger";
+import { obtenerAppContext } from "../../src/shared/infrastructure/container.js";
+import { leerCookie } from "../../src/shared/infrastructure/cookies.js";
+import { logger } from "../../src/shared/infrastructure/logger.js";
 
 /**
  * Controlador HTTP — RF-18. Devuelve las recomendaciones visibles del usuario

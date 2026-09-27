@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ForbiddenError } from "../../../shared/domain/DomainError";
-import type { AuthProvider, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider";
-import type { ProfileRepository } from "../domain/ProfileRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ForbiddenError } from "../../../shared/domain/DomainError.js";
+import type { AuthProvider, UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider.js";
+import type { ProfileRepository } from "../domain/ProfileRepository.js";
 
 export type ListedUser = UsuarioResumen & { readonly name?: string };
 

@@ -1,5 +1,5 @@
-import type { Recommendation } from "../domain/Recommendation";
-import type { RecommendationRepository } from "../domain/RecommendationRepository";
+import type { Recommendation } from "../domain/Recommendation.js";
+import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
 /** Fake solo para tests — ADR-03 §3.6. En dev/producción: SupabaseRecommendationRepository. */
 export class InMemoryRecommendationRepository implements RecommendationRepository {

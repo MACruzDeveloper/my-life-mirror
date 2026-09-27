@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
+import { PublicFormBox } from "@shared/ui/components/PublicFormBox";
 import { Link as RouterLink, useNavigate } from "react-router";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 
@@ -69,7 +69,7 @@ export function RegisterForm() {
     return (
       <>
         <Breadcrumbs items={migas} />
-        <Box sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
+        <PublicFormBox>
           <Alert severity="success" sx={{ mb: 2 }}>
             {t("registro.exito", { email: estado.email })}
           </Alert>
@@ -78,7 +78,7 @@ export function RegisterForm() {
               {t("registro.irALogin")}
             </Link>
           </Typography>
-        </Box>
+        </PublicFormBox>
       </>
     );
   }
@@ -86,7 +86,7 @@ export function RegisterForm() {
   return (
     <>
       <Breadcrumbs items={migas} />
-      <Box component="form" onSubmit={manejarEnvio} sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
+      <PublicFormBox component="form" onSubmit={manejarEnvio}>
         <Typography variant="h5" component="h1" gutterBottom>
           {t("registro.titulo")}
         </Typography>
@@ -120,7 +120,7 @@ export function RegisterForm() {
             {estado.tipo === "enviando" ? t("registro.botonEnviando") : t("registro.boton")}
           </Button>
         </Stack>
-      </Box>
+      </PublicFormBox>
     </>
   );
 }

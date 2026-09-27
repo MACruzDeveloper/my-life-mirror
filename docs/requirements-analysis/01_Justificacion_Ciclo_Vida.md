@@ -50,7 +50,7 @@ Lo que se descarta deliberadamente del espiral formal, y por qué: el análisis 
 - **Cierre de ciclo:** demo.
 
 ### Ciclo 2 — Should restante
-- **Alcance:** RF-02, RF-08, RF-09, RF-11, RF-12, RF-13, RF-22 (resto de cuenta/check-in/notificaciones) · RF-15, RF-16, RF-31 (visualización y resumen mensual) · RF-26 (avatares) · RF-29 (apoyo profesional) · RF-27, RF-28 (localización, contenido ilustrativo per RES-10).
+- **Alcance:** RF-02, RF-08, RF-09, RF-11, RF-12, RF-13, RF-22 (resto de cuenta/check-in/notificaciones) · RF-15, RF-16, RF-31 (visualización y resumen mensual) · RF-26 (avatares) · RF-29 (apoyo profesional) · RF-27, RF-28 (localización, contenido ilustrativo per RES-10) · RF-40 (recomendaciones personalizadas con IA, ancladas al catálogo).
 - **Riesgo principal:** RES-10 (contenido ficticio) — asegurar que quede explícito en la UI que ciertos datos son ilustrativos, para no inducir a error incluso en una demo académica.
 - **V&V aplicado:** piloto corto con datos reales (RN-01/02/03), checklist manual sobre el resto de Should.
 
@@ -59,7 +59,7 @@ Lo que se descarta deliberadamente del espiral formal, y por qué: el análisis 
 - **Riesgo principal:** RES-11 (no exponer puntuaciones entre usuarios) — el de mayor complejidad de diseño de todo el documento; por eso se deja para cuando el núcleo ya esté validado.
 
 ### Fuera de alcance del TFM (Won't / futuro)
-RN-09 (comparativa social), app nativa (RES-06), contenido real (no ficticio) de comunidad/directorio profesional, motor de recomendaciones con personalización avanzada basada en IA, A/B testing con muestra real.
+RN-09 (comparativa social), app nativa (RES-06), contenido real (no ficticio) de comunidad/directorio profesional, motor de recomendaciones con personalización avanzada basada en IA más allá de RF-40 (texto generado sin anclaje al catálogo, o a partir de notas libres y categorías sensibles sin una evaluación previa), A/B testing con muestra real.
 
 ---
 
@@ -75,3 +75,4 @@ Con los tres documentos de Fase 2 cerrados (matriz de trazabilidad, plan de V&V,
 - **v1.1 (6 sept. 2026)** — se añade motivo personal como cuarta justificación: incertidumbre técnica alta y deliberada por querer aplicar lo aprendido en el máster, no solo riesgo de producto.
 - **v1.2 (8 sept. 2026)** — referencia cruzada a [10_Enfoque_SDD.md](10_Enfoque_SDD.md): el motivo de incertidumbre técnica de este punto 4 es también la razón por la que se descarta Nivel 1 (Spec First) como metodología de especificación del proyecto, en favor de Spec Anchored.
 - **v1.1 (19 sept. 2026)** — nota: este documento descarta Scrum como modelo de ciclo de vida y sigue vigente (espiral ligero). Cómo fluye el trabajo dentro de cada ciclo se decide aparte, en [00_Metodologia_Lean.md](../project-management/00_Metodologia_Lean.md) (Lean + Kanban con apetito fijo, sin sprints).
+- **v1.3 (27 sept. 2026)** — RF-40 entra en el Ciclo 2; la exclusión de "personalización avanzada basada en IA" se acota a lo que va más allá de RF-40.

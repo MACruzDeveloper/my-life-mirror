@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { ChartDataTable } from "@shared/ui/charts/ChartDataTable";
 import { TimeLineChart } from "@shared/ui/charts/TimeLineChart/TimeLineChart";
 import { formatDate } from "@shared/ui/charts/timeWindow";
+import { BAND_COLORS, BAND_LABEL_KEYS, scoreBand } from "../scoreBand";
 import type { ScorePoint } from "./scoreHistory";
 
 /** Las puntuaciones van de 1 a 10: eje fijo en todas las tarjetas para que sean comparables. */
@@ -54,6 +55,8 @@ export function CategoryEvolutionCard({ categoryName, currentScore, points, hist
             <Typography variant="h5" component="span" sx={{ fontWeight: 700 }}>
               {currentScore}
             </Typography>
+            {/* UX-02: la banda en texto, como en Resultados; fondo suave, número en color normal (RN-04). */}
+            <BandLabel score={currentScore} />
           </Box>
         )}
       </Box>
@@ -95,6 +98,21 @@ export function CategoryEvolutionCard({ categoryName, currentScore, points, hist
       )}
       {extra}
     </Box>
+  );
+}
+
+function BandLabel({ score }: { score: number }) {
+  const { t } = useTranslation();
+  const band = scoreBand(score);
+  return (
+    <Typography
+      variant="caption"
+      component="span"
+      data-band={band}
+      sx={{ px: 1, py: 0.25, borderRadius: 999, bgcolor: BAND_COLORS[band].bg, color: "text.primary", border: 1, borderColor: BAND_COLORS[band].border }}
+    >
+      {t(BAND_LABEL_KEYS[band])}
+    </Typography>
   );
 }
 

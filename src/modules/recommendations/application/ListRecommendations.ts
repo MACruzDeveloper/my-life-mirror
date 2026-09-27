@@ -1,9 +1,9 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
-import type { AssessmentRepository } from "../../assessments/domain/AssessmentRepository";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository";
-import { type Recommendation, isOpen } from "../domain/Recommendation";
-import type { RecommendationRepository } from "../domain/RecommendationRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
+import type { AssessmentRepository } from "../../assessments/domain/AssessmentRepository.js";
+import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import { type Recommendation, isOpen } from "../domain/Recommendation.js";
+import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
 export interface VisibleRecommendation extends Recommendation {
   categoryName: string;

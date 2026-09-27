@@ -1,6 +1,6 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { AuthenticationError, ConflictError, DomainError, ValidationError } from "../../../shared/domain/DomainError";
-import { type EraseUserDependencies, createEraseUser } from "./EraseUser";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { AuthenticationError, ConflictError, DomainError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { type EraseUserDependencies, createEraseUser } from "./EraseUser.js";
 
 export interface DeleteAccountInput {
   userId: string;

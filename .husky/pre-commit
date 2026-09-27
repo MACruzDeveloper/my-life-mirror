@@ -1,0 +1,3 @@
+# Rápido (~7 s): estilo y tipos. Lo lento va en pre-push.
+npm run lint
+npm run typecheck

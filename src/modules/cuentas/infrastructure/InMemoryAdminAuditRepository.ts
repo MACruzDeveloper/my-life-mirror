@@ -1,5 +1,5 @@
-import type { AdminAuditEntry } from "../domain/AdminAuditEntry";
-import type { AdminAuditRepository } from "../domain/AdminAuditRepository";
+import type { AdminAuditEntry } from "../domain/AdminAuditEntry.js";
+import type { AdminAuditRepository } from "../domain/AdminAuditRepository.js";
 
 /** Fake solo para tests — ADR-03 §3.6. En dev/producción: SupabaseAdminAuditRepository. */
 export class InMemoryAdminAuditRepository implements AdminAuditRepository {

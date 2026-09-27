@@ -1,4 +1,4 @@
-import type { Locale } from "../../../shared/domain/locales";
+import type { Locale } from "../../../shared/domain/locales.js";
 
 /** Nombre y descripción de una categoría en un idioma. */
 export interface CategoryText {

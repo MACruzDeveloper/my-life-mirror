@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Recommendation, RecommendationStatus } from "../domain/Recommendation";
-import type { RecommendationRepository } from "../domain/RecommendationRepository";
+import type { Recommendation, RecommendationStatus } from "../domain/Recommendation.js";
+import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
 interface FilaRecomendacion {
   id: string;

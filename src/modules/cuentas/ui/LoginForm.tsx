@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
+import { PublicFormBox } from "@shared/ui/components/PublicFormBox";
 import { Link as RouterLink, useNavigate } from "react-router";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 
@@ -50,7 +50,7 @@ export function LoginForm() {
   return (
     <>
       <Breadcrumbs items={[{ etiqueta: t("breadcrumbs.inicio"), ruta: "/" }, { etiqueta: t("breadcrumbs.iniciarSesion") }]} />
-      <Box component="form" onSubmit={manejarEnvio} sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
+      <PublicFormBox component="form" onSubmit={manejarEnvio}>
         <Typography variant="h5" component="h1" gutterBottom>
           {t("login.titulo")}
         </Typography>
@@ -81,7 +81,7 @@ export function LoginForm() {
             </Link>
           </Typography>
         </Stack>
-      </Box>
+      </PublicFormBox>
     </>
   );
 }

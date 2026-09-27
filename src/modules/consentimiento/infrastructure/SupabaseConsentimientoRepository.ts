@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Consentimiento } from "../domain/Consentimiento";
-import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository";
+import type { Consentimiento } from "../domain/Consentimiento.js";
+import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository.js";
 
 interface FilaConsentimiento {
   id: string;

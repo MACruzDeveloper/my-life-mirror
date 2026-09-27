@@ -1,4 +1,4 @@
-import type { Assessment } from "./Assessment";
+import type { Assessment } from "./Assessment.js";
 
 /**
  * Puerto — ADR-03 §3.3. Solo inserta (RF-12: registro inmutable); la única

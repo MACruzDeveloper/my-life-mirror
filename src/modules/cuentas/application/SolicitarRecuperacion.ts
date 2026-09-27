@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import type { ValidationError } from "../../../shared/domain/DomainError";
-import { Email } from "../domain/Email";
-import type { AuthProvider } from "../domain/AuthProvider";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import type { ValidationError } from "../../../shared/domain/DomainError.js";
+import { Email } from "../domain/Email.js";
+import type { AuthProvider } from "../domain/AuthProvider.js";
 
 export interface SolicitarRecuperacionInput {
   email: string;

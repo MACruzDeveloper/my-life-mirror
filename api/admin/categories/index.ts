@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../src/shared/infrastructure/container";
-import { leerCookie } from "../../../src/shared/infrastructure/cookies";
-import { logger } from "../../../src/shared/infrastructure/logger";
+import { obtenerAppContext } from "../../../src/shared/infrastructure/container.js";
+import { leerCookie } from "../../../src/shared/infrastructure/cookies.js";
+import { logger } from "../../../src/shared/infrastructure/logger.js";
 
 // Un texto por idioma; el caso de uso comprueba que estén todos los soportados (RNF-10).
 const AddSchema = z.object({

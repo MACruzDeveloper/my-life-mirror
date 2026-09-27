@@ -5,7 +5,8 @@
     "contrasenaAyuda": "Al menos 8 caracteres",
     "errorServidor": "No se pudo contactar con el servidor",
     "reintentar": "Reintentar",
-    "idioma": "Idioma"
+    "idioma": "Idioma",
+    "abrirMenu": "Abrir menú"
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -133,7 +134,13 @@
     "tituloActualizar": "Actualiza tus respuestas",
     "descripcionActualizar": "¿Ha cambiado algo desde la última vez? Revisa tus respuestas y cambia solo lo que quieras. Cada cambio se guarda como un registro nuevo y tu historial se conserva.",
     "irA": "Ir a una categoría",
-    "sinResponder": "Sin responder"
+    "sinResponder": "Sin responder",
+    "pasosTitulo": "Qué vamos a hacer",
+    "pasosPrimeraVez": [
+      "Marca abajo las categorías de las que quieres hablar.",
+      "En cada una, toca un número del 1 al 10. Puedes dejar alguna para otro día.",
+      "Al final, pulsa «{{boton}}»."
+    ]
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -363,7 +370,10 @@
       }
     },
     "dialogoTitulo": "Una idea para {{categoria}}",
-    "cerrar": "Cerrar"
+    "cerrar": "Cerrar",
+    "resumenTitulo": "Ideas para ti",
+    "resumenTexto": "Para las áreas con la puntuación más baja. Tú decides si te sirven.",
+    "ideaPara": "Idea para {{categoria}}"
   },
   "evolucion": {
     "titulo": "Tu evolución",
@@ -399,5 +409,21 @@
   "idiomas": {
     "es": "español",
     "en": "inglés"
+  },
+  "guia": {
+    "comoFunciona": "Cómo funciona",
+    "pasos": [
+      "Elige las áreas de tu vida que quieres mirar.",
+      "Puntúa cada una del 1 al 10: son unos dos minutos, y puedes dejar alguna para otro día.",
+      "Mira tu equilibrio, cómo cambia con el tiempo e ideas para las áreas que quieras mejorar."
+    ],
+    "panelTitulo": "Cómo leer esta página",
+    "panelPuntos": [
+      "«{{equilibrio}}»: tu última puntuación en cada área, todas juntas en la misma escala.",
+      "«{{evolucion}}»: cómo ha cambiado cada área cada vez que has actualizado tus respuestas.",
+      "«{{idea}}» aparece en las áreas con una puntuación baja: tócala para ver una sugerencia.",
+      "Cuando algo cambie en tu vida, usa «{{actualizar}}»."
+    ],
+    "entendido": "Entendido"
   }
 }
