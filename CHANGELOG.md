@@ -39,6 +39,12 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - `<html lang>` fijo en `en` con la app en español: ahora sigue al idioma elegido (lectores de pantalla).
 
+### Cambiado (rendimiento y móvil)
+
+- Funciones de Vercel en Dublín (`vercel.json`, `"regions": ["dub1"]`), junto a la base de datos de Supabase (Irlanda); antes corrían en Washington y cada consulta cruzaba el Atlántico.
+- **UX-03** — cabecera en móvil con menú (Inicio, Administración si es admin, Mi perfil, nombre, Cerrar sesión) en lugar de cinco botones; desde `sm`, sin cambios.
+- Páginas públicas de cuenta con margen lateral en móvil y alineadas con las migas (`PublicFormBox`, sustituye 8 copias del mismo estilo).
+
 ### Añadido (calidad)
 
 - Quality gates con Husky: `pre-commit` ejecuta lint y `typecheck`; `pre-push` ejecuta `npm run verify` (lint, tests con cobertura, build, `check:api` y e2e). Cobertura con `@vitest/coverage-v8` y umbral solo sobre la lógica de negocio (dominio + aplicación: 90/80/95/95; medido 95/87/99/98). Nuevos scripts `typecheck`, `test:coverage`, `verify`.
