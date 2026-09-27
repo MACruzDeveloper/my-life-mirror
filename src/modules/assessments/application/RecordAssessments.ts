@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ConflictError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError";
-import type { Clock } from "../../../shared/domain/Clock";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository";
-import type { Assessment } from "../domain/Assessment";
-import type { AssessmentRepository } from "../domain/AssessmentRepository";
-import { Score } from "../domain/Score";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ConflictError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError.js";
+import type { Clock } from "../../../shared/domain/Clock.js";
+import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import type { Assessment } from "../domain/Assessment.js";
+import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
+import { Score } from "../domain/Score.js";
 
 const MAX_NOTE_LENGTH = 500;
 

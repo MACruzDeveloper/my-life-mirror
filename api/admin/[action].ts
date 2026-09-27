@@ -1,6 +1,6 @@
-import { createRouter } from "../../src/shared/infrastructure/http/router";
-import audit from "../../src/shared/infrastructure/http/handlers/admin/audit";
-import users from "../../src/shared/infrastructure/http/handlers/admin/users";
+import { createRouter } from "../../src/shared/infrastructure/http/router.js";
+import audit from "../../src/shared/infrastructure/http/handlers/admin/audit.js";
+import users from "../../src/shared/infrastructure/http/handlers/admin/users.js";
 import {
   changeRole,
   createUser,
@@ -10,7 +10,7 @@ import {
   suspendUser,
   updateEmail,
   updateName,
-} from "../../src/shared/infrastructure/http/handlers/admin/userActions";
+} from "../../src/shared/infrastructure/http/handlers/admin/userActions.js";
 
 /**
  * Única función serverless de `/api/admin/*` salvo el catálogo de categorías

@@ -16,4 +16,14 @@ describe("Landing (RF-39)", () => {
     expect(screen.getByRole("link", { name: /crear cuenta/i })).toHaveAttribute("href", "/registro");
     expect(screen.getByRole("link", { name: /iniciar sesión/i })).toHaveAttribute("href", "/login");
   });
+
+  it("explica cómo funciona antes de tener cuenta (UX-01)", () => {
+    render(
+      <MemoryRouter>
+        <Landing />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("region", { name: /cómo funciona/i })).toBeInTheDocument();
+  });
 });

@@ -1,4 +1,4 @@
-import type { Profile } from "./Profile";
+import type { Profile } from "./Profile.js";
 
 /** Puerto — ADR-03 §3.3. `save` es upsert: un usuario tiene un único perfil. */
 export interface ProfileRepository {

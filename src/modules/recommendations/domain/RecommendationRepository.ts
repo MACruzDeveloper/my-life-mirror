@@ -1,4 +1,4 @@
-import type { Recommendation } from "./Recommendation";
+import type { Recommendation } from "./Recommendation.js";
 
 /** Puerto — ADR-03 §3.3. `saveMany` es upsert por id (así RF-19 podrá cambiar el estado). */
 export interface RecommendationRepository {

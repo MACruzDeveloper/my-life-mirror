@@ -1,6 +1,6 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { type AuthenticationError, DomainError, ValidationError } from "../../../shared/domain/DomainError";
-import type { AuthProvider, UsuarioAutenticado } from "../domain/AuthProvider";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { type AuthenticationError, DomainError, ValidationError } from "../../../shared/domain/DomainError.js";
+import type { AuthProvider, UsuarioAutenticado } from "../domain/AuthProvider.js";
 
 /** Caso de uso — comprueba la cookie de sesión (ADR-06, RF-39 nota "spec viva"). */
 export function crearVerificarSesion(authProvider: AuthProvider) {

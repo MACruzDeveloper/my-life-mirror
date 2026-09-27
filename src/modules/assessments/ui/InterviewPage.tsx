@@ -13,7 +13,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
-import SvgIcon from "@mui/material/SvgIcon";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
@@ -65,14 +65,6 @@ type SaveState =
   | { kind: "error"; message: string };
 
 /** Icono "i" en círculo (Material) inline — evita añadir la dependencia @mui/icons-material solo para uno. */
-function InfoIcon() {
-  return (
-    <SvgIcon fontSize="small">
-      <path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-    </SvgIcon>
-  );
-}
-
 function omitKey<T>(record: Record<string, T>, key: string): Record<string, T> {
   const { [key]: _omitted, ...rest } = record;
   void _omitted;
@@ -368,6 +360,16 @@ export function InterviewPage() {
 
       <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
         <Typography variant="body1">{hasSavedAnswers ? t("entrevista.descripcionActualizar") : t("entrevista.descripcion")}</Typography>
+        {/* UX-01: la primera vez, los pasos concretos de esta pantalla; al actualizar ya se conocen. */}
+        {!hasSavedAnswers && (
+          <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ my: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+            {(t("entrevista.pasosPrimeraVez", { returnObjects: true, boton: t("entrevista.guardar") }) as string[]).map((step) => (
+              <Typography component="li" variant="body2" key={step}>
+                {step}
+              </Typography>
+            ))}
+          </Box>
+        )}
         <Typography variant="caption" color="text.secondary">
           {t("entrevista.escala")}
         </Typography>
@@ -473,7 +475,7 @@ export function InterviewPage() {
                   aria-expanded={openExamples[category.id] === true}
                   onClick={() => setOpenExamples((current) => ({ ...current, [category.id]: !current[category.id] }))}
                 >
-                  <InfoIcon />
+                  <InfoOutlinedIcon fontSize="small" />
                 </IconButton>
               )}
             </Box>

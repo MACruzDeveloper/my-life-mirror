@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -8,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 import { extraerTokenDeHash } from "./extraerTokenDeHash";
+import { PublicFormBox } from "@shared/ui/components/PublicFormBox";
 
 type Estado = { tipo: "inicial" } | { tipo: "enviando" } | { tipo: "exito" } | { tipo: "error"; mensaje: string };
 
@@ -51,9 +51,11 @@ export function RestablecerPasswordForm() {
     return (
       <>
         <Breadcrumbs items={migas} />
-        <Alert severity="error" sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
-          {t("restablecerPassword.enlaceInvalido")}
-        </Alert>
+        <PublicFormBox>
+          <Alert severity="error">
+            {t("restablecerPassword.enlaceInvalido")}
+          </Alert>
+        </PublicFormBox>
       </>
     );
   }
@@ -62,9 +64,11 @@ export function RestablecerPasswordForm() {
     return (
       <>
         <Breadcrumbs items={migas} />
-        <Alert severity="success" sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
-          {t("restablecerPassword.exito")}
-        </Alert>
+        <PublicFormBox>
+          <Alert severity="success">
+            {t("restablecerPassword.exito")}
+          </Alert>
+        </PublicFormBox>
       </>
     );
   }
@@ -72,7 +76,7 @@ export function RestablecerPasswordForm() {
   return (
     <>
       <Breadcrumbs items={migas} />
-      <Box component="form" onSubmit={manejarEnvio} sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
+      <PublicFormBox component="form" onSubmit={manejarEnvio}>
         <Typography variant="h5" component="h1" gutterBottom>
           {t("restablecerPassword.titulo")}
         </Typography>
@@ -91,7 +95,7 @@ export function RestablecerPasswordForm() {
             {estado.tipo === "enviando" ? t("restablecerPassword.botonEnviando") : t("restablecerPassword.boton")}
           </Button>
         </Stack>
-      </Box>
+      </PublicFormBox>
     </>
   );
 }

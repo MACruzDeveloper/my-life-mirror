@@ -1,16 +1,16 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { requireAdmin } from "../../../shared/domain/Actor";
-import type { Clock } from "../../../shared/domain/Clock";
-import { AuthenticationError, ConflictError, DomainError, ForbiddenError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError";
-import { Email } from "../domain/Email";
-import type { AdminAuditEntry } from "../domain/AdminAuditEntry";
-import type { AdminAuditRepository } from "../domain/AdminAuditRepository";
-import type { UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider";
-import { ROLES_VALIDOS, type RolUsuario } from "../domain/RolUsuario";
-import { type EraseUserDependencies, createEraseUser } from "./EraseUser";
-import type { createRegisterUser } from "./RegisterUser";
-import type { createUpdateProfile } from "./UpdateProfile";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { requireAdmin } from "../../../shared/domain/Actor.js";
+import type { Clock } from "../../../shared/domain/Clock.js";
+import { AuthenticationError, ConflictError, DomainError, ForbiddenError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { Email } from "../domain/Email.js";
+import type { AdminAuditEntry } from "../domain/AdminAuditEntry.js";
+import type { AdminAuditRepository } from "../domain/AdminAuditRepository.js";
+import type { UsuarioAutenticado, UsuarioResumen } from "../domain/AuthProvider.js";
+import { ROLES_VALIDOS, type RolUsuario } from "../domain/RolUsuario.js";
+import { type EraseUserDependencies, createEraseUser } from "./EraseUser.js";
+import type { createRegisterUser } from "./RegisterUser.js";
+import type { createUpdateProfile } from "./UpdateProfile.js";
 
 const MAX_NAME_LENGTH = 100;
 const AUDIT_LIST_LIMIT = 100;

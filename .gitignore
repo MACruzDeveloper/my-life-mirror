@@ -20,6 +20,9 @@ dist-ssr
 # Vercel
 .vercel
 
+# Informe de cobertura (npm run test:coverage)
+/coverage/
+
 # Playwright
 /test-results/
 /playwright-report/

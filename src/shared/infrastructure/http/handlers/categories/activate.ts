@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../container";
-import { leerCookie } from "../../../cookies";
-import { logger } from "../../../logger";
-import { VERSION_POLITICA_ACTUAL } from "../../../../../modules/consentimiento/domain/PoliticaActual";
+import { obtenerAppContext } from "../../../container.js";
+import { leerCookie } from "../../../cookies.js";
+import { logger } from "../../../logger.js";
+import { VERSION_POLITICA_ACTUAL } from "../../../../../modules/consentimiento/domain/PoliticaActual.js";
 
 const ActivateCategorySchema = z.object({
   categoryId: z.string(),

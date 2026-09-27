@@ -1,4 +1,4 @@
-import { adminHandler } from "./adminHandler";
+import { adminHandler } from "./adminHandler.js";
 
 /** GET /api/admin/audit — ADM-03. Últimas anotaciones de auditoría. Solo admin. */
 export default adminHandler({

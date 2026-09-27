@@ -1,6 +1,6 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
-import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
+import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository.js";
 
 export interface VerificarConsentimientoInput {
   usuarioId: string;

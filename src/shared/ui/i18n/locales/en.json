@@ -5,7 +5,8 @@
     "contrasenaAyuda": "At least 8 characters",
     "errorServidor": "Could not reach the server",
     "reintentar": "Retry",
-    "idioma": "Language"
+    "idioma": "Language",
+    "abrirMenu": "Open menu"
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -133,7 +134,13 @@
     "tituloActualizar": "Update your answers",
     "descripcionActualizar": "Has anything changed since last time? Review your answers and change only what you want. Every change is saved as a new record and your history is kept.",
     "irA": "Go to a category",
-    "sinResponder": "Not answered"
+    "sinResponder": "Not answered",
+    "pasosTitulo": "What we'll do",
+    "pasosPrimeraVez": [
+      "Tick below the categories you want to talk about.",
+      "In each one, tap a number from 1 to 10. You can leave some for another day.",
+      "At the end, press “{{boton}}”."
+    ]
   },
   "resultados": {
     "titulo": "Your results",
@@ -363,7 +370,10 @@
       }
     },
     "dialogoTitulo": "An idea for {{categoria}}",
-    "cerrar": "Close"
+    "cerrar": "Close",
+    "resumenTitulo": "Ideas for you",
+    "resumenTexto": "For the areas with the lowest scores. You decide whether they help.",
+    "ideaPara": "Idea for {{categoria}}"
   },
   "evolucion": {
     "titulo": "Your evolution",
@@ -399,5 +409,21 @@
   "idiomas": {
     "es": "Spanish",
     "en": "English"
+  },
+  "guia": {
+    "comoFunciona": "How it works",
+    "pasos": [
+      "Choose the areas of your life you want to look at.",
+      "Rate each one from 1 to 10: it takes about two minutes, and you can leave some for another day.",
+      "See your balance, how it changes over time, and ideas for the areas you want to improve."
+    ],
+    "panelTitulo": "How to read this page",
+    "panelPuntos": [
+      "“{{equilibrio}}”: your latest score in each area, all together on the same scale.",
+      "“{{evolucion}}”: how each area has changed every time you updated your answers.",
+      "“{{idea}}” appears on areas with a low score: tap it to see a suggestion.",
+      "When something changes in your life, use “{{actualizar}}”."
+    ],
+    "entendido": "Got it"
   }
 }

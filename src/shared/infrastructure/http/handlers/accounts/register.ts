@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 // Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
-import { obtenerAppContext } from "../../../container";
-import { cookieDeSesion } from "../../../cookies";
-import { logger } from "../../../logger";
+import { obtenerAppContext } from "../../../container.js";
+import { cookieDeSesion } from "../../../cookies.js";
+import { logger } from "../../../logger.js";
 
 // Las funciones Node de Vercel son handlers HTTP estándar; req.body ya llega
 // parseado como JSON en tiempo de ejecución. Se tipa contra Node nativo en

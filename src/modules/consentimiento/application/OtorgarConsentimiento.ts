@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
-import type { Clock } from "../../../shared/domain/Clock";
-import type { Consentimiento } from "../domain/Consentimiento";
-import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
+import type { Clock } from "../../../shared/domain/Clock.js";
+import type { Consentimiento } from "../domain/Consentimiento.js";
+import type { ConsentimientoRepository } from "../domain/ConsentimientoRepository.js";
 
 export interface OtorgarConsentimientoInput {
   usuarioId: string;

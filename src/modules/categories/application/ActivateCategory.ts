@@ -1,9 +1,9 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ConsentRequiredError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError";
-import type { Category } from "../domain/Category";
-import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
-import type { CategoryRepository } from "../domain/CategoryRepository";
-import type { crearVerificarConsentimiento } from "../../consentimiento/application/VerificarConsentimiento";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ConsentRequiredError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError.js";
+import type { Category } from "../domain/Category.js";
+import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
+import type { CategoryRepository } from "../domain/CategoryRepository.js";
+import type { crearVerificarConsentimiento } from "../../consentimiento/application/VerificarConsentimiento.js";
 
 export interface ActivateCategoryInput {
   userId: string;

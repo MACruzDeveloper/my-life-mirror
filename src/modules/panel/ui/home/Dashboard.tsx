@@ -11,6 +11,8 @@ import type { LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
+import { DashboardGuide } from "./DashboardGuide";
+import { IdeasSummary } from "./IdeasSummary";
 
 /**
  * Los gráficos (Apache ECharts) se cargan solo al llegar al panel: son la mayor
@@ -55,6 +57,14 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
           {t("entrevista.actualizarRespuestas")}
         </Button>
       </Box>
+      <DashboardGuide />
+      <IdeasSummary
+        ideas={recommendations.map((recommendation) => ({
+          id: recommendation.id,
+          templateKey: recommendation.templateKey,
+          categoryName: categoryLabel(recommendation.catalogId).name,
+        }))}
+      />
       <Suspense fallback={<ChartsFallback />}>
         <BalanceCard latestScores={displayedScores} />
       </Suspense>

@@ -1,9 +1,9 @@
-import { type Result } from "../../../shared/domain/Result";
-import { ok } from "../../../shared/domain/Result";
-import { type Actor, requireAdmin } from "../../../shared/domain/Actor";
-import type { ForbiddenError } from "../../../shared/domain/DomainError";
-import type { CatalogCategory } from "../domain/CatalogCategory";
-import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
+import { type Result } from "../../../shared/domain/Result.js";
+import { ok } from "../../../shared/domain/Result.js";
+import { type Actor, requireAdmin } from "../../../shared/domain/Actor.js";
+import type { ForbiddenError } from "../../../shared/domain/DomainError.js";
+import type { CatalogCategory } from "../domain/CatalogCategory.js";
+import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 
 /** Caso de uso — ADM-02. Solo admin (comprobado aquí, no solo en el endpoint). Incluye las retiradas. */
 export function createListCatalog(catalog: CategoryCatalogRepository) {
