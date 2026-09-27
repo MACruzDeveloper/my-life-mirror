@@ -217,7 +217,7 @@
     "pestanaUsuarios": "Users",
     "pestanaCategorias": "Categories",
     "catalogoTitulo": "Category catalog",
-    "catalogoAyuda": "New categories appear, inactive, in every user's interview. Retiring one hides it and deactivates it for everyone, but scores already saved are kept.",
+    "catalogoAyuda": "New categories appear, inactive, in every user's interview, in Spanish or English depending on each user's language. Retiring one hides it and deactivates it for everyone, but scores already saved are kept.",
     "nombre": "Name",
     "descripcion": "Description",
     "estado": "Status",
@@ -293,7 +293,9 @@
     "acciones_user_email_changed": "Email change",
     "acciones_user_name_changed": "Name change",
     "acciones_user_recovery_sent": "Recovery link sent",
-    "acciones_reauth_failed": "Wrong confirmation password"
+    "acciones_reauth_failed": "Wrong confirmation password",
+    "nombreEnIdioma": "Name ({{idioma}})",
+    "descripcionEnIdioma": "Description ({{idioma}})"
   },
   "datos": {
     "titulo": "Privacy & data",
@@ -394,42 +396,8 @@
     "categoria": "Category",
     "tabla": "Latest score by category"
   },
-  "categoriasEstandar": {
-    "economia": {
-      "nombre": "Finances",
-      "descripcion": "Your personal finances: savings, spending, debts."
-    },
-    "vidaSocial": {
-      "nombre": "Social life",
-      "descripcion": "Friendships and time with other people."
-    },
-    "pareja": {
-      "nombre": "Relationship",
-      "descripcion": "Your relationship with your partner, if you have one."
-    },
-    "sexo": {
-      "nombre": "Sex",
-      "descripcion": "Your sex life."
-    },
-    "deporte": {
-      "nombre": "Sport",
-      "descripcion": "Physical activity and health."
-    },
-    "aventura": {
-      "nombre": "Adventure",
-      "descripcion": "New experiences, travel, challenges."
-    },
-    "espiritualidad": {
-      "nombre": "Spirituality",
-      "descripcion": "Beliefs, religion or spiritual practice."
-    },
-    "familia": {
-      "nombre": "Family",
-      "descripcion": "Your relationship with your family."
-    },
-    "inversiones": {
-      "nombre": "Investments",
-      "descripcion": "Investing and long-term financial planning."
-    }
+  "idiomas": {
+    "es": "Spanish",
+    "en": "English"
   }
 }

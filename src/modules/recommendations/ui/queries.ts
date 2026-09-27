@@ -5,6 +5,8 @@ export interface RecommendationDto {
   id: string;
   categoryId: string;
   categoryName: string;
+  /** Identidad en el catálogo: se muestra con `useCategoryLabel`. */
+  catalogId?: string;
   templateKey: string;
   status: string;
 }

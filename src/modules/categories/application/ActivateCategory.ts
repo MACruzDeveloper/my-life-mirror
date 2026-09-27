@@ -38,7 +38,7 @@ export function createActivateCategory(
 
     // Retirada por el admin (ADM-02): ya no se puede activar. Aquí, y no solo
     // en la lista, para que una llamada directa a la API tampoco pueda.
-    const entrada = (await catalog.findAll()).find((c) => c.name === category.name);
+    const entrada = (await catalog.findAll()).find((c) => c.id === category.catalogId);
     if (!entrada || entrada.retiredAt) return err(new NotFoundError("Category not found"));
 
     if (category.isSensitiveData) {

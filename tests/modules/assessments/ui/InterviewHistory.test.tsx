@@ -5,6 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import i18n from "@shared/ui/i18n";
 import { InterviewHistory } from "@modules/assessments/ui/InterviewHistory";
 import { withClient } from "../../../helpers/queryClient";
+import { categoryLabelsFixture } from "../../../helpers/categoryLabels";
 
 afterEach(async () => {
   vi.unstubAllGlobals();
@@ -16,10 +17,15 @@ describe("InterviewHistory", () => {
     await i18n.changeLanguage("en");
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => [{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Economía", score: 4, previousScore: 6 }] }],
-      }),
+      vi.fn((url: string) =>
+        Promise.resolve({
+          ok: true,
+          json: async () =>
+            url === "/api/categories/translations"
+              ? categoryLabelsFixture()
+              : [{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4, previousScore: 6 }] }],
+        }),
+      ),
     );
 
     render(withClient(<InterviewHistory />));

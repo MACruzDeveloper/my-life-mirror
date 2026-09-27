@@ -88,7 +88,7 @@ describe("ActivateCategory (RF-07/RF-04)", () => {
 
   it("rechaza activar una categoría que el admin ya retiró del catálogo", async () => {
     const { activateCategory, noSensible, catalog } = await setup();
-    const entrada = (await catalog.findAll()).find((c) => c.name === noSensible.name)!;
+    const entrada = (await catalog.findAll()).find((c) => c.id === noSensible.catalogId)!;
     await catalog.save({ ...entrada, retiredAt: new Date("2026-09-19T10:00:00Z") });
 
     const resultado = await activateCategory({ userId: "u1", categoryId: noSensible.id, policyVersion: POLICY_VERSION });

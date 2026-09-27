@@ -60,7 +60,7 @@ describe("AdminPage (ADM-01)", () => {
           ok: true,
           status: 200,
           json: async () =>
-            url === "/api/admin/categories" ? [{ id: "k1", name: "Economía", description: "d", isSensitiveData: false }] : [],
+            url === "/api/admin/categories" ? [{ id: "k1", key: "economia", translations: { es: { name: "Economía", description: "d" }, en: { name: "Finances", description: "d" } }, isSensitiveData: false }] : [],
         }),
       ),
     );
@@ -76,7 +76,7 @@ describe("AdminPage (ADM-01)", () => {
       Promise.resolve({
         ok: true,
         status: 200,
-        json: async () => (url === "/api/admin/categories" ? [{ id: "k1", name: "Economía", description: "d", isSensitiveData: false }] : [{ id: "1", email: "ana@ejemplo.com", rol: "usuario", createdAt: "2026-09-18T10:00:00.000Z" }]),
+        json: async () => (url === "/api/admin/categories" ? [{ id: "k1", key: "economia", translations: { es: { name: "Economía", description: "d" }, en: { name: "Finances", description: "d" } }, isSensitiveData: false }] : [{ id: "1", email: "ana@ejemplo.com", rol: "usuario", createdAt: "2026-09-18T10:00:00.000Z" }]),
       }),
     );
     vi.stubGlobal("fetch", fetchMock);

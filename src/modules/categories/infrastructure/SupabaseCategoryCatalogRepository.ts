@@ -1,53 +1,80 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { CatalogCategory } from "../domain/CatalogCategory";
+import { DEFAULT_LOCALE, isSupportedLocale, type Locale } from "../../../shared/domain/locales";
+import type { CatalogCategory, CategoryText } from "../domain/CatalogCategory";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
 
-interface FilaCatalogo {
+interface CatalogRow {
   id: string;
-  name: string;
-  description: string;
-  name_en: string | null;
-  description_en: string | null;
+  key: string | null;
   is_sensitive_data: boolean;
   retired_at: string | null;
 }
 
-/** Adaptador real (supabase/migrations/0005_category_catalog.sql). Sin test propio: solo mapea filas ↔ CatalogCategory. */
+interface TranslationRow {
+  catalog_id: string;
+  locale: string;
+  name: string;
+  description: string;
+}
+
+/**
+ * Adaptador real: `category_catalog` + `category_translations` (una fila por
+ * categoría e idioma, migración 0009), unidas aquí en un solo `CatalogCategory`.
+ * Las columnas `name`/`description` de `category_catalog` se mantienen con el
+ * texto del idioma por defecto (son obligatorias y tienen el índice único
+ * histórico), pero la interfaz ya no las lee. Sin test propio: solo mapea filas.
+ */
 export class SupabaseCategoryCatalogRepository implements CategoryCatalogRepository {
-  private readonly cliente: SupabaseClient;
+  private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.cliente = createClient(url, serviceRoleKey);
+    this.client = createClient(url, serviceRoleKey);
   }
 
   async findAll(): Promise<CatalogCategory[]> {
-    const { data, error } = await this.cliente.from("category_catalog").select("id, name, description, name_en, description_en, is_sensitive_data, retired_at");
-    if (error) {
-      throw new Error(`No se pudo leer el catálogo: ${error.message}`);
+    const [catalog, translations] = await Promise.all([
+      this.client.from("category_catalog").select("id, key, is_sensitive_data, retired_at"),
+      this.client.from("category_translations").select("catalog_id, locale, name, description"),
+    ]);
+    if (catalog.error) throw new Error(`No se pudo leer el catálogo: ${catalog.error.message}`);
+    if (translations.error) throw new Error(`No se pudieron leer las traducciones del catálogo: ${translations.error.message}`);
+
+    const byCatalogId = new Map<string, Partial<Record<Locale, CategoryText>>>();
+    for (const row of translations.data as TranslationRow[]) {
+      if (!isSupportedLocale(row.locale)) continue;
+      byCatalogId.set(row.catalog_id, { ...byCatalogId.get(row.catalog_id), [row.locale]: { name: row.name, description: row.description } });
     }
-    return (data as FilaCatalogo[]).map((fila) => ({
-      id: fila.id,
-      name: fila.name,
-      description: fila.description,
-      ...(fila.name_en ? { nameEn: fila.name_en } : {}),
-      ...(fila.description_en ? { descriptionEn: fila.description_en } : {}),
-      isSensitiveData: fila.is_sensitive_data,
-      ...(fila.retired_at ? { retiredAt: new Date(fila.retired_at) } : {}),
+
+    return (catalog.data as CatalogRow[]).map((row) => ({
+      id: row.id,
+      ...(row.key ? { key: row.key } : {}),
+      translations: byCatalogId.get(row.id) ?? {},
+      isSensitiveData: row.is_sensitive_data,
+      ...(row.retired_at ? { retiredAt: new Date(row.retired_at) } : {}),
     }));
   }
 
   async save(category: CatalogCategory): Promise<void> {
-    const { error } = await this.cliente.from("category_catalog").upsert({
+    const defaultText = category.translations[DEFAULT_LOCALE];
+    if (!defaultText) throw new Error(`Falta el texto en ${DEFAULT_LOCALE} de la categoría ${category.id}`);
+
+    const { error } = await this.client.from("category_catalog").upsert({
       id: category.id,
-      name: category.name,
-      description: category.description,
-      name_en: category.nameEn ?? null,
-      description_en: category.descriptionEn ?? null,
+      key: category.key ?? null,
+      name: defaultText.name,
+      description: defaultText.description,
       is_sensitive_data: category.isSensitiveData,
       retired_at: category.retiredAt ? category.retiredAt.toISOString() : null,
     });
-    if (error) {
-      throw new Error(`No se pudo guardar la categoría del catálogo: ${error.message}`);
-    }
+    if (error) throw new Error(`No se pudo guardar la categoría del catálogo: ${error.message}`);
+
+    const rows = Object.entries(category.translations).map(([locale, text]) => ({
+      catalog_id: category.id,
+      locale,
+      name: text.name,
+      description: text.description,
+    }));
+    const { error: translationsError } = await this.client.from("category_translations").upsert(rows, { onConflict: "catalog_id,locale" });
+    if (translationsError) throw new Error(`No se pudieron guardar las traducciones de la categoría: ${translationsError.message}`);
   }
 }

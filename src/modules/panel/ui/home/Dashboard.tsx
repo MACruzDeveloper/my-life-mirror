@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useAssessmentHistory } from "@modules/assessments/ui/queries";
 import type { LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
+import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
 
@@ -38,6 +39,11 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
   // Secundarios respecto a las puntuaciones: si tardan o fallan, el panel se ve igual.
   const recommendations = useRecommendations().data ?? [];
   const history = useAssessmentHistory();
+  const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
+  // Los gráficos reciben el nombre ya en el idioma de la interfaz: no saben nada de traducciones.
+  const displayedScores = latestScores.map((latestScore) => ({ ...latestScore, categoryName: categoryLabel(latestScore.catalogId).name }));
+
+  if (labelsPending) return <ChartsFallback />;
 
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", mt: 3, px: 2, display: "flex", flexDirection: "column", gap: 2 }}>
@@ -50,7 +56,7 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
         </Button>
       </Box>
       <Suspense fallback={<ChartsFallback />}>
-        <BalanceCard latestScores={latestScores} />
+        <BalanceCard latestScores={displayedScores} />
       </Suspense>
       <Box sx={{ mt: 1 }}>
         <Typography variant="h6" component="h2">
@@ -62,12 +68,12 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
       </Box>
       <Suspense fallback={<ChartsFallback />}>
         <EvolutionPanel
-          latestScores={latestScores}
+          latestScores={displayedScores}
           sessions={history.data}
           historyError={history.isError}
           renderCardExtra={(categoryId) => {
             const recommendation = recommendations.find((candidate) => candidate.categoryId === categoryId);
-            return recommendation ? <RecommendationButton templateKey={recommendation.templateKey} categoryName={recommendation.categoryName} /> : null;
+            return recommendation ? <RecommendationButton templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} /> : null;
           }}
         />
       </Suspense>

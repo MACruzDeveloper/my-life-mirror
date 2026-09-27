@@ -8,7 +8,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import SvgIcon from "@mui/material/SvgIcon";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
-import { useCategoryLabels } from "@modules/categories/ui/categoryLabels";
 
 /** Tono "idea" amarillo suave: destaca sin sonar a aviso ni a error (RN-04, RES-07). */
 const IDEA_COLORS = { background: "#FFF6D6", text: "#6B4E00", border: "#F1D98A", hoverBackground: "#FDEFBE" };
@@ -23,6 +22,7 @@ function LightbulbIcon() {
 
 interface RecommendationButtonProps {
   templateKey: string;
+  /** Nombre ya en el idioma de la interfaz (lo resuelve la página). */
   categoryName: string;
 }
 
@@ -36,7 +36,6 @@ export function RecommendationButton({ templateKey, categoryName }: Recommendati
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const titleId = useId();
-  const displayName = useCategoryLabels().name(categoryName);
 
   return (
     <>
@@ -63,9 +62,9 @@ export function RecommendationButton({ templateKey, categoryName }: Recommendati
         {t("recomendaciones.titulo")}
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby={titleId} fullWidth maxWidth="xs">
-        <DialogTitle id={titleId}>{t("recomendaciones.dialogoTitulo", { categoria: displayName })}</DialogTitle>
+        <DialogTitle id={titleId}>{t("recomendaciones.dialogoTitulo", { categoria: categoryName })}</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: "text.primary", mb: 2 }}>{t(`recomendaciones.plantillas.${templateKey}`, { categoria: displayName })}</DialogContentText>
+          <DialogContentText sx={{ color: "text.primary", mb: 2 }}>{t(`recomendaciones.plantillas.${templateKey}`, { categoria: categoryName })}</DialogContentText>
           <Typography variant="caption" color="text.secondary" component="p">
             {t("recomendaciones.aviso")}
           </Typography>
