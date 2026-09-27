@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { NotFoundError, ValidationError } from "../../../shared/domain/DomainError";
-import type { Category } from "../domain/Category";
-import type { CategoryRepository } from "../domain/CategoryRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { NotFoundError, ValidationError } from "../../../shared/domain/DomainError.js";
+import type { Category } from "../domain/Category.js";
+import type { CategoryRepository } from "../domain/CategoryRepository.js";
 
 export interface DeactivateCategoryInput {
   userId: string;

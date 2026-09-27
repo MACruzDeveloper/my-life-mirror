@@ -1,4 +1,4 @@
-import type { Consentimiento } from "./Consentimiento";
+import type { Consentimiento } from "./Consentimiento.js";
 
 /**
  * Puerto — ADR-03 §3.3. `versionPolitica` forma parte de la clave de

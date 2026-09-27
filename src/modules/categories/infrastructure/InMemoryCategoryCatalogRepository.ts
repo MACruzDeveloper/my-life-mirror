@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import type { CatalogCategory } from "../domain/CatalogCategory";
-import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
-import { STANDARD_CATEGORIES } from "../domain/standardCategories";
+import type { CatalogCategory } from "../domain/CatalogCategory.js";
+import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
+import { STANDARD_CATEGORIES } from "../domain/standardCategories.js";
 
 /**
  * Fake para tests — ADR-03 §3.6. Arranca con las 9 estándar y sus textos en

@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { type Result, ok } from "../../../shared/domain/Result";
-import type { Clock } from "../../../shared/domain/Clock";
-import type { Assessment } from "../../assessments/domain/Assessment";
-import type { CategoryCatalogRepository } from "../../categories/domain/CategoryCatalogRepository";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository";
-import { type Recommendation, isOpen } from "../domain/Recommendation";
-import type { RecommendationRepository } from "../domain/RecommendationRepository";
-import { templateKeysFor } from "../domain/recommendationCatalog";
+import { type Result, ok } from "../../../shared/domain/Result.js";
+import type { Clock } from "../../../shared/domain/Clock.js";
+import type { Assessment } from "../../assessments/domain/Assessment.js";
+import type { CategoryCatalogRepository } from "../../categories/domain/CategoryCatalogRepository.js";
+import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import { type Recommendation, isOpen } from "../domain/Recommendation.js";
+import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
+import { templateKeysFor } from "../domain/recommendationCatalog.js";
 
 interface Dependencies {
   recommendationRepository: RecommendationRepository;

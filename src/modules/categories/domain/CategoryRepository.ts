@@ -1,4 +1,4 @@
-import type { Category } from "./Category";
+import type { Category } from "./Category.js";
 
 /** Puerto — ADR-03 §3.3. */
 export interface CategoryRepository {

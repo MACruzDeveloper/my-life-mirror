@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { type AuthenticationError, DomainError, ValidationError } from "../../../shared/domain/DomainError";
-import { Email } from "../domain/Email";
-import type { AuthProvider, SesionIniciada } from "../domain/AuthProvider";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { type AuthenticationError, DomainError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { Email } from "../domain/Email.js";
+import type { AuthProvider, SesionIniciada } from "../domain/AuthProvider.js";
 
 export interface IniciarSesionInput {
   email: string;

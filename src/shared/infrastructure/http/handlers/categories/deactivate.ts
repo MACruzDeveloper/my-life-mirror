@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../container";
-import { leerCookie } from "../../../cookies";
-import { logger } from "../../../logger";
+import { obtenerAppContext } from "../../../container.js";
+import { leerCookie } from "../../../cookies.js";
+import { logger } from "../../../logger.js";
 
 const DeactivateCategorySchema = z.object({
   categoryId: z.string(),

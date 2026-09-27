@@ -1,6 +1,6 @@
-import type { Locale } from "../../../shared/domain/locales";
-import type { CategoryText } from "../domain/CatalogCategory";
-import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
+import type { Locale } from "../../../shared/domain/locales.js";
+import type { CategoryText } from "../domain/CatalogCategory.js";
+import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 
 export interface CatalogLabel {
   catalogId: string;

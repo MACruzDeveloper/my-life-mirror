@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
-import { DEFAULT_LOCALE } from "../../../shared/domain/locales";
-import type { Category } from "../domain/Category";
-import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository";
-import type { CategoryRepository } from "../domain/CategoryRepository";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
+import { DEFAULT_LOCALE } from "../../../shared/domain/locales.js";
+import type { Category } from "../domain/Category.js";
+import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
+import type { CategoryRepository } from "../domain/CategoryRepository.js";
 
 /**
  * Caso de uso — RF-06, ADM-02. Sincroniza las categorías del usuario con el

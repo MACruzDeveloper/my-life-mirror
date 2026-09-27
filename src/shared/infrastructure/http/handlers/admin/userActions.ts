@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { adminHandler } from "./adminHandler";
+import { adminHandler } from "./adminHandler.js";
 
 const userId = z.string().min(1);
 const password = z.string();

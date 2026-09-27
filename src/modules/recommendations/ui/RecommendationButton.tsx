@@ -5,20 +5,12 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import SvgIcon from "@mui/material/SvgIcon";
+import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 
 /** Tono "idea" amarillo suave: destaca sin sonar a aviso ni a error (RN-04, RES-07). */
 const IDEA_COLORS = { background: "#FFF6D6", text: "#6B4E00", border: "#F1D98A", hoverBackground: "#FDEFBE" };
-
-function LightbulbIcon() {
-  return (
-    <SvgIcon fontSize="small">
-      <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7" />
-    </SvgIcon>
-  );
-}
 
 interface RecommendationButtonProps {
   templateKey: string;
@@ -43,7 +35,7 @@ export function RecommendationButton({ templateKey, categoryName, label }: Recom
     <>
       <Button
         size="small"
-        startIcon={<LightbulbIcon />}
+        startIcon={<LightbulbOutlinedIcon fontSize="small" />}
         aria-haspopup="dialog"
         data-highlighted="true"
         onClick={() => setOpen(true)}

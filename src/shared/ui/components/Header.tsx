@@ -6,7 +6,7 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import SvgIcon from "@mui/material/SvgIcon";
+import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -21,14 +21,6 @@ export interface HeaderProps {
   onLogout: () => void;
   /** Solo muestra el enlace: la protección real de /admin está en el servidor (ADM-01). */
   isAdmin?: boolean;
-}
-
-function MenuIcon() {
-  return (
-    <SvgIcon>
-      <path d="M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z" />
-    </SvgIcon>
-  );
 }
 
 /**

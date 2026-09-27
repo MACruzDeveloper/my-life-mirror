@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
 
 const PATRON_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

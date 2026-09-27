@@ -1,7 +1,7 @@
-import { createRouter } from "../../src/shared/infrastructure/http/router";
-import activate from "../../src/shared/infrastructure/http/handlers/categories/activate";
-import deactivate from "../../src/shared/infrastructure/http/handlers/categories/deactivate";
-import translations from "../../src/shared/infrastructure/http/handlers/categories/translations";
+import { createRouter } from "../../src/shared/infrastructure/http/router.js";
+import activate from "../../src/shared/infrastructure/http/handlers/categories/activate.js";
+import deactivate from "../../src/shared/infrastructure/http/handlers/categories/deactivate.js";
+import translations from "../../src/shared/infrastructure/http/handlers/categories/translations.js";
 
 /**
  * Función serverless de `/api/categories/activate|deactivate|translations`

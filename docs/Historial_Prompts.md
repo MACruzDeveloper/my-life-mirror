@@ -152,6 +152,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **27 sept. 2026** — *"go ahead with Husky and we do a test with the next PR, but before read the pdf that I attached for you just to be aware of these notes"* (apuntes del máster: Scope Rule, TDD, Husky con *quality gates* y umbrales de cobertura, Playwright con Page Objects y regresión visual, `as const`, ARIA/regiones *live*, excluir tests del tsconfig de build, Sentry).
 → Husky con dos niveles: `pre-commit` rápido (lint + tipos) y `pre-push` completo (`npm run verify`). De los apuntes se adopta el **umbral de cobertura**, pero solo sobre dominio + aplicación (los adaptadores de Supabase necesitan la base real). **No se adopta** excluir `tests/` del tsconfig: aquí el build no empaqueta los tests (Vite parte de `index.html`) y comprobar sus tipos ha cazado errores reales. Page Objects y regresión visual se consideran en la tarea de Playwright contra `api/`; Sentry sigue descartado a esta escala (ADR-08).
 
+**27 sept. 2026** — *"I tried to login or register [en la preview] but I get a server 500 error… I started Docker desktop already, but before continuing we should complete the PR"*
+→ Causa encontrada en los logs de Vercel (`vercel logs`): `ERR_MODULE_NOT_FOUND` — las funciones corren como ESM nativo y los imports relativos no tenían extensión; en local (Vite, Vitest, `vercel dev`) funcionaba igual, y `check:api` solo miraba los tipos con `bundler`. Se añaden `.js` a los imports alcanzables desde `api/` y se refuerza el *quality gate*: `nodenext` + carga real de cada función en Node. Probablemente las *previews* llevaban rotas desde que se agruparon las funciones con `createRouter`; nadie lo vio porque siempre se probaba en local. El PR se cierra con esto antes de empezar con Docker.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

@@ -1,5 +1,5 @@
-import type { Assessment } from "../domain/Assessment";
-import type { AssessmentRepository } from "../domain/AssessmentRepository";
+import type { Assessment } from "../domain/Assessment.js";
+import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
 
 /** Fake solo para tests — ADR-03 §3.6. En dev/producción: SupabaseAssessmentRepository. */
 export class InMemoryAssessmentRepository implements AssessmentRepository {

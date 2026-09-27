@@ -1,11 +1,11 @@
 import type { ServerResponse } from "node:http";
 import { z } from "zod";
-import type { Result } from "../../../../domain/Result";
-import type { UsuarioAutenticado } from "../../../../../modules/cuentas/domain/AuthProvider";
-import { type AppContext, obtenerAppContext } from "../../../container";
-import { leerCookie } from "../../../cookies";
-import { logger } from "../../../logger";
-import type { ManejadorHttp, PeticionHttp } from "../../router";
+import type { Result } from "../../../../domain/Result.js";
+import type { UsuarioAutenticado } from "../../../../../modules/cuentas/domain/AuthProvider.js";
+import { type AppContext, obtenerAppContext } from "../../../container.js";
+import { leerCookie } from "../../../cookies.js";
+import { logger } from "../../../logger.js";
+import type { ManejadorHttp, PeticionHttp } from "../../router.js";
 
 function responder(res: ServerResponse, status: number, cuerpo: unknown) {
   // Datos de administración: que ninguna caché intermedia los conserve.

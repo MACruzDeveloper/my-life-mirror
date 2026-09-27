@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result";
-import { ValidationError } from "../../../shared/domain/DomainError";
+import { type Result, err, ok } from "../../../shared/domain/Result.js";
+import { ValidationError } from "../../../shared/domain/DomainError.js";
 
 export const MIN_SCORE = 1;
 export const MAX_SCORE = 10;

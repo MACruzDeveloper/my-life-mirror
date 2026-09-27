@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Assessment } from "../domain/Assessment";
-import type { AssessmentRepository } from "../domain/AssessmentRepository";
+import type { Assessment } from "../domain/Assessment.js";
+import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
 
 interface AssessmentRow {
   id: string;

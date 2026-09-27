@@ -1,5 +1,5 @@
-import type { Locale } from "../../../shared/domain/locales";
-import type { CategoryText } from "./CatalogCategory";
+import type { Locale } from "../../../shared/domain/locales.js";
+import type { CategoryText } from "./CatalogCategory.js";
 
 /**
  * RF-06: catálogo inicial. La fuente real es la base de datos
