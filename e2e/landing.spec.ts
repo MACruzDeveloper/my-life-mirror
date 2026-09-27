@@ -34,3 +34,17 @@ test.describe("Landing pública", () => {
     await expect(page.getByText(/versión 2026-09/i)).toBeVisible();
   });
 });
+
+test.describe("Idioma en las páginas públicas (RNF-10)", () => {
+  test("se puede pasar la portada a inglés antes de tener cuenta, y la elección se recuerda", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("lang", "es");
+
+    await page.getByRole("button", { name: "English" }).click();
+
+    await expect(page.getByRole("link", { name: "Create account" })).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await page.reload();
+    await expect(page.getByRole("link", { name: "Create account" })).toBeVisible();
+  });
+});

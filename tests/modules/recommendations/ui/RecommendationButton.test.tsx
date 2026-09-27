@@ -47,4 +47,13 @@ describe("RecommendationButton (RF-18)", () => {
       }
     }
   });
+
+  it("muestra el nombre que recibe, ya en el idioma de la interfaz (la página lo resuelve por id), también dentro de la idea general", () => {
+    render(<RecommendationButton templateKey="general.1" categoryName="Creativity" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+
+    const dialog = screen.getByRole("dialog", { name: "Una idea para Creativity" });
+    expect(within(dialog).getByText(/creativity/i, { selector: "p" })).toBeInTheDocument();
+  });
 });

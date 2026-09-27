@@ -13,6 +13,7 @@ import type { ScorePoint } from "./scoreHistory";
 const SCORE_AXIS = { min: 1, max: 10, interval: 3 };
 
 interface CategoryEvolutionCardProps {
+  /** Nombre ya en el idioma de la interfaz (lo resuelve la página). */
   categoryName: string;
   currentScore?: number;
   /** `undefined` mientras carga el historial. */

@@ -1,9 +1,11 @@
 import { createRouter } from "../../src/shared/infrastructure/http/router";
 import activate from "../../src/shared/infrastructure/http/handlers/categories/activate";
 import deactivate from "../../src/shared/infrastructure/http/handlers/categories/deactivate";
+import translations from "../../src/shared/infrastructure/http/handlers/categories/translations";
 
 /**
- * Función serverless de `/api/categories/activate|deactivate` (`/api/categories`
- * a secas sigue siendo `index.ts`). Ver createRouter sobre el límite de 12 funciones.
+ * Función serverless de `/api/categories/activate|deactivate|translations`
+ * (`/api/categories` a secas sigue siendo `index.ts`). Ver createRouter sobre
+ * el límite de 12 funciones.
  */
-export default createRouter("/api/categories/", { activate, deactivate });
+export default createRouter("/api/categories/", { activate, deactivate, translations });

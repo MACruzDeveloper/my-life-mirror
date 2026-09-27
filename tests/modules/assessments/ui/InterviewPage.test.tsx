@@ -4,24 +4,26 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { InterviewPage } from "@modules/assessments/ui/InterviewPage";
+import i18n from "@shared/ui/i18n";
 import { createTestClient, withClient } from "../../../helpers/queryClient";
 import type { QueryClient } from "@tanstack/react-query";
+import { categoryLabelsFixture } from "../../../helpers/categoryLabels";
 
 const CATEGORIES = [
-  { id: "c1", name: "Economía", description: "...", status: "active", isSensitiveData: false },
-  { id: "c2", name: "Deporte", description: "...", status: "active", isSensitiveData: true },
-  { id: "c3", name: "Pareja", description: "...", status: "inactive", isSensitiveData: false },
-  { id: "c4", name: "Sexo", description: "...", status: "inactive", isSensitiveData: true },
+  { id: "c1", catalogId: "k-economia", name: "Economía", description: "...", status: "active", isSensitiveData: false },
+  { id: "c2", catalogId: "k-deporte", name: "Deporte", description: "...", status: "active", isSensitiveData: true },
+  { id: "c3", catalogId: "k-pareja", name: "Pareja", description: "...", status: "inactive", isSensitiveData: false },
+  { id: "c4", catalogId: "k-sexo", name: "Sexo", description: "...", status: "inactive", isSensitiveData: true },
 ];
 
 const LATEST = [
-  { categoryId: "c1", categoryName: "Economía", score: 6, recordedAt: "2026-09-18T10:00:00.000Z" },
-  { categoryId: "c2", categoryName: "Deporte" },
+  { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, recordedAt: "2026-09-18T10:00:00.000Z" },
+  { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte" },
 ];
 
 const HISTORY = [
-  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Economía", score: 4, previousScore: 6 }] },
-  { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Economía", score: 6 }] },
+  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4, previousScore: 6 }] },
+  { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6 }] },
 ];
 
 interface StubOptions {
@@ -33,6 +35,7 @@ interface StubOptions {
 function stubFetch({ latest = LATEST, history = HISTORY, saveResponse: saveResponse }: StubOptions = {}) {
   const fetchMock: ReturnType<typeof vi.fn> = vi.fn((url: string, init?: RequestInit) => {
     if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => CATEGORIES });
+    if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
     if (url === "/api/assessments/history") return Promise.resolve({ ok: true, json: async () => history });
     if (url === "/api/assessments" && (!init || !init.method || init.method === "GET")) {
       return Promise.resolve({ ok: true, json: async () => latest });
@@ -396,7 +399,7 @@ describe("InterviewPage (RF-10)", () => {
   });
 
   it("la primera vez es una entrevista; con respuestas guardadas se presenta como actualizarlas", async () => {
-    stubFetch({ latest: [{ categoryId: "c1", categoryName: "Economía" }, { categoryId: "c2", categoryName: "Deporte" }] });
+    stubFetch({ latest: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }, { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte" }] });
     const firstRender = renderPage();
     expect(await screen.findByRole("heading", { level: 1, name: /tu entrevista/i })).toBeInTheDocument();
     firstRender.unmount();
@@ -405,5 +408,43 @@ describe("InterviewPage (RF-10)", () => {
     renderPage();
     expect(await screen.findByRole("heading", { level: 1, name: /actualiza tus respuestas/i })).toBeInTheDocument();
   });
-});
 
+  it("en inglés, los nombres y descripciones de las categorías estándar salen traducidos (RNF-10)", async () => {
+    await i18n.changeLanguage("en");
+    try {
+      stubFetch();
+      renderPage();
+
+      expect(await screen.findByRole("checkbox", { name: /finances/i })).toBeInTheDocument();
+      expect(screen.getByText("How are you feeling about Finances?")).toBeInTheDocument();
+      expect(screen.getByRole("group", { name: "Score for Finances" })).toBeInTheDocument();
+      expect(screen.queryByText(/economía/i)).not.toBeInTheDocument();
+      // Los ejemplos siguen funcionando: se buscan por el nombre guardado, no por el traducido.
+      expect(screen.getByRole("button", { name: /see examples for finances/i })).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage("es");
+    }
+  });
+
+  it("en inglés, una categoría creada por el admin se nombra igual que las estándar: por su id, con su traducción", async () => {
+    await i18n.changeLanguage("en");
+    try {
+      const fetchMock = stubFetch();
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      const creativity = { catalogId: "k-creatividad", translations: { es: { name: "Creatividad", description: "Arte y hobbies." }, en: { name: "Creativity", description: "Art and hobbies." } } };
+      fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+        if (url === "/api/categories") {
+          return Promise.resolve({ ok: true, json: async () => [...CATEGORIES, { id: "c9", catalogId: "k-creatividad", name: "Creatividad", description: "Arte y hobbies.", status: "active", isSensitiveData: false }] });
+        }
+        if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture([creativity]) });
+        return defaultImplementation(url, init);
+      });
+      renderPage();
+
+      expect(await screen.findByText("How are you feeling about Creativity?")).toBeInTheDocument();
+      expect(screen.getByText("Art and hobbies.")).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage("es");
+    }
+  });
+});

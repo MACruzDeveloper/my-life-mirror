@@ -26,7 +26,7 @@ async function setup() {
   await categoryRepository.save({ ...economia, status: "active" });
   await categoryRepository.save({ ...deporte, status: "active" });
 
-  const generate = createGenerateRecommendations({ recommendationRepository, categoryRepository, clock, threshold: THRESHOLD });
+  const generate = createGenerateRecommendations({ recommendationRepository, categoryRepository, catalog, clock, threshold: THRESHOLD });
   const list = createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository });
   const record = createRecordAssessments(assessmentRepository, categoryRepository, clock, (userId, guardadas) => generate(userId, guardadas));
   return { generate, list, record, recommendationRepository, categoryRepository, assessmentRepository, economia, deporte, avanzar: (d: Date) => (ahora = d) };
@@ -41,7 +41,7 @@ describe("GenerateRecommendations (RF-18)", () => {
     const guardadas = await recommendationRepository.findByUserId("u1");
     expect(guardadas).toHaveLength(1);
     expect(guardadas[0]).toMatchObject({ userId: "u1", categoryId: economia.id, status: "pending", threshold: THRESHOLD });
-    expect(templateKeysFor("Economía")).toContain(guardadas[0].templateKey);
+    expect(templateKeysFor("economia")).toContain(guardadas[0].templateKey);
   });
 
   it("no crea nada con una puntuación igual o superior al umbral", async () => {
@@ -73,7 +73,7 @@ describe("GenerateRecommendations (RF-18)", () => {
 
   it("al generar otra tras cerrar la anterior elige una plantilla que aún no había recibido, y repite al agotarlas", async () => {
     const { generate, record, recommendationRepository, economia } = await setup();
-    const claves = templateKeysFor("Economía");
+    const claves = templateKeysFor("economia");
     const cerrar = async () => {
       for (const r of await recommendationRepository.findByUserId("u1")) await recommendationRepository.saveMany([{ ...r, status: "done" }]);
     };
@@ -184,5 +184,16 @@ describe("ListRecommendations (RF-18)", () => {
 
     expect((await list("u1")).ok && (await list("u1"))).toMatchObject({ value: [] });
     expect((await list(" ")).ok).toBe(false);
+  });
+});
+
+describe("ListRecommendations — identidad de la categoría", () => {
+  it("lleva el id de catálogo de la categoría, para que la interfaz busque su nombre en cada idioma", async () => {
+    const { record, list, economia } = await setup();
+    await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 3 }] });
+
+    const resultado = await list("u1");
+
+    expect(resultado.ok && resultado.value[0].catalogId).toBe(economia.catalogId);
   });
 });

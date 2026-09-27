@@ -21,7 +21,7 @@ export function createRetireCatalogCategory(catalog: CategoryCatalogRepository, 
     if (!entrada.retiredAt) {
       await catalog.save({ ...entrada, retiredAt: now() });
     }
-    await categoryRepository.deactivateByName(entrada.name);
+    await categoryRepository.deactivateByCatalogId(entrada.id);
     return ok(undefined);
   };
 }

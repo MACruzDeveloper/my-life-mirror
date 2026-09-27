@@ -71,4 +71,13 @@ describe("GetLatestScores (RF-10, consulta de resultados)", () => {
     expect(resultado.ok).toBe(false);
     if (!resultado.ok) expect(resultado.error.code).toBe("VALIDATION_ERROR");
   });
+
+  it("cada resultado lleva el id de catálogo de su categoría (la interfaz nombra por id, en cada idioma)", async () => {
+    const { getLatestScores, a } = await setup();
+
+    const resultado = await getLatestScores("u1");
+
+    expect(resultado.ok && resultado.value.find((r) => r.categoryId === a.id)?.catalogId).toBe(a.catalogId);
+    expect(a.catalogId).toBeDefined();
+  });
 });

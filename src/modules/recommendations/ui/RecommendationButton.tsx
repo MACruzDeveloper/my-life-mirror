@@ -22,6 +22,7 @@ function LightbulbIcon() {
 
 interface RecommendationButtonProps {
   templateKey: string;
+  /** Nombre ya en el idioma de la interfaz (lo resuelve la página). */
   categoryName: string;
 }
 

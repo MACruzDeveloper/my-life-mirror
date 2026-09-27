@@ -41,6 +41,7 @@ import { SupabaseCategoryRepository } from "../../modules/categories/infrastruct
 import type { CategoryCatalogRepository } from "../../modules/categories/domain/CategoryCatalogRepository";
 import { InMemoryCategoryCatalogRepository } from "../../modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
 import { SupabaseCategoryCatalogRepository } from "../../modules/categories/infrastructure/SupabaseCategoryCatalogRepository";
+import { createListCatalogLabels } from "../../modules/categories/application/ListCatalogLabels";
 import { createListCatalog } from "../../modules/categories/application/ListCatalog";
 import { createAddCatalogCategory } from "../../modules/categories/application/AddCatalogCategory";
 import { createRetireCatalogCategory } from "../../modules/categories/application/RetireCatalogCategory";
@@ -202,6 +203,7 @@ export interface AppContext {
   categoryRepository: CategoryRepository;
   categoryCatalogRepository: CategoryCatalogRepository;
   listCatalog: ReturnType<typeof createListCatalog>;
+  listCatalogLabels: ReturnType<typeof createListCatalogLabels>;
   addCatalogCategory: ReturnType<typeof createAddCatalogCategory>;
   retireCatalogCategory: ReturnType<typeof createRetireCatalogCategory>;
   listCategories: ReturnType<typeof createListCategories>;
@@ -231,6 +233,7 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
   const generateRecommendations = createGenerateRecommendations({
     recommendationRepository,
     categoryRepository,
+    catalog: categoryCatalogRepository,
     clock,
     threshold: parseThreshold(process.env.RECOMMENDATION_THRESHOLD),
   });
@@ -270,6 +273,7 @@ export function crearAppContext(entorno: Entorno = detectarEntorno()): AppContex
     categoryRepository,
     categoryCatalogRepository,
     listCatalog: createListCatalog(categoryCatalogRepository),
+    listCatalogLabels: createListCatalogLabels(categoryCatalogRepository),
     addCatalogCategory: createAddCatalogCategory(categoryCatalogRepository),
     retireCatalogCategory: createRetireCatalogCategory(categoryCatalogRepository, categoryRepository, () => clock.now()),
     listCategories: createListCategories(categoryRepository, categoryCatalogRepository),

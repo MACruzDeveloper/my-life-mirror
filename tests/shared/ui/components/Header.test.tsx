@@ -62,7 +62,7 @@ describe("Header", () => {
   it("el selector de idioma cambia el idioma activo", async () => {
     renderHeader();
 
-    fireEvent.click(screen.getByRole("button", { name: "EN" }));
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
 
     expect(await screen.findByRole("button", { name: /log out/i })).toBeInTheDocument();
   });

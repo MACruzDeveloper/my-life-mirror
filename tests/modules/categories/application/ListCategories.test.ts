@@ -50,7 +50,7 @@ describe("ListCategories (RF-06)", () => {
     const catalog = new InMemoryCategoryCatalogRepository();
     const listCategories = createListCategories(repo, catalog);
     await listCategories("u1");
-    await catalog.save({ id: "nueva", name: "Creatividad", description: "Arte y hobbies.", isSensitiveData: false });
+    await catalog.save({ id: "nueva", translations: { es: { name: "Creatividad", description: "Arte y hobbies." }, en: { name: "Creativity", description: "Art and hobbies." } }, isSensitiveData: false });
 
     const resultado = await listCategories("u1");
 
@@ -68,12 +68,36 @@ describe("ListCategories (RF-06)", () => {
     const catalog = new InMemoryCategoryCatalogRepository();
     const listCategories = createListCategories(repo, catalog);
     await listCategories("u1");
-    const economia = (await catalog.findAll()).find((c) => c.name === "Economía")!;
+    const economia = (await catalog.findAll()).find((c) => c.key === "economia")!;
     await catalog.save({ ...economia, retiredAt: new Date("2026-09-19T10:00:00Z") });
 
     const resultado = await listCategories("u1");
 
     expect(resultado.ok && resultado.value.some((c) => c.name === "Economía")).toBe(false);
     expect((await repo.findByUserId("u1")).some((c) => c.name === "Economía")).toBe(true);
+  });
+
+  it("cada copia apunta a su entrada del catálogo por id (no por nombre) y guarda el texto del idioma por defecto", async () => {
+    const repo = new InMemoryCategoryRepository();
+    const catalog = new InMemoryCategoryCatalogRepository();
+
+    const resultado = await createListCategories(repo, catalog)("u1");
+
+    const economiaCatalogo = (await catalog.findAll()).find((entry) => entry.key === "economia")!;
+    const economia = resultado.ok ? resultado.value.find((category) => category.catalogId === economiaCatalogo.id) : undefined;
+    expect(economia).toMatchObject({ name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas." });
+  });
+
+  it("si cambia el texto de una entrada del catálogo, no se crea una copia duplicada (la identidad es el id)", async () => {
+    const repo = new InMemoryCategoryRepository();
+    const catalog = new InMemoryCategoryCatalogRepository();
+    const listCategories = createListCategories(repo, catalog);
+    await listCategories("u1");
+    const economia = (await catalog.findAll()).find((entry) => entry.key === "economia")!;
+    await catalog.save({ ...economia, translations: { ...economia.translations, es: { name: "Dinero", description: "d" } } });
+
+    const resultado = await listCategories("u1");
+
+    expect(resultado.ok && resultado.value).toHaveLength(STANDARD_CATEGORIES.length);
   });
 });

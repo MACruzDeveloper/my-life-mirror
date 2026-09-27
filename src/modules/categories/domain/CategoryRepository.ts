@@ -8,6 +8,6 @@ export interface CategoryRepository {
   saveMany(categories: Category[]): Promise<void>;
   /** Borra todas las categorías del usuario (RF-05). Repetible. */
   deleteByUserId(userId: string): Promise<void>;
-  /** Desactiva esa categoría (por nombre) en todos los usuarios — al retirarla del catálogo (ADM-02). No borra nada. */
-  deactivateByName(name: string): Promise<void>;
+  /** Desactiva, en todos los usuarios, las copias de esa entrada del catálogo — al retirarla (ADM-02). No borra nada. */
+  deactivateByCatalogId(catalogId: string): Promise<void>;
 }

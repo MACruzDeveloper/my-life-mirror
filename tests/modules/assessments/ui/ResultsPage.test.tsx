@@ -5,12 +5,17 @@ import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { withClient } from "../../../helpers/queryClient";
 import { ResultsPage } from "@modules/assessments/ui/ResultsPage";
+import { categoryLabelsFixture } from "../../../helpers/categoryLabels";
 
 function stub(ok: boolean, body: unknown, recommendations: unknown = []) {
   vi.stubGlobal(
     "fetch",
     vi.fn((url: string) =>
-      url === "/api/recommendations" ? Promise.resolve({ ok: true, json: async () => recommendations }) : Promise.resolve({ ok, json: async () => body }),
+      url === "/api/recommendations"
+        ? Promise.resolve({ ok: true, json: async () => recommendations })
+        : url === "/api/categories/translations"
+          ? Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() })
+          : Promise.resolve({ ok, json: async () => body }),
     ),
   );
 }
@@ -30,8 +35,8 @@ afterEach(() => vi.unstubAllGlobals());
 describe("ResultsPage", () => {
   it("muestra la puntuación de cada categoría junto a su nombre", async () => {
     stub(true, [
-      { categoryId: "c1", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
-      { categoryId: "c2", categoryName: "Deporte", score: 2, note: "Poco", recordedAt: "2026-09-19T10:00:00.000Z" },
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
+      { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 2, note: "Poco", recordedAt: "2026-09-19T10:00:00.000Z" },
     ]);
     renderPage();
 
@@ -44,7 +49,7 @@ describe("ResultsPage", () => {
   });
 
   it("indica las categorías sin puntuar", async () => {
-    stub(true, [{ categoryId: "c1", categoryName: "Economía" }]);
+    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }]);
     renderPage();
 
     await waitFor(() => expect(screen.getByText("Sin puntuar todavía")).toBeInTheDocument());
@@ -69,10 +74,10 @@ describe("ResultsPage", () => {
     stub(
       true,
       [
-        { categoryId: "c1", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
-        { categoryId: "c2", categoryName: "Deporte", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" },
+        { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
+        { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" },
       ],
-      [{ id: "r1", categoryId: "c2", categoryName: "Deporte", templateKey: "deporte.1", status: "pending" }],
+      [{ id: "r1", categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", templateKey: "deporte.1", status: "pending" }],
     );
     renderPage();
 
@@ -90,9 +95,11 @@ describe("ResultsPage", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn((url: string) =>
-        url === "/api/recommendations"
+        url === "/api/categories/translations"
+          ? Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() })
+          : url === "/api/recommendations"
           ? Promise.resolve({ ok: false, status: 500, json: async () => ({}) })
-          : Promise.resolve({ ok: true, json: async () => [{ categoryId: "c1", categoryName: "Economía", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" }] }),
+          : Promise.resolve({ ok: true, json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" }] }),
       ),
     );
     renderPage();
@@ -102,11 +109,23 @@ describe("ResultsPage", () => {
   });
 
   it("con puntuaciones guardadas ofrece actualizar las respuestas, no hacer otra entrevista", async () => {
-    stub(true, [{ categoryId: "c1", categoryName: "Economía", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
     renderPage();
 
     expect(await screen.findByRole("link", { name: /actualizar mis respuestas/i })).toHaveAttribute("href", "/perfil/entrevista");
     expect(screen.queryByRole("link", { name: /hacer una entrevista/i })).not.toBeInTheDocument();
   });
-});
 
+  it("en inglés, las tarjetas de detalle usan el nombre traducido", async () => {
+    const i18n = (await import("@shared/ui/i18n")).default;
+    await i18n.changeLanguage("en");
+    try {
+      stub(true, [{ categoryId: "c1", catalogId: "k-vidaSocial", categoryName: "Vida social", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+      renderPage();
+
+      expect(await screen.findByText("Social life")).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage("es");
+    }
+  });
+});
