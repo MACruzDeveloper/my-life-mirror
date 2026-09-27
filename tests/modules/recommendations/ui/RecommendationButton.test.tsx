@@ -48,19 +48,12 @@ describe("RecommendationButton (RF-18)", () => {
     }
   });
 
-  it("en inglés, el título usa el nombre traducido; una categoría del admin conserva el suyo", async () => {
-    await i18n.changeLanguage("en");
-    try {
-      const { unmount } = render(<RecommendationButton templateKey="economia.1" categoryName="Economía" />);
-      fireEvent.click(screen.getByRole("button", { name: /an idea for you/i }));
-      expect(screen.getByRole("dialog", { name: "An idea for Finances" })).toBeInTheDocument();
-      unmount();
+  it("muestra el nombre que recibe, ya en el idioma de la interfaz (la página lo resuelve por id), también dentro de la idea general", () => {
+    render(<RecommendationButton templateKey="general.1" categoryName="Creativity" />);
 
-      render(<RecommendationButton templateKey="general.1" categoryName="Creatividad" />);
-      fireEvent.click(screen.getByRole("button", { name: /an idea for you/i }));
-      expect(screen.getByRole("dialog", { name: "An idea for Creatividad" })).toBeInTheDocument();
-    } finally {
-      await i18n.changeLanguage("es");
-    }
+    fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+
+    const dialog = screen.getByRole("dialog", { name: "Una idea para Creativity" });
+    expect(within(dialog).getByText(/creativity/i, { selector: "p" })).toBeInTheDocument();
   });
 });

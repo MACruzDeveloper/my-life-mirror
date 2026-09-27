@@ -11,11 +11,15 @@ export type CategoryStatus = "active" | "inactive";
 export interface Category {
   readonly id: string;
   readonly userId: string;
+  /**
+   * Entrada del catálogo de la que es copia: su identidad (no el nombre). La
+   * interfaz muestra el texto de cada idioma buscándolo por este id. Opcional
+   * solo para categorías propias del usuario (RF-08, sin construir).
+   */
+  readonly catalogId?: string;
+  /** Texto en el idioma por defecto, copiado del catálogo al crearla (exportación de datos, registros). */
   readonly name: string;
   readonly description: string;
-  /** Traducción al inglés (RNF-10) de las categorías creadas por el admin; las estándar se traducen en la interfaz. */
-  readonly nameEn?: string;
-  readonly descriptionEn?: string;
   readonly type: CategoryType;
   readonly status: CategoryStatus;
   readonly isSensitiveData: boolean;

@@ -217,7 +217,7 @@
     "pestanaUsuarios": "Usuarios",
     "pestanaCategorias": "Categorías",
     "catalogoTitulo": "Catálogo de categorías",
-    "catalogoAyuda": "Las categorías nuevas aparecen, sin activar, en la entrevista de todos los usuarios. Retirar una la oculta y la desactiva para todos, pero las puntuaciones ya guardadas se conservan.",
+    "catalogoAyuda": "Las categorías nuevas aparecen, sin activar, en la entrevista de todos los usuarios, en español y en inglés según el idioma de cada uno. Retirar una la oculta y la desactiva para todos, pero las puntuaciones ya guardadas se conservan.",
     "nombre": "Nombre",
     "descripcion": "Descripción",
     "estado": "Estado",
@@ -293,7 +293,9 @@
     "acciones_user_email_changed": "Cambio de email",
     "acciones_user_name_changed": "Cambio de nombre",
     "acciones_user_recovery_sent": "Enlace de recuperación enviado",
-    "acciones_reauth_failed": "Contraseña de confirmación incorrecta"
+    "acciones_reauth_failed": "Contraseña de confirmación incorrecta",
+    "nombreEnIdioma": "Nombre ({{idioma}})",
+    "descripcionEnIdioma": "Descripción ({{idioma}})"
   },
   "datos": {
     "titulo": "Privacidad y datos",
@@ -394,42 +396,8 @@
     "categoria": "Categoría",
     "tabla": "Última puntuación por categoría"
   },
-  "categoriasEstandar": {
-    "economia": {
-      "nombre": "Economía",
-      "descripcion": "Tus finanzas personales: ahorro, gasto, deudas."
-    },
-    "vidaSocial": {
-      "nombre": "Vida social",
-      "descripcion": "Amistades y tiempo con otras personas."
-    },
-    "pareja": {
-      "nombre": "Pareja",
-      "descripcion": "Tu relación de pareja, si la tienes."
-    },
-    "sexo": {
-      "nombre": "Sexo",
-      "descripcion": "Tu vida sexual."
-    },
-    "deporte": {
-      "nombre": "Deporte",
-      "descripcion": "Actividad física y salud."
-    },
-    "aventura": {
-      "nombre": "Aventura",
-      "descripcion": "Nuevas experiencias, viajes, retos."
-    },
-    "espiritualidad": {
-      "nombre": "Espiritualidad",
-      "descripcion": "Creencias, religión o práctica espiritual."
-    },
-    "familia": {
-      "nombre": "Familia",
-      "descripcion": "Tu relación con tu familia."
-    },
-    "inversiones": {
-      "nombre": "Inversiones",
-      "descripcion": "Inversión y planificación financiera a largo plazo."
-    }
+  "idiomas": {
+    "es": "español",
+    "en": "inglés"
   }
 }

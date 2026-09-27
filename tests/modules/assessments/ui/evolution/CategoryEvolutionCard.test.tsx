@@ -52,16 +52,4 @@ describe("CategoryEvolutionCard (RF-14 + RF-16)", () => {
     expect(rows[2]).toHaveTextContent(/2026[\s\S]*7/);
   });
 
-  it("en inglés, el título y la descripción del gráfico usan el nombre traducido", async () => {
-    const i18n = (await import("@shared/ui/i18n")).default;
-    await i18n.changeLanguage("en");
-    try {
-      render(<CategoryEvolutionCard categoryName="Economía" currentScore={7} points={[point(3, "2026-01-15T10:00:00"), point(7, "2026-09-18T10:00:00")]} window={WINDOW} />);
-
-      expect(screen.getByRole("region", { name: "Finances" })).toBeInTheDocument();
-      expect(screen.getByRole("img", { name: /finances/i })).toBeInTheDocument();
-    } finally {
-      await i18n.changeLanguage("es");
-    }
-  });
 });

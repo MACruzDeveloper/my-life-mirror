@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { ChartDataTable } from "@shared/ui/charts/ChartDataTable";
 import { escapeHtml } from "@shared/ui/charts/escapeHtml";
 import { RadarChart } from "@shared/ui/charts/RadarChart/RadarChart";
-import { useCategoryLabels } from "@modules/categories/ui/categoryLabels";
 import type { LatestScoreDto } from "../ScoreCards";
 import { buildBalance } from "./balance";
 
@@ -23,12 +22,8 @@ const SCORE_SCALE = { min: 0, max: 10, splitNumber: 5 };
  */
 export function BalanceCard({ latestScores }: { latestScores: LatestScoreDto[] }) {
   const { t } = useTranslation();
-  const labels = useCategoryLabels();
-  // Nombres en el idioma de la interfaz; el orden (el del catálogo) no cambia.
-  const displayedScores = latestScores.map((latestScore) => ({ ...latestScore, categoryName: labels.name(latestScore.categoryName) }));
-  const displayedKey = displayedScores.map((latestScore) => `${latestScore.categoryName}:${latestScore.score ?? ""}`).join("|");
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- se recalcula cuando cambian los nombres mostrados o las puntuaciones.
-  const balance = useMemo(() => buildBalance(displayedScores), [displayedKey]);
+  // `latestScores` llega con el nombre ya en el idioma de la interfaz (lo resuelve la página).
+  const balance = useMemo(() => buildBalance(latestScores), [latestScores]);
   const scoreList = balance.axes.map((axis) => `${axis.name} ${axis.value}`).join(", ");
 
   return (

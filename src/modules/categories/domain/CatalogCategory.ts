@@ -1,17 +1,28 @@
+import type { Locale } from "../../../shared/domain/locales";
+
+/** Nombre y descripción de una categoría en un idioma. */
+export interface CategoryText {
+  readonly name: string;
+  readonly description: string;
+}
+
 /**
- * ADM-02. Entrada del catálogo global de categorías, que gestiona el admin.
- * Las categorías de cada usuario (`Category`) se siembran a partir de aquí.
- * `retiredAt` en vez de borrar: retirar una categoría no destruye las
- * evaluaciones de nadie (RF-12) — solo deja de ofrecerse. `isSensitiveData`
- * no se puede cambiar tras crearla (afectaría a consentimientos ya dados).
+ * ADM-02 / RNF-10. Entrada del catálogo global de categorías, que gestiona el
+ * admin. Las categorías de cada usuario (`Category`) apuntan aquí por
+ * `catalogId`.
+ * - `translations`: el texto en cada idioma, sin columnas por idioma — añadir
+ *   un idioma no cambia el modelo. El idioma por defecto siempre está.
+ * - `key`: identificador estable de las 9 estándar (lo usan los ejemplos y las
+ *   plantillas de recomendación); las del admin no tienen.
+ * - `retiredAt` en vez de borrar: retirar una categoría no destruye las
+ *   evaluaciones de nadie (RF-12).
+ * - `isSensitiveData` no se puede cambiar tras crearla (afectaría a
+ *   consentimientos ya dados).
  */
 export interface CatalogCategory {
   readonly id: string;
-  readonly name: string;
-  readonly description: string;
-  /** Inglés (RNF-10): obligatorio al crear desde el panel de administración; ausente en las 9 estándar, que se traducen en la interfaz. */
-  readonly nameEn?: string;
-  readonly descriptionEn?: string;
+  readonly key?: string;
+  readonly translations: Partial<Record<Locale, CategoryText>>;
   readonly isSensitiveData: boolean;
   readonly retiredAt?: Date;
 }

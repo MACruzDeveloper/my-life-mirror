@@ -1,48 +1,44 @@
-import type { TFunction } from "i18next";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { DEFAULT_LOCALE, isSupportedLocale } from "@shared/domain/locales";
+import { useCategoryLabelsQuery, type CatalogLabelDto } from "./queries";
+
+export interface CategoryLabel {
+  name: string;
+  description: string;
+  /** Clave estable de las categorías estándar (ejemplos de la entrevista, plantillas). */
+  key?: string;
+}
+
+const EMPTY_LABEL: CategoryLabel = { name: "", description: "" };
 
 /**
- * RNF-10. Los nombres y descripciones de las categorías vienen de la base de
- * datos, en español. Las 9 estándar (ver `standardCategories.ts` y la
- * migración 0005) se traducen en la interfaz con estas claves; las que crea
- * el admin (ADM-02) no tienen traducción y se muestran tal cual.
- *
- * Se traduce **solo al mostrar**: la lógica (ejemplos de la entrevista,
- * plantillas de recomendación...) sigue identificando cada categoría por su
- * nombre guardado.
+ * RNF-10. Texto de una categoría en un idioma, buscado por su `catalogId`
+ * (una sola referencia, sin campos por idioma). Si falta ese idioma, se usa el
+ * de por defecto; un id desconocido da texto vacío en vez de romper la pantalla.
  */
-const STANDARD_CATEGORY_KEYS: Record<string, string> = {
-  Economía: "economia",
-  "Vida social": "vidaSocial",
-  Pareja: "pareja",
-  Sexo: "sexo",
-  Deporte: "deporte",
-  Aventura: "aventura",
-  Espiritualidad: "espiritualidad",
-  Familia: "familia",
-  Inversiones: "inversiones",
-};
-
-/** Clave de i18n de una categoría estándar (`undefined` si la creó el admin). */
-export function standardCategoryKey(storedName: string): string | undefined {
-  return STANDARD_CATEGORY_KEYS[storedName];
+export function resolveCategoryLabel(labelsById: Map<string, CatalogLabelDto>, catalogId: string | undefined, language: string): CategoryLabel {
+  const entry = catalogId ? labelsById.get(catalogId) : undefined;
+  if (!entry) return EMPTY_LABEL;
+  const locale = isSupportedLocale(language) ? language : DEFAULT_LOCALE;
+  const text = entry.translations[locale] ?? entry.translations[DEFAULT_LOCALE];
+  if (!text) return EMPTY_LABEL;
+  return { name: text.name, description: text.description, ...(entry.key ? { key: entry.key } : {}) };
 }
 
-export function translateCategoryName(storedName: string, t: TFunction): string {
-  const key = standardCategoryKey(storedName);
-  return key ? t(`categoriasEstandar.${key}.nombre`) : storedName;
-}
-
-export function translateCategoryDescription(storedName: string, storedDescription: string, t: TFunction): string {
-  const key = standardCategoryKey(storedName);
-  return key ? t(`categoriasEstandar.${key}.descripcion`) : storedDescription;
-}
-
-/** Atajo para componentes: nombre y descripción de una categoría en el idioma actual. */
-export function useCategoryLabels() {
-  const { t } = useTranslation();
+/**
+ * Para las páginas: `categoryLabel(catalogId)` en el idioma actual. Los textos
+ * de todas las categorías se piden una vez (`GET /api/categories/translations`)
+ * y quedan en la caché; cambiar de idioma no repite ninguna llamada. Las
+ * pantallas deben esperar a `isPending` antes de pintar nombres.
+ */
+export function useCategoryLabel() {
+  const { i18n } = useTranslation();
+  const query = useCategoryLabelsQuery();
+  const labelsById = useMemo(() => new Map((query.data ?? []).map((label) => [label.catalogId, label])), [query.data]);
   return {
-    name: (storedName: string) => translateCategoryName(storedName, t),
-    description: (storedName: string, storedDescription: string) => translateCategoryDescription(storedName, storedDescription, t),
+    categoryLabel: (catalogId: string | undefined) => resolveCategoryLabel(labelsById, catalogId, i18n.language),
+    isPending: query.isPending,
+    isError: query.isError,
   };
 }

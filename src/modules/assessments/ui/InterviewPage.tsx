@@ -24,7 +24,7 @@ import { Link as RouterLink } from "react-router";
 import interviewerAvatar from "../../../assets/avatars/interviewer.svg";
 import userAvatar from "../../../assets/avatars/user.svg";
 import { BandBackground } from "./BandBackground";
-import { standardCategoryKey, useCategoryLabels } from "@modules/categories/ui/categoryLabels";
+import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
 import { InterviewHistory } from "./InterviewHistory";
 import { ASSESSMENTS_KEY, LATEST_SCORES_KEY, useLatestScores } from "./queries";
@@ -132,7 +132,7 @@ function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNo
 export function InterviewPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const labels = useCategoryLabels();
+  const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
   const categoriesQuery = useCategories();
   const latestScoresQuery = useLatestScores();
   const categories = categoriesQuery.data ?? [];
@@ -323,23 +323,23 @@ export function InterviewPage() {
       label={
         <Box>
           <Typography variant="body1" component="span">
-            {labels.name(category.name)}
+            {categoryLabel(category.catalogId).name}
           </Typography>
-          {category.description && (
+          {categoryLabel(category.catalogId).description && (
             <Typography variant="caption" color="text.secondary" component="span" sx={{ display: "block" }}>
-              {labels.description(category.name, category.description)}
+              {categoryLabel(category.catalogId).description}
             </Typography>
           )}
         </Box>
       }
     />
   {pendingCategoryIds.has(category.id) && category.isSensitiveData && (
-      <CircularProgress size={16} aria-label={labels.name(category.name)} />
+      <CircularProgress size={16} aria-label={categoryLabel(category.catalogId).name} />
     )}
     </Box>
   );
 
-  if (categoriesQuery.isPending || latestScoresQuery.isPending) {
+  if (categoriesQuery.isPending || latestScoresQuery.isPending || labelsPending) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
         <CircularProgress />
@@ -435,7 +435,7 @@ export function InterviewPage() {
                   "&:hover, &:focus-visible": { borderColor: isUnanswered ? PENDING_COLORS.fg : "text.secondary" },
                 }}
               >
-                {labels.name(category.name)}
+                {categoryLabel(category.catalogId).name}
                 {isUnanswered && (
                   <Box component="span" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
                     · {t("entrevista.sinResponder")}
@@ -464,12 +464,12 @@ export function InterviewPage() {
         >
           <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
-              <Typography variant="body1">{t("entrevista.pregunta", { categoria: labels.name(category.name) })}</Typography>
+              <Typography variant="body1">{t("entrevista.pregunta", { categoria: categoryLabel(category.catalogId).name })}</Typography>
               {scores[category.id] === undefined && <PendingBadge label={t("entrevista.sinResponder")} />}
-              {standardCategoryKey(category.name) && (
+              {categoryLabel(category.catalogId).key && (
                 <IconButton
                   size="small"
-                  aria-label={t("entrevista.verEjemplos", { categoria: labels.name(category.name) })}
+                  aria-label={t("entrevista.verEjemplos", { categoria: categoryLabel(category.catalogId).name })}
                   aria-expanded={openExamples[category.id] === true}
                   onClick={() => setOpenExamples((current) => ({ ...current, [category.id]: !current[category.id] }))}
                 >
@@ -477,13 +477,13 @@ export function InterviewPage() {
                 </IconButton>
               )}
             </Box>
-            {standardCategoryKey(category.name) && (
+            {categoryLabel(category.catalogId).key && (
               <Collapse in={openExamples[category.id] === true}>
                 <Typography variant="caption" color="text.secondary">
                   {t("entrevista.ejemplosTitulo")}
                 </Typography>
                 <Box component="ul" sx={{ m: 0, pl: 2.5, mt: 0.5 }}>
-                  {(t(`ejemplos.${standardCategoryKey(category.name)}`, { returnObjects: true }) as string[]).map((example) => (
+                  {(t(`ejemplos.${categoryLabel(category.catalogId).key}`, { returnObjects: true }) as string[]).map((example) => (
                     <Typography key={example} component="li" variant="body2">
                       {example}
                     </Typography>
@@ -493,7 +493,7 @@ export function InterviewPage() {
             )}
           </Bubble>
           <Bubble side="right" avatar={userAvatar} alt={t("entrevista.tu")} band={scores[category.id] !== undefined ? scoreBand(scores[category.id]) : undefined}>
-            <Box role="group" aria-label={t("entrevista.puntuacionDe", { categoria: labels.name(category.name) })} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            <Box role="group" aria-label={t("entrevista.puntuacionDe", { categoria: categoryLabel(category.catalogId).name })} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {SCORES.map((score) => {
                 return (
                   <ToggleButton
@@ -540,7 +540,7 @@ export function InterviewPage() {
       <Dialog open={categoryAwaitingConsent !== null} onClose={() => setCategoryAwaitingConsent(null)}>
         <DialogTitle>{t("categorias.modalTitulo")}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t("categorias.modalTexto", { categoria: categoryAwaitingConsent ? labels.name(categoryAwaitingConsent.name) : "" })}</DialogContentText>
+          <DialogContentText>{t("categorias.modalTexto", { categoria: categoryAwaitingConsent ? categoryLabel(categoryAwaitingConsent.catalogId).name : "" })}</DialogContentText>
           <Link href="/politica-privacidad" target="_blank" rel="noopener noreferrer">
             {t("categorias.leerPolitica")}
           </Link>

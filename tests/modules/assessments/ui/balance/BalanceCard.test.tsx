@@ -61,17 +61,4 @@ describe("BalanceCard (RF-15)", () => {
     expect(tooltip).not.toContain("<img");
   });
 
-  it("en inglés, los ejes y la lista de pendientes usan los nombres traducidos", async () => {
-    const i18n = (await import("@shared/ui/i18n")).default;
-    await i18n.changeLanguage("en");
-    try {
-      render(<BalanceCard latestScores={[...SCORED, { categoryId: "c2", categoryName: "Familia" }]} />);
-
-      expect(screen.getByRole("img", { name: /finances 7/i })).toBeInTheDocument();
-      expect(setOption.mock.calls.at(-1)![0].radar.indicator.map((i: { name: string }) => i.name)).toContain("Sport");
-      expect(screen.getByText(/not scored yet: family/i)).toBeInTheDocument();
-    } finally {
-      await i18n.changeLanguage("es");
-    }
-  });
 });

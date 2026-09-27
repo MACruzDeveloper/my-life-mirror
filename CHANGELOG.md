@@ -22,9 +22,20 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - Selector de idioma en las páginas públicas (portada, registro, login, recuperar contraseña, política): `LanguageSwitcher` compartido con la cabecera y nuevo `PublicLayout`. El botón se nombra en el idioma de destino ("English"/"Español"). Test E2E: se cambia a inglés en la portada y la elección se recuerda tras recargar.
 
+### Añadido (ADM-02, multidioma)
+
+- El admin crea las categorías con nombre y descripción en **cada idioma soportado** (hoy español e inglés, todos obligatorios; ningún nombre se repite en ningún idioma). Los textos viven en la nueva tabla `category_translations` (una fila por categoría e idioma) y la interfaz los resuelve **por id de catálogo** (`GET /api/categories/translations`, `useCategoryLabel`), en entrevista, historial, Resultados, evolución, radar y recomendaciones. Mismo modelo para las 9 estándar y las del admin. Lista de idiomas en un único sitio (`shared/domain/locales.ts`); el formulario y la tabla del admin se generan a partir de ella. `AdminCategories` reescrito con identificadores en inglés.
+- `supabase/migrations/0009_category_translations_table.sql`: tabla `category_translations`, `category_catalog.key` (clave estable de las estándar, usada por ejemplos y recomendaciones en lugar del nombre) y `categories.catalog_id` (FK, en lugar de emparejar por nombre). Migra los datos de la 0008 y borra sus columnas; repetible.
+
+### Cambiado (ADM-02)
+
+- Sustituido el primer planteamiento bilingüe (columnas `name_en`/`description_en` de la migración 0008 y campos `nameEn`/`categoryNameEn` en los DTO): no escalaba a más idiomas. Eliminadas también las claves i18n `categoriasEstandar.*`.
+
 ### Corregido (RNF-10)
 
-- Los nombres y descripciones de las categorías estándar salían en español con la interfaz en inglés (vienen de la base de datos). Ahora se traducen al mostrarlos en entrevista, historial, Resultados, tarjetas de evolución, radar y recomendaciones (`categoryLabels.ts`, claves `categoriasEstandar.*`); las categorías creadas por el admin conservan su nombre. La lista de ejemplos de la entrevista reutiliza la misma correspondencia (se elimina el `EXAMPLES_KEY` duplicado).
+- El despliegue de la PR fallaba en `npm run build`: el caso de uso ya exigía los campos en inglés pero `api/admin/categories` no los aceptaba (trabajo que había quedado a medias). Corregido y comprobado con `npm run build` y `npm run check:api`.
+
+- Los nombres y descripciones de las categorías estándar salían en español con la interfaz en inglés (vienen de la base de datos). Ahora se traducen al mostrarlos en entrevista, historial, Resultados, tarjetas de evolución, radar y recomendaciones (primero con claves `categoriasEstandar.*`; después con el modelo por id descrito en ADM-02, multidioma). La lista de ejemplos de la entrevista usa la `key` de la categoría (se elimina el `EXAMPLES_KEY` duplicado).
 
 - `<html lang>` fijo en `en` con la app en español: ahora sigue al idioma elegido (lectores de pantalla).
 

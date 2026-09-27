@@ -6,8 +6,8 @@ import type { AssessmentRepository } from "../domain/AssessmentRepository";
 export interface LatestScore {
   categoryId: string;
   categoryName: string;
-  /** Solo en categorías creadas por el admin (las estándar se traducen en la interfaz). */
-  categoryNameEn?: string;
+  /** Identidad de la categoría en el catálogo: la interfaz la nombra por aquí, en cada idioma. */
+  catalogId?: string;
   /** `undefined` = todavía sin puntuar. */
   score?: number;
   note?: string;
@@ -47,7 +47,7 @@ export function createGetLatestScores(assessmentRepository: AssessmentRepository
           return {
             categoryId: category.id,
             categoryName: category.name,
-            ...(category.nameEn ? { categoryNameEn: category.nameEn } : {}),
+            ...(category.catalogId ? { catalogId: category.catalogId } : {}),
             ...(latest
               ? { score: latest.score, ...(latest.note ? { note: latest.note } : {}), recordedAt: latest.recordedAt }
               : {}),

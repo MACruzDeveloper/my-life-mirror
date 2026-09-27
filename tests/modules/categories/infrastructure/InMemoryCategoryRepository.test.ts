@@ -56,15 +56,15 @@ describe("InMemoryCategoryRepository", () => {
     expect((await repo.findById("u1", "c1"))?.status).toBe("active");
   });
 
-  it("deactivateByName desactiva esa categoría en todos los usuarios y no toca las demás", async () => {
+  it("deactivateByCatalogId desactiva esa categoría del catálogo en todos los usuarios y no toca las demás", async () => {
     const repo = new InMemoryCategoryRepository();
     await repo.saveMany([
-      createCategory({ id: "a", userId: "u1", name: "Economía", status: "active" }),
-      createCategory({ id: "b", userId: "u2", name: "Economía", status: "active" }),
-      createCategory({ id: "c", userId: "u1", name: "Pareja", status: "active" }),
+      createCategory({ id: "a", userId: "u1", catalogId: "k-eco", status: "active" }),
+      createCategory({ id: "b", userId: "u2", catalogId: "k-eco", status: "active" }),
+      createCategory({ id: "c", userId: "u1", catalogId: "k-par", name: "Pareja", status: "active" }),
     ]);
 
-    await repo.deactivateByName("Economía");
+    await repo.deactivateByCatalogId("k-eco");
 
     expect((await repo.findById("u1", "a"))?.status).toBe("inactive");
     expect((await repo.findById("u2", "b"))?.status).toBe("inactive");

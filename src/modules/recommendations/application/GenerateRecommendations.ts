@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { type Result, ok } from "../../../shared/domain/Result";
 import type { Clock } from "../../../shared/domain/Clock";
 import type { Assessment } from "../../assessments/domain/Assessment";
+import type { CategoryCatalogRepository } from "../../categories/domain/CategoryCatalogRepository";
 import type { CategoryRepository } from "../../categories/domain/CategoryRepository";
 import { type Recommendation, isOpen } from "../domain/Recommendation";
 import type { RecommendationRepository } from "../domain/RecommendationRepository";
@@ -10,6 +11,8 @@ import { templateKeysFor } from "../domain/recommendationCatalog";
 interface Dependencies {
   recommendationRepository: RecommendationRepository;
   categoryRepository: CategoryRepository;
+  /** Para la clave estable de la categoría, de la que dependen sus plantillas. */
+  catalog: CategoryCatalogRepository;
   clock: Clock;
   /** Se recomienda cuando la puntuación es menor que este valor (configurable, ver `parseThreshold`). */
   threshold: number;
@@ -24,9 +27,10 @@ interface Dependencies {
  * Se invoca como oyente de `RecordAssessments`, después de persistir.
  * Ver docs/user-stories/RF-18-recomendaciones.md.
  */
-export function createGenerateRecommendations({ recommendationRepository, categoryRepository, clock, threshold }: Dependencies) {
+export function createGenerateRecommendations({ recommendationRepository, categoryRepository, catalog, clock, threshold }: Dependencies) {
   return async function generateRecommendations(userId: string, assessments: Assessment[]): Promise<Result<Recommendation[], never>> {
     const existentes = await recommendationRepository.findByUserId(userId);
+    const keysByCatalogId = new Map((await catalog.findAll()).map((entry) => [entry.id, entry.key]));
     const nuevas: Recommendation[] = [];
 
     for (const assessment of assessments) {
@@ -38,7 +42,7 @@ export function createGenerateRecommendations({ recommendationRepository, catego
       const deLaCategoria = [...existentes, ...nuevas].filter((r) => r.categoryId === category.id);
       if (deLaCategoria.some(isOpen)) continue;
 
-      const claves = templateKeysFor(category.name);
+      const claves = templateKeysFor(category.catalogId ? keysByCatalogId.get(category.catalogId) : undefined);
       const usadas = new Set(deLaCategoria.map((r) => r.templateKey));
       const templateKey = claves.find((c) => !usadas.has(c)) ?? claves[0];
 

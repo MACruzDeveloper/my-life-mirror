@@ -22,13 +22,6 @@ async function setup() {
   return { record, getLatestScores, a, b, c, avanzar: (d: Date) => (ahora = d) };
 }
 
-async function setupWithEnglish(categoryId: string) {
-  const categoryRepository = new InMemoryCategoryRepository();
-  const assessmentRepository = new InMemoryAssessmentRepository();
-  await categoryRepository.save({ id: categoryId, userId: "u1", name: "Economía", description: "d", nameEn: "Finances (custom)", descriptionEn: "d", type: "standard", status: "active", isSensitiveData: false });
-  return { getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository) };
-}
-
 describe("GetLatestScores (RF-10, consulta de resultados)", () => {
   it("devuelve cada categoría activa sin puntuar todavía con score undefined", async () => {
     const { getLatestScores, a, b } = await setup();
@@ -79,12 +72,12 @@ describe("GetLatestScores (RF-10, consulta de resultados)", () => {
     if (!resultado.ok) expect(resultado.error.code).toBe("VALIDATION_ERROR");
   });
 
-  it("incluye el nombre en inglés cuando la categoría lo tiene (categorías creadas por el admin)", async () => {
-    const { a } = await setup();
-    const withEnglish = await setupWithEnglish(a.id);
+  it("cada resultado lleva el id de catálogo de su categoría (la interfaz nombra por id, en cada idioma)", async () => {
+    const { getLatestScores, a } = await setup();
 
-    const resultado = await withEnglish.getLatestScores("u1");
+    const resultado = await getLatestScores("u1");
 
-    expect(resultado.ok && resultado.value.find((r) => r.categoryId === a.id)?.categoryNameEn).toBe("Finances (custom)");
+    expect(resultado.ok && resultado.value.find((r) => r.categoryId === a.id)?.catalogId).toBe(a.catalogId);
+    expect(a.catalogId).toBeDefined();
   });
 });

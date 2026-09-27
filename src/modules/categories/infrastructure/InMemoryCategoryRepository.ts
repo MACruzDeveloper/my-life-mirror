@@ -27,9 +27,9 @@ export class InMemoryCategoryRepository implements CategoryRepository {
     }
   }
 
-  async deactivateByName(name: string): Promise<void> {
-    for (const [clave, category] of this.categories) {
-      if (category.name === name) this.categories.set(clave, { ...category, status: "inactive" });
+  async deactivateByCatalogId(catalogId: string): Promise<void> {
+    for (const [key, category] of this.categories) {
+      if (category.catalogId === catalogId) this.categories.set(key, { ...category, status: "inactive" });
     }
   }
 
