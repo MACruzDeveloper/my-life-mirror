@@ -1,23 +1,94 @@
+import type { Locale } from "../../../shared/domain/locales";
+import type { CategoryText } from "./CatalogCategory";
+
 /**
- * RF-06: catálogo inicial. Desde ADM-02 la fuente real es la tabla
- * `category_catalog` (migración 0005, que repite estos textos); esta lista
- * solo alimenta el fake en memoria de los tests. Sensibles (RNF-04/RES-04, categoría especial RGPD
+ * RF-06: catálogo inicial. La fuente real es la base de datos
+ * (`category_catalog` + `category_translations`, migraciones 0005 y 0009, que
+ * repiten estos textos); esta lista alimenta el fake en memoria de los tests y
+ * documenta la semilla. Sensibles (RNF-04/RES-04, categoría especial RGPD
  * Art. 9 — sexo/orientación, salud, religión): sexo, deporte, espiritualidad.
+ *
+ * `key` es un identificador estable (no cambia aunque cambie el texto): lo usan
+ * los ejemplos de la entrevista y las plantillas de recomendación.
  */
 export interface StandardCategoryTemplate {
-  readonly name: string;
-  readonly description: string;
+  readonly key: string;
   readonly isSensitiveData: boolean;
+  /** Obligatorio en cada idioma soportado: el compilador avisa si se añade uno sin traducir. */
+  readonly translations: Record<Locale, CategoryText>;
 }
 
 export const STANDARD_CATEGORIES: readonly StandardCategoryTemplate[] = [
-  { name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas.", isSensitiveData: false },
-  { name: "Vida social", description: "Amistades y tiempo con otras personas.", isSensitiveData: false },
-  { name: "Pareja", description: "Tu relación de pareja, si la tienes.", isSensitiveData: false },
-  { name: "Sexo", description: "Tu vida sexual.", isSensitiveData: true },
-  { name: "Deporte", description: "Actividad física y salud.", isSensitiveData: true },
-  { name: "Aventura", description: "Nuevas experiencias, viajes, retos.", isSensitiveData: false },
-  { name: "Espiritualidad", description: "Creencias, religión o práctica espiritual.", isSensitiveData: true },
-  { name: "Familia", description: "Tu relación con tu familia.", isSensitiveData: false },
-  { name: "Inversiones", description: "Inversión y planificación financiera a largo plazo.", isSensitiveData: false },
+  {
+    key: "economia",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas." },
+      en: { name: "Finances", description: "Your personal finances: savings, spending, debts." },
+    },
+  },
+  {
+    key: "vidaSocial",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Vida social", description: "Amistades y tiempo con otras personas." },
+      en: { name: "Social life", description: "Friendships and time with other people." },
+    },
+  },
+  {
+    key: "pareja",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Pareja", description: "Tu relación de pareja, si la tienes." },
+      en: { name: "Relationship", description: "Your relationship with your partner, if you have one." },
+    },
+  },
+  {
+    key: "sexo",
+    isSensitiveData: true,
+    translations: {
+      es: { name: "Sexo", description: "Tu vida sexual." },
+      en: { name: "Sex", description: "Your sex life." },
+    },
+  },
+  {
+    key: "deporte",
+    isSensitiveData: true,
+    translations: {
+      es: { name: "Deporte", description: "Actividad física y salud." },
+      en: { name: "Sport", description: "Physical activity and health." },
+    },
+  },
+  {
+    key: "aventura",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Aventura", description: "Nuevas experiencias, viajes, retos." },
+      en: { name: "Adventure", description: "New experiences, travel, challenges." },
+    },
+  },
+  {
+    key: "espiritualidad",
+    isSensitiveData: true,
+    translations: {
+      es: { name: "Espiritualidad", description: "Creencias, religión o práctica espiritual." },
+      en: { name: "Spirituality", description: "Beliefs, religion or spiritual practice." },
+    },
+  },
+  {
+    key: "familia",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Familia", description: "Tu relación con tu familia." },
+      en: { name: "Family", description: "Your relationship with your family." },
+    },
+  },
+  {
+    key: "inversiones",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Inversiones", description: "Inversión y planificación financiera a largo plazo." },
+      en: { name: "Investments", description: "Investing and long-term financial planning." },
+    },
+  },
 ];

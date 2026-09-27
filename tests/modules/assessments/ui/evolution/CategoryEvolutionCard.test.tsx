@@ -51,4 +51,5 @@ describe("CategoryEvolutionCard (RF-14 + RF-16)", () => {
     expect(rows).toHaveLength(3);
     expect(rows[2]).toHaveTextContent(/2026[\s\S]*7/);
   });
+
 });

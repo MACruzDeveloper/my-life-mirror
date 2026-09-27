@@ -18,6 +18,40 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 - Plan de métricas DORA y Flow para la revisión de calidad ([02_Metricas_DORA_y_Flujo.md](docs/project-management/02_Metricas_DORA_y_Flujo.md)); solo planificación.
 - `PrivacyPolicyPage` (`/politica-privacidad`, pública, RNF-05): antes del modal de consentimiento no había nada real que leer. Enlazada desde el modal; muestra la misma `VERSION_POLITICA_ACTUAL` que valida el backend. Contenido de borrador razonable para un TFM, no redactado por asesoría legal.
 
+### Añadido (RNF-10)
+
+- Selector de idioma en las páginas públicas (portada, registro, login, recuperar contraseña, política): `LanguageSwitcher` compartido con la cabecera y nuevo `PublicLayout`. El botón se nombra en el idioma de destino ("English"/"Español"). Test E2E: se cambia a inglés en la portada y la elección se recuerda tras recargar.
+
+### Añadido (ADM-02, multidioma)
+
+- El admin crea las categorías con nombre y descripción en **cada idioma soportado** (hoy español e inglés, todos obligatorios; ningún nombre se repite en ningún idioma). Los textos viven en la nueva tabla `category_translations` (una fila por categoría e idioma) y la interfaz los resuelve **por id de catálogo** (`GET /api/categories/translations`, `useCategoryLabel`), en entrevista, historial, Resultados, evolución, radar y recomendaciones. Mismo modelo para las 9 estándar y las del admin. Lista de idiomas en un único sitio (`shared/domain/locales.ts`); el formulario y la tabla del admin se generan a partir de ella. `AdminCategories` reescrito con identificadores en inglés.
+- `supabase/migrations/0009_category_translations_table.sql`: tabla `category_translations`, `category_catalog.key` (clave estable de las estándar, usada por ejemplos y recomendaciones en lugar del nombre) y `categories.catalog_id` (FK, en lugar de emparejar por nombre). Migra los datos de la 0008 y borra sus columnas; repetible.
+
+### Cambiado (ADM-02)
+
+- Sustituido el primer planteamiento bilingüe (columnas `name_en`/`description_en` de la migración 0008 y campos `nameEn`/`categoryNameEn` en los DTO): no escalaba a más idiomas. Eliminadas también las claves i18n `categoriasEstandar.*`.
+
+### Corregido (RNF-10)
+
+- El despliegue de la PR fallaba en `npm run build`: el caso de uso ya exigía los campos en inglés pero `api/admin/categories` no los aceptaba (trabajo que había quedado a medias). Corregido y comprobado con `npm run build` y `npm run check:api`.
+
+- Los nombres y descripciones de las categorías estándar salían en español con la interfaz en inglés (vienen de la base de datos). Ahora se traducen al mostrarlos en entrevista, historial, Resultados, tarjetas de evolución, radar y recomendaciones (primero con claves `categoriasEstandar.*`; después con el modelo por id descrito en ADM-02, multidioma). La lista de ejemplos de la entrevista usa la `key` de la categoría (se elimina el `EXAMPLES_KEY` duplicado).
+
+- `<html lang>` fijo en `en` con la app en español: ahora sigue al idioma elegido (lectores de pantalla).
+
+### Añadido (validación)
+
+- Guion del test de usabilidad del MVP ([docs/validation/01_Guion_Test_Usabilidad.md](docs/validation/01_Guion_Test_Usabilidad.md)): preparación, cómo dirigir la sesión (pensar en voz alta, sesgo de cercanía), 8 tareas del flujo completo con lo que observar en cada una, SUS, preguntas sobre el tono (RN-04/RES-07) y regla de decisión por gravedad. Hoja de resultados lista para rellenar ([02_Resultados_Test_Usabilidad.md](docs/validation/02_Resultados_Test_Usabilidad.md)). Versión corta en inglés para la sesión real (~20 min, 5 tareas, 5 preguntas): [03_Short_Test_Script_EN.md](docs/validation/03_Short_Test_Script_EN.md).
+
+### Añadido (RF-15)
+
+- **RF-15** — radar de equilibrio ([historia](docs/user-stories/RF-15-radar-equilibrio.md)): tarjeta "Tu equilibrio" en Inicio, encima de la evolución, con la última puntuación de cada categoría activa y puntuada. Plantilla genérica `RadarChart` en `shared/ui/charts/RadarChart/` (reutiliza `useEChart`; modo compacto en móvil para que quepan nombres largos). Lógica en `assessments/ui/balance/` (`buildBalance`, `BalanceCard`): orden fijo del catálogo, escala 0-10, mínimo tres categorías, lista de las que faltan por puntuar, descripción textual y "Ver datos". Sin endpoint nuevo; carga diferida.
+
+### Corregido (RF-15)
+
+- `escapeHtml` para los tooltips de ECharts, que se pintan como HTML: los nombres de categoría (que puede crear el admin) ya no pueden inyectar HTML.
+- Tests intermitentes con toda la batería en paralelo (flujo de consentimiento, gráficos diferidos de Inicio): espera asíncrona de Testing Library de 1 s a 3 s en `tests/setup.ts`.
+
 ### Añadido (infraestructura)
 
 - `.github/workflows/supabase-keep-alive.yml`: una consulta diaria mínima (solo lectura, clave pública *anon*, sin permisos sobre el repositorio) para que Supabase Free no pause el proyecto por inactividad; si Supabase no responde 200, el job falla y GitHub avisa. Necesita los secretos `SUPABASE_URL` y `SUPABASE_ANON_KEY` y que la rama por defecto sea `develop` (ver ADR-03 §6bis).

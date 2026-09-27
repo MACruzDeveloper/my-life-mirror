@@ -140,6 +140,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **26 sept. 2026** — *"We will have time for the Radar chart so don't put it as optional… I received this email from Supabase [aviso de pausa por inactividad]… Does it change something about the project?"*
 → No cambia la arquitectura (limitación ya documentada), pero importa por el calendario: la evaluación del TFM tras el 31 oct. Se elige un **workflow diario de GitHub Actions** (clave anon, solo lectura, también sirve de alarma) frente a reactivar a mano o pagar Pro; como GitHub solo programa desde la rama por defecto y `main` dispara producción, la rama por defecto pasa a `develop` hasta el MVP. **RF-15 (radar) comprometido**, antes de la validación.
 
+**27 sept. 2026** — *"Could we improve this? `labels.name(latestScore.categoryName, latestScore.categoryNameEn)`… I think it's not a good practice, imagine if in the future we have 20 languages. We should have only one variable and its translations should be independent. Like calling the category by its id and get the translations"*
+→ Se descarta el modelo de una columna por idioma (`name_en`, migración 0008, del mismo día). **Traducciones en tabla aparte** (`category_translations`, una fila por categoría e idioma, migración 0009), **resueltas por id** en la interfaz (`categoryLabel(catalogId)`); los DTO solo llevan `catalogId`. Mismo modelo para las categorías estándar y las del admin; las estándar ganan una `key` estable para ejemplos y recomendaciones, y la copia del usuario enlaza por `catalog_id` en vez de por nombre. Lista de idiomas en un único sitio (`shared/domain/locales.ts`); el panel de admin genera un campo por idioma.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

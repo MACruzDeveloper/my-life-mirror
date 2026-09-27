@@ -4,7 +4,8 @@
     "contrasena": "Contraseña",
     "contrasenaAyuda": "Al menos 8 caracteres",
     "errorServidor": "No se pudo contactar con el servidor",
-    "reintentar": "Reintentar"
+    "reintentar": "Reintentar",
+    "idioma": "Idioma"
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -216,7 +217,7 @@
     "pestanaUsuarios": "Usuarios",
     "pestanaCategorias": "Categorías",
     "catalogoTitulo": "Catálogo de categorías",
-    "catalogoAyuda": "Las categorías nuevas aparecen, sin activar, en la entrevista de todos los usuarios. Retirar una la oculta y la desactiva para todos, pero las puntuaciones ya guardadas se conservan.",
+    "catalogoAyuda": "Las categorías nuevas aparecen, sin activar, en la entrevista de todos los usuarios, en español y en inglés según el idioma de cada uno. Retirar una la oculta y la desactiva para todos, pero las puntuaciones ya guardadas se conservan.",
     "nombre": "Nombre",
     "descripcion": "Descripción",
     "estado": "Estado",
@@ -292,7 +293,9 @@
     "acciones_user_email_changed": "Cambio de email",
     "acciones_user_name_changed": "Cambio de nombre",
     "acciones_user_recovery_sent": "Enlace de recuperación enviado",
-    "acciones_reauth_failed": "Contraseña de confirmación incorrecta"
+    "acciones_reauth_failed": "Contraseña de confirmación incorrecta",
+    "nombreEnIdioma": "Nombre ({{idioma}})",
+    "descripcionEnIdioma": "Descripción ({{idioma}})"
   },
   "datos": {
     "titulo": "Privacidad y datos",
@@ -383,5 +386,18 @@
     "periodoTodo": "Todo",
     "anterior": "Periodo anterior",
     "siguiente": "Periodo siguiente"
+  },
+  "equilibrio": {
+    "titulo": "Tu equilibrio",
+    "descripcion": "Cada eje es una categoría con tu última puntuación, todas en la misma escala de 0 a 10.",
+    "resumen": "Equilibrio actual por categoría: {{lista}}",
+    "pocasCategorias": "El equilibrio aparece a partir de la tercera categoría puntuada.",
+    "faltan": "Faltan por puntuar: {{lista}}",
+    "categoria": "Categoría",
+    "tabla": "Última puntuación por categoría"
+  },
+  "idiomas": {
+    "es": "español",
+    "en": "inglés"
   }
 }

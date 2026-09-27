@@ -22,42 +22,69 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { getJson, HttpError } from "@shared/ui/api/getJson";
+import { DEFAULT_LOCALE, isSupportedLocale, SUPPORTED_LOCALES, type Locale } from "@shared/domain/locales";
 import { CATEGORIES_KEY } from "@modules/categories/ui/queries";
 import { ASSESSMENTS_KEY } from "@modules/assessments/ui/queries";
 
-interface CatalogDto {
-  id: string;
+interface CategoryTextDto {
   name: string;
   description: string;
+}
+
+interface CatalogDto {
+  id: string;
+  key?: string;
+  translations: Partial<Record<Locale, CategoryTextDto>>;
   isSensitiveData: boolean;
   retiredAt?: string;
 }
 
-const ADMIN_CATALOG_KEY = ["admin", "catalog"] as const;
+interface NewCategoryForm {
+  translations: Record<Locale, CategoryTextDto>;
+  isSensitiveData: boolean;
+}
 
-const POST = (cuerpo: unknown) => ({
+const emptyForm = (): NewCategoryForm => ({
+  translations: Object.fromEntries(SUPPORTED_LOCALES.map((locale) => [locale, { name: "", description: "" }])) as Record<Locale, CategoryTextDto>,
+  isSensitiveData: false,
+});
+const ADMIN_CATALOG_KEY = ["admin", "catalog"] as const;
+const MAX_NAME_LENGTH = 60;
+const MAX_DESCRIPTION_LENGTH = 200;
+
+const postJson = (body: unknown) => ({
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(cuerpo),
+  body: JSON.stringify(body),
 });
 
 /**
- * Gestión del catálogo de categorías (ADM-02): añadir y retirar. Solo
- * refleja lo que responde la API — el permiso lo decide el servidor.
+ * Gestión del catálogo de categorías (ADM-02): añadir y retirar. Una categoría
+ * nueva se crea con nombre y descripción en **cada idioma soportado** (RNF-10):
+ * el formulario y la tabla se generan a partir de `SUPPORTED_LOCALES`, así que
+ * añadir un idioma añade sus campos sin tocar este componente. Solo refleja lo
+ * que responde la API — el permiso lo decide el servidor.
  */
 export function AdminCategories() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const catalogo = useQuery({ queryKey: ADMIN_CATALOG_KEY, queryFn: () => getJson<CatalogDto[]>("/api/admin/categories") });
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isSensitiveData, setIsSensitiveData] = useState(false);
-  const [enviando, setEnviando] = useState(false);
-  const [errorAccion, setErrorAccion] = useState<string | undefined>();
-  const [aRetirar, setARetirar] = useState<CatalogDto | null>(null);
+  const catalog = useQuery({ queryKey: ADMIN_CATALOG_KEY, queryFn: () => getJson<CatalogDto[]>("/api/admin/categories") });
+  const [form, setForm] = useState<NewCategoryForm>(emptyForm);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [actionError, setActionError] = useState<string | undefined>();
+  const [categoryToRetire, setCategoryToRetire] = useState<CatalogDto | null>(null);
+
+  const interfaceLocale: Locale = isSupportedLocale(i18n.language) ? i18n.language : DEFAULT_LOCALE;
+  const languageName = (locale: Locale) => t(`idiomas.${locale}`);
+  const isFormComplete = SUPPORTED_LOCALES.every((locale) => form.translations[locale].name.trim() && form.translations[locale].description.trim());
+  const textIn = (category: CatalogDto, locale: Locale) => category.translations[locale] ?? category.translations[DEFAULT_LOCALE];
+
+  function updateText(locale: Locale, field: keyof CategoryTextDto, value: string) {
+    setForm((current) => ({ ...current, translations: { ...current.translations, [locale]: { ...current.translations[locale], [field]: value } } }));
+  }
 
   /** Añadir/retirar cambia el catálogo y lo que ven los usuarios (la caché de esta misma sesión incluida). */
-  async function refrescar() {
+  async function refresh() {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ADMIN_CATALOG_KEY }),
       queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY }),
@@ -65,55 +92,53 @@ export function AdminCategories() {
     ]);
   }
 
-  async function anadir(evento: React.FormEvent) {
-    evento.preventDefault();
-    setEnviando(true);
-    setErrorAccion(undefined);
+  async function addCategory(event: React.FormEvent) {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setActionError(undefined);
     try {
-      const respuesta = await fetch("/api/admin/categories", POST({ name, description, isSensitiveData }));
-      if (!respuesta.ok) {
-        const datos = await respuesta.json();
-        setErrorAccion(datos.error ?? t("admin.errorGuardar"));
+      const response = await fetch("/api/admin/categories", postJson(form));
+      if (!response.ok) {
+        const data = await response.json();
+        setActionError(data.error ?? t("admin.errorGuardar"));
         return;
       }
-      setName("");
-      setDescription("");
-      setIsSensitiveData(false);
-      await refrescar();
+      setForm(emptyForm());
+      await refresh();
     } catch {
-      setErrorAccion(t("admin.errorGuardar"));
+      setActionError(t("admin.errorGuardar"));
     } finally {
-      setEnviando(false);
+      setIsSubmitting(false);
     }
   }
 
-  async function confirmarRetirada() {
-    if (!aRetirar) return;
-    const categoria = aRetirar;
-    setARetirar(null);
-    setErrorAccion(undefined);
+  async function confirmRetirement() {
+    if (!categoryToRetire) return;
+    const category = categoryToRetire;
+    setCategoryToRetire(null);
+    setActionError(undefined);
     try {
-      const respuesta = await fetch("/api/admin/categories/retire", POST({ categoryId: categoria.id }));
-      if (!respuesta.ok) {
-        const datos = await respuesta.json();
-        setErrorAccion(datos.error ?? t("admin.errorGuardar"));
+      const response = await fetch("/api/admin/categories/retire", postJson({ categoryId: category.id }));
+      if (!response.ok) {
+        const data = await response.json();
+        setActionError(data.error ?? t("admin.errorGuardar"));
         return;
       }
-      await refrescar();
+      await refresh();
     } catch {
-      setErrorAccion(t("admin.errorGuardar"));
+      setActionError(t("admin.errorGuardar"));
     }
   }
 
-  if (catalogo.isPending) {
+  if (catalog.isPending) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
         <CircularProgress />
       </Box>
     );
   }
-  if (catalogo.error instanceof HttpError && catalogo.error.status === 403) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;
-  if (catalogo.isError) return <Alert severity="error">{t("admin.errorCarga")}</Alert>;
+  if (catalog.error instanceof HttpError && catalog.error.status === 403) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;
+  if (catalog.isError) return <Alert severity="error">{t("admin.errorCarga")}</Alert>;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -123,30 +148,34 @@ export function AdminCategories() {
           {t("admin.catalogoAyuda")}
         </Typography>
       </Box>
-      {errorAccion && <Alert severity="error">{errorAccion}</Alert>}
+      {actionError && <Alert severity="error">{actionError}</Alert>}
 
       <TableContainer sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>{t("admin.nombre")}</TableCell>
+              {SUPPORTED_LOCALES.map((locale) => (
+                <TableCell key={locale}>{t("admin.nombreEnIdioma", { idioma: languageName(locale) })}</TableCell>
+              ))}
               <TableCell>{t("admin.descripcion")}</TableCell>
               <TableCell>{t("admin.estado")}</TableCell>
               <TableCell>{t("admin.acciones")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {(catalogo.data ?? []).map((categoria) => (
-              <TableRow key={categoria.id} sx={categoria.retiredAt ? { opacity: 0.6 } : undefined}>
+            {(catalog.data ?? []).map((category) => (
+              <TableRow key={category.id} sx={category.retiredAt ? { opacity: 0.6 } : undefined}>
+                {SUPPORTED_LOCALES.map((locale, index) => (
+                  <TableCell key={locale} lang={locale}>
+                    {category.translations[locale]?.name ?? "—"}
+                    {index === 0 && category.isSensitiveData && <Chip size="small" label={t("admin.sensible")} sx={{ ml: 0.5 }} />}
+                  </TableCell>
+                ))}
+                <TableCell>{textIn(category, interfaceLocale)?.description}</TableCell>
+                <TableCell>{category.retiredAt ? t("admin.retirada") : t("admin.vigente")}</TableCell>
                 <TableCell>
-                  {categoria.name}{" "}
-                  {categoria.isSensitiveData && <Chip size="small" label={t("admin.sensible")} sx={{ ml: 0.5 }} />}
-                </TableCell>
-                <TableCell>{categoria.description}</TableCell>
-                <TableCell>{categoria.retiredAt ? t("admin.retirada") : t("admin.vigente")}</TableCell>
-                <TableCell>
-                  {!categoria.retiredAt && (
-                    <Button size="small" color="warning" onClick={() => setARetirar(categoria)}>
+                  {!category.retiredAt && (
+                    <Button size="small" color="warning" onClick={() => setCategoryToRetire(category)}>
                       {t("admin.retirar")}
                     </Button>
                   )}
@@ -157,35 +186,51 @@ export function AdminCategories() {
         </Table>
       </TableContainer>
 
-      <Box component="form" onSubmit={anadir} sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 480 }}>
+      <Box component="form" onSubmit={addCategory} sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 760 }}>
         <Typography variant="subtitle1">{t("admin.anadirTitulo")}</Typography>
-        <TextField label={t("admin.nombre")} value={name} onChange={(e) => setName(e.target.value)} slotProps={{ htmlInput: { maxLength: 60 } }} required size="small" />
-        <TextField
-          label={t("admin.descripcion")}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          slotProps={{ htmlInput: { maxLength: 200 } }}
-          required
-          size="small"
-          multiline
-        />
+        {/* Una columna por idioma (apiladas en móvil): nombre y descripción de cada uno. */}
+        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: `repeat(${SUPPORTED_LOCALES.length}, 1fr)` } }}>
+          {SUPPORTED_LOCALES.map((locale) => (
+            <Box key={locale} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <TextField
+                label={t("admin.nombreEnIdioma", { idioma: languageName(locale) })}
+                value={form.translations[locale].name}
+                onChange={(event) => updateText(locale, "name", event.target.value)}
+                slotProps={{ htmlInput: { maxLength: MAX_NAME_LENGTH, lang: locale } }}
+                required
+                size="small"
+              />
+              <TextField
+                label={t("admin.descripcionEnIdioma", { idioma: languageName(locale) })}
+                value={form.translations[locale].description}
+                onChange={(event) => updateText(locale, "description", event.target.value)}
+                slotProps={{ htmlInput: { maxLength: MAX_DESCRIPTION_LENGTH, lang: locale } }}
+                required
+                size="small"
+                multiline
+              />
+            </Box>
+          ))}
+        </Box>
         <FormControlLabel
-          control={<Checkbox checked={isSensitiveData} onChange={(e) => setIsSensitiveData(e.target.checked)} />}
+          control={<Checkbox checked={form.isSensitiveData} onChange={(event) => setForm((current) => ({ ...current, isSensitiveData: event.target.checked }))} />}
           label={t("admin.anadirDatosSensibles")}
         />
-        <Button type="submit" variant="contained" disabled={enviando}>
-          {enviando ? t("admin.anadiendo") : t("admin.anadir")}
-        </Button>
+        <Box>
+          <Button type="submit" variant="contained" disabled={isSubmitting || !isFormComplete}>
+            {isSubmitting ? t("admin.anadiendo") : t("admin.anadir")}
+          </Button>
+        </Box>
       </Box>
 
-      <Dialog open={aRetirar !== null} onClose={() => setARetirar(null)}>
-        <DialogTitle>{t("admin.retirarTitulo", { nombre: aRetirar?.name ?? "" })}</DialogTitle>
+      <Dialog open={categoryToRetire !== null} onClose={() => setCategoryToRetire(null)}>
+        <DialogTitle>{t("admin.retirarTitulo", { nombre: categoryToRetire ? (textIn(categoryToRetire, interfaceLocale)?.name ?? "") : "" })}</DialogTitle>
         <DialogContent>
           <DialogContentText>{t("admin.retirarTexto")}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setARetirar(null)}>{t("admin.cancelar")}</Button>
-          <Button onClick={() => void confirmarRetirada()} color="warning" variant="contained">
+          <Button onClick={() => setCategoryToRetire(null)}>{t("admin.cancelar")}</Button>
+          <Button onClick={() => void confirmRetirement()} color="warning" variant="contained">
             {t("admin.retirarConfirmar")}
           </Button>
         </DialogActions>

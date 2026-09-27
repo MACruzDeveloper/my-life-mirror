@@ -49,7 +49,7 @@ describe("GetAssessmentHistory (RF-10, historial de cambios)", () => {
     expect(resultado.value).toHaveLength(2);
     expect(resultado.value[0].recordedAt).toEqual(new Date("2026-09-18T10:00:00Z"));
     expect(resultado.value[0].entries).toEqual([
-      { categoryId: a.id, categoryName: a.name, score: 4, previousScore: 6, note: "mes justo" },
+      { categoryId: a.id, catalogId: a.catalogId, categoryName: a.name, score: 4, previousScore: 6, note: "mes justo" },
     ]);
     expect(resultado.value[1].entries.map((e) => e.score).sort()).toEqual([6, 7]);
     expect(resultado.value[1].entries.every((e) => e.previousScore === undefined)).toBe(true);
@@ -69,5 +69,14 @@ describe("GetAssessmentHistory (RF-10, historial de cambios)", () => {
     const { history } = await setup();
 
     expect((await history("  ")).ok).toBe(false);
+  });
+
+  it("cada entrada lleva el id de catálogo de su categoría", async () => {
+    const { record, history, a } = await setup();
+    await record({ userId: "u1", entries: [{ categoryId: a.id, score: 6 }] });
+
+    const resultado = await history("u1");
+
+    expect(resultado.ok && resultado.value[0].entries[0].catalogId).toBe(a.catalogId);
   });
 });

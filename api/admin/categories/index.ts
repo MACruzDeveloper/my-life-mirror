@@ -4,9 +4,9 @@ import { obtenerAppContext } from "../../../src/shared/infrastructure/container"
 import { leerCookie } from "../../../src/shared/infrastructure/cookies";
 import { logger } from "../../../src/shared/infrastructure/logger";
 
+// Un texto por idioma; el caso de uso comprueba que estén todos los soportados (RNF-10).
 const AddSchema = z.object({
-  name: z.string(),
-  description: z.string(),
+  translations: z.record(z.string(), z.object({ name: z.string(), description: z.string() })),
   isSensitiveData: z.boolean(),
 });
 
@@ -51,7 +51,7 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
-    const resultado = await addCatalogCategory(sesion.value, datos.data);
+    const resultado = await addCatalogCategory(sesion.value, datos.data as Parameters<typeof addCatalogCategory>[1]);
     if (!resultado.ok) {
       const status = resultado.error.code === "FORBIDDEN" ? 403 : resultado.error.code === "CONFLICT" ? 409 : 400;
       responder(res, status, { error: resultado.error.message, code: resultado.error.code });

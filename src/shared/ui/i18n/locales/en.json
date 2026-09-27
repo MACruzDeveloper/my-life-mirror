@@ -4,7 +4,8 @@
     "contrasena": "Password",
     "contrasenaAyuda": "At least 8 characters",
     "errorServidor": "Could not reach the server",
-    "reintentar": "Retry"
+    "reintentar": "Retry",
+    "idioma": "Language"
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -216,7 +217,7 @@
     "pestanaUsuarios": "Users",
     "pestanaCategorias": "Categories",
     "catalogoTitulo": "Category catalog",
-    "catalogoAyuda": "New categories appear, inactive, in every user's interview. Retiring one hides it and deactivates it for everyone, but scores already saved are kept.",
+    "catalogoAyuda": "New categories appear, inactive, in every user's interview, in Spanish or English depending on each user's language. Retiring one hides it and deactivates it for everyone, but scores already saved are kept.",
     "nombre": "Name",
     "descripcion": "Description",
     "estado": "Status",
@@ -292,7 +293,9 @@
     "acciones_user_email_changed": "Email change",
     "acciones_user_name_changed": "Name change",
     "acciones_user_recovery_sent": "Recovery link sent",
-    "acciones_reauth_failed": "Wrong confirmation password"
+    "acciones_reauth_failed": "Wrong confirmation password",
+    "nombreEnIdioma": "Name ({{idioma}})",
+    "descripcionEnIdioma": "Description ({{idioma}})"
   },
   "datos": {
     "titulo": "Privacy & data",
@@ -383,5 +386,18 @@
     "periodoTodo": "All",
     "anterior": "Previous period",
     "siguiente": "Next period"
+  },
+  "equilibrio": {
+    "titulo": "Your balance",
+    "descripcion": "Each axis is a category with your latest score, all on the same 0 to 10 scale.",
+    "resumen": "Current balance by category: {{lista}}",
+    "pocasCategorias": "Your balance appears once three categories are scored.",
+    "faltan": "Not scored yet: {{lista}}",
+    "categoria": "Category",
+    "tabla": "Latest score by category"
+  },
+  "idiomas": {
+    "es": "Spanish",
+    "en": "English"
   }
 }
