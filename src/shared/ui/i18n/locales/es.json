@@ -5,7 +5,8 @@
     "contrasenaAyuda": "Al menos 8 caracteres",
     "errorServidor": "No se pudo contactar con el servidor",
     "reintentar": "Reintentar",
-    "idioma": "Idioma"
+    "idioma": "Idioma",
+    "abrirMenu": "Abrir menú"
   },
   "breadcrumbs": {
     "inicio": "Inicio",

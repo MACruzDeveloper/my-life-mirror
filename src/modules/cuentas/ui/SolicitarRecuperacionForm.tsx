@@ -1,12 +1,12 @@
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
+import { PublicFormBox } from "@shared/ui/components/PublicFormBox";
 
 type Estado = { tipo: "inicial" } | { tipo: "enviando" } | { tipo: "enviado" } | { tipo: "error"; mensaje: string };
 
@@ -49,9 +49,11 @@ export function SolicitarRecuperacionForm() {
     return (
       <>
         <Breadcrumbs items={migas} />
-        <Alert severity="success" sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
-          {t("olvidePassword.confirmacion")}
-        </Alert>
+        <PublicFormBox>
+          <Alert severity="success">
+            {t("olvidePassword.confirmacion")}
+          </Alert>
+        </PublicFormBox>
       </>
     );
   }
@@ -59,7 +61,7 @@ export function SolicitarRecuperacionForm() {
   return (
     <>
       <Breadcrumbs items={migas} />
-      <Box component="form" onSubmit={manejarEnvio} sx={{ maxWidth: 360, mx: "auto", mt: 4 }}>
+      <PublicFormBox component="form" onSubmit={manejarEnvio}>
         <Typography variant="h5" component="h1" gutterBottom>
           {t("olvidePassword.titulo")}
         </Typography>
@@ -77,7 +79,7 @@ export function SolicitarRecuperacionForm() {
             {estado.tipo === "enviando" ? t("olvidePassword.botonEnviando") : t("olvidePassword.boton")}
           </Button>
         </Stack>
-      </Box>
+      </PublicFormBox>
     </>
   );
 }

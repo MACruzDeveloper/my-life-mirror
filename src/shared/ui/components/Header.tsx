@@ -1,8 +1,16 @@
+import { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import SvgIcon from "@mui/material/SvgIcon";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -15,16 +23,29 @@ export interface HeaderProps {
   isAdmin?: boolean;
 }
 
+function MenuIcon() {
+  return (
+    <SvgIcon>
+      <path d="M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z" />
+    </SvgIcon>
+  );
+}
+
 /**
  * Cabecera de las páginas protegidas (RF-39): logo (texto, sin imagen todavía),
  * enlaces de navegación ("Inicio" — el panel —, "Administración" solo para
  * admin, y "Mi perfil" — Perfil, Entrevista, Resultados y Privacidad viven
  * dentro, en el menú lateral de AccountPage), usuario con sesión activa,
- * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 §6):
- * `displayName` se oculta en móvil (`xs`) para dejar sitio a las acciones.
+ * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 §6,
+ * UX-03): en móvil, logo + idioma + un menú con la navegación, el nombre y
+ * cerrar sesión; desde `sm`, todo en línea.
  */
-export function Header({ displayName, onLogout: onLogout, isAdmin }: HeaderProps) {
+export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), { noSsr: true });
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const closeMenu = () => setMenuAnchor(null);
 
   return (
     <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -32,28 +53,70 @@ export function Header({ displayName, onLogout: onLogout, isAdmin }: HeaderProps
         <Typography variant="h6" component="span" sx={{ fontWeight: 700 }}>
           MyLifeMirror
         </Typography>
-        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
-          <Button size="small" component={RouterLink} to="/inicio">
-            {t("breadcrumbs.inicio")}
-          </Button>
-          {isAdmin ? (
-            <Button size="small" component={RouterLink} to="/admin">
-              {t("breadcrumbs.administracion")}
+        {isMobile ? (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <LanguageSwitcher />
+            <IconButton
+              aria-label={t("comun.abrirMenu")}
+              aria-haspopup="menu"
+              aria-expanded={menuAnchor ? "true" : undefined}
+              onClick={(event) => setMenuAnchor(event.currentTarget)}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={closeMenu}>
+              {displayName ? (
+                <Typography variant="body2" color="text.secondary" sx={{ px: 2, py: 1 }}>
+                  {displayName}
+                </Typography>
+              ) : null}
+              {displayName ? <Divider /> : null}
+              <MenuItem component={RouterLink} to="/inicio" onClick={closeMenu}>
+                {t("breadcrumbs.inicio")}
+              </MenuItem>
+              {isAdmin ? (
+                <MenuItem component={RouterLink} to="/admin" onClick={closeMenu}>
+                  {t("breadcrumbs.administracion")}
+                </MenuItem>
+              ) : null}
+              <MenuItem component={RouterLink} to="/perfil" onClick={closeMenu}>
+                {t("breadcrumbs.miPerfil")}
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  closeMenu();
+                  onLogout();
+                }}
+              >
+                {t("panel.cerrarSesion")}
+              </MenuItem>
+            </Menu>
+          </Box>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 2 }}>
+            <Button size="small" component={RouterLink} to="/inicio">
+              {t("breadcrumbs.inicio")}
             </Button>
-          ) : null}
-          <Button size="small" component={RouterLink} to="/perfil">
-            {t("breadcrumbs.miPerfil")}
-          </Button>
-          {displayName ? (
-            <Typography variant="body2" color="text.secondary" sx={{ display: { xs: "none", sm: "block" } }}>
-              {displayName}
-            </Typography>
-          ) : null}
-          <LanguageSwitcher />
-          <Button size="small" variant="outlined" onClick={onLogout}>
-            {t("panel.cerrarSesion")}
-          </Button>
-        </Box>
+            {isAdmin ? (
+              <Button size="small" component={RouterLink} to="/admin">
+                {t("breadcrumbs.administracion")}
+              </Button>
+            ) : null}
+            <Button size="small" component={RouterLink} to="/perfil">
+              {t("breadcrumbs.miPerfil")}
+            </Button>
+            {displayName ? (
+              <Typography variant="body2" color="text.secondary">
+                {displayName}
+              </Typography>
+            ) : null}
+            <LanguageSwitcher />
+            <Button size="small" variant="outlined" onClick={onLogout}>
+              {t("panel.cerrarSesion")}
+            </Button>
+          </Box>
+        )}
       </Toolbar>
     </AppBar>
   );

@@ -5,7 +5,8 @@
     "contrasenaAyuda": "At least 8 characters",
     "errorServidor": "Could not reach the server",
     "reintentar": "Retry",
-    "idioma": "Language"
+    "idioma": "Language",
+    "abrirMenu": "Open menu"
   },
   "breadcrumbs": {
     "inicio": "Home",
