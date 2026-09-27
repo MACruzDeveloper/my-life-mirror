@@ -24,6 +24,8 @@ interface RecommendationButtonProps {
   templateKey: string;
   /** Nombre ya en el idioma de la interfaz (lo resuelve la página). */
   categoryName: string;
+  /** Texto del botón; por defecto "Una idea para ti" (el resumen de Inicio lo nombra por su categoría). */
+  label?: string;
 }
 
 /**
@@ -32,7 +34,7 @@ interface RecommendationButtonProps {
  * sin llenarle la pantalla de texto; la idea y el aviso de RES-05 se leen en
  * una ventana al pulsarlo. Sin ventanas que se abran solas (RES-07).
  */
-export function RecommendationButton({ templateKey, categoryName }: RecommendationButtonProps) {
+export function RecommendationButton({ templateKey, categoryName, label }: RecommendationButtonProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const titleId = useId();
@@ -59,7 +61,7 @@ export function RecommendationButton({ templateKey, categoryName }: Recommendati
           "&:hover": { bgcolor: IDEA_COLORS.hoverBackground },
         }}
       >
-        {t("recomendaciones.titulo")}
+        {label ?? t("recomendaciones.titulo")}
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby={titleId} fullWidth maxWidth="xs">
         <DialogTitle id={titleId}>{t("recomendaciones.dialogoTitulo", { categoria: categoryName })}</DialogTitle>

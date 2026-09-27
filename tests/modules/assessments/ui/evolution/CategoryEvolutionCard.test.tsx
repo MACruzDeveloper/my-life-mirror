@@ -22,6 +22,12 @@ describe("CategoryEvolutionCard (RF-14 + RF-16)", () => {
     expect(within(card).getByText("extra")).toBeInTheDocument();
   });
 
+  it("junto a la puntuación escribe su banda, como en Resultados (UX-02)", () => {
+    render(<CategoryEvolutionCard categoryName="Economía" currentScore={2} points={[point(2, "2026-09-18T10:00:00")]} window={WINDOW} />);
+
+    expect(within(screen.getByRole("region", { name: "Economía" })).getByText("Bajo")).toBeInTheDocument();
+  });
+
   it("sin puntuaciones dice que está sin puntuar y no crea gráfico", () => {
     render(<CategoryEvolutionCard categoryName="Familia" points={[]} window={WINDOW} />);
 

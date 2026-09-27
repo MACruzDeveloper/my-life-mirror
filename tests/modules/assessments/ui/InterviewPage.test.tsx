@@ -409,6 +409,23 @@ describe("InterviewPage (RF-10)", () => {
     expect(await screen.findByRole("heading", { level: 1, name: /actualiza tus respuestas/i })).toBeInTheDocument();
   });
 
+  it("la primera vez, el entrevistador explica los pasos de la pantalla con el nombre real del botón (UX-01)", async () => {
+    stubFetch({ latest: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }] });
+    renderPage();
+
+    const steps = await screen.findByRole("list", { name: /qué vamos a hacer/i });
+    expect(within(steps).getAllByRole("listitem")).toHaveLength(3);
+    expect(steps).toHaveTextContent(/guardar cambios/i);
+  });
+
+  it("al actualizar respuestas no repite los pasos (UX-01)", async () => {
+    stubFetch();
+    renderPage();
+
+    await screen.findByRole("heading", { level: 1, name: /actualiza tus respuestas/i });
+    expect(screen.queryByRole("list", { name: /qué vamos a hacer/i })).not.toBeInTheDocument();
+  });
+
   it("en inglés, los nombres y descripciones de las categorías estándar salen traducidos (RNF-10)", async () => {
     await i18n.changeLanguage("en");
     try {

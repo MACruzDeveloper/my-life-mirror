@@ -11,33 +11,39 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **Validación** (desde el 26 sept.) — preparada: [guion](../validation/01_Guion_Test_Usabilidad.md) y [hoja de resultados](../validation/02_Resultados_Test_Usabilidad.md). Pendiente: realizar la sesión, clasificar los problemas por gravedad y arreglar los de gravedad 3-4 (y todo lo que toque RN-04). La demo de cierre va después.
+_(nada en curso)_
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
-- [ ] **Demo de cierre del Ciclo 1** — tras corregir lo que salga de la validación. Se reserva tiempo para validación y demo **siempre**: es lo último que se recorta, no lo primero.
+- [ ] **Rendimiento del servidor** (medir antes de tocar) — (a) alinear la región de las funciones de Vercel con la de Supabase (`regions` en `vercel.json`; Hobby permite una) — hoy por defecto es EE. UU. este; (b) validar la sesión sin llamar a Supabase en cada petición (`getClaims`/JWKS): ahorra un salto por llamada pero un usuario borrado o bloqueado seguiría siendo válido hasta que caduque el token (1 h) — decisión de seguridad, no solo de velocidad; (c) un endpoint que devuelva de una vez lo que la entrevista pide en tres llamadas; (d) menos funciones = menos arranques en frío ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis). La (b) es una decisión de seguridad: se propone antes de tocarla.
+- [ ] **Menú de la cabecera en móvil** — hoy hay "Inicio" y "Mi perfil" (y "Administración" para el admin), más idioma y cerrar sesión; en móvil puede quedar justo. Con uno más (o si se ve mal en la validación) hace falta un menú (hamburguesa en móvil) en vez de más botones.
+- [ ] **Mobile-first retroactivo de las páginas públicas** — Landing/Login/Registro/Recuperar contraseña: funcionan, pero sin adaptación intencionada a tablet/escritorio ([07_UI.md](../architecture-decisions/07_UI.md) §6). Va con el menú: mismo repaso visual.
+- [ ] **Playwright contra `api/`** (RF-01 registro/login) — decidir cómo aislar los datos de prueba en Supabase (proyecto dedicado o limpieza tras cada test) antes de automatizar nada que cree cuentas reales. Ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1bis. Primero la decisión de aislamiento (a proponer); después, automatizar los criterios Must de extremo a extremo.
+- [ ] **Métricas DORA y Flow** — revisión de calidad planificada antes de la validación; se simula DORA por cada PR fusionada a `develop` (producción = `main`, solo al completar el MVP) y se anota fecha de inicio/fin de cada tarea ([02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md)). Para la memoria del TFM; se hace junto a la demo, con los datos de las PR ya fusionadas.
+- [ ] **Demo de cierre del Ciclo 1** — la última tarea del MVP, para enseñar la versión final. Se reserva tiempo para validación y demo **siempre**: es lo último que se recorta, no lo primero.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
 
 - [ ] **RF-23** — Caso de uso `ConfigurarNotificaciones`. Ningún otro RF del Ciclo 1 depende de él.
-- [ ] Primeras historias del Ciclo 2.
+- [ ] Primeras historias del Ciclo 2. Ideas **importantes** que salen de la validación (27 sept.), pendientes de convertirse en RF con su prioridad:
+  - **Perfil ampliado** tras el registro: aficiones, estado civil, hijos (y sus edades o necesidades especiales), ubicación, peso/altura, salud, religión… Hoy RF-03 solo tiene nombre, fecha de nacimiento, género y zona horaria. **Salud y religión son datos de categoría especial (RGPD art. 9):** solo con consentimiento explícito (como las categorías sensibles), cada campo opcional y ligado a un uso concreto (minimización). Su uso con IA sigue sujeto a RD-09 y RES-09.
+  - **Pregunta abierta por categoría** en la entrevista (p. ej. "¿Cuál es la mejor aventura que has vivido?"). Las notas actuales no se entendieron: sustituirlas o integrarlas, y dejar claro para qué sirven y quién las ve (solo el usuario).
+  - **Sugerencias personalizadas → RF-40** (decidido el 27 sept., Should): la IA reescribe ideas del catálogo con verificación automática y caída al texto curado, sin moderación humana ([05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) §4.3). Se empieza contra un *Fake*; el adaptador real de Anthropic cuando haya crédito de API. Primera versión sin notas ni categorías sensibles; el perfil ampliado y la pregunta abierta la enriquecerán después.
 
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
 - **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
 - **RF-17** (puntuación global ponderada, Could): sin planificar; decidir según el tiempo que quede tras la validación. (RF-15 ya está hecho.)
-- **Rendimiento del servidor** (medir antes de tocar): (a) alinear la región de las funciones de Vercel con la de Supabase (`regions` en `vercel.json`; Hobby permite una) — hoy por defecto es EE. UU. este; (b) validar la sesión sin llamar a Supabase en cada petición (`getClaims`/JWKS): ahorra un salto por llamada pero un usuario borrado o bloqueado seguiría siendo válido hasta que caduque el token (1 h) — decisión de seguridad, no solo de velocidad; (c) un endpoint que devuelva de una vez lo que la entrevista pide en tres llamadas; (d) menos funciones = menos arranques en frío ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis).
-- **Validaciones previas al push con Husky** (idea): `pre-push` con lint, tests, `npm run build` y `npm run check:api`, para no descubrir en Vercel lo que se puede ver en local.
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
-- **Métricas DORA y Flow:** revisión de calidad planificada antes de la validación; se simula DORA por cada PR fusionada a `develop` (producción = `main`, solo al completar el MVP) y se anota fecha de inicio/fin de cada tarea ([02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md)).
-- **Playwright contra `api/`** (RF-01 registro/login): decidir cómo aislar los datos de prueba en Supabase (proyecto dedicado o limpieza tras cada test) antes de automatizar nada que cree cuentas reales. Ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1bis.
-- **Header con tres o más enlaces**: hoy hay "Inicio" y "Mi perfil" (y "Administración" para el admin), más idioma y cerrar sesión; en móvil puede quedar justo. Con uno más (o si se ve mal en la validación) hace falta un menú (hamburguesa en móvil) en vez de más botones.
-- **Mobile-first retroactivo** de Landing/Login/Registro/Recuperar contraseña: funcionan, pero sin adaptación intencionada a tablet/escritorio ([07_UI.md](../architecture-decisions/07_UI.md) §6).
 - **Renombrado a inglés** del código anterior al 14 sept.: solo cuando se toque por otro motivo (AGENTS.md).
 - **Política de privacidad**: borrador de TFM, no revisado legalmente ([PrivacyPolicyPage](../../src/pages/PrivacyPolicyPage.tsx)).
 
 ## Hecho
 
+- [x] **Quality gates con Husky**: `pre-commit` (lint + typecheck, ~7 s) y `pre-push` (`npm run verify`: lint, tests con umbral de cobertura en dominio + aplicación, build, `check:api`, e2e; ~40 s). Comprobado que una función de dominio sin test bloquea la subida. Se valida de verdad con la próxima PR.
+- [x] **Validación** (26-27 sept.): sesión con el [guion corto](../validation/03_Short_Test_Script_EN.md), [resultados](../validation/02_Resultados_Test_Usabilidad.md); RN-04 se cumple según lo declarado; problemas corregidos con UX-01 y UX-02.
+- [x] **UX-02** destacar las propuestas (gravedad 2 de la validación): banda en texto junto a la puntuación en cada tarjeta del panel y resumen "Ideas para ti" arriba del panel con un botón por idea. Frases inspiradoras e ideas con IA quedan fuera (pendientes de decidir) — [historia](../user-stories/UX-02-destacar-propuestas.md).
+- [x] **UX-01** guía de primer uso (gravedad 3 de la validación): "Cómo funciona" en tres pasos en la portada y en la bienvenida de Inicio, pasos de la pantalla en la primera entrevista, y "Cómo leer esta página" en el panel (se cierra con "Entendido", se recuerda en el dispositivo y se puede reabrir) — [historia](../user-stories/UX-01-guia-primer-uso.md).
 - [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow diario de GitHub Actions contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis). Requiere dos secretos y la rama por defecto en `develop`.
 
 Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHANGELOG.md); aquí solo el resumen.
@@ -96,3 +102,9 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.16 (26 sept. 2026)** — RF-15 hecha (radar de equilibrio). Solo queda la validación por encima de la línea de corte.
 - **v2.17 (26 sept. 2026)** — Validación pasa a "En curso", con guion y hoja de resultados preparados; la demo de cierre queda como tarea aparte en "Listo".
 - **v2.18 (27 sept. 2026)** — ADM-02 ampliada: categorías con texto en cada idioma soportado, en tabla de traducciones resuelta por id (sustituye las columnas `name_en` del mismo día).
+- **v2.19 (27 sept. 2026)** — sesión de validación hecha. Suben a "Listo": T5 (eliminar cuenta, gravedad 3), guía de primer uso (gravedad 3) y destacar las propuestas (gravedad 2). Tres ideas importantes para el Ciclo 2: perfil ampliado, pregunta abierta por categoría y sugerencias personalizadas.
+- **v2.20 (27 sept. 2026)** — T5 descartada (la participante no quiso borrar su cuenta; el autor lo comprobó con la suya). UX-01 (guía de primer uso) hecha.
+- **v2.21 (27 sept. 2026)** — UX-02 (destacar las propuestas) hecha. Todos los problemas de la validación corregidos; solo queda la demo por encima de la línea de corte.
+- **v2.22 (27 sept. 2026)** — Validación pasa a "Hecho". RF-40 (recomendaciones personalizadas con IA) decidido para el Ciclo 2.
+- **v2.23 (27 sept. 2026)** — a petición del autor, pasan de "Decisiones y deuda" al MVP (por encima de la demo): Husky, rendimiento del servidor, menú de la cabecera en móvil, mobile-first de las páginas públicas, Playwright contra `api/` y métricas DORA/Flow. Siguen como decisiones: RF-19, RF-17, aviso de categorías nuevas (depende de RF-23), renombrado a inglés (regla del boy scout) y la política de privacidad.
+- **v2.24 (27 sept. 2026)** — Husky hecho (quality gates en pre-commit y pre-push, con cobertura).

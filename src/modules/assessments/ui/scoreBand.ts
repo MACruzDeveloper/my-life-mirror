@@ -13,6 +13,14 @@ export function scoreBand(score: number): ScoreBand {
   return "high";
 }
 
+/** Texto de cada banda: el color nunca es la única señal. Lo comparten Resultados e Inicio. */
+export const BAND_LABEL_KEYS: Record<ScoreBand, string> = {
+  low: "resultados.bandaLow",
+  mediumLow: "resultados.bandaMediumLow",
+  medium: "resultados.bandaMedium",
+  high: "resultados.bandaHigh",
+};
+
 export const BAND_COLORS: Record<ScoreBand, { bg: string; fg: string; border: string }> = {
   low: { bg: "#FDECEA", fg: "#B3261E", border: "#F2B8B5" },
   mediumLow: { bg: "#FFF1E0", fg: "#A85300", border: "#FFD2A1" },
