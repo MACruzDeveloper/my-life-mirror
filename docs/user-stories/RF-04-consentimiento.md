@@ -9,7 +9,7 @@ Para que mis datos sensibles solo se traten con mi autorización informada (RGPD
 
 ## Alcance
 
-Cubre el módulo `consentimiento` (dominio + aplicación): la entidad `Consentimiento` y los casos de uso `OtorgarConsentimiento`/`VerificarConsentimiento`. Persistencia real en Supabase desde el principio (`SupabaseConsentimientoRepository`), no en memoria — ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §7bis.
+Cubre el módulo `consentimiento` (dominio + aplicación): la entidad `Consentimiento` y los casos de uso `OtorgarConsentimiento`/`VerificarConsentimiento`. Persistencia real en Supabase desde el principio (`SupabaseConsentimientoRepository`), no en memoria — ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §5.1.
 
 **Disparador real conectado (15 sept. 2026, RF-06/RF-07)**: `ActivateCategory` llama a `VerificarConsentimiento` al activar una categoría sensible; si no hay consentimiento, devuelve `ConsentRequiredError` y el frontend muestra el modal, que llama a `api/consent/grant.ts` (primer endpoint real de esta historia) antes de reintentar la activación. Ver [RF-06-RF-07-categorias.md](RF-06-RF-07-categorias.md).
 

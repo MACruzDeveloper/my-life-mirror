@@ -144,7 +144,7 @@ function crearCategoryCatalogRepository(entorno: Entorno): CategoryCatalogReposi
  * Persistencia real desde el principio, sin pasar por en memoria en dev —
  * se escribe desde activar/desactivar y se lee desde listar, funciones
  * distintas de `api/` (ver supabase/migrations/0003_categories.sql y
- * 04_Almacenamiento_Datos.md §7bis: no se repite el error de RF-03/RF-04).
+ * 04_Almacenamiento_Datos.md §5.1: no se repite el error de RF-03/RF-04).
  */
 function crearCategoryRepository(entorno: Entorno): CategoryRepository {
   if (entorno === "test") {

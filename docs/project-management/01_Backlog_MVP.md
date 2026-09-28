@@ -15,7 +15,6 @@ _(nada en curso)_
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
-- [ ] **Playwright contra `api/`** (RF-01 registro/login) — decidir cómo aislar los datos de prueba en Supabase (proyecto dedicado o limpieza tras cada test) antes de automatizar nada que cree cuentas reales. Ver [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1bis. Primero la decisión de aislamiento (a proponer); después, automatizar los criterios Must de extremo a extremo.
 - [ ] **Métricas DORA y Flow** — revisión de calidad planificada antes de la validación; se simula DORA por cada PR fusionada a `develop` (producción = `main`, solo al completar el MVP) y se anota fecha de inicio/fin de cada tarea ([02_Metricas_DORA_y_Flujo.md](02_Metricas_DORA_y_Flujo.md)). Para la memoria del TFM; se hace junto a la demo, con los datos de las PR ya fusionadas.
 - [ ] **Demo de cierre del Ciclo 1** — la última tarea del MVP, para enseñar la versión final. Se reserva tiempo para validación y demo **siempre**: es lo último que se recorta, no lo primero.
 
@@ -37,14 +36,16 @@ _(nada en curso)_
 
 ## Hecho
 
-- [x] **Rendimiento del servidor**: funciones de Vercel en Dublín (`dub1`, `vercel.json`), junto a Supabase (Irlanda); antes, en Washington. `getClaims` descartado (un usuario borrado seguiría entrando hasta 1 h) y endpoint combinado de la entrevista aplazado hasta medir ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis). **Pendiente de medir** en la próxima *preview* (las *previews* piden login de Vercel y aún no hay producción).
+- [x] **E2E con `api/` en GitHub Actions** (`E2E con api`, en cada PR, sin secretos) y **`npm run dev:local`** para probar la app completa contra el Supabase local; README reescrito para quien quiera probarla.
+- [x] **Playwright contra `api/`**: Supabase local en Docker, servidor propio en Vite con salvaguarda (nunca la base real) y aislamiento entre funciones; 9 tests × móvil/escritorio sobre RF-01, RF-04, RF-05, RF-10, RF-14, RF-15, RF-18, RF-39, UX-01 y UX-02 (`npm run test:e2e:api`, [plan de V&V](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1.2).
+- [x] **Rendimiento del servidor**: funciones de Vercel en Dublín (`dub1`, `vercel.json`), junto a Supabase (Irlanda); antes, en Washington. `getClaims` descartado (un usuario borrado seguiría entrando hasta 1 h) y endpoint combinado de la entrevista aplazado hasta medir ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6.1). **Pendiente de medir** en la próxima *preview* (las *previews* piden login de Vercel y aún no hay producción).
 - [x] **UX-03** menú de la cabecera en móvil: logo + idioma + menú (Inicio, Administración si es admin, Mi perfil, nombre, Cerrar sesión); desde `sm`, como antes — [historia](../user-stories/UX-03-menu-cabecera-movil.md).
 - [x] **Mobile-first de las páginas públicas**: registro, login, recuperar y restablecer contraseña con margen lateral en móvil (los campos tocaban el borde) y alineados con las migas (`PublicFormBox`, compartido); portada con margen superior adaptable. Comprobado en navegador a 360 y 1280 px.
 - [x] **Quality gates con Husky**: `pre-commit` (lint + typecheck, ~7 s) y `pre-push` (`npm run verify`: lint, tests con umbral de cobertura en dominio + aplicación, build, `check:api`, e2e; ~40 s). Comprobado que una función de dominio sin test bloquea la subida. Se valida de verdad con la próxima PR.
 - [x] **Validación** (26-27 sept.): sesión con el [guion corto](../validation/03_Short_Test_Script_EN.md), [resultados](../validation/02_Resultados_Test_Usabilidad.md); RN-04 se cumple según lo declarado; problemas corregidos con UX-01 y UX-02.
 - [x] **UX-02** destacar las propuestas (gravedad 2 de la validación): banda en texto junto a la puntuación en cada tarjeta del panel y resumen "Ideas para ti" arriba del panel con un botón por idea. Frases inspiradoras e ideas con IA quedan fuera (pendientes de decidir) — [historia](../user-stories/UX-02-destacar-propuestas.md).
 - [x] **UX-01** guía de primer uso (gravedad 3 de la validación): "Cómo funciona" en tres pasos en la portada y en la bienvenida de Inicio, pasos de la pantalla en la primera entrevista, y "Cómo leer esta página" en el panel (se cierra con "Entendido", se recuerda en el dispositivo y se puede reabrir) — [historia](../user-stories/UX-01-guia-primer-uso.md).
-- [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow diario de GitHub Actions contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6bis). Requiere dos secretos y la rama por defecto en `develop`.
+- [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow diario de GitHub Actions contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6.1). Requiere dos secretos y la rama por defecto en `develop`.
 
 Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHANGELOG.md); aquí solo el resumen.
 
@@ -54,7 +55,7 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - [x] **RF-38** recuperación de contraseña — [historia](../user-stories/RF-38-recuperar-password.md).
 - [x] **RNF-10** i18n ES/EN ([ADR-09](../architecture-decisions/09_Internacionalizacion.md)), `Breadcrumbs`/`Header` reutilizables ([ADR-07](../architecture-decisions/07_UI.md)).
 - [x] **RF-04** consentimiento explícito y versionado por política — [historia](../user-stories/RF-04-consentimiento.md); con disparador real (`ActivateCategory`) y `PrivacyPolicyPage`.
-- [x] **RNF-13** roles de usuario (`usuario`/`premium`/`admin`) en `app_metadata` de Supabase ([ADR-06](../architecture-decisions/06_Autenticacion.md) §1bis).
+- [x] **RNF-13** roles de usuario (`usuario`/`premium`/`admin`) en `app_metadata` de Supabase ([ADR-06](../architecture-decisions/06_Autenticacion.md) §1.1).
 - [x] **RF-03** perfil (nombre, fecha de nacimiento, género opcional, zona horaria) — [historia](../user-stories/RF-03-configurar-perfil.md); `name` se captura en el registro.
 - [x] **RF-06 / RF-07** catálogo de 9 categorías y activación individual — [historia](../user-stories/RF-06-RF-07-categorias.md).
 - [x] **RF-10** entrevista personal (los requisitos la llaman check-in): `Score` (1-10), `Assessment` inmutable, `RecordAssessments` (todo o nada, con nota opcional, puntuación parcial), `GetLatestScores`, Supabase real (`0004_assessments.sql`), `api/assessments`, pantallas `/perfil/entrevista` (con categorías integradas y ejemplos por pregunta) y `/perfil/resultados` (fondo suave por banda) — [historia](../user-stories/RF-10-entrevista.md). Sin periodos (RF-09) ni recomendaciones (RF-18) todavía.
@@ -74,7 +75,7 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 
 - **Se tira, no se empuja:** la siguiente tarea se elige de arriba de "Listo" solo cuando hay hueco en "En curso" (WIP ≤ 2, una sola persona).
 - **Orden por riesgo y dependencias, no por numeración de RF** (mismo criterio del espiral, [01_Justificacion_Ciclo_Vida.md](../requirements-analysis/01_Justificacion_Ciclo_Vida.md)): sin cuenta + consentimiento no se puede probar nada del resto de forma honesta.
-- **Datos que cruzan funciones de `api/`** → persistencia real (Supabase) desde el principio; los adaptadores en memoria solo valen para tests y para casos de uso sin endpoint propio. Cada archivo de `api/` es una función serverless aislada, sin memoria compartida ([04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §7bis).
+- **Datos que cruzan funciones de `api/`** → persistencia real (Supabase) desde el principio; los adaptadores en memoria solo valen para tests y para casos de uso sin endpoint propio. Cada archivo de `api/` es una función serverless aislada, sin memoria compartida ([04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §5.1).
 - **La línea de corte se revisa** cada vez que una tarea se cierra: ¿el tiempo restante hasta el 31 oct. cubre lo que queda por encima de la línea? Si no, se baja una tarea por debajo — nunca se estira el plazo.
 - **Trabajo transversal** (renombrados, reorganizaciones, herramientas) solo entra si desbloquea o abarata lo que hay en "Listo"; si no, va a "Decisiones y deuda".
 
@@ -109,3 +110,5 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.23 (27 sept. 2026)** — a petición del autor, pasan de "Decisiones y deuda" al MVP (por encima de la demo): Husky, rendimiento del servidor, menú de la cabecera en móvil, mobile-first de las páginas públicas, Playwright contra `api/` y métricas DORA/Flow. Siguen como decisiones: RF-19, RF-17, aviso de categorías nuevas (depende de RF-23), renombrado a inglés (regla del boy scout) y la política de privacidad.
 - **v2.24 (27 sept. 2026)** — Husky hecho (quality gates en pre-commit y pre-push, con cobertura).
 - **v2.25 (27 sept. 2026)** — hechos: región de las funciones (dub1), menú móvil (UX-03) y mobile-first de las páginas públicas. Quedan Playwright contra `api/` (decisión de aislamiento primero), métricas DORA/Flow y la demo.
+- **v2.26 (27 sept. 2026)** — Playwright contra `api/` hecho (Docker). Quedan métricas DORA/Flow y la demo.
+- **v2.27 (28 sept. 2026)** — E2E con `api/` en GitHub Actions, `dev:local` y README.
