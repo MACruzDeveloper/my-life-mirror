@@ -45,6 +45,8 @@ Decisión que §1.1 dejaba pendiente: **cómo automatizar los flujos que escribe
   - **En cada PR, solo:** workflow de GitHub Actions `E2E con api` (`.github/workflows/e2e-api.yml`). La máquina de GitHub trae Docker, levanta su propio Supabase vacío y ejecuta la misma batería; no necesita secretos porque nunca toca la base real. Si falla, el PR lo muestra y el informe queda como artefacto descargable (`informe-playwright`).
   - **En local, cuando se quiera:** `npm run test:e2e:api` (~35 s con el reinicio de la base). No va en el *pre-push*: necesita Docker abierto.
 
+- **Lección de la primera ejecución en CI (28 sept.):** un test falló solo en móvil y solo en la máquina de GitHub, más lenta. El Page Object elegía entre el menú móvil y el botón de escritorio con `isVisible()`, que mira una vez sin esperar; justo después del registro la cabecera aún no estaba pintada. Ahora se decide por el ancho de pantalla (el mismo punto de corte que la cabecera) y se deja que Playwright espere. Regla para los Page Objects: nunca bifurcar con `isVisible()`; decidir con datos fijos (dispositivo, estado conocido) y dejar esperar a las acciones. En esa misma ejecución Docker Hub/ECR respondió varias veces `toomanyrequests` al descargar imágenes; la CLI de Supabase reintentó y siguió, pero es un riesgo conocido de la primera descarga en cada ejecución.
+
 #### 1.2.1 Cómo ver que funciona
 
 Requisito: Docker Desktop abierto. La primera vez, `supabase start` descarga las imágenes (unos minutos).
