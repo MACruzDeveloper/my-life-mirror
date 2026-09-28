@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
  * Primer test E2E del proyecto (V&V §1). Deliberadamente limitado a lo que
  * no toca `api/` — un registro/login real de verdad crearía una cuenta real
  * en Supabase Auth en cada ejecución. Cubrir el flujo completo (RF-01) con
- * Playwright es la lección de §1bis, pero necesita antes una decisión sobre
+ * Playwright es la lección de §1.1, pero necesita antes una decisión sobre
  * cómo aislar los datos de prueba (proyecto de Supabase dedicado, o
  * limpieza tras cada test) — no asumida aquí, ver AGENTS.md/pregunta al usuario.
  */

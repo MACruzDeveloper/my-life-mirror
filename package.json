@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --open",
     "dev:full": "(sleep 2 && open http://localhost:3000) & npx -y vercel dev",
+    "dev:local": "node scripts/dev-local.mjs",
     "build": "tsc -b && vite build",
     "check:api": "node scripts/check-api-types.mjs",
     "lint": "eslint .",
@@ -15,6 +16,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:api": "node scripts/e2e-api.mjs",
     "prepare": "husky",
     "verify": "npm run lint && npm run test:coverage && npm run build && npm run check:api && npm run test:e2e"
   },

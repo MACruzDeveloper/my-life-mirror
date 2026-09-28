@@ -2,7 +2,7 @@
 -- inserta; no hay política ni código de update/delete de filas sueltas.
 -- Persistencia real desde el principio: se escribe desde un endpoint y lo
 -- leerán otros (panel RF-14, recomendaciones RF-18) — ver
--- 04_Almacenamiento_Datos.md §7bis. Si se borra la categoría o el usuario,
+-- 04_Almacenamiento_Datos.md §5.1. Si se borra la categoría o el usuario,
 -- se borran sus evaluaciones (derecho al olvido, RF-05).
 
 create table if not exists public.assessments (

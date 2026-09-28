@@ -27,11 +27,45 @@ Ambas son necesarias: se puede verificar perfectamente un sistema que resuelve e
 | **UAT dirigido por criterios (Given/When/Then)** | Por cada RF de prioridad Must/Should, redactar 1 criterio de aceptación en formato Given/When/Then (ver plantilla y ejemplos §3) y ejecutarlo manualmente como checklist antes de cada demo. | RF Must/Should | Alta |
 | **Criterios de aceptación ejecutables** | Automatizar con Playwright los escenarios Given/When/Then de **todos los RF de prioridad Must**, etiquetados por ID de RF para trazabilidad directa requisito↔prueba. Should/Could quedan como checklist manual salvo que sobre tiempo. Instalado el 15 sept. (`e2e/`, `npm run test:e2e`); primer test cubre solo páginas públicas — los flujos que tocan `api/` (RF-01 registro/login, el Must más obvio) están pendientes de decidir aislamiento de datos de prueba antes de automatizarse. | RF Must | Alta |
 
-### 1bis. Límite real encontrado: lo que Vitest no puede ver (14 sept. 2026)
+### 1.1 Límite real encontrado: lo que Vitest no puede ver (14 sept. 2026)
 
 Caso concreto, no hipotético: `ProfileRepository` en memoria pasó 100% de sus tests unitarios y de aplicación (Vitest) desde el primer momento, y seguía pasándolos incluso después de descubrirse que estaba roto de verdad. La razón es estructural, no un test mal escrito: **Vitest ejecuta todo dentro de un único proceso Node**, así que un `Map` en memoria compartido entre "casos de uso" en un test *sí* se comparte — exactamente la condición que **no** se cumple en producción/`vercel dev`, donde cada archivo de `api/` es una función serverless aislada sin memoria compartida con las demás. El bug (nombre guardado desde `api/accounts/profile.ts` invisible para `api/accounts/session.ts`) solo era detectable ejecutando la app de verdad contra funciones serverless reales — ninguna cantidad de tests unitarios/de integración corriendo en un solo proceso podía haberlo revelado.
 
-**Lección para el resto del proyecto**: la "Prueba unitaria" de esta tabla verifica lógica de negocio correctamente, pero no verifica *dónde vive el estado entre peticiones* — eso es un problema de arquitectura de despliegue, no de lógica, y necesita su propia categoría de comprobación: probar manualmente (o con Playwright) contra `vercel dev` real antes de dar por cerrado cualquier RF cuyo dato se escriba en un endpoint y se lea en otro. Ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §7bis para la corrección aplicada (persistencia real en Supabase adelantada respecto al plan original).
+**Lección para el resto del proyecto**: la "Prueba unitaria" de esta tabla verifica lógica de negocio correctamente, pero no verifica *dónde vive el estado entre peticiones* — eso es un problema de arquitectura de despliegue, no de lógica, y necesita su propia categoría de comprobación: probar manualmente (o con Playwright) contra `vercel dev` real antes de dar por cerrado cualquier RF cuyo dato se escriba en un endpoint y se lea en otro. Ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §5.1 para la corrección aplicada (persistencia real en Supabase adelantada respecto al plan original).
+
+### 1.2 E2E con `api/` contra un Supabase local (27 sept. 2026)
+
+Decisión que §1.1 dejaba pendiente: **cómo automatizar los flujos que escriben datos sin tocar la base real.**
+
+- **Base de datos:** Supabase local en Docker (`supabase start`, configuración en `supabase/config.toml`). Cada ejecución la vacía y reaplica `supabase/migrations` (`supabase db reset`), así que además comprueba que las migraciones funcionan sobre una base limpia. Se descartaron un segundo proyecto de Supabase en la nube (más credenciales que gestionar y otra base que se pausa) y usar la base real borrando después (si la limpieza falla, quedan cuentas de prueba entre las reales).
+- **Servidor:** no `vercel dev`. Se comprobó, con una sonda que no escribe nada, que `vercel dev` carga siempre el `.env` del proyecto aunque se le pasen otras variables: un test de registro habría creado cuentas en la base real. En su lugar, un plugin de Vite (`e2e/support/apiDevServer.ts`) sirve las funciones de `api/` con las mismas rutas que Vercel (probadas con Vitest) y **se niega a arrancar si `SUPABASE_URL` no es local**.
+- **El fallo de §1.1 sigue cubierto:** cada petición carga los módulos en un *module runner* nuevo, así que ninguna función ve la memoria de otra. Comprobado a propósito con dos funciones temporales (una guarda en un `Map`, la otra no lo ve).
+- **Tests:** Page Objects en `e2e/api/pages/`, un usuario nuevo por test (corren en paralelo), en móvil (Pixel 7) y escritorio. Primera batería: RF-01 (registro con sesión, login, contraseña incorrecta, cerrar sesión y volver), RF-39/UX-01 (bienvenida con "Cómo funciona"), RF-10 + RF-14 + RF-15 + RF-18 + UX-02 (puntuar, panel, equilibrio, idea para el área baja con el aviso de RES-05), RF-04 (aceptar y cancelar el consentimiento, persistido) y RF-05 (exportación con los datos; borrado con contraseña correcta e incorrecta).
+- **Cuándo se ejecuta:**
+  - **En cada PR, solo:** workflow de GitHub Actions `E2E con api` (`.github/workflows/e2e-api.yml`). La máquina de GitHub trae Docker, levanta su propio Supabase vacío y ejecuta la misma batería; no necesita secretos porque nunca toca la base real. Si falla, el PR lo muestra y el informe queda como artefacto descargable (`informe-playwright`).
+  - **En local, cuando se quiera:** `npm run test:e2e:api` (~35 s con el reinicio de la base). No va en el *pre-push*: necesita Docker abierto.
+
+- **Lección de la primera ejecución en CI (28 sept.):** un test falló solo en móvil y solo en la máquina de GitHub, más lenta. El Page Object elegía entre el menú móvil y el botón de escritorio con `isVisible()`, que mira una vez sin esperar; justo después del registro la cabecera aún no estaba pintada. Ahora se decide por el ancho de pantalla (el mismo punto de corte que la cabecera) y se deja que Playwright espere. Regla para los Page Objects: nunca bifurcar con `isVisible()`; decidir con datos fijos (dispositivo, estado conocido) y dejar esperar a las acciones. En esa misma ejecución Docker Hub/ECR respondió varias veces `toomanyrequests` al descargar imágenes; la CLI de Supabase reintentó y siguió, pero es un riesgo conocido de la primera descarga en cada ejecución.
+
+#### 1.2.1 Cómo ver que funciona
+
+Requisito: Docker Desktop abierto. La primera vez, `supabase start` descarga las imágenes (unos minutos).
+
+| Qué | Comando | Qué se ve |
+|---|---|---|
+| Ejecución normal | `npm run test:e2e:api` | La lista de tests con ✓/✘ en la terminal. |
+| En directo | `npm run test:e2e:api -- --headed` | Los navegadores (móvil y escritorio) se abren y la app se usa sola, paso a paso. |
+| Modo interactivo | `npm run test:e2e:api -- --ui` | La ventana de Playwright: se elige un test, se ejecuta y se recorre cada acción hacia atrás con su captura ("viaje en el tiempo"). La mejor opción para la demo. Mientras está abierta ocupa el puerto 5174. |
+| Informe | `npm run test:e2e:api -- --reporter=html` y después `npx playwright show-report` | Una página con cada test, su resultado y su duración (y la traza si alguno falla). Útil como captura para la memoria. |
+| Solo un test | `npm run test:e2e:api -- -g "consentimiento"` | Ejecuta solo los tests cuyo nombre contiene el texto. |
+| Solo un dispositivo | `npm run test:e2e:api -- --project=mobile` | `mobile` (Pixel 7) o `desktop`. |
+| Los datos que crean | Supabase Studio local: http://127.0.0.1:54323 | *Authentication → Users* (cuentas `e2e-…@example.com`), *Table Editor* (`assessments`, `recommendations`…). La siguiente ejecución los borra. |
+| En GitHub | Pestaña *Actions* → `E2E con api`, o el apartado de *checks* del PR | El resultado en cada PR; el informe HTML se descarga desde el artefacto `informe-playwright`. |
+
+Otros comandos útiles:
+
+- `npm run dev:local` — la app completa contra el mismo Supabase local (http://localhost:5175), para probarla a mano sin cuentas de Vercel ni de Supabase. Los datos se conservan entre arranques; `npx supabase db reset` la vacía.
+- `npx supabase stop` — apaga el Supabase local y libera la memoria (sus contenedores siguen consumiendo aunque no se use). Los dos comandos anteriores lo vuelven a arrancar si hace falta.
 
 ---
 
@@ -101,6 +135,8 @@ Con este plan aprobado, seguimos con el archivo 3: **justificación del ciclo de
   - Peer review marcado en espera (sin acceso a tutor/compañeros por ahora).
   - Usability testing y pilot testing ajustados a la disponibilidad real (n=1, mi pareja), documentando la limitación frente a la muestra ideal.
   - Automatización con Playwright de los criterios de aceptación pasa de "opcional" a prioridad Alta, específicamente para todos los RF de prioridad Must.
-- **v1.1 (14 sept. 2026)** — §1bis: caso real de un límite estructural de Vitest (no detecta que los datos no sobreviven entre funciones serverless distintas) encontrado al implementar RF-03.
-- **v1.2 (15 sept. 2026)** — Playwright instalado de verdad (§1, §4): primer test cubre solo páginas públicas. Automatizar RF-01 (registro/login) — el caso que motivó §1bis — queda pendiente de decidir aislamiento de datos de prueba en Supabase.
+- **v1.1 (14 sept. 2026)** — §1.1: caso real de un límite estructural de Vitest (no detecta que los datos no sobreviven entre funciones serverless distintas) encontrado al implementar RF-03.
+- **v1.2 (15 sept. 2026)** — Playwright instalado de verdad (§1, §4): primer test cubre solo páginas públicas. Automatizar RF-01 (registro/login) — el caso que motivó §1.1 — queda pendiente de decidir aislamiento de datos de prueba en Supabase.
 - **v1.3 (26 sept. 2026)** — §4 corregido: decía "usability test de 5 personas", contradiciendo el ajuste a n = 1 de §2. Enlaces al guion y a la hoja de resultados del test del MVP.
+- **v1.4 (27 sept. 2026)** — nueva §1.2: E2E con `api/` contra Supabase local en Docker, con un servidor propio en Vite (no `vercel dev`, que carga siempre la base real) y aislamiento entre funciones que mantiene cubierto el fallo de §1.1. Primera batería de 9 tests × 2 dispositivos.
+- **v1.5 (28 sept. 2026)** — §1.2: workflow de GitHub Actions en cada PR y nuevo §1.2.1 "Cómo ver que funciona" (modos `--headed`, `--ui`, informe HTML, Studio local, `npm run dev:local`). Los apartados "1bis/1ter" pasan a numeración decimal (1.1, 1.2), igual que en el resto de documentos.

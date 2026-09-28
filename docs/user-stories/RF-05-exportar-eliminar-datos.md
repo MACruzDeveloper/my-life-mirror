@@ -60,7 +60,7 @@ Para tener el control sobre la información personal que he dejado en la aplicac
 - **Orden del borrado:** datos primero (evaluaciones → categorías → consentimientos → perfil), cuenta de acceso **la última**. Si algo falla antes de borrar la cuenta, el usuario sigue pudiendo entrar y repetirlo; al revés dejaría datos huérfanos sin dueño que pueda pedir su borrado. Las claves foráneas de la base de datos ya tienen `on delete cascade` sobre `auth.users` como red de seguridad, pero el caso de uso no depende de ello (los fakes en memoria no tienen cascada).
 - **Contraseña:** se comprueba reutilizando `iniciarSesion` de `AuthProvider`. Crea un token de sesión que se descarta; a cambio no hay un método nuevo en el puerto.
 - **Caso de uso en `cuentas`, datos de otros módulos por sus puertos:** `ExportUserData` y `DeleteAccount` orquestan los repositorios de perfil, categorías, consentimientos y evaluaciones (mismo patrón que `ActivateCategory` con el consentimiento).
-- **Función serverless:** las dos acciones (`export-data`, `delete-account`) van en `api/accounts/[action].ts`; no añaden funciones (ADR-03 §6bis).
+- **Función serverless:** las dos acciones (`export-data`, `delete-account`) van en `api/accounts/[action].ts`; no añaden funciones (ADR-03 §6.1).
 - **Caché del frontend:** al eliminar se vacía entera (`queryClient.clear()`).
 
 ## Historial de cambios

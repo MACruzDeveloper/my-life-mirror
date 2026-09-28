@@ -39,7 +39,24 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - `<html lang>` fijo en `en` con la app en español: ahora sigue al idioma elegido (lectores de pantalla).
 
+### Añadido (verificación y documentación)
+
+- Workflow de GitHub Actions **E2E con api** (`.github/workflows/e2e-api.yml`): en cada PR levanta un Supabase local y ejecuta `npm run test:e2e:api`; guarda el informe HTML como artefacto. Sin secretos: nunca toca la base real.
+- `npm run dev:local`: la app completa contra el Supabase local (http://localhost:5175), sin cuentas ni `.env`. Lógica común con `test:e2e:api` en `scripts/local-supabase.mjs`; `vite.e2e.config.ts` pasa a `vite.local.config.ts`.
+- `README.md` reescrito (era la plantilla de Vite): qué es la app, cómo probarla en local, cómo entrar como administrador, tests y cómo verlos funcionar.
+- Plan de verificación, §1.2.1 "Cómo ver que funciona".
+
+### Cambiado (documentación)
+
+- Numeración de apartados: "1bis/1ter/2bis/6bis/7bis/7ter" pasan a subapartados decimales (1.1, 1.2, 2.1, 6.1, 5.1, 6.1) en ADR-03, ADR-04, ADR-06, ADR-09 y el plan de verificación, con las referencias actualizadas en 29 archivos.
+
+### Añadido (verificación)
+
+- `npm run test:e2e:api`: tests E2E con `api/` contra un Supabase local en Docker (`supabase/config.toml`; la base se vacía y se reaplican las migraciones en cada ejecución). Servidor propio en Vite (`e2e/support/apiDevServer.ts`, rutas como Vercel, probado con Vitest) que se niega a arrancar si la base no es local y aísla la memoria de cada petición. Page Objects en `e2e/api/pages/`; 9 tests en móvil y escritorio (registro, login, cerrar sesión, consentimiento, entrevista, panel, idea, exportar y eliminar la cuenta).
+
 ### Corregido (despliegue)
+
+- E2E con `api/` en GitHub Actions: el test de contraseña incorrecta fallaba en móvil (solo en CI, más lento). El Page Object elegía el menú móvil o el botón de escritorio con `isVisible()`, que no espera; ahora decide por el ancho de pantalla. Comprobado con 90 repeticiones en paralelo.
 
 - Login, registro y el resto de la API devolvían 500 en la *preview* de Vercel: `Cannot find module …/http/router`. Las funciones corren como ESM nativo de Node, que no resuelve imports relativos sin extensión, y ni los tipos (`bundler`) ni `vercel dev` lo detectaban. Imports con `.js` en todo lo alcanzable desde `api/`, `api/tsconfig.json` en `nodenext`, y `npm run check:api` (también en el pre-push) comprueba ahora los archivos de `src/` que `api/` alcanza y carga cada función en Node.
 
@@ -82,7 +99,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 ### Añadido (infraestructura)
 
-- `.github/workflows/supabase-keep-alive.yml`: una consulta diaria mínima (solo lectura, clave pública *anon*, sin permisos sobre el repositorio) para que Supabase Free no pause el proyecto por inactividad; si Supabase no responde 200, el job falla y GitHub avisa. Necesita los secretos `SUPABASE_URL` y `SUPABASE_ANON_KEY` y que la rama por defecto sea `develop` (ver ADR-03 §6bis).
+- `.github/workflows/supabase-keep-alive.yml`: una consulta diaria mínima (solo lectura, clave pública *anon*, sin permisos sobre el repositorio) para que Supabase Free no pause el proyecto por inactividad; si Supabase no responde 200, el job falla y GitHub avisa. Necesita los secretos `SUPABASE_URL` y `SUPABASE_ANON_KEY` y que la rama por defecto sea `develop` (ver ADR-03 §6.1).
 
 ### Cambiado (estructura y nombres)
 
@@ -161,7 +178,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - `RegisterUser` no aislaba el guardado del perfil inicial (`updateProfile`) del alta en Supabase Auth: una excepción ahí habría reportado el registro entero como fallido pese a que la cuenta ya existiera. Ahora va en su propio try/catch, sin poder deshacer un registro ya válido.
 - Bug real encontrado en pruebas manuales: tras guardar el perfil, el `Header` seguía mostrando el email en vez del nombre recién guardado. `useSesion` (hook independiente, sin forma de invalidarse) se sustituye por `SessionProvider`/`useSession` (contexto de React) — `RutaProtegida` (renombrada `ProtectedRoute`) instala un único contexto por ruta que `ProtectedLayout` y `ProfileForm` comparten, así `ProfileForm` puede pedir un `refresh()` tras guardar.
-- Bug real más profundo, mismo síntoma: `ProfileRepository`/`ConsentimientoRepository` en memoria no sobreviven entre funciones serverless distintas de `api/` (cada archivo es una función aislada, sin memoria compartida — ni en producción ni en `vercel dev`). Se adelanta su persistencia real a Supabase (`SupabaseProfileRepository`, `SupabaseConsentimientoRepository`) desde ahora, no en el Sprint 5 como estaba planeado — ver [04_Almacenamiento_Datos.md](docs/architecture-decisions/04_Almacenamiento_Datos.md) §7bis. Esquemas en `supabase/migrations/`.
+- Bug real más profundo, mismo síntoma: `ProfileRepository`/`ConsentimientoRepository` en memoria no sobreviven entre funciones serverless distintas de `api/` (cada archivo es una función aislada, sin memoria compartida — ni en producción ni en `vercel dev`). Se adelanta su persistencia real a Supabase (`SupabaseProfileRepository`, `SupabaseConsentimientoRepository`) desde ahora, no en el Sprint 5 como estaba planeado — ver [04_Almacenamiento_Datos.md](docs/architecture-decisions/04_Almacenamiento_Datos.md) §5.1. Esquemas en `supabase/migrations/`.
 - `api/accounts/session.ts` devolvía 500 (rompiendo la comprobación de sesión entera) si `getProfile` fallaba por cualquier motivo — p. ej. la tabla `profiles` sin migrar todavía. Aislado en su propio try/catch: un fallo ahí ahora solo significa "sin nombre todavía", nunca "no sé si hay sesión" (mismo criterio que `RegisterUser`).
 
 ## [0.1.0] - 2026-09-14
