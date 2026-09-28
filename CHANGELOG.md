@@ -56,6 +56,8 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 ### Corregido (despliegue)
 
+- E2E con `api/` en GitHub Actions: el test de contraseña incorrecta fallaba en móvil (solo en CI, más lento). El Page Object elegía el menú móvil o el botón de escritorio con `isVisible()`, que no espera; ahora decide por el ancho de pantalla. Comprobado con 90 repeticiones en paralelo.
+
 - Login, registro y el resto de la API devolvían 500 en la *preview* de Vercel: `Cannot find module …/http/router`. Las funciones corren como ESM nativo de Node, que no resuelve imports relativos sin extensión, y ni los tipos (`bundler`) ni `vercel dev` lo detectaban. Imports con `.js` en todo lo alcanzable desde `api/`, `api/tsconfig.json` en `nodenext`, y `npm run check:api` (también en el pre-push) comprueba ahora los archivos de `src/` que `api/` alcanza y carga cada función en Node.
 
 ### Cambiado (rendimiento y móvil)
