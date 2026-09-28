@@ -155,6 +155,12 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **27 sept. 2026** — *"I tried to login or register [en la preview] but I get a server 500 error… I started Docker desktop already, but before continuing we should complete the PR"*
 → Causa encontrada en los logs de Vercel (`vercel logs`): `ERR_MODULE_NOT_FOUND` — las funciones corren como ESM nativo y los imports relativos no tenían extensión; en local (Vite, Vitest, `vercel dev`) funcionaba igual, y `check:api` solo miraba los tipos con `bundler`. Se añaden `.js` a los imports alcanzables desde `api/` y se refuerza el *quality gate*: `nodenext` + carga real de cada función en Node. Probablemente las *previews* llevaban rotas desde que se agruparon las funciones con `createRouter`; nadie lo vio porque siempre se probaba en local. El PR se cierra con esto antes de empezar con Docker.
 
+**27 sept. 2026** — *"Regarding the Playwright I didn't understand properly, but it would be great to try Docker"* → *"Ok PR merged. Go ahead with Playwright and Docker"*
+→ Supabase local en Docker para los E2E con `api/`. Hallazgo por el camino: `vercel dev` carga siempre el `.env` real aunque se le pasen otras variables (comprobado con una sonda que solo intenta entrar), así que se sirve `api/` con un plugin de Vite propio con salvaguarda de base local, y con un *module runner* por petición para no perder la protección del fallo de §1.1 (verificado con una prueba a propósito). 9 tests con Page Objects, en móvil y escritorio, sobre los Must.
+
+**28 sept. 2026** — *"ok yes add it as a GitHub Action. -add the instructions of How to show it's working in the docs… And please add it to the readme.md… -instead of using § is it ok to use just sub-points? Like between 2 and 3 you can add 2.1, 2.2..."*
+→ Workflow **E2E con api** en cada PR (Supabase local en la máquina de GitHub, sin secretos). "Cómo ver que funciona" en el plan de verificación y en un README nuevo pensado para quien quiera probar la app, con `npm run dev:local` (la app completa contra el Supabase local, sin cuentas). Numeración: se abandona "bis/ter" por subapartados decimales en todo el repositorio; `§` se mantiene solo como abreviatura de "apartado".
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

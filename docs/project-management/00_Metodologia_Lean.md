@@ -34,7 +34,7 @@ Alternativas vistas en clase, evaluadas contra este proyecto (una persona, plazo
 | Principio Lean | Práctica en este proyecto |
 |---|---|
 | Eliminar desperdicio | Nada se construye "por si acaso": una tarea entra al tablero solo si desbloquea algo de "Listo" o cumple un requisito Must. La deuda y las ideas viven en "Decisiones y deuda" sin coste hasta que duelen. YAGNI ya está en [02_Principios_Diseño.md](../architecture-decisions/02_Principios_Diseño.md). |
-| Amplificar el aprendizaje | Cada hallazgo real (bug, límite de una herramienta) se documenta como lección (p. ej. [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1bis) y cambia una regla de flujo, no solo el código. |
+| Amplificar el aprendizaje | Cada hallazgo real (bug, límite de una herramienta) se documenta como lección (p. ej. [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §1.1) y cambia una regla de flujo, no solo el código. |
 | Decidir lo más tarde posible | Decisiones caras de revertir (persistencia real, roles, Playwright contra `api/`) se aplazan hasta que un caso concreto las exige, y entonces se toman con evidencia. |
 | Entregar lo antes posible | Cortes verticales finos (dominio → aplicación → infraestructura → vista → prueba) que funcionan de extremo a extremo antes de pasar a la siguiente tarea. |
 | Integridad incorporada | TDD obligatorio ([AGENTS.md](../../AGENTS.md)), especificaciones Nivel 2 ([10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md)), tests, lint y build en verde antes de dar algo por hecho. |

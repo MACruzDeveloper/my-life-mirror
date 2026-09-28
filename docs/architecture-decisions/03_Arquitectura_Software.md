@@ -95,7 +95,7 @@ Esto es más aparato del que un MVP en solitario necesitaría por pura eficienci
 
 ---
 
-## 6bis. Limitaciones conocidas del proyecto
+### 6.1 Limitaciones conocidas del proyecto
 
 Restricciones del entorno gratuito (Vercel Hobby, Supabase Free) que condicionan el diseño; no son fallos, son límites asumidos.
 
@@ -123,8 +123,9 @@ Con arquitectura y almacenamiento de datos ya decididos ([04_Almacenamiento_Dato
 - **v2.1 (12 sept. 2026)** — limpieza editorial: se retira la narrativa de revisión del cuerpo principal (queda solo aquí), se corrigen referencias desactualizadas a Firebase/Supabase por MongoDB Atlas (ya decidido en ADR-04), se actualiza §7.
 - **v2.2 (19 sept. 2026)** — `api/tsconfig.json` es necesario y debe ser **autocontenido, sin `extends`** (Vercel no lo resuelve; mantenerlo alineado a mano con `tsconfig.api.json`): Vercel compila cada función con el `tsconfig.json` más cercano hacia arriba; sin él usa el de la raíz (solo referencias, sin opciones) y cae en `nodenext`, que rompe los imports sin extensión. No lo cubre `tsc -b` local porque este usa `tsconfig.api.json` directamente. Para vigilarlo: `npm run check:api`, que imita esa compilación.
 - **v2.3 (19 sept. 2026)** — límite de 12 funciones serverless del plan Hobby de Vercel: regla **una función por capacidad, no por acción**. Cada capacidad con varias acciones usa `api/<capacidad>/[action].ts` + `createRouter`, con los handlers en `src/shared/infrastructure/http/handlers/<capacidad>/` (URLs sin cambios). `api/<capacidad>/index.ts` sigue sirviendo la ruta base. Se pasó de 16 a 9 funciones; `check:api` falla si hay más de 12.
-- **v2.4 (20 sept. 2026)** — nueva §6bis "Limitaciones conocidas del proyecto": límite de 12 funciones de Vercel Hobby (con regla, aviso y plan de escape), latencia y pausa de Supabase Free.
+- **v2.4 (20 sept. 2026)** — nueva §6.1 "Limitaciones conocidas del proyecto": límite de 12 funciones de Vercel Hobby (con regla, aviso y plan de escape), latencia y pausa de Supabase Free.
 - **v2.5 (20 sept. 2026)** — el disparo de RF-18 se resuelve sin Outbox: `RecordAssessments` avisa a un oyente opcional después de persistir (evento de dominio en proceso, best effort). Outbox queda para cuando haya varios oyentes o hagan falta garantías entre procesos. Funciones serverless: 10 de 12.
-- **v2.6 (26 sept. 2026)** — §6bis: mitigación de la pausa de Supabase Free con un workflow diario de GitHub Actions (clave anon, solo lectura), rama por defecto `develop` durante el desarrollo y límites de la solución.
-- **v2.7 (27 sept. 2026)** — §6bis: funciones en `dub1`, junto a Supabase; `getClaims` descartado por seguridad; endpoint combinado de la entrevista aplazado hasta medir.
+- **v2.6 (26 sept. 2026)** — §6.1: mitigación de la pausa de Supabase Free con un workflow diario de GitHub Actions (clave anon, solo lectura), rama por defecto `develop` durante el desarrollo y límites de la solución.
+- **v2.7 (27 sept. 2026)** — §6.1: funciones en `dub1`, junto a Supabase; `getClaims` descartado por seguridad; endpoint combinado de la entrevista aplazado hasta medir.
 - **v2.8 (27 sept. 2026)** — fallo real en la *preview*: login y registro devolvían 500 (`ERR_MODULE_NOT_FOUND …/http/router`). Con `"type": "module"`, Vercel ejecuta las funciones como ESM nativo de Node, que exige extensión en los imports relativos; `api/tsconfig.json` usaba `bundler`, que los acepta sin ella, así que los tipos pasaban y el fallo solo aparecía al arrancar. Corrección: `.js` en los imports de todo lo alcanzable desde `api/` (84 archivos, con las sugerencias del propio compilador), `api/tsconfig.json` en `nodenext` y `check:api` ampliado: revisa también los archivos de `src/` que `api/` alcanza (antes solo `api/`) y carga cada función compilada en Node, sin ejecutar ningún handler.
+- **v2.9 (28 sept. 2026)** — numeración: los apartados "bis/ter" pasan a subapartados decimales del apartado anterior (convención del proyecto, AGENTS.md); referencias actualizadas en todo el repositorio. Sin cambios de contenido.

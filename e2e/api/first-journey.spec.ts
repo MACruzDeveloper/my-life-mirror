@@ -1,0 +1,69 @@
+import { expect, test } from "@playwright/test";
+import { AccountPages } from "./pages/AccountPages";
+import { HomePage } from "./pages/HomePage";
+import { InterviewPage } from "./pages/InterviewPage";
+import { newUser } from "./pages/users";
+
+// El recorrido de la validación (tareas 1-3), de extremo a extremo y con base de datos real (local).
+test.describe("primer uso: registro → entrevista → panel", () => {
+  test("RF-01 + RF-39: registrarse deja la sesión iniciada y lleva a la bienvenida (UX-01)", async ({ page }) => {
+    const user = newUser();
+    await new AccountPages(page).register(user);
+
+    const home = new HomePage(page);
+    await expect(home.startInterviewLink()).toBeVisible();
+    await expect(page.getByRole("region", { name: "Cómo funciona" })).toBeVisible();
+  });
+
+  test("RF-10 + RF-14 + RF-15 + RF-18: puntuar tres áreas muestra el panel, el equilibrio y una idea para la más baja", async ({ page }) => {
+    await new AccountPages(page).register(newUser());
+    await new HomePage(page).startInterviewLink().click();
+
+    const interview = new InterviewPage(page);
+    for (const name of ["Economía", "Familia", "Vida social"]) await interview.activate(name);
+    await interview.score("Economía", 2);
+    await interview.score("Familia", 8);
+    await interview.score("Vida social", 6);
+    await interview.save();
+
+    const home = new HomePage(page);
+    await home.open();
+    await expect(home.categoryCard("Economía")).toContainText("2");
+    await expect(home.categoryCard("Economía")).toContainText("Bajo");
+    await expect(home.balanceCard()).toBeVisible();
+
+    const idea = home.ideasSummary().getByRole("button", { name: "Idea para Economía" });
+    await expect(idea).toBeVisible();
+    await expect(home.ideasSummary().getByRole("button", { name: /familia/i })).toHaveCount(0);
+    await idea.click();
+    await expect(page.getByRole("dialog")).toContainText(/no sustituyen el asesoramiento/i);
+  });
+
+  test("RF-01: cerrar sesión y volver a entrar recupera los datos guardados", async ({ page }) => {
+    const user = newUser();
+    const account = new AccountPages(page);
+    await account.register(user);
+
+    const interview = new InterviewPage(page);
+    await interview.open();
+    await interview.activate("Familia");
+    await interview.score("Familia", 7);
+    await interview.save();
+
+    await account.logout();
+    await account.login(user);
+    await expect(page).toHaveURL(/\/inicio$/);
+    await expect(new HomePage(page).categoryCard("Familia")).toContainText("7");
+  });
+
+  test("RF-01: una contraseña incorrecta no entra y lo explica", async ({ page }) => {
+    const user = newUser();
+    const account = new AccountPages(page);
+    await account.register(user);
+    await account.logout();
+
+    await account.login({ email: user.email, password: "no-es-la-clave" });
+    await expect(page.getByRole("alert")).toContainText(/incorrectos/i);
+    await expect(page).toHaveURL(/\/login$/);
+  });
+});

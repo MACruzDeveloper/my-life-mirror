@@ -3,7 +3,7 @@ import type { ConsentimientoRepository } from "../domain/ConsentimientoRepositor
 
 /**
  * Fake solo para tests — ADR-03 §3.6. En dev/producción se usa
- * SupabaseConsentimientoRepository (04_Almacenamiento_Datos.md §7bis).
+ * SupabaseConsentimientoRepository (04_Almacenamiento_Datos.md §5.1).
  */
 export class InMemoryConsentimientoRepository implements ConsentimientoRepository {
   private readonly consentimientos: Consentimiento[] = [];
