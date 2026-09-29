@@ -11,6 +11,7 @@ interface CategoryRow {
   type: string;
   status: string;
   is_sensitive_data: boolean;
+  experience_tags: string[] | null;
 }
 
 function categoryFromRow(row: CategoryRow): Category {
@@ -23,6 +24,7 @@ function categoryFromRow(row: CategoryRow): Category {
     type: row.type as CategoryType,
     status: row.status as CategoryStatus,
     isSensitiveData: row.is_sensitive_data,
+    experienceTags: row.experience_tags ?? [],
   };
 }
 
@@ -36,6 +38,7 @@ function rowFromCategory(category: Category): Omit<CategoryRow, never> {
     type: category.type,
     status: category.status,
     is_sensitive_data: category.isSensitiveData,
+    experience_tags: [...(category.experienceTags ?? [])],
   };
 }
 
@@ -56,7 +59,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   async findByUserId(userId: string): Promise<Category[]> {
     const { data, error } = await this.client
       .from("categories")
-      .select("id, user_id, catalog_id, name, description, type, status, is_sensitive_data")
+      .select("id, user_id, catalog_id, name, description, type, status, is_sensitive_data, experience_tags")
       .eq("user_id", userId);
 
     if (error) {
@@ -68,7 +71,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   async findById(userId: string, categoryId: string): Promise<Category | undefined> {
     const { data, error } = await this.client
       .from("categories")
-      .select("id, user_id, catalog_id, name, description, type, status, is_sensitive_data")
+      .select("id, user_id, catalog_id, name, description, type, status, is_sensitive_data, experience_tags")
       .eq("user_id", userId)
       .eq("id", categoryId)
       .maybeSingle();

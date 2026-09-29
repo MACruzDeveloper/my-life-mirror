@@ -10,7 +10,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { categoryLabelsFixture } from "../../../helpers/categoryLabels";
 
 const CATEGORIES = [
-  { id: "c1", catalogId: "k-economia", name: "Economía", description: "...", status: "active", isSensitiveData: false },
+  { id: "c1", catalogId: "k-economia", name: "Economía", description: "...", status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"] },
   { id: "c2", catalogId: "k-deporte", name: "Deporte", description: "...", status: "active", isSensitiveData: true },
   { id: "c3", catalogId: "k-pareja", name: "Pareja", description: "...", status: "inactive", isSensitiveData: false },
   { id: "c4", catalogId: "k-sexo", name: "Sexo", description: "...", status: "inactive", isSensitiveData: true },
@@ -47,6 +47,11 @@ function stubFetch({ latest = LATEST, history = HISTORY, saveResponse: saveRespo
         return Promise.resolve({ ok: false, json: async () => ({ error: "Requiere consentimiento", code: "CONSENT_REQUIRED" }) });
       }
       return Promise.resolve({ ok: true, json: async () => ({ ...category, status: "active" }) });
+    }
+    if (url === "/api/categories/experience") {
+      const { categoryId, tags } = JSON.parse(init?.body as string);
+      const category = CATEGORIES.find((category) => category.id === categoryId);
+      return Promise.resolve({ ok: true, json: async () => ({ ...category, experienceTags: tags }) });
     }
     if (url === "/api/categories/deactivate") {
       const { categoryId } = JSON.parse(init?.body as string);
@@ -129,19 +134,80 @@ describe("InterviewPage (RF-10)", () => {
     expect(screen.getByRole("button", { name: /guardar cambios/i })).toBeDisabled();
   });
 
-  it("se puede puntuar por primera vez una categoría sin puntuación previa, con nota", async () => {
+  it("se puede puntuar por primera vez una categoría sin puntuación previa, con su experiencia privada", async () => {
     const fetchMock = stubFetch();
     renderPage();
     await waitUntilLoaded();
 
     chooseScore("deporte", 8);
-    fireEvent.click(screen.getAllByRole("button", { name: /añadir una nota/i })[1]);
-    fireEvent.change(screen.getByLabelText(/nota \(opcional\)/i), { target: { value: "voy al gimnasio" } });
+    fireEvent.click(screen.getAllByRole("button", { name: /tu experiencia \(privada\)/i })[1]);
+    fireEvent.change(screen.getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "voy al gimnasio" } });
     fireEvent.click(screen.getByRole("button", { name: /guardar cambios/i }));
 
     await waitFor(() => expect(screen.getByText(/cambios guardados/i)).toBeInTheDocument());
     const [call] = postCalls(fetchMock, "/api/assessments");
     expect(JSON.parse(call[1].body as string)).toEqual({ entries: [{ categoryId: "c2", score: 8, note: "voy al gimnasio" }] });
+  });
+
+  describe("experiencias (RF-41)", () => {
+    function helpsGroup(categoryName: string) {
+      return screen.getByRole("group", { name: new RegExp(`qué te ayuda.*${categoryName}`, "i") });
+    }
+
+    it("'¿Qué te ayuda?' está plegado, cuenta lo marcado y al abrirlo enseña las opciones de esa categoría", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+
+      const toggle = screen.getByRole("button", { name: "¿Qué te ayuda en esta área? (1)" });
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+      fireEvent.click(toggle);
+
+      const group = helpsGroup("economía");
+      expect(within(group).getByRole("button", { name: "Llevar un presupuesto", pressed: true })).toBeInTheDocument();
+      expect(within(group).getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeInTheDocument();
+      expect(within(group).queryByRole("button", { name: "Gimnasio" })).not.toBeInTheDocument();
+    });
+
+    it("marcar una opción se ve al instante y se guarda sin esperar a 'Guardar cambios'", async () => {
+      const fetchMock = stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
+
+      expect(await within(helpsGroup("economía")).findByRole("button", { name: "Apps de finanzas", pressed: true })).toBeInTheDocument();
+      await waitFor(() => expect(postCalls(fetchMock, "/api/categories/experience")).toHaveLength(1));
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/experience")[0][1].body as string)).toEqual({ categoryId: "c1", tags: ["economia.presupuesto", "economia.apps"] });
+      expect(screen.getByRole("button", { name: /guardar cambios/i })).toBeDisabled();
+    });
+
+    it("si el servidor lo rechaza, la marca se deshace y se avisa", async () => {
+      const fetchMock = stubFetch();
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+        url === "/api/categories/experience" ? Promise.resolve({ ok: false, json: async () => ({ error: "Unknown option" }) }) : defaultImplementation(url, init),
+      );
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
+
+      await waitFor(() => expect(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeInTheDocument());
+      expect(screen.getByText(/no se pudo guardar tu elección/i)).toBeInTheDocument();
+    });
+
+    it("'Tu experiencia (privada)' avisa de que solo la ve el usuario y nunca va a la IA", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(screen.getAllByRole("button", { name: /tu experiencia \(privada\)/i })[0]);
+
+      expect(screen.getByText("Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.")).toBeInTheDocument();
+    });
   });
 
   it("marcar una categoría inactiva no sensible la activa y muestra su pregunta", async () => {

@@ -111,8 +111,8 @@
     "pregunta": "How are you feeling about {{categoria}}?",
     "escala": "1 = very bad · 10 = very good",
     "puntuacionDe": "Score for {{categoria}}",
-    "anadirNota": "Add a note",
-    "nota": "Note (optional)",
+    "anadirNota": "Your experience (private)",
+    "nota": "Your experience (private)",
     "elegirAlgo": "Tick at least one category to start.",
     "guardar": "Save changes",
     "guardando": "Saving…",
@@ -143,7 +143,12 @@
     ],
     "verHistorial": "See my history ({{count}})",
     "ocultarHistorial": "Hide history",
-    "verMasHistorial": "Show more"
+    "verMasHistorial": "Show more",
+    "queTeAyuda": "What helps you in this area?",
+    "queTeAyudaMarcadas": "What helps you in this area? ({{count}})",
+    "queTeAyudaTexto": "Optional. It helps the app's ideas fit you.",
+    "notaPrivada": "Only you can see it. It's never sent to the AI or shared with anyone.",
+    "errorExperiencia": "Your choice could not be saved"
   },
   "resultados": {
     "titulo": "Your results",
@@ -428,5 +433,78 @@
       "When something changes in your life, use “{{actualizar}}”."
     ],
     "entendido": "Got it"
+  },
+  "experiencias": {
+    "economia": {
+      "presupuesto": "Keeping a budget",
+      "ahorroAlCobrar": "Saving as soon as I get paid",
+      "apps": "Money apps",
+      "hablarlo": "Talking it over with someone I trust",
+      "aprender": "Learning about money",
+      "ingresosExtra": "Extra income"
+    },
+    "vidaSocial": {
+      "quedarEnPersona": "Meeting up in person",
+      "mensajesYLlamadas": "Messages and calls",
+      "actividadesEnGrupo": "Group activities",
+      "voluntariado": "Volunteering",
+      "conocerGente": "Meeting new people",
+      "planesTranquilos": "Quiet plans"
+    },
+    "pareja": {
+      "tiempoJuntos": "Quality time together",
+      "hablarLasCosas": "Talking things through",
+      "pequenosDetalles": "Small gestures",
+      "planesNuevos": "Trying new things together",
+      "espacioPropio": "Having my own space",
+      "rutinasCompartidas": "Shared routines"
+    },
+    "sexo": {
+      "comunicacion": "Communication",
+      "tiempoSinPrisa": "Unhurried time",
+      "bienestarCorporal": "Feeling good in my body",
+      "explorar": "Exploring",
+      "informarme": "Learning more"
+    },
+    "deporte": {
+      "caminar": "Walking",
+      "gimnasio": "Gym",
+      "deporteEnEquipo": "Team sports",
+      "naturaleza": "Outdoors",
+      "bailar": "Dancing",
+      "yogaEstiramientos": "Yoga or stretching",
+      "ejercicioEnCasa": "Home workouts"
+    },
+    "aventura": {
+      "viajar": "Travelling",
+      "escapadas": "Short getaways",
+      "aprenderAlgoNuevo": "Learning something new",
+      "naturaleza": "Outdoors",
+      "comidaNueva": "Trying new food",
+      "retosPersonales": "Personal challenges"
+    },
+    "espiritualidad": {
+      "meditacion": "Meditation",
+      "naturaleza": "Nature",
+      "lectura": "Reading",
+      "comunidad": "Community or group",
+      "silencio": "Moments of silence",
+      "gratitud": "Gratitude"
+    },
+    "familia": {
+      "comidasJuntos": "Meals together",
+      "llamadas": "Calls",
+      "planesFinDeSemana": "Weekend plans",
+      "tradiciones": "Traditions",
+      "ayudarnos": "Helping each other",
+      "hablar": "Talking"
+    },
+    "inversiones": {
+      "aprenderAntes": "Learning before investing",
+      "largoPlazo": "Thinking long term",
+      "consultarProfesional": "Asking a professional",
+      "pocoAPoco": "Investing little by little",
+      "revisarDeVezEnCuando": "Checking now and then"
+    }
   }
 }
