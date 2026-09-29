@@ -37,7 +37,7 @@ Sobre el coste económico: el tier gratuito de Supabase se autopausa tras ~1 sem
 | **`Conexión` autorreferencial** | FK estándar de SQL — trivial, sin el rodeo de `$lookup` que hacía falta en MongoDB. |
 | **RF-34** (filtros combinados estado/categoría/fecha) | Una consulta SQL indexada, sin las limitaciones de Firestore ni el modelado manual de MongoDB. |
 | **Autorización** (sustituye la ausencia de RLS de MongoDB) | Row-Level Security de Postgres, nativo de Supabase — refuerza, no sustituye, la autorización ya prevista en la capa de Casos de Uso. |
-| **Auditoría** (RNF-11) | Igual que en la decisión anterior: un caso de uso `RegistrarAuditoria` explícito vía evento de dominio/Outbox ([03_Arquitectura_Software.md](03_Arquitectura_Software.md) §3.4) — Supabase no cambia esta pieza. |
+| **Auditoría** (RNF-11) | Igual que en la decisión anterior: un caso de uso `RegistrarAuditoria` explícito vía evento de dominio/Outbox ([03_Arquitectura_Software.md](03_Arquitectura_Software.md) apartado 3.4) — Supabase no cambia esta pieza. |
 | **Cifrado de campos sensibles** (RES-04, RD-06) | Cifrado a nivel de aplicación para los campos marcados como sensibles, igual que antes — no se implementa nada adicional específico de Postgres todavía (YAGNI). |
 | **Exportación de datos** (RNF-12) | SQL → JSON/CSV es tooling estándar. |
 
@@ -46,7 +46,7 @@ Sobre el coste económico: el tier gratuito de Supabase se autopausa tras ~1 sem
 - **Cliente:** `@supabase/supabase-js`, el SDK oficial.
 - **Autenticación:** ver [06_Autenticacion.md](06_Autenticacion.md) — Supabase Auth gestiona contraseñas y sesión; no se toca directamente Postgres para eso.
 - **Datos propios de la app** (perfil, categorías, evaluaciones...): una tabla por Aggregate Root, accedida a través de un `Repository` por puerto, igual disciplina que ya establecía ADR-03 — el adaptador concreto (`SupabaseXRepository`) es el único código con permiso para importar el cliente de Supabase para esos datos.
-- **Entorno de desarrollo/test**: adaptadores en memoria (Fakes) solo para los tests, según ADR-03 §3.6. En dev y producción se usa siempre el proyecto real de Supabase — ver §5.1, donde se explica por qué esto ya no es solo el caso de `AuthProvider`.
+- **Entorno de desarrollo/test**: adaptadores en memoria (Fakes) solo para los tests, según ADR-03 apartado 3.6. En dev y producción se usa siempre el proyecto real de Supabase — ver apartado 5.1, donde se explica por qué esto ya no es solo el caso de `AuthProvider`.
 
 ### 5.1 Corrección importante (14 sept. 2026): "en memoria hasta el final" no funciona entre funciones serverless
 
@@ -78,7 +78,7 @@ Con el almacenamiento decidido, seguir con RF-01: registro (ya migrado) y login 
 
 - **v1.0 (10 sept. 2026)** — versión inicial: MongoDB Atlas M0 elegido por familiaridad y coste, con mitigaciones para sus carencias (sin esquema forzado, sin RLS, sin auditoría nativa).
 - **v2.0 (13 sept. 2026)** — se sustituye MongoDB Atlas por **Supabase (Postgres + Auth gestionada)**, decisión tomada en el punto más barato posible (antes de construir el adaptador real de Mongo). Motivo principal: Supabase elimina la necesidad de construir autenticación a mano, además del mejor encaje relacional ya señalado en la v1.0.
-- **v2.1 (14 sept. 2026)** — corrección importante (§5.1): "en memoria hasta el final" no funciona para datos que cruzan funciones serverless distintas. `ProfileRepository` y `ConsentimientoRepository` pasan a Supabase real ya, no en Sprint 5. Migraciones SQL versionadas en `supabase/migrations/`, aplicación manual (§6.1).
+- **v2.1 (14 sept. 2026)** — corrección importante (apartado 5.1): "en memoria hasta el final" no funciona para datos que cruzan funciones serverless distintas. `ProfileRepository` y `ConsentimientoRepository` pasan a Supabase real ya, no en Sprint 5. Migraciones SQL versionadas en `supabase/migrations/`, aplicación manual (apartado 6.1).
 - **v2.2 (19 sept. 2026)** — nueva tabla `category_catalog` (ADM-02, migración 0005): catálogo global de categorías con retirada lógica (`retired_at`); `public.categories` sigue siendo por usuario y se siembra/sincroniza desde el catálogo.
 - **v2.3 (20 sept. 2026)** — derecho al olvido (RF-05): los repositorios ganan borrado por usuario. Todas las tablas con datos de usuario ya tenían `on delete cascade` hacia `auth.users`, pero `DeleteAccount` borra explícitamente y deja la cuenta de acceso para el final; la cascada es solo red de seguridad. `assessments` deja de ser estrictamente "solo inserta": el borrado por usuario es la única excepción.
 - **v2.4 (20 sept. 2026)** — nueva tabla `admin_audit_log` (ADM-03, migración 0006): auditoría de acciones de administración, solo inserción (trigger que impide `UPDATE`/`DELETE`), sin claves foráneas a `auth.users` para que eliminar una cuenta no borre la huella, y sin datos personales.

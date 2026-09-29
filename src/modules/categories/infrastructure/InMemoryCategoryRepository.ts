@@ -1,7 +1,7 @@
 import type { Category } from "../domain/Category.js";
 import type { CategoryRepository } from "../domain/CategoryRepository.js";
 
-/** Fake para tests — ADR-03 §3.6. */
+/** Fake para tests — ADR-03 apartado 3.6. */
 export class InMemoryCategoryRepository implements CategoryRepository {
   private readonly categories = new Map<string, Category>();
 

@@ -1,7 +1,7 @@
 # Historia: Panel de administración — primer corte (usuarios registrados)
 
 **Nivel:** 2 — Spec Anchored ([10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md))
-**Referencias:** RNF-13 (roles; "administrador de uso interno, no autoasignable"), [06_Autenticacion.md](../architecture-decisions/06_Autenticacion.md) §1.1
+**Referencias:** RNF-13 (roles; "administrador de uso interno, no autoasignable"), [06_Autenticacion.md](../architecture-decisions/06_Autenticacion.md) apartado 1.1
 
 > **Requisito propuesto, no registrado todavía.** Los requisitos actuales solo prevén el *rol* admin (RNF-13), no una pantalla de administración. Esta historia lo concreta con el identificador provisional **ADM-01**; si se acepta, se registra en [02_Requisitos_Fase1.md](../requirements-analysis/02_Requisitos_Fase1.md) (como Should, fuera del corte del MVP salvo que se decida lo contrario).
 
@@ -24,7 +24,7 @@ El servidor decide, la interfaz solo se adapta:
 3. **Denegar por defecto:** cualquier rol distinto de `admin`, o un rol ausente/corrupto, es "usuario" (ya lo garantiza `leerRolDesdeMetadata`).
 4. **La interfaz no es seguridad:** ocultar el enlace y redirigir `/admin` a quien no sea admin es solo comodidad; aunque alguien llegue a la página, la API le devuelve 403 y no ve datos.
 5. Sin acciones de escritura en este corte (no hay nada que un CSRF pueda alterar).
-6. Aviso operativo: un cambio de rol no se refleja en una sesión ya abierta hasta que el token se renueva (ver ADR-06 §1.1).
+6. Aviso operativo: un cambio de rol no se refleja en una sesión ya abierta hasta que el token se renueva (ver ADR-06 apartado 1.1).
 
 ## Criterios de aceptación
 

@@ -27,7 +27,7 @@ Para tener un registro honesto de mi vida, sin juicios y a mi ritmo
 - **Nota opcional** (RD-03; RF-11 es Should): el modelo, el caso de uso y la pantalla ya la admiten; longitud máx. 500.
 - **Registro inmutable** (RF-12, Should): solo se insertan evaluaciones; la ventana de corrección de 24 h **no** se implementa todavía.
 - **Sin periodos ni frecuencia** (RF-09, Should) ni **recomendaciones** (RF-18, lo siguiente del tablero).
-- **Persistencia real desde el principio** (Supabase, `supabase/migrations/0004_assessments.sql`) — ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §5.1.
+- **Persistencia real desde el principio** (Supabase, `supabase/migrations/0004_assessments.sql`) — ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) apartado 5.1.
 
 ## Criterios de aceptación
 

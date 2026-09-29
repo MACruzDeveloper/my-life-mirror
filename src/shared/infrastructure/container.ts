@@ -56,7 +56,7 @@ import { createGetAssessmentHistory } from "../../modules/assessments/applicatio
 import { createGetLatestScores } from "../../modules/assessments/application/GetLatestScores.js";
 
 /**
- * Composition Root — ADR-03 §3.4. Único lugar del sistema con permiso para
+ * Composition Root — ADR-03 apartado 3.4. Único lugar del sistema con permiso para
  * conocer implementaciones concretas de infraestructura y conectarlas a los
  * casos de uso. Lo usan las funciones de `api/`, nunca un componente de React
  * directamente (los casos de uso corren en el servidor, no en el navegador).
@@ -80,7 +80,7 @@ function credencialesSupabase(): { url: string; serviceRoleKey: string } {
 
 function crearAuthProvider(entorno: Entorno): AuthProvider {
   // Sin sustituto en memoria razonable para autenticación completa en dev —
-  // se usa el proyecto real de Supabase también ahí (ADR-06 §1). Solo los
+  // se usa el proyecto real de Supabase también ahí (ADR-06 apartado 1). Solo los
   // tests usan InMemoryAuthProvider.
   if (entorno === "test") {
     return new InMemoryAuthProvider();
@@ -144,7 +144,7 @@ function crearCategoryCatalogRepository(entorno: Entorno): CategoryCatalogReposi
  * Persistencia real desde el principio, sin pasar por en memoria en dev —
  * se escribe desde activar/desactivar y se lee desde listar, funciones
  * distintas de `api/` (ver supabase/migrations/0003_categories.sql y
- * 04_Almacenamiento_Datos.md §5.1: no se repite el error de RF-03/RF-04).
+ * 04_Almacenamiento_Datos.md apartado 5.1: no se repite el error de RF-03/RF-04).
  */
 function crearCategoryRepository(entorno: Entorno): CategoryRepository {
   if (entorno === "test") {

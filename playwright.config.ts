@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * V&V (04_Plan_Verificacion_Validacion.md §1) + lección de §1.1: Vitest no
+ * V&V (04_Plan_Verificacion_Validacion.md apartado 1) + lección de apartado 1.1: Vitest no
  * puede detectar que un dato no sobrevive entre funciones serverless
  * distintas — solo un navegador real contra la app real lo hace. `webServer`
  * arranca `vite` (frontend puro) automáticamente antes de los tests; el

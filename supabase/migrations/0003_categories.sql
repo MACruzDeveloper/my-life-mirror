@@ -1,7 +1,7 @@
 -- RF-06/RF-07: catálogo de categorías y activación por usuario. Persistencia
 -- real desde el principio (no en memoria) — este dato se escribe desde un
 -- endpoint (activar/desactivar) y se lee desde otro (listar); ver la lección
--- de RF-03 en 04_Almacenamiento_Datos.md §5.1.
+-- de RF-03 en 04_Almacenamiento_Datos.md apartado 5.1.
 
 create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),

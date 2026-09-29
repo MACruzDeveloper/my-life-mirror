@@ -12,7 +12,7 @@ interface RegistroInterno {
   suspendido: boolean;
 }
 
-/** Fake para tests — ADR-03 §3.6. No sustituye a Supabase en dev (ADR-06 §1). */
+/** Fake para tests — ADR-03 apartado 3.6. No sustituye a Supabase en dev (ADR-06 apartado 1). */
 export class InMemoryAuthProvider implements AuthProvider {
   private readonly usuarios: RegistroInterno[] = [];
   private readonly tokensDeRecuperacion = new Map<string, string>(); // token -> email

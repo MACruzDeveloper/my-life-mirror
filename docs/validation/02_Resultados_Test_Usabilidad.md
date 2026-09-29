@@ -14,7 +14,7 @@
 | Dispositivo y navegador | no anotado |
 | Idioma de la app | inglés (la participante no habla español) |
 | Participante | P1 — adulta, sin perfil técnico, angloparlante |
-| Relación con el autor | Pareja (sesgo de cercanía: ver guion §3) |
+| Relación con el autor | Pareja (sesgo de cercanía: ver guion apartado 3) |
 | Grabación | No |
 | Duración total | no anotada (≈ 20 min previstos) |
 
@@ -75,7 +75,7 @@ Gravedad (Nielsen): 0 no es un problema · 1 cosmético · 2 menor · 3 importan
 ## 5. Conclusiones
 
 - **RN-04 / RES-07: se cumple según lo declarado.** No se sintió juzgada (4/5, y "No" en la pregunta abierta), respondió con sinceridad (4/5) y la frase de la amiga describe casi literalmente el objetivo del producto: confiar sin sentirse juzgada, y recibir guía. Sin observación directa de incomodidad.
-- **RNF-01:** no medido en esta sesión (ver §2).
+- **RNF-01:** no medido en esta sesión (ver apartado 2).
 - **Lo que mejor ha funcionado:** el tono, las ideas (T3 sin ayuda, 4/5) y la intención de volver (5/5).
 - **Lo que más urge cambiar:** el primer contacto (T1-T2 con ayuda); corregido con UX-01.
 - **RF-05 (eliminar cuenta):** sin evidencia de esta sesión (T5 no se intentó); verificado por el autor con una cuenta sin rol admin, y cubierto por sus tests automáticos.

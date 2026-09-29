@@ -40,6 +40,10 @@ where email = 'tu-email@ejemplo.com';
 
 Cierra sesión y vuelve a entrar: aparecerá **Administración** en la cabecera (usuarios, catálogo de categorías y auditoría).
 
+### Ver los gráficos con meses de historial
+
+Una cuenta nueva solo tiene las respuestas de hoy. Para ver la evolución (y el radar) como si llevaras un año usando la app: activa algunas categorías, contesta la entrevista una vez y ejecuta [scripts/sql/simulated-history.sql](scripts/sql/simulated-history.sql) en el *SQL Editor* de Studio, con tu email. Añade una entrevista simulada al mes durante los 12 meses anteriores, sin tocar tus respuestas reales; el final del archivo trae la consulta para borrarlas.
+
 ### Idioma
 
 Español por defecto; el botón **EN** / **ES** de arriba a la derecha cambia a inglés (también antes de tener cuenta).
@@ -64,7 +68,7 @@ npm run test:e2e:api -- --headed   # los navegadores se abren y la app se usa so
 npm run test:e2e:api -- --reporter=html && npx playwright show-report   # informe en el navegador
 ```
 
-En GitHub, cada PR ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**). Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (§1.2).
+En GitHub, cada PR ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**). Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (apartado 1.2).
 
 ---
 

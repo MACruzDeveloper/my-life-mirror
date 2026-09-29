@@ -2,7 +2,7 @@
  * Logging estructurado — ADR-08. Cada línea es un JSON en stdout/stderr,
  * capturado gratis por el visor de logs de Vercel; nada de SaaS externo
  * todavía (YAGNI, RES-03). No confundir con la auditoría de RNF-11
- * (RegistrarAuditoria, ADR-04 §4) — eso es un registro de negocio en la
+ * (RegistrarAuditoria, ADR-04 apartado 4) — eso es un registro de negocio en la
  * base de datos, esto es observabilidad operativa.
  */
 type Nivel = "info" | "warn" | "error";

@@ -1,5 +1,5 @@
 /**
- * Jerarquía tipada de excepciones de dominio — ADR-03 §3.2.
+ * Jerarquía tipada de excepciones de dominio — ADR-03 apartado 3.2.
  * Distingue error de negocio (estos) de error técnico (excepciones nativas
  * de infraestructura, que nunca deberían cruzar hacia el dominio/aplicación).
  */
