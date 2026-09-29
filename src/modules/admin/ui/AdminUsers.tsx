@@ -108,19 +108,19 @@ export function AdminUsers() {
 
   async function confirmAction() {
     if (!action) return;
-    const { kind: tipo, user: usuario } = action;
-    const body: Record<string, unknown> = { userId: usuario.id };
-    if (tipo === "role") body.rol = role;
-    if (tipo === "email") body.email = value;
-    if (tipo === "name") body.name = value;
-    if (WITH_PASSWORD.includes(tipo)) body.password = password;
+    const { kind, user } = action;
+    const body: Record<string, unknown> = { userId: user.id };
+    if (kind === "role") body.rol = role;
+    if (kind === "email") body.email = value;
+    if (kind === "name") body.name = value;
+    if (WITH_PASSWORD.includes(kind)) body.password = password;
 
     setSending(true);
     setError(undefined);
     try {
-      const r = await postAdmin(ENDPOINT[tipo], body);
+      const r = await postAdmin(ENDPOINT[kind], body);
       if (!r.ok) {
-        setError(explain(r.status, tipo === "email"));
+        setError(explain(r.status, kind === "email"));
         return;
       }
       setAction(null);

@@ -29,7 +29,7 @@ export interface UserSummary {
 }
 
 export interface AuthProvider {
-  registrar(email: string, password: string): Promise<AuthenticatedUser>;
+  register(email: string, password: string): Promise<AuthenticatedUser>;
   logIn(email: string, password: string): Promise<LoggedInSession>;
   /** Valida un token de sesión ya emitido — lanza AuthenticationError si no es válido. */
   verifySession(token: string): Promise<AuthenticatedUser>;

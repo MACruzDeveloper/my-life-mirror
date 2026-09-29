@@ -13,8 +13,8 @@ import { logger } from "../../../logger.js";
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession: verificarSesion, getProfile } = getAppContext();
-    const result = await verificarSesion(token);
+    const { verifySession, getProfile } = getAppContext();
+    const result = await verifySession(token);
 
     if (!result.ok) {
       res.writeHead(200, { "Content-Type": "application/json" });

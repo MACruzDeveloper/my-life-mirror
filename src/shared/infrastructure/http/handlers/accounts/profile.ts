@@ -24,8 +24,8 @@ const UpdateProfileSchema = z.object({
 export default async function handler(req: RequestWithBody, res: ServerResponse) {
   try {
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession: verificarSesion, updateProfile, getProfile } = getAppContext();
-    const session = await verificarSesion(token);
+    const { verifySession, updateProfile, getProfile } = getAppContext();
+    const session = await verifySession(token);
 
     if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });

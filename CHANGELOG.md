@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (limpieza)
+
+- Últimos restos en español del pase anterior: nombres locales en las desestructuraciones de los handlers (`verifySession: verificarSesion`), el método `registrar` de `AuthProvider` (→ `register`) y los nombres de las funciones internas de seis casos de uso.
+
 ### Cambiado (UX-04)
 
 - El historial de cambios de la entrevista empieza plegado ("Ver mi historial (N)"); al abrirlo, una línea de tiempo por meses con los 5 guardados más recientes y "Ver más". Mismos datos y caché: abrir y cerrar no repite llamadas.

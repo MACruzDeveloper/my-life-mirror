@@ -8,7 +8,7 @@ import { InMemoryAuthProvider } from "@modules/accounts/infrastructure/InMemoryA
 describe("VerificarSesion", () => {
   it("devuelve el usuario cuando el token de sesión es válido", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await authProvider.registrar("ana@ejemplo.com", "12345678");
+    await authProvider.register("ana@ejemplo.com", "12345678");
     const session = await createLogIn(authProvider)({ email: "ana@ejemplo.com", password: "12345678" });
     const verifySession = createVerifySession(authProvider);
 

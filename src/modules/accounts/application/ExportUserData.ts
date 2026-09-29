@@ -34,12 +34,12 @@ interface Dependencies {
  * que `ActivateCategory` con el consentimiento.
  * Ver docs/user-stories/RF-05-exportar-eliminar-datos.md.
  */
-export function createExportUserData({ profileRepository, categoryRepository, consentRepository: consentimientoRepository, assessmentRepository, recommendationRepository, clock }: Dependencies) {
+export function createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, clock }: Dependencies) {
   return async function exportUserData(user: { id: string; email: string }): Promise<Result<UserDataExport, never>> {
     const [profile, categories, consents, assessments, recommendations] = await Promise.all([
       profileRepository.findByUserId(user.id),
       categoryRepository.findByUserId(user.id),
-      consentimientoRepository.findByUser(user.id),
+      consentRepository.findByUser(user.id),
       assessmentRepository.findByUserId(user.id),
       recommendationRepository.findByUserId(user.id),
     ]);

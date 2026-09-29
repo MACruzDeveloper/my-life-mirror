@@ -239,7 +239,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   });
 
   return {
-    environment: environment,
+    environment,
     clock,
     authProvider,
     // registerUser depende de updateProfile (guarda el nombre como perfil
@@ -252,7 +252,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
       authProvider,
       profileRepository,
       categoryRepository,
-      consentRepository: consentRepository,
+      consentRepository,
       assessmentRepository,
       recommendationRepository,
       auditRepository: createAdminAuditRepository(environment),
@@ -260,13 +260,13 @@ export function createAppContext(environment: Environment = detectEnvironment())
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
-    consentRepository: consentRepository,
+    consentRepository,
     grantConsent: createGrantConsent(consentRepository, clock),
-    checkConsent: checkConsent,
+    checkConsent,
     profileRepository,
     updateProfile,
     getProfile: createGetProfile(profileRepository),
@@ -277,7 +277,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     addCatalogCategory: createAddCatalogCategory(categoryCatalogRepository),
     retireCatalogCategory: createRetireCatalogCategory(categoryCatalogRepository, categoryRepository, () => clock.now()),
     listCategories: createListCategories(categoryRepository, categoryCatalogRepository),
-    // activateCategory depende de verificarConsentimiento (RF-04 extiende a RF-07 para categorías sensibles).
+    // activateCategory depende de checkConsent (RF-04 extiende a RF-07 para categorías sensibles).
     activateCategory: createActivateCategory(categoryRepository, checkConsent, categoryCatalogRepository),
     deactivateCategory: createDeactivateCategory(categoryRepository),
     assessmentRepository,
@@ -286,7 +286,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
       try {
         await generateRecommendations(userId, saved);
       } catch (error) {
-        logger.error("No se pudieron generar las recomendaciones (el guardado sigue siendo válido)", error, { userId: userId });
+        logger.error("No se pudieron generar las recomendaciones (el guardado sigue siendo válido)", error, { userId });
       }
     }),
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
