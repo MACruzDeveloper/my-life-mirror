@@ -67,7 +67,7 @@ No se escribe implementación antes que su test correspondiente.
 * Cada documento de `docs/` conserva su contenido y añade una sección **"Historial de cambios"** al final en vez de sobrescribirse en silencio.
 * Un apartado nuevo entre dos existentes es un subapartado decimal del anterior (`### 2.1`, `### 2.2`…), nunca "2bis"/"2ter". Las referencias se escriben con la palabra: "ADR-03, apartado 6.1", sin el símbolo de sección.
 * [docs/Historial_Prompts.md](docs/Historial_Prompts.md) registra cada prompt que fija una decisión de diseño, proceso o alcance — no cada mensaje.
-* `package.json` sube de versión siguiendo [SemVer](https://semver.org/lang/es/) en cada cambio significativo, y [CHANGELOG.md](CHANGELOG.md) registra los cambios siguiendo [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/) — el mismo espíritu que ya se aplica a los documentos, extendido al código. Mientras el proyecto esté en `0.x` (antes del cierre del Ciclo 1), MINOR = nueva funcionalidad, PATCH = corrección; sin API pública que rompa compatibilidad todavía.
+* `package.json` sube de versión siguiendo [SemVer](https://semver.org/lang/es/) en cada cambio significativo, y [CHANGELOG.md](CHANGELOG.md) registra los cambios siguiendo [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/) — el mismo espíritu que ya se aplica a los documentos, extendido al código. Desde la `1.0.0` (primera entrega a producción, 29 sept. 2026): MINOR = nueva funcionalidad, PATCH = corrección, MAJOR = un cambio que obligue a migrar datos o rompa lo existente. Cada entrega a `main` es una versión con su sección en el CHANGELOG y su etiqueta (`v1.1.0`…).
 * Commits/push solo cuando el usuario lo pida explícitamente.
 
 ## 🚫 Prohibiciones
@@ -115,3 +115,4 @@ No se escribe implementación antes que su test correspondiente.
 - **v1.23 (27 sept. 2026)** — `npm run test:e2e:api`: E2E con `api/` contra Supabase local en Docker (nunca `vercel dev`, que carga la base real).
 - **v1.24 (28 sept. 2026)** — `npm run dev:local` (probar la app contra el Supabase local), E2E con `api/` en GitHub Actions y numeración decimal de apartados en lugar de "bis/ter" (referencias actualizadas en todo el repositorio).
 - **v1.25 (29 sept. 2026)** — referencias a apartados con la palabra "apartado" en lugar del símbolo de sección, en todo el repositorio.
+- **v1.26 (29 sept. 2026)** — versión 1.0.0 (primera entrega a producción): reglas de SemVer a partir de ahora.
