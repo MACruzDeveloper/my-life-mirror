@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (UX-04)
+
+- El historial de cambios de la entrevista empieza plegado ("Ver mi historial (N)"); al abrirlo, una línea de tiempo por meses con los 5 guardados más recientes y "Ver más". Mismos datos y caché: abrir y cerrar no repite llamadas.
+
 ### Cambiado
 
 - Código en inglés en un pase completo: módulos `cuentas` → `accounts`, `consentimiento` → `consent`, `bienestar` → `wellbeing`, `notificaciones` → `notifications`; ~60 archivos renombrados (`IniciarSesion` → `LogIn`, `OtorgarConsentimiento` → `GrantConsent`, `RolUsuario` → `UserRole`…) y ~750 identificadores (`obtenerAppContext` → `getAppContext`…). Hecho con el servicio de lenguaje de TypeScript, que cambia cada referencia y rechaza un nombre que choque con otro ya visible. Sin cambios de comportamiento: 419 tests, E2E con base de datos local y `check:api` en verde.
