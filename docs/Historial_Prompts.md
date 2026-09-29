@@ -164,6 +164,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **29 sept. 2026** — *"just remember to change this §6 markers and change it for sub-points"*
 → Se deja también el símbolo de sección: todas las referencias pasan a "apartado N" (199 en 76 archivos, incluidos comentarios de código y workflows). Completa la decisión del 28 sept. sobre la numeración decimal.
 
+**29 sept. 2026** — *"I think the demo script is not necessary for now because my teachers only will review the project when it's totally finished. So let's try only to deploy to production unless you consider that it's better to wait for the end of the project."*
+→ Se despliega a producción ya (v1.0.0, cierre del Ciclo 1): encontrar ahora lo que solo falla en producción (como las variables de Vercel que faltaban) y empezar a medir DORA de verdad. La demo pasa al final del proyecto; su guion se conserva.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*
