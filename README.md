@@ -3,6 +3,7 @@
 Aplicación web para evaluar cómo va tu vida por áreas (economía, familia, deporte…), ver tu equilibrio y su evolución, y recibir ideas concretas para mejorar lo que tú elijas, **sin juicios ni comparaciones**. Trabajo de Fin de Máster del Máster en Desarrollo con IA (BIG School).
 
 - **Stack:** React 19 + TypeScript + Vite, Material UI, TanStack Query, react-i18next (español e inglés), Apache ECharts; funciones serverless en Vercel (`api/`); Supabase (Postgres + Auth).
+- **En producción:** https://my-life-mirror.vercel.app
 - **Arquitectura:** monolito modular con Clean Architecture en cada módulo (dominio / aplicación / infraestructura), TDD y especificación Spec Anchored. Ver [docs/](docs/).
 
 ---
