@@ -12,7 +12,7 @@ export interface RequestPasswordResetInput {
  * exista o no la cuenta — nunca revela si un email está registrado.
  */
 export function createRequestPasswordReset(authProvider: AuthProvider) {
-  return async function solicitarRecuperacion(
+  return async function requestPasswordReset(
     input: RequestPasswordResetInput,
   ): Promise<Result<void, ValidationError>> {
     const email = Email.create(input.email);

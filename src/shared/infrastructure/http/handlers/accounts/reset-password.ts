@@ -22,8 +22,8 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
       return;
     }
 
-    const { resetPassword: restablecerPassword } = getAppContext();
-    const result = await restablecerPassword(data.data);
+    const { resetPassword } = getAppContext();
+    const result = await resetPassword(data.data);
 
     if (!result.ok) {
       const status = result.error.code === "AUTHENTICATION_ERROR" ? 401 : 400;

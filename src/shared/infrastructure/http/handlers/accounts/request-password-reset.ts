@@ -23,8 +23,8 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
       return;
     }
 
-    const { requestPasswordReset: solicitarRecuperacion } = getAppContext();
-    const result = await solicitarRecuperacion(data.data);
+    const { requestPasswordReset } = getAppContext();
+    const result = await requestPasswordReset(data.data);
 
     if (!result.ok) {
       res.writeHead(400, { "Content-Type": "application/json" });

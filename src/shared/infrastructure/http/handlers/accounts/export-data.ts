@@ -16,8 +16,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession: verificarSesion, exportUserData } = getAppContext();
-    const session = await verificarSesion(token);
+    const { verifySession, exportUserData } = getAppContext();
+    const session = await verifySession(token);
     if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));

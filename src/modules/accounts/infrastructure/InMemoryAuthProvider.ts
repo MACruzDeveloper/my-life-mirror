@@ -17,7 +17,7 @@ export class InMemoryAuthProvider implements AuthProvider {
   private readonly users: StoredUser[] = [];
   private readonly resetTokens = new Map<string, string>(); // token -> email
 
-  async registrar(email: string, password: string): Promise<AuthenticatedUser> {
+  async register(email: string, password: string): Promise<AuthenticatedUser> {
     if (this.users.some((u) => u.email === email)) {
       throw new ConflictError("Ya existe una cuenta con ese email");
     }

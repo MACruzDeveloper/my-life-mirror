@@ -21,7 +21,7 @@ export class SupabaseAuthProvider implements AuthProvider {
     this.resetPasswordUrl = resetPasswordUrl;
   }
 
-  async registrar(email: string, password: string): Promise<AuthenticatedUser> {
+  async register(email: string, password: string): Promise<AuthenticatedUser> {
     const { data, error } = await this.client.auth.admin.createUser({
       email,
       password,

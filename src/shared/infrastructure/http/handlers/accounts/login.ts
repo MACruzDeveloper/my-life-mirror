@@ -32,8 +32,8 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
       return;
     }
 
-    const { logIn: iniciarSesion } = getAppContext();
-    const result = await iniciarSesion(data.data);
+    const { logIn } = getAppContext();
+    const result = await logIn(data.data);
 
     if (!result.ok) {
       const status = result.error.code === "AUTHENTICATION_ERROR" ? 401 : 400;

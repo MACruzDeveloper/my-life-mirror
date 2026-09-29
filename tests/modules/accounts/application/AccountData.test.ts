@@ -26,8 +26,8 @@ async function setup() {
   const recommendationRepository = new InMemoryRecommendationRepository();
   const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository };
 
-  const ana = await authProvider.registrar("ana@ejemplo.com", "12345678");
-  const luis = await authProvider.registrar("luis@ejemplo.com", "abcdefgh");
+  const ana = await authProvider.register("ana@ejemplo.com", "12345678");
+  const luis = await authProvider.register("luis@ejemplo.com", "abcdefgh");
   const updateProfile = createUpdateProfile(profileRepository);
   await updateProfile({ userId: ana.id, name: "Ana", birthDate: "1996-05-20", timeZone: "Europe/Madrid" });
   await updateProfile({ userId: luis.id, name: "Luis" });
@@ -95,7 +95,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
 
   it("sin perfil ni datos devuelve un documento válido con listas vacías", async () => {
     const { exportUserData, authProvider } = await setup();
-    const draft = await authProvider.registrar("nuevo@ejemplo.com", "12345678");
+    const draft = await authProvider.register("nuevo@ejemplo.com", "12345678");
 
     const result = await exportUserData({ id: draft.id, email: draft.email });
 

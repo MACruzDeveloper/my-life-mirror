@@ -15,7 +15,7 @@ export interface CheckConsentInput {
  * modal de consentimiento o activar la categoría directamente.
  */
 export function createCheckConsent(repository: ConsentRepository) {
-  return async function verificarConsentimiento(
+  return async function checkConsent(
     input: CheckConsentInput,
   ): Promise<Result<boolean, ValidationError>> {
     const userId = input.userId.trim();
