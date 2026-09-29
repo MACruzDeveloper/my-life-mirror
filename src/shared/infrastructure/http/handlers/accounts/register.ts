@@ -10,11 +10,11 @@ import { logger } from "../../../logger.js";
 // vez de instalar @vercel/node solo por los tipos — su cadena de
 // dependencias trae vulnerabilidades (ajv/path-to-regexp/undici) que no
 // compensan por unos tipos que Node ya cubre (mismo criterio de
-// "comprobar la alternativa nativa" de 02_Principios_Diseño.md §4).
+// "comprobar la alternativa nativa" de 02_Principios_Diseño.md apartado 4).
 type PeticionConCuerpo = IncomingMessage & { body: unknown };
 
 /**
- * Controlador HTTP — ADR-03 §3.4. Solo recibe input, valida tipos básicos,
+ * Controlador HTTP — ADR-03 apartado 3.4. Solo recibe input, valida tipos básicos,
  * delega al caso de uso y traduce el Result a un código de estado. Cero
  * lógica de negocio aquí. `name` se guarda como perfil inicial dentro del
  * propio caso de uso (RegisterUser, RF-03) — no hay una segunda llamada.

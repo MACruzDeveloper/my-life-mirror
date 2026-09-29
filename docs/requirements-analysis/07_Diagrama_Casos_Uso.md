@@ -3,7 +3,7 @@
 **Diagrama:** [07_Diagrama_Casos_Uso.drawio](07_Diagrama_Casos_Uso.drawio) — ábrelo con la app de draw.io (desktop/web, "Abrir archivo") o la extensión "Draw.io Integration" de VS Code.
 **Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.4
 **Fecha:** 7 de septiembre de 2026
-**Formato:** draw.io (XML), el único diagrama del proyecto en este formato — el resto usa Mermaid (ver [05](05_Diagrama_Clases.md), [06](06_Diagrama_Secuencia_CheckIn.md)). Los use cases están consolidados a nivel de objetivo de usuario (no 1:1 con cada RF) porque esa es la granularidad correcta en UML — un caso de uso modela una meta del actor, no un botón de la interfaz. La trazabilidad completa a nivel de RF se mantiene en la tabla del §2, no en el propio dibujo.
+**Formato:** draw.io (XML), el único diagrama del proyecto en este formato — el resto usa Mermaid (ver [05](05_Diagrama_Clases.md), [06](06_Diagrama_Secuencia_CheckIn.md)). Los use cases están consolidados a nivel de objetivo de usuario (no 1:1 con cada RF) porque esa es la granularidad correcta en UML — un caso de uso modela una meta del actor, no un botón de la interfaz. La trazabilidad completa a nivel de RF se mantiene en la tabla del apartado 2, no en el propio dibujo.
 
 ---
 

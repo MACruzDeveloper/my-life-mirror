@@ -13,7 +13,7 @@ import { createServerModuleRunner, type Plugin } from "vite";
  * Imita lo que hace Vercel con estas funciones: rutas por archivo (lo concreto
  * gana a `[action]`, `index.ts` responde a su carpeta) y `req.body` ya
  * parseado. Los handlers solo usan la API de Node (`writeHead`/`end`), así que
- * no hace falta nada más. Ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md §1.1.
+ * no hace falta nada más. Ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md apartado 1.1.
  */
 
 export interface ApiRoute {
@@ -89,7 +89,7 @@ export function vercelApiRoutes(apiDir: string): Plugin {
           // memoria de otra (ni la de una petición anterior). Más estricto que Vercel, que
           // sí reutiliza una instancia caliente de la misma función; así este entorno no
           // puede ocultar el fallo de docs/requirements-analysis/04_Plan_Verificacion_Validacion.md
-          // §1.1 (datos en memoria que "funcionan" porque todo corre en un mismo proceso).
+          // apartado 1.1 (datos en memoria que "funcionan" porque todo corre en un mismo proceso).
           // La caché de transformación de Vite se comparte, así que sigue siendo rápido.
           const runner = createServerModuleRunner(server.environments.ssr, { hmr: false });
           try {

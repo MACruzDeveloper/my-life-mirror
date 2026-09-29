@@ -27,7 +27,7 @@ El tablero describía esta tarea como un caso de uso de solo lectura `ConsultarP
 Motivos:
 - Ambas ya están hechas, probadas y cacheadas por separado (`["assessments","latest"]`, `["assessments","recommendations"]` — la segunda vive deliberadamente bajo el prefijo de la primera para invalidarse junto a ella, ver `queries.ts`).
 - Un caso de uso combinado en el servidor acoplaría el módulo `assessments` a `recommendations` (o exigiría un módulo nuevo solo para componer), sin ganar nada que la composición en la pantalla no dé ya: la pantalla necesita el nombre de la categoría, su puntuación y, si la hay, su recomendación — un simple cruce por `categoryId`.
-- Añadir un endpoint nuevo solo para esto gastaría una función serverless más (10/12 hoy, [03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) §6.1) sin necesidad.
+- Añadir un endpoint nuevo solo para esto gastaría una función serverless más (10/12 hoy, [03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) apartado 6.1) sin necesidad.
 
 Si en el futuro el panel crece (RF-15/RF-16/RF-31) y la composición en la pantalla se vuelve difícil de mantener, ese es el momento de mover la composición al servidor — no antes (YAGNI).
 

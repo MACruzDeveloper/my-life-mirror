@@ -1,6 +1,6 @@
 # Diagrama de Secuencia — Activación de Categoría y Consentimiento
 
-**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.4 (RF-04, RF-07, RD-02, RD-05), [07_Diagrama_Casos_Uso.md](07_Diagrama_Casos_Uso.md) §3-4
+**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.4 (RF-04, RF-07, RD-02, RD-05), [07_Diagrama_Casos_Uso.md](07_Diagrama_Casos_Uso.md) apartado 3-4
 **Fecha:** 7 de septiembre de 2026
 **Formato:** Mermaid.
 

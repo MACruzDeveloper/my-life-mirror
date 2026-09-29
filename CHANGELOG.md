@@ -39,15 +39,21 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - `<html lang>` fijo en `en` con la app en español: ahora sigue al idioma elegido (lectores de pantalla).
 
+### Añadido (gestión)
+
+- `scripts/sql/simulated-history.sql`: historial simulado de 12 meses para un usuario (una entrevista al mes, solo en sus categorías activas, antes de su primera respuesta real y enlazando con su puntuación actual), para ver la evolución y el radar en desarrollo y en la demo. Repetible y reversible (marca en los microsegundos de `recorded_at`). Probado sobre las 9 migraciones con PGlite.
+- Primera revisión de métricas DORA y Flow ([02_Metricas_DORA_y_Flujo.md](docs/project-management/02_Metricas_DORA_y_Flujo.md) apartado 7) y dos reglas de flujo nuevas en el tablero.
+
 ### Añadido (verificación y documentación)
 
 - Workflow de GitHub Actions **E2E con api** (`.github/workflows/e2e-api.yml`): en cada PR levanta un Supabase local y ejecuta `npm run test:e2e:api`; guarda el informe HTML como artefacto. Sin secretos: nunca toca la base real.
 - `npm run dev:local`: la app completa contra el Supabase local (http://localhost:5175), sin cuentas ni `.env`. Lógica común con `test:e2e:api` en `scripts/local-supabase.mjs`; `vite.e2e.config.ts` pasa a `vite.local.config.ts`.
 - `README.md` reescrito (era la plantilla de Vite): qué es la app, cómo probarla en local, cómo entrar como administrador, tests y cómo verlos funcionar.
-- Plan de verificación, §1.2.1 "Cómo ver que funciona".
+- Plan de verificación, apartado 1.2.1 "Cómo ver que funciona".
 
 ### Cambiado (documentación)
 
+- Referencias a apartados escritas con la palabra ("ADR-03, apartado 6.1") en lugar del símbolo de sección, en todo el repositorio.
 - Numeración de apartados: "1bis/1ter/2bis/6bis/7bis/7ter" pasan a subapartados decimales (1.1, 1.2, 2.1, 6.1, 5.1, 6.1) en ADR-03, ADR-04, ADR-06, ADR-09 y el plan de verificación, con las referencias actualizadas en 29 archivos.
 
 ### Añadido (verificación)
@@ -99,7 +105,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 ### Añadido (infraestructura)
 
-- `.github/workflows/supabase-keep-alive.yml`: una consulta diaria mínima (solo lectura, clave pública *anon*, sin permisos sobre el repositorio) para que Supabase Free no pause el proyecto por inactividad; si Supabase no responde 200, el job falla y GitHub avisa. Necesita los secretos `SUPABASE_URL` y `SUPABASE_ANON_KEY` y que la rama por defecto sea `develop` (ver ADR-03 §6.1).
+- `.github/workflows/supabase-keep-alive.yml`: una consulta diaria mínima (solo lectura, clave pública *anon*, sin permisos sobre el repositorio) para que Supabase Free no pause el proyecto por inactividad; si Supabase no responde 200, el job falla y GitHub avisa. Necesita los secretos `SUPABASE_URL` y `SUPABASE_ANON_KEY` y que la rama por defecto sea `develop` (ver ADR-03 apartado 6.1).
 
 ### Cambiado (estructura y nombres)
 
@@ -165,7 +171,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 - `useSesion` se mueve de `modules/cuentas/ui/` a `shared/ui/` para que `ProtectedLayout` pueda usarlo sin invertir la dirección de dependencia entre `shared` y los módulos.
 - Código y nombres de archivo en inglés a partir de ahora (comentarios/docs siguen en español) — aplicado a todo lo tocado en RF-03: `RegistrarUsuario`→`RegisterUser`, `RegistroForm`→`RegisterForm`, `Perfil`→`Profile`, `ConfigurarPerfil`→`UpdateProfile`, `ObtenerPerfil`→`GetProfile`, `LayoutProtegido`→`ProtectedLayout`, `api/registro.ts`→`api/register.ts`, `api/configurar-perfil.ts`→`api/profile.ts` (y, más tarde el 15 sept., toda la carpeta `api/` se reorganiza en subcarpetas — ver más abajo). El resto del código existente (no tocado en este cambio) se renombra cuando se toque, no en un pase retroactivo — ver AGENTS.md.
 - `edad` (entero) sustituida por `birthDate` (fecha, selector nativo `<input type="date">`).
-- `api/` reorganizado en subcarpetas por capacidad de negocio (`accounts/`, `categories/`, `consent/`), reflejando la estructura de `src/modules/` — Vercel sí soporta rutas anidadas de forma nativa (carpeta → segmento de URL); la duda sobre esto venía de un incidente anterior ya resuelto por otra causa (`SUPABASE_URL` mal configurada, ADR-06 §2), no de un problema real con anidar carpetas. URLs afectadas: `/api/register`→`/api/accounts/register`, `/api/login`→`/api/accounts/login`, `/api/logout`→`/api/accounts/logout`, `/api/sesion`→`/api/accounts/session`, `/api/solicitar-recuperacion`→`/api/accounts/request-password-reset`, `/api/restablecer-password`→`/api/accounts/reset-password`, `/api/profile`→`/api/accounts/profile`, `/api/activate-category`→`/api/categories/activate`, `/api/deactivate-category`→`/api/categories/deactivate`, `/api/grant-consent`→`/api/consent/grant` (`/api/categories` sin cambios).
+- `api/` reorganizado en subcarpetas por capacidad de negocio (`accounts/`, `categories/`, `consent/`), reflejando la estructura de `src/modules/` — Vercel sí soporta rutas anidadas de forma nativa (carpeta → segmento de URL); la duda sobre esto venía de un incidente anterior ya resuelto por otra causa (`SUPABASE_URL` mal configurada, ADR-06 apartado 2), no de un problema real con anidar carpetas. URLs afectadas: `/api/register`→`/api/accounts/register`, `/api/login`→`/api/accounts/login`, `/api/logout`→`/api/accounts/logout`, `/api/sesion`→`/api/accounts/session`, `/api/solicitar-recuperacion`→`/api/accounts/request-password-reset`, `/api/restablecer-password`→`/api/accounts/reset-password`, `/api/profile`→`/api/accounts/profile`, `/api/activate-category`→`/api/categories/activate`, `/api/deactivate-category`→`/api/categories/deactivate`, `/api/grant-consent`→`/api/consent/grant` (`/api/categories` sin cambios).
 - Header consolidado: "Perfil" y "Categorías" eran dos enlaces sueltos, ahora es uno solo ("Mi perfil") hacia `AccountPage`, con un menú lateral (cajón fijo en md+, desplegable en móvil) que sustituye a las pestañas: Perfil, Categorías, Entrevista y Resultados (rutas anidadas `/perfil/*`, recargables/enlazables).
 - Metodología: se abandonan los sprints semanales por Lean + Kanban con apetito fijo y línea de corte ([00_Metodologia_Lean.md](docs/project-management/00_Metodologia_Lean.md)); el backlog pasa a ser un tablero Kanban. `docs/user-stories/` se mantiene plano (una historia por archivo, sin carpetas por sprint).
 - Playwright instalado (`e2e/`, `npm run test:e2e`, `tsconfig.e2e.json`) — primer test cubre solo páginas públicas (no toca `api/`). Automatizar RF-01 (registro/login) queda pendiente de decidir cómo aislar los datos de prueba en Supabase.
@@ -178,7 +184,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 - `RegisterUser` no aislaba el guardado del perfil inicial (`updateProfile`) del alta en Supabase Auth: una excepción ahí habría reportado el registro entero como fallido pese a que la cuenta ya existiera. Ahora va en su propio try/catch, sin poder deshacer un registro ya válido.
 - Bug real encontrado en pruebas manuales: tras guardar el perfil, el `Header` seguía mostrando el email en vez del nombre recién guardado. `useSesion` (hook independiente, sin forma de invalidarse) se sustituye por `SessionProvider`/`useSession` (contexto de React) — `RutaProtegida` (renombrada `ProtectedRoute`) instala un único contexto por ruta que `ProtectedLayout` y `ProfileForm` comparten, así `ProfileForm` puede pedir un `refresh()` tras guardar.
-- Bug real más profundo, mismo síntoma: `ProfileRepository`/`ConsentimientoRepository` en memoria no sobreviven entre funciones serverless distintas de `api/` (cada archivo es una función aislada, sin memoria compartida — ni en producción ni en `vercel dev`). Se adelanta su persistencia real a Supabase (`SupabaseProfileRepository`, `SupabaseConsentimientoRepository`) desde ahora, no en el Sprint 5 como estaba planeado — ver [04_Almacenamiento_Datos.md](docs/architecture-decisions/04_Almacenamiento_Datos.md) §5.1. Esquemas en `supabase/migrations/`.
+- Bug real más profundo, mismo síntoma: `ProfileRepository`/`ConsentimientoRepository` en memoria no sobreviven entre funciones serverless distintas de `api/` (cada archivo es una función aislada, sin memoria compartida — ni en producción ni en `vercel dev`). Se adelanta su persistencia real a Supabase (`SupabaseProfileRepository`, `SupabaseConsentimientoRepository`) desde ahora, no en el Sprint 5 como estaba planeado — ver [04_Almacenamiento_Datos.md](docs/architecture-decisions/04_Almacenamiento_Datos.md) apartado 5.1. Esquemas en `supabase/migrations/`.
 - `api/accounts/session.ts` devolvía 500 (rompiendo la comprobación de sesión entera) si `getProfile` fallaba por cualquier motivo — p. ej. la tabla `profiles` sin migrar todavía. Aislado en su propio try/catch: un fallo ahí ahora solo significa "sin nombre todavía", nunca "no sé si hay sesión" (mismo criterio que `RegisterUser`).
 
 ## [0.1.0] - 2026-09-14
@@ -193,7 +199,7 @@ Primera entrega funcional del Ciclo 1 (MVP): Sprint 0 completo + Sprint 1 hasta 
 - **RF-39** — routing real con React Router: Landing pública, Home protegida (`RutaProtegida` + `useSesion`), `api/sesion.ts` y `api/logout.ts`.
 - **RF-30** — lógica de líneas de ayuda en crisis (`obtenerLineasAyudaCrisis`), lista para su colocación visual en una pantalla de ayuda futura.
 - **RNF-10** — internacionalización ES/EN con `react-i18next`; todas las pantallas de cuentas traducidas, con selector manual de idioma en el `Header` ([09_Internacionalizacion.md](docs/architecture-decisions/09_Internacionalizacion.md)).
-- `Breadcrumbs` y `Header` como componentes de navegación reutilizables en `shared/ui/` ([07_UI.md](docs/architecture-decisions/07_UI.md) §5).
+- `Breadcrumbs` y `Header` como componentes de navegación reutilizables en `shared/ui/` ([07_UI.md](docs/architecture-decisions/07_UI.md) apartado 5).
 - Material UI como librería de interfaz, con tema explícito en modo claro.
 - Observabilidad mínima: logger estructurado en JSON para los endpoints de `api/` ([08_Observabilidad.md](docs/architecture-decisions/08_Observabilidad.md)).
 

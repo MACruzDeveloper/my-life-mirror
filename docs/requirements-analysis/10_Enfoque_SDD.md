@@ -17,7 +17,7 @@
 
 ## 2. Por qué Nivel 1 no es el que gobierna este proyecto
 
-Nivel 1 asume baja incertidumbre. Pero elegimos deliberadamente un ciclo de vida espiral precisamente por **alta incertidumbre técnica** (motivo personal explícito en [01_Justificacion_Ciclo_Vida.md](01_Justificacion_Ciclo_Vida.md) §2, punto 4: quieres aplicar lo aprendido en el máster, lo que implica tecnologías con poca experiencia previa). Forzar Nivel 1 como filosofía general del proyecto sería contradecir esa decisión ya tomada.
+Nivel 1 asume baja incertidumbre. Pero elegimos deliberadamente un ciclo de vida espiral precisamente por **alta incertidumbre técnica** (motivo personal explícito en [01_Justificacion_Ciclo_Vida.md](01_Justificacion_Ciclo_Vida.md) apartado 2, punto 4: quieres aplicar lo aprendido en el máster, lo que implica tecnologías con poca experiencia previa). Forzar Nivel 1 como filosofía general del proyecto sería contradecir esa decisión ya tomada.
 
 Dicho esto: la Fase 2 (`02_Requisitos_Fase1.md` y los diagramas) sí se comportó, a nivel de sistema completo, de forma parecida a un Spec First inicial — pero en la práctica ya fue una **especificación viva**: pasó de v0.1 a v0.5 según fuimos aprendiendo cosas (comentarios tuyos, hallazgos de los diagramas). Eso es, en espíritu, ya Nivel 2, aplicado al conjunto del sistema en vez de a una historia de usuario suelta.
 
@@ -25,9 +25,9 @@ Dicho esto: la Fase 2 (`02_Requisitos_Fase1.md` y los diagramas) sí se comport�
 
 | Nivel | Granularidad en este proyecto | Estado |
 |---|---|---|
-| **Spec First** | No se adopta como filosofía general — ver §2. | Descartado como enfoque gobernante |
+| **Spec First** | No se adopta como filosofía general — ver apartado 2. | Descartado como enfoque gobernante |
 | **Spec Anchored** | **Nivel por defecto para cada historia de usuario** del Ciclo 1 en adelante: criterios de aceptación Given/When/Then, referenciados a RF/RD, que se reajustan si al construir aparece algo que no habíamos visto (como ya nos ha pasado varias veces). | ✅ Adoptado — se aplica ya a partir de las historias de usuario del Ciclo 1 |
-| **Spec Source** | Selectivo, historia por historia, con el criterio real del documento: objetivo con alta claridad + tamaño medio/complejo. No para cambios triviales (ver riesgo de "documentación muerta", §4). | Selectivo — se decide caso por caso |
+| **Spec Source** | Selectivo, historia por historia, con el criterio real del documento: objetivo con alta claridad + tamaño medio/complejo. No para cambios triviales (ver riesgo de "documentación muerta", apartado 4). | Selectivo — se decide caso por caso |
 
 ## 4. Cuándo NO escribir una spec formal
 
@@ -65,7 +65,7 @@ este documento se actualiza con ese criterio ANTES de tocar el código — no se
 improvisa directamente en la implementación.
 ```
 
-Esto es exactamente lo que ya usamos como muestra en [04_Plan_Verificacion_Validacion.md](04_Plan_Verificacion_Validacion.md) §3, ahora formalizado como el molde estándar por historia.
+Esto es exactamente lo que ya usamos como muestra en [04_Plan_Verificacion_Validacion.md](04_Plan_Verificacion_Validacion.md) apartado 3, ahora formalizado como el molde estándar por historia.
 
 ## 6. El mismo ejemplo llevado a Nivel 3 (Spec Source)
 

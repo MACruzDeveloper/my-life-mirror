@@ -63,4 +63,4 @@ Siguiente diagrama: **casos de uso** (mejor candidato para draw.io, por la notac
 ## Historial de cambios
 
 - **v1.0 (7 sept. 2026)** — versión inicial: secuencia completa del check-in, desde apertura hasta actualización del panel, incluyendo consentimiento condicional y respuesta a recomendación.
-- **v1.1 (7 sept. 2026)** — se retira el paso de consentimiento de este flujo: RF-04 dispara al activar la categoría, no en cada check-in (ver hallazgo resuelto en [07_Diagrama_Casos_Uso.md](07_Diagrama_Casos_Uso.md) §4). El flujo de consentimiento pasa a su propio diagrama, [08_Diagrama_Secuencia_Consentimiento.md](08_Diagrama_Secuencia_Consentimiento.md).
+- **v1.1 (7 sept. 2026)** — se retira el paso de consentimiento de este flujo: RF-04 dispara al activar la categoría, no en cada check-in (ver hallazgo resuelto en [07_Diagrama_Casos_Uso.md](07_Diagrama_Casos_Uso.md) apartado 4). El flujo de consentimiento pasa a su propio diagrama, [08_Diagrama_Secuencia_Consentimiento.md](08_Diagrama_Secuencia_Consentimiento.md).

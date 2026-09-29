@@ -1,7 +1,7 @@
 import type { Assessment } from "../domain/Assessment.js";
 import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
 
-/** Fake solo para tests — ADR-03 §3.6. En dev/producción: SupabaseAssessmentRepository. */
+/** Fake solo para tests — ADR-03 apartado 3.6. En dev/producción: SupabaseAssessmentRepository. */
 export class InMemoryAssessmentRepository implements AssessmentRepository {
   private readonly assessments: Assessment[] = [];
 

@@ -42,7 +42,7 @@ function filaDesdeCategoria(category: Category): Omit<FilaCategoria, never> {
 /**
  * Adaptador real desde el principio — a diferencia de RF-03/RF-04, aquí no
  * se repite el error de empezar en memoria (ver supabase/migrations/0003_categories.sql
- * y 04_Almacenamiento_Datos.md §5.1). Sin test propio: sin lógica más allá
+ * y 04_Almacenamiento_Datos.md apartado 5.1). Sin test propio: sin lógica más allá
  * de mapear filas ↔ Category, mismo criterio que el resto de adaptadores
  * Supabase de este proyecto.
  */

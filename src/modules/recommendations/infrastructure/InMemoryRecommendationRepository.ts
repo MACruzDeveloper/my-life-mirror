@@ -1,7 +1,7 @@
 import type { Recommendation } from "../domain/Recommendation.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
-/** Fake solo para tests — ADR-03 §3.6. En dev/producción: SupabaseRecommendationRepository. */
+/** Fake solo para tests — ADR-03 apartado 3.6. En dev/producción: SupabaseRecommendationRepository. */
 export class InMemoryRecommendationRepository implements RecommendationRepository {
   private readonly recommendations = new Map<string, Recommendation>();
 

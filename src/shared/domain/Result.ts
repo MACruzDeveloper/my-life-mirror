@@ -1,5 +1,5 @@
 /**
- * Patrón Result — ADR-03 §3.3.
+ * Patrón Result — ADR-03 apartado 3.3.
  * Los casos de uso devuelven este tipo en vez de lanzar excepciones para
  * resultados de negocio esperables (validación fallida, no encontrado, conflicto),
  * obligando a quien llama a manejar explícitamente ambos casos.

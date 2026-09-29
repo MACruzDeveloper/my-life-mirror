@@ -1,6 +1,6 @@
 # Mantiene activo el proyecto de Supabase (plan Free): Supabase pausa los
 # proyectos sin actividad durante ~7 días. Una vez al día hace una consulta
-# mínima de solo lectura. Ver docs/architecture-decisions/03_Arquitectura_Software.md §6.1.
+# mínima de solo lectura. Ver docs/architecture-decisions/03_Arquitectura_Software.md apartado 6.1.
 #
 # - Usa SOLO la clave pública "anon" (la misma que podría ir en un navegador),
 #   nunca la service role key. Con RLS activado y sin políticas, la consulta
@@ -8,7 +8,7 @@
 # - Si Supabase no responde con 200 (p. ej. porque el proyecto ya está pausado),
 #   el job falla y GitHub avisa por correo: sirve también de alarma.
 # - GitHub solo ejecuta los workflows programados desde la rama por defecto del
-#   repositorio (hoy `develop`, ver ADR-03 §6.1).
+#   repositorio (hoy `develop`, ver ADR-03 apartado 6.1).
 name: Supabase keep-alive
 
 on:

@@ -15,7 +15,7 @@ const UpdateProfileSchema = z.object({
 });
 
 /**
- * Controlador HTTP — ADR-03 §3.4 / RF-03. GET devuelve el perfil actual (o
+ * Controlador HTTP — ADR-03 apartado 3.4 / RF-03. GET devuelve el perfil actual (o
  * `null` si aún no existe); POST actualiza (upsert parcial — solo los
  * campos indicados). Ambos exigen sesión activa — el `userId` sale siempre
  * de la cookie, nunca del cuerpo de la petición (evita que alguien edite el
