@@ -1,7 +1,7 @@
 {
   "name": "my-sims",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite --open",
@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:api": "node scripts/e2e-api.mjs",
+    "smoke:prod": "node scripts/smoke-prod.mjs",
     "prepare": "husky",
     "verify": "npm run lint && npm run test:coverage && npm run build && npm run check:api && npm run test:e2e"
   },

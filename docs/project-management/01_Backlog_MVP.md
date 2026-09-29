@@ -11,7 +11,7 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **Primera entrega a producción (v1.0.0)** (desde el 29 sept.) — variables de Vercel (Production y Preview), `APP_URL` con la URL de producción, URLs de Supabase, limpiar cuentas de prueba y crear la de administrador, PR `develop` → `main`, comprobación en la URL real, rama por defecto a `main`. Pasos en el [guion de la demo](../validation/04_Guion_Demo_Cierre.md), apartado 1.1.
+- [ ] **Primera entrega a producción** (desde el 29 sept.) — **v1.0.0 desplegada** en https://my-life-mirror.vercel.app (funciones en Dublín, variables en Production y Preview, etiqueta `v1.0.0`, rama por defecto `main`). Tenía un fallo: recargar una ruta de la app daba 404 → **v1.0.1** lo corrige y añade `npm run smoke:prod` y su workflow. Pendiente: URLs de Supabase (*Authentication → URL Configuration*), limpiar cuentas de prueba y confirmar la cuenta de administrador.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
@@ -117,3 +117,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.28 (29 sept. 2026)** — métricas DORA/Flow revisadas; dos reglas de flujo nuevas (una PR por historia; corregir los avisos en su causa). Solo queda la demo de cierre.
 - **v2.29 (29 sept. 2026)** — la demo de cierre pasa a "En curso", con su guion y la lista de la primera entrega a producción.
 - **v2.30 (29 sept. 2026)** — la demo se aplaza al final del proyecto (los profesores solo revisan el proyecto terminado); la primera entrega a producción (v1.0.0) se hace ya, para encontrar ahora los problemas que solo aparecen en producción.
+- **v2.31 (29 sept. 2026)** — v1.0.0 en producción; fallo de rutas detectado a los ~10 minutos y corregido en la v1.0.1, con un control nuevo (*smoke* de producción).

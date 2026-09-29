@@ -152,7 +152,16 @@ Dos, como pedía apartado 4 (añadidos a las "Reglas de flujo" del [tablero](01_
 1. **Una PR por historia (como mucho dos, si dependen entre sí), con commits por paso.** Es la regla que ya salió el 19 sept. (apartado 6) y no se ha cumplido: 4 de 11 PRs llevan 3 historias o más. Sin ella, el plazo de entrega no se puede medir y el WIP real supera el límite.
 2. **Un aviso del compilador o de la plataforma se corrige en su causa; no se silencia cambiando la configuración** sin entender qué detecta. Si hay que cambiar la configuración, se añade a la vez un control que cubra lo que el aviso vigilaba. Es la lección directa de apartado 7.2.
 
-**Siguiente revisión:** al cerrar el Ciclo 1 (tras la demo), ya con la primera entrega real a `main`: ahí empieza la DORA de verdad (frecuencia y plazo hasta producción).
+**Siguiente revisión:** al cerrar el proyecto, con varias entregas reales a `main` (apartado 7.7).
+
+### 7.7 Primeras entregas a producción (DORA real)
+
+| Versión | Desplegada | Fallo en producción | Detección | Arreglo |
+|---|---|---|---|---|
+| 1.0.0 | 29 sept. 11:55 | **Sí**: recargar cualquier ruta que no fuera la portada daba 404 (también el enlace del correo de recuperar contraseña). | ~10 min, revisando el despliegue a mano (`curl` a `/inicio`). | 1.0.1 (`vercel.json`) |
+| 1.0.1 | *pendiente* | | | |
+
+Lección, con la regla 2 del apartado 7.6: el fallo era invisible para todos los controles, porque Vite (desarrollo y E2E) sirve las rutas de la app sin esa configuración. Se añade el control que lo cubre: `npm run smoke:prod`, ejecutado solo tras cada despliegue de producción (workflow *Smoke producción*).
 
 ---
 
@@ -161,3 +170,4 @@ Dos, como pedía apartado 4 (añadidos a las "Reglas de flujo" del [tablero](01_
 - **v1.0 (19 sept. 2026)** — versión inicial: DORA (cinco métricas) y Flow (cinco métricas) mapeadas a las fuentes de datos reales del proyecto, con punto de revisión previo a la validación. Solo planificación: aún no se mide nada.
 - **v1.1 (19 sept. 2026)** — decisiones abiertas resueltas (producción = `main` al completar el MVP; DORA-proxy por PR a `develop`), simulación con línea base reconstruida de git y hallazgo sobre commits grandes.
 - **v1.2 (29 sept. 2026)** — primera revisión (apartado 7): datos de las 11 PRs, el único fallo que llegó a `develop` (funciones que no arrancaban en Vercel, 8 días sin detectar, 20 minutos en arreglarse), DORA simulado, métricas de flujo por historia y dos ajustes a las reglas de flujo.
+- **v1.3 (29 sept. 2026)** — apartado 7.7: primeras entregas reales a producción (1.0.0 con un fallo de rutas detectado en ~10 minutos; 1.0.1 lo corrige) y el control nuevo que lo cubre.

@@ -5,6 +5,17 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.0.1] - 2026-09-29
+
+### Corregido
+
+- En producción, recargar cualquier página que no fuera la portada (o abrir un enlace directo, como el del correo de recuperar contraseña) daba 404: Vercel no sabía que esas rutas son de la app. `vercel.json` reescribe a `index.html` las rutas sin extensión que no son de `api/` (ni de Vite en `vercel dev`).
+
+### Añadido
+
+- `npm run smoke:prod` (`scripts/smoke-prod.mjs`): comprueba un despliegue real sin crear datos (portada, rutas de la app al recargar, funciones en Dublín, conexión con Supabase, 404 en `api/` inexistente).
+- Workflow **Smoke producción**: lo ejecuta automáticamente tras cada despliegue de producción de Vercel.
+
 ## [1.0.0] - 2026-09-29
 
 Primera entrega a producción (`main`): cierre del Ciclo 1 (MVP). Reúne todo lo fusionado en `develop` desde la 0.1.0.
