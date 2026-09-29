@@ -48,6 +48,7 @@ import { createRetireCatalogCategory } from "../../modules/categories/applicatio
 import { createListCategories } from "../../modules/categories/application/ListCategories.js";
 import { createActivateCategory } from "../../modules/categories/application/ActivateCategory.js";
 import { createDeactivateCategory } from "../../modules/categories/application/DeactivateCategory.js";
+import { createSetCategoryExperience } from "../../modules/categories/application/SetCategoryExperience.js";
 import type { AssessmentRepository } from "../../modules/assessments/domain/AssessmentRepository.js";
 import { InMemoryAssessmentRepository } from "../../modules/assessments/infrastructure/InMemoryAssessmentRepository.js";
 import { SupabaseAssessmentRepository } from "../../modules/assessments/infrastructure/SupabaseAssessmentRepository.js";
@@ -209,6 +210,7 @@ export interface AppContext {
   listCategories: ReturnType<typeof createListCategories>;
   activateCategory: ReturnType<typeof createActivateCategory>;
   deactivateCategory: ReturnType<typeof createDeactivateCategory>;
+  setCategoryExperience: ReturnType<typeof createSetCategoryExperience>;
   assessmentRepository: AssessmentRepository;
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
@@ -280,6 +282,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     // activateCategory depende de checkConsent (RF-04 extiende a RF-07 para categorías sensibles).
     activateCategory: createActivateCategory(categoryRepository, checkConsent, categoryCatalogRepository),
     deactivateCategory: createDeactivateCategory(categoryRepository),
+    setCategoryExperience: createSetCategoryExperience(categoryRepository, categoryCatalogRepository),
     assessmentRepository,
     // Las recomendaciones son secundarias: un fallo se registra pero nunca deshace el guardado de la entrevista.
     recordAssessments: createRecordAssessments(assessmentRepository, categoryRepository, clock, async (userId, saved) => {

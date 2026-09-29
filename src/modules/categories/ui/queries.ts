@@ -11,6 +11,8 @@ export interface CategoryDto {
   description?: string;
   isSensitiveData?: boolean;
   status: "active" | "inactive";
+  /** RF-41: opciones marcadas de "¿Qué te ayuda?" (claves de `experienceOptions`). */
+  experienceTags?: string[];
 }
 
 export interface CatalogLabelDto {
