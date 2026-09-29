@@ -11,7 +11,7 @@
 |---|---|
 | **Cascada (Waterfall)** | Exige congelar requisitos antes de construir. Aquí hay al menos un requisito (RN-04, tono no punitivo) que **no se puede verificar sin construir y probar algo primero** — cascada no deja margen para ese aprendizaje. |
 | **Scrum/ágil por sprints de tiempo fijo** | Válido, pero organiza el trabajo por calendario (sprints de 2 semanas), no explícitamente por **riesgo**. Aquí hay riesgos muy desiguales (privacidad de datos Art. 9 RGPD, límites éticos de RES-09, percepción de tono) que conviene resolver **antes** que funcionalidades de bajo riesgo como la gamificación. |
-| **Espiral (Boehm), versión formal completa** | Es el que mejor casa conceptualmente (ver §2), pero su versión de manual incluye un análisis de riesgo documentado y formal en cada ciclo, con estimaciones de coste — proceso pensado para equipos, no defendible en tiempo/coste para una persona con fecha límite fija (RES-01, RES-02). |
+| **Espiral (Boehm), versión formal completa** | Es el que mejor casa conceptualmente (ver apartado 2), pero su versión de manual incluye un análisis de riesgo documentado y formal en cada ciclo, con estimaciones de coste — proceso pensado para equipos, no defendible en tiempo/coste para una persona con fecha límite fija (RES-01, RES-02). |
 
 ## 2. Por qué "espiral" es la idea correcta
 

@@ -107,7 +107,7 @@ function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNo
 
 /**
  * Vista de RF-10 — la "entrevista personal", siempre editable. Mobile-first
- * (ADR-07 §6). Diseño relajado a propósito (paleta suave, esquinas
+ * (ADR-07 apartado 6). Diseño relajado a propósito (paleta suave, esquinas
  * redondeadas, mucho aire, tono de conversación); los avatares son imágenes
  * por defecto — el catálogo real llega con RF-26.
  *

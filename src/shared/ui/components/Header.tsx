@@ -28,7 +28,7 @@ export interface HeaderProps {
  * enlaces de navegación ("Inicio" — el panel —, "Administración" solo para
  * admin, y "Mi perfil" — Perfil, Entrevista, Resultados y Privacidad viven
  * dentro, en el menú lateral de AccountPage), usuario con sesión activa,
- * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 §6,
+ * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 apartado 6,
  * UX-03): en móvil, logo + idioma + un menú con la navegación, el nombre y
  * cerrar sesión; desde `sm`, todo en línea.
  */

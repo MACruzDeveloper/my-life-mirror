@@ -13,7 +13,7 @@ const LoginSchema = z.object({
 });
 
 /**
- * Controlador HTTP — ADR-03 §3.4 / ADR-06. El token que emite Supabase se
+ * Controlador HTTP — ADR-03 apartado 3.4 / ADR-06. El token que emite Supabase se
  * guarda en una cookie httpOnly puesta aquí — nunca se devuelve en el
  * cuerpo de la respuesta ni se maneja en el cliente.
  */

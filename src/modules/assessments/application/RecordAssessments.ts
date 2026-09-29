@@ -34,7 +34,7 @@ export function createRecordAssessments(
   clock: Clock,
   /**
    * Oyente opcional, avisado DESPUÉS de persistir (RF-18: recomendaciones). Es
-   * el equivalente en proceso del evento de dominio del ADR-03 §3.4, sin Outbox.
+   * el equivalente en proceso del evento de dominio del ADR-03 apartado 3.4, sin Outbox.
    * Es secundario: quien lo cablea es responsable de capturar sus propios
    * fallos; aquí, si aun así lanza, no se deshace un guardado ya hecho.
    */

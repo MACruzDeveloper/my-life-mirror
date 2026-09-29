@@ -13,7 +13,7 @@ Para centrar la app solo en lo que quiero seguir, sin ruido de lo que no
 - **RF-07** — activar/desactivar cada categoría individualmente. Activar una sensible dispara el flujo de consentimiento (RF-04) ya construido, por fin conectado a un disparador real — ver 08_Diagrama_Secuencia_Consentimiento.md.
 - **RF-08** (categorías personalizadas) queda fuera — Could, fuera del MVP por ahora. El modelo (`type: "standard" | "custom"`) ya lo admite sin cambios futuros.
 - **Sin RN de RD-02 sobre dónde vive el catálogo**: cada usuario tiene su propia copia de las 9 categorías estándar (mismo modelo que ya usa `Categoria` en RD-02 — sin tabla de catálogo global aparte), sembrada la primera vez que consulta su lista — no en el registro, para no acoplar `RegisterUser` a un módulo más.
-- **Persistencia real desde el principio** (no en memoria): este dato se escribe desde un endpoint y se lee desde otro — la lección de RF-03 (ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) §5.1) se aplica aquí sin repetir el error.
+- **Persistencia real desde el principio** (no en memoria): este dato se escribe desde un endpoint y se lee desde otro — la lección de RF-03 (ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) apartado 5.1) se aplica aquí sin repetir el error.
 - **Versión de política simplificada**: no existe todavía una pantalla real de política de privacidad — se usa una constante (`CURRENT_POLICY_VERSION`) como marcador de la versión vigente. Cuando exista una página de política real, esa constante pasa a derivarse de ella, no a mano.
 
 ## Criterios de aceptación
@@ -48,7 +48,7 @@ Para centrar la app solo en lo que quiero seguir, sin ruido de lo que no
 
 ## Nota de diseño — por qué "requiere consentimiento" no es un error de validación
 
-Es una respuesta de negocio esperable, no un dato mal formado — de ahí un `ConsentRequiredError` propio en la jerarquía de `DomainError` (ADR-03 §3.2), en vez de forzarlo dentro de `ValidationError`. El frontend lo distingue por `code` para decidir si muestra el modal de consentimiento o un mensaje de error genérico.
+Es una respuesta de negocio esperable, no un dato mal formado — de ahí un `ConsentRequiredError` propio en la jerarquía de `DomainError` (ADR-03 apartado 3.2), en vez de forzarlo dentro de `ValidationError`. El frontend lo distingue por `code` para decidir si muestra el modal de consentimiento o un mensaje de error genérico.
 
 ## Historial de cambios
 

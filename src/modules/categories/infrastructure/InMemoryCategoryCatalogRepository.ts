@@ -4,7 +4,7 @@ import type { CategoryCatalogRepository } from "../domain/CategoryCatalogReposit
 import { STANDARD_CATEGORIES } from "../domain/standardCategories.js";
 
 /**
- * Fake para tests — ADR-03 §3.6. Arranca con las 9 estándar y sus textos en
+ * Fake para tests — ADR-03 apartado 3.6. Arranca con las 9 estándar y sus textos en
  * cada idioma, como hacen las migraciones 0005 y 0009 en la base de datos real.
  */
 export class InMemoryCategoryCatalogRepository implements CategoryCatalogRepository {

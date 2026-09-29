@@ -1,7 +1,7 @@
 # Historia: Menú de la cabecera en móvil
 
 **Nivel:** 2 — Spec Anchored ([10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md))
-**Referencias:** RF-39 (navegación), RNF-06 (móvil primero), RNF-10 (i18n), ADM-01 (enlace de administración), [07_UI.md](../architecture-decisions/07_UI.md) §5-6
+**Referencias:** RF-39 (navegación), RNF-06 (móvil primero), RNF-10 (i18n), ADM-01 (enlace de administración), [07_UI.md](../architecture-decisions/07_UI.md) apartado 5-6
 
 Como usuario que usa la app en el móvil
 Quiero una cabecera ordenada, con la navegación en un menú

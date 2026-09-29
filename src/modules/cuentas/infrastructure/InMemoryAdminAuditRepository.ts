@@ -1,7 +1,7 @@
 import type { AdminAuditEntry } from "../domain/AdminAuditEntry.js";
 import type { AdminAuditRepository } from "../domain/AdminAuditRepository.js";
 
-/** Fake solo para tests — ADR-03 §3.6. En dev/producción: SupabaseAdminAuditRepository. */
+/** Fake solo para tests — ADR-03 apartado 3.6. En dev/producción: SupabaseAdminAuditRepository. */
 export class InMemoryAdminAuditRepository implements AdminAuditRepository {
   private readonly entries: AdminAuditEntry[] = [];
 

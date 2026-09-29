@@ -10,7 +10,7 @@
 
 RNF-08 exige, desde la Fase 1, "una arquitectura modular que permita añadir nuevas categorías sin modificar el core del sistema". RNF-07 (Could) pide poder crecer un orden de magnitud sin rediseño mayor. Al mismo tiempo, RES-01 (fecha fija) y RES-02 (una persona) advierten contra añadir complejidad operativa antes de necesitarla.
 
-La arquitectura elegida es **Clean Architecture completa dentro de un Monolito Modular** — no porque el MVP lo exija por sí solo, sino como ejercicio deliberado de práctica de una arquitectura grande, resiliente al cambio y preparada para innovación constante, coherente con el motivo 4 de [01_Justificacion_Ciclo_Vida.md](../requirements-analysis/01_Justificacion_Ciclo_Vida.md) (incertidumbre técnica deliberada por aplicar lo aprendido en el máster). El coste de esa decisión frente a una opción más ligera se asume conscientemente — ver §5.
+La arquitectura elegida es **Clean Architecture completa dentro de un Monolito Modular** — no porque el MVP lo exija por sí solo, sino como ejercicio deliberado de práctica de una arquitectura grande, resiliente al cambio y preparada para innovación constante, coherente con el motivo 4 de [01_Justificacion_Ciclo_Vida.md](../requirements-analysis/01_Justificacion_Ciclo_Vida.md) (incertidumbre técnica deliberada por aplicar lo aprendido en el máster). El coste de esa decisión frente a una opción más ligera se asume conscientemente — ver apartado 5.
 
 ## 2. Alternativas consideradas
 
@@ -19,7 +19,7 @@ La arquitectura elegida es **Clean Architecture completa dentro de un Monolito M
 | **MVC** | Patrón de capa de presentación, no de organización de sistema completo. | Descartada — responde a una pregunta distinta a la que se está resolviendo aquí. |
 | **Microservicios / Event-Driven puro (con broker)** | Servicios independientes desplegados por separado, comunicados por red o por un bus de mensajes real. | Descartada para esta fase — coste operativo desproporcionado para RES-01/RES-02/RES-03. |
 | **Monolito Modular + hexagonal ligero** | Un despliegue, módulos con fronteras claras, ideas de puertos/adaptadores sin ceremonia formal. | Descartada — el usuario prefiere practicar la disciplina completa de Clean Architecture, no la versión reducida. |
-| **Monolito Modular + Clean Architecture completa** ✅ | Un despliegue, módulos = capacidades de negocio, y **dentro de cada módulo**, la disciplina completa de Clean Architecture: dominio inviolable, casos de uso, puertos/adaptadores, Composition Root. | Decisión final — ver §3. |
+| **Monolito Modular + Clean Architecture completa** ✅ | Un despliegue, módulos = capacidades de negocio, y **dentro de cada módulo**, la disciplina completa de Clean Architecture: dominio inviolable, casos de uso, puertos/adaptadores, Composition Root. | Decisión final — ver apartado 3. |
 
 ## 3. Decisión: Monolito Modular, con Clean Architecture dentro de cada módulo
 
@@ -35,7 +35,7 @@ Los módulos (macro-frontera) son las capacidades de negocio mapeadas a las secc
 - **Value Objects**: inmutables, se validan a sí mismos en el momento de crearse, sin setters — cualquier operación devuelve una instancia nueva. Ejemplo directo de este proyecto: una `Puntuacion` como VO en vez de un `number` suelto, que valida el rango 1-10 (RF-10) en su propia construcción — imposible que exista en memoria una puntuación inválida.
 - **Aggregate Root**: único punto de entrada para modificar un conjunto de objetos relacionados, garante de que las invariantes de negocio se cumplen antes de persistir cualquier cambio. Ejemplo: `Evaluación` como aggregate root que protege la regla de inmutabilidad de RF-12 (no editable retroactivamente salvo corrección en 24h).
 - **Excepciones de dominio**: jerarquía tipada (error de negocio vs. error técnico), no `try/catch` genérico.
-- **Eventos de dominio**: los emite únicamente el Aggregate Root ante cambios de estado significativos, y solo se publican **después** de que la persistencia esté confirmada (ver Outbox, §3.4) — nunca antes, para no anunciar algo que podría no haberse guardado.
+- **Eventos de dominio**: los emite únicamente el Aggregate Root ante cambios de estado significativos, y solo se publican **después** de que la persistencia esté confirmada (ver Outbox, apartado 3.4) — nunca antes, para no anunciar algo que podría no haberse guardado.
 - Sin I/O, sin imports de framework — testable en aislamiento total y a velocidad de milisegundos.
 
 ### 3.3 Capa de Aplicación — Casos de Uso
@@ -53,7 +53,7 @@ Cada historia de usuario del Ciclo 1 (formato Nivel 2 Spec Anchored, [10_Enfoque
 - Los **adaptadores** implementan los Puertos contra tecnología real: persistencia (p. ej. `MongoEvaluacionRepository` implementando `EvaluacionRepository` — ver [04_Almacenamiento_Datos.md](04_Almacenamiento_Datos.md)), mensajería, observabilidad, controladores HTTP.
 - Los **controladores HTTP** solo reciben el input, validan tipos básicos, delegan al caso de uso, y traducen el Result/las excepciones de dominio a códigos de estado HTTP — cero lógica de negocio aquí.
 - **Composition Root** (p. ej. un único `container.ts`): el único lugar del sistema con permiso para conocer implementaciones concretas y conectarlas a los casos de uso, según configuración de entorno. Ningún otro archivo debe instanciar un adaptador directamente.
-- **Patrón Outbox** para publicar eventos de forma fiable: el adaptador persiste el evento en una tabla/colección de salida dentro de la misma transacción que el cambio de estado; un proceso aparte (dispatcher) se encarga de publicarlo después, evitando la fragilidad de publicar directamente a un bus de mensajes a mitad de transacción. Esto también da soporte natural al registro de auditoría de RNF-11 (ver [04_Almacenamiento_Datos.md](04_Almacenamiento_Datos.md) §4).
+- **Patrón Outbox** para publicar eventos de forma fiable: el adaptador persiste el evento en una tabla/colección de salida dentro de la misma transacción que el cambio de estado; un proceso aparte (dispatcher) se encarga de publicarlo después, evitando la fragilidad de publicar directamente a un bus de mensajes a mitad de transacción. Esto también da soporte natural al registro de auditoría de RNF-11 (ver [04_Almacenamiento_Datos.md](04_Almacenamiento_Datos.md) apartado 4).
 - Comportamiento por entorno: **desarrollo** (adaptador en memoria + logging verboso, para iterar rápido), **test** (base de datos efímera, reseteada entre ejecuciones), **producción** (MongoDB Atlas + outbox + telemetría).
 
 ### 3.5 Estructura de carpetas — empezar mínima, escalar cuando duela
@@ -79,13 +79,13 @@ Conecta directamente con [04_Plan_Verificacion_Validacion.md](../requirements-an
 
 ## 4. Cómo encaja con lo ya decidido
 
-- Los patrones de [02_Principios_Diseño.md](02_Principios_Diseño.md) §4 se mapean 1:1: **Repository** es un Puerto; **Strategy** encaja como variantes de caso de uso o de lógica de dominio (p. ej. una estrategia de recomendación por categoría); **Adapter** son los adaptadores de infraestructura; **Factory** construye Entidades/Value Objects válidos.
+- Los patrones de [02_Principios_Diseño.md](02_Principios_Diseño.md) apartado 4 se mapean 1:1: **Repository** es un Puerto; **Strategy** encaja como variantes de caso de uso o de lógica de dominio (p. ej. una estrategia de recomendación por categoría); **Adapter** son los adaptadores de infraestructura; **Factory** construye Entidades/Value Objects válidos.
 - El formato Given/When/Then de las historias del Ciclo 1 encaja de forma natural con el patrón Result: Given/When son el "arrange/act", Then comprueba el Result devuelto por el caso de uso.
 - Los módulos son la macro-frontera; Clean Architecture es la estructura interna de cada uno.
 
 ## 5. Coste asumido conscientemente
 
-Esto es más aparato del que un MVP en solitario necesitaría por pura eficiencia. La decisión de pagar ese coste es explícita, informada y con un motivo de aprendizaje real, no un descuido. La mitigación de riesgo sobre RES-01 es la de §3.5: estructura mínima primero, granularidad completa solo cuando un Ciclo concreto la justifique — nunca por adelantado "por si acaso" (eso sería el anti-patrón de abstracción prematura de [02_Principios_Diseño.md](02_Principios_Diseño.md) §3).
+Esto es más aparato del que un MVP en solitario necesitaría por pura eficiencia. La decisión de pagar ese coste es explícita, informada y con un motivo de aprendizaje real, no un descuido. La mitigación de riesgo sobre RES-01 es la de apartado 3.5: estructura mínima primero, granularidad completa solo cuando un Ciclo concreto la justifique — nunca por adelantado "por si acaso" (eso sería el anti-patrón de abstracción prematura de [02_Principios_Diseño.md](02_Principios_Diseño.md) apartado 3).
 
 ## 6. Consecuencias
 
@@ -120,12 +120,12 @@ Con arquitectura y almacenamiento de datos ya decididos ([04_Almacenamiento_Dato
 
 - **v1.0 (9 sept. 2026)** — versión inicial: Monolito Modular + hexagonal ligero por módulo.
 - **v2.0 (9 sept. 2026)** — se sustituye por Clean Architecture completa dentro de cada módulo, por decisión del usuario (practicar una arquitectura grande). Se mantiene el Monolito Modular como macro-frontera.
-- **v2.1 (12 sept. 2026)** — limpieza editorial: se retira la narrativa de revisión del cuerpo principal (queda solo aquí), se corrigen referencias desactualizadas a Firebase/Supabase por MongoDB Atlas (ya decidido en ADR-04), se actualiza §7.
+- **v2.1 (12 sept. 2026)** — limpieza editorial: se retira la narrativa de revisión del cuerpo principal (queda solo aquí), se corrigen referencias desactualizadas a Firebase/Supabase por MongoDB Atlas (ya decidido en ADR-04), se actualiza apartado 7.
 - **v2.2 (19 sept. 2026)** — `api/tsconfig.json` es necesario y debe ser **autocontenido, sin `extends`** (Vercel no lo resuelve; mantenerlo alineado a mano con `tsconfig.api.json`): Vercel compila cada función con el `tsconfig.json` más cercano hacia arriba; sin él usa el de la raíz (solo referencias, sin opciones) y cae en `nodenext`, que rompe los imports sin extensión. No lo cubre `tsc -b` local porque este usa `tsconfig.api.json` directamente. Para vigilarlo: `npm run check:api`, que imita esa compilación.
 - **v2.3 (19 sept. 2026)** — límite de 12 funciones serverless del plan Hobby de Vercel: regla **una función por capacidad, no por acción**. Cada capacidad con varias acciones usa `api/<capacidad>/[action].ts` + `createRouter`, con los handlers en `src/shared/infrastructure/http/handlers/<capacidad>/` (URLs sin cambios). `api/<capacidad>/index.ts` sigue sirviendo la ruta base. Se pasó de 16 a 9 funciones; `check:api` falla si hay más de 12.
-- **v2.4 (20 sept. 2026)** — nueva §6.1 "Limitaciones conocidas del proyecto": límite de 12 funciones de Vercel Hobby (con regla, aviso y plan de escape), latencia y pausa de Supabase Free.
+- **v2.4 (20 sept. 2026)** — nueva apartado 6.1 "Limitaciones conocidas del proyecto": límite de 12 funciones de Vercel Hobby (con regla, aviso y plan de escape), latencia y pausa de Supabase Free.
 - **v2.5 (20 sept. 2026)** — el disparo de RF-18 se resuelve sin Outbox: `RecordAssessments` avisa a un oyente opcional después de persistir (evento de dominio en proceso, best effort). Outbox queda para cuando haya varios oyentes o hagan falta garantías entre procesos. Funciones serverless: 10 de 12.
-- **v2.6 (26 sept. 2026)** — §6.1: mitigación de la pausa de Supabase Free con un workflow diario de GitHub Actions (clave anon, solo lectura), rama por defecto `develop` durante el desarrollo y límites de la solución.
-- **v2.7 (27 sept. 2026)** — §6.1: funciones en `dub1`, junto a Supabase; `getClaims` descartado por seguridad; endpoint combinado de la entrevista aplazado hasta medir.
+- **v2.6 (26 sept. 2026)** — apartado 6.1: mitigación de la pausa de Supabase Free con un workflow diario de GitHub Actions (clave anon, solo lectura), rama por defecto `develop` durante el desarrollo y límites de la solución.
+- **v2.7 (27 sept. 2026)** — apartado 6.1: funciones en `dub1`, junto a Supabase; `getClaims` descartado por seguridad; endpoint combinado de la entrevista aplazado hasta medir.
 - **v2.8 (27 sept. 2026)** — fallo real en la *preview*: login y registro devolvían 500 (`ERR_MODULE_NOT_FOUND …/http/router`). Con `"type": "module"`, Vercel ejecuta las funciones como ESM nativo de Node, que exige extensión en los imports relativos; `api/tsconfig.json` usaba `bundler`, que los acepta sin ella, así que los tipos pasaban y el fallo solo aparecía al arrancar. Corrección: `.js` en los imports de todo lo alcanzable desde `api/` (84 archivos, con las sugerencias del propio compilador), `api/tsconfig.json` en `nodenext` y `check:api` ampliado: revisa también los archivos de `src/` que `api/` alcanza (antes solo `api/`) y carga cada función compilada en Node, sin ejecutar ningún handler.
 - **v2.9 (28 sept. 2026)** — numeración: los apartados "bis/ter" pasan a subapartados decimales del apartado anterior (convención del proyecto, AGENTS.md); referencias actualizadas en todo el repositorio. Sin cambios de contenido.

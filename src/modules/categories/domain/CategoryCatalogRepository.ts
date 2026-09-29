@@ -1,6 +1,6 @@
 import type { CatalogCategory } from "./CatalogCategory.js";
 
-/** Puerto — ADR-03 §3.3. */
+/** Puerto — ADR-03 apartado 3.3. */
 export interface CategoryCatalogRepository {
   /** Todas, también las retiradas. */
   findAll(): Promise<CatalogCategory[]>;

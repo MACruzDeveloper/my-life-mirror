@@ -64,8 +64,8 @@ Con los dos hallazgos cerrados, seguimos con el **Plan de Verificación y Valida
 
 ## Historial de cambios
 
-- **v1.0 (5 sept. 2026)** — versión inicial, hallazgos 1 y 2 identificados y luego cerrados (ver §2).
+- **v1.0 (5 sept. 2026)** — versión inicial, hallazgos 1 y 2 identificados y luego cerrados (ver apartado 2).
 - **v1.1 (7 sept. 2026)** — se añade RF-34 (historial de recomendaciones) a la fila de RN-02, derivado de `09_Diagrama_Estados_Recomendacion.md`. Se corrige el enlace/versión de cabecera tras la renumeración de archivos.
 - **v1.2 (10 sept. 2026)** — se añaden RF-35 (RN-02), RF-36 (RN-03) y RF-37 (RN-08), la nueva sección 2.11 de funcionalidades asistidas por IA. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md).
-- **v1.3 (14 sept. 2026)** — se añaden RF-38 y RF-39 como infraestructura de cuenta transversal (§3).
+- **v1.3 (14 sept. 2026)** — se añaden RF-38 y RF-39 como infraestructura de cuenta transversal (apartado 3).
 - **v1.4 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA) en la fila de RN-02.

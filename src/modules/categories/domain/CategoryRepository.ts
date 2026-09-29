@@ -1,6 +1,6 @@
 import type { Category } from "./Category.js";
 
-/** Puerto — ADR-03 §3.3. */
+/** Puerto — ADR-03 apartado 3.3. */
 export interface CategoryRepository {
   findByUserId(userId: string): Promise<Category[]>;
   findById(userId: string, categoryId: string): Promise<Category | undefined>;

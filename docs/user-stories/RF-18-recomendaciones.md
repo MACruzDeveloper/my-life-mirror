@@ -55,7 +55,7 @@ Para tener un primer paso pequeño, sin que la aplicación me juzgue ni me agobi
 
 ## Notas de diseño
 
-- **Disparo:** `RecordAssessments` avisa, *después* de persistir, a un oyente opcional (`onRecorded`). Es el equivalente en proceso del evento de dominio del ADR-03 §3.4 sin el patrón Outbox (una tabla y un proceso aparte que hoy no aportan: hay una sola operación y un solo oyente); si un día hay varios oyentes o hace falta fiabilidad entre procesos, se sustituye por Outbox sin tocar el dominio. El oyente es *best effort*: un fallo no deshace el guardado.
+- **Disparo:** `RecordAssessments` avisa, *después* de persistir, a un oyente opcional (`onRecorded`). Es el equivalente en proceso del evento de dominio del ADR-03 apartado 3.4 sin el patrón Outbox (una tabla y un proceso aparte que hoy no aportan: hay una sola operación y un solo oyente); si un día hay varios oyentes o hace falta fiabilidad entre procesos, se sustituye por Outbox sin tocar el dominio. El oyente es *best effort*: un fallo no deshace el guardado.
 - **Cálculo al leer:** `ListRecommendations` filtra al leer (categoría activa + última puntuación bajo el umbral con el que se creó) en vez de mantener el estado sincronizado al escribir — menos piezas que puedan quedar inconsistentes.
 - **Catálogo en código, no en BD:** RD-09 (catálogo versionable sin tocar código) es Could. Las plantillas viven en las traducciones; el modelo ya guarda claves, así que moverlas a una tabla más adelante no cambia la entidad.
 - **Módulo propio** `recommendations` (Clean Architecture) con su repositorio; se enlaza con evaluaciones y categorías solo por sus puertos.

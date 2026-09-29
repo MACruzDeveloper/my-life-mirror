@@ -32,7 +32,7 @@ type Estado =
   | { tipo: "error"; mensaje: string };
 
 /**
- * Vista de RF-03. Mobile-first (ADR-07 §6): campos apilados en móvil,
+ * Vista de RF-03. Mobile-first (ADR-07 apartado 6): campos apilados en móvil,
  * fecha de nacimiento+género en fila desde `sm` en adelante. `name` ya se
  * capturó en el registro (RF-01) — aquí se puede corregir junto al resto.
  * `birthDate` usa el selector de fecha nativo del navegador (`input

@@ -17,7 +17,7 @@ Para atender casos reales: alguien que da problemas, alguien que no consigue reg
 ## Propuesta
 
 **1. Modificar un usuario** (`POST /api/admin/...`, acciones dentro de una única función `api/admin/[action].ts`)
-- Cambiar el **rol** (`usuario` / `premium` / `admin`). Sustituye al SQL manual de ADR-06 §1.1. Con la regla del último administrador.
+- Cambiar el **rol** (`usuario` / `premium` / `admin`). Sustituye al SQL manual de ADR-06 apartado 1.1. Con la regla del último administrador.
 - Corregir el **email** (caso "escribió mal su correo") y el **nombre**.
 - Enviar un **enlace de recuperación de contraseña** (caso "no puede entrar"), reutilizando `resetPasswordForEmail`. El admin **nunca ve ni fija** contraseñas ajenas.
 
