@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { cookieDeSesionBorrada } from "../../../cookies.js";
+import { clearedSessionCookie } from "../../../cookies.js";
 
 /** Borra la cookie de sesión — no hace falta invalidar el token en Supabase para el Ciclo 1. */
 export default function handler(req: IncomingMessage, res: ServerResponse) {
@@ -9,6 +9,6 @@ export default function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
-  res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": cookieDeSesionBorrada() });
+  res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": clearedSessionCookie() });
   res.end(JSON.stringify({ ok: true }));
 }

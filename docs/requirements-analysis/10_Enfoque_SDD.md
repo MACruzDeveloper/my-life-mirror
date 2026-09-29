@@ -91,13 +91,7 @@ En este nivel, si mañana decides que el texto de la recomendación sí puede ge
 El documento del máster lo remarca: usar IA no exime de responsabilidad — el humano sigue siendo quien valida que el código cumple lo definido. Esto ya está cubierto por lo que definimos en [04_Plan_Verificacion_Validacion.md](04_Plan_Verificacion_Validacion.md): cada criterio Given/When/Then de una spec Nivel 2/3 es precisamente lo que se ejecuta manualmente o vía Playwright para esa validación.
 
 ---
-
-## 8. Próximo paso
-
-Las historias de usuario del Ciclo 1 (MVP) se escriben ya con este formato — Nivel 2 por defecto, Nivel 3 donde el objetivo esté muy claro y el desafío sea de tamaño medio/complejo. Empezamos por la primera del MVP en cuanto lo confirmes.
-
----
-
 ## Historial de cambios
 
 - **v1.0 (8 sept. 2026)** — versión inicial a partir del material del máster: los 3 niveles, por qué Nivel 1 no gobierna el proyecto, granularidad adoptada (Nivel 2 por defecto, Nivel 3 selectivo), ejemplo completo sobre RF-18 en ambos niveles.
+- **v1.1 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

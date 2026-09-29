@@ -8,8 +8,8 @@ import type { CategoryCatalogRepository } from "../domain/CategoryCatalogReposit
 /** Caso de uso — ADM-02. Solo admin (comprobado aquí, no solo en el endpoint). Incluye las retiradas. */
 export function createListCatalog(catalog: CategoryCatalogRepository) {
   return async function listCatalog(actor: Actor): Promise<Result<CatalogCategory[], ForbiddenError>> {
-    const permiso = requireAdmin(actor);
-    if (!permiso.ok) return permiso;
+    const permission = requireAdmin(actor);
+    if (!permission.ok) return permission;
     return ok(await catalog.findAll());
   };
 }

@@ -8,41 +8,41 @@ describe("ListCategories (RF-06)", () => {
   it("siembra las categorías estándar la primera vez, todas inactivas", async () => {
     const listCategories = createListCategories(new InMemoryCategoryRepository(), new InMemoryCategoryCatalogRepository());
 
-    const resultado = await listCategories("u1");
+    const result = await listCategories("u1");
 
-    expect(resultado.ok).toBe(true);
-    if (resultado.ok) {
-      expect(resultado.value).toHaveLength(STANDARD_CATEGORIES.length);
-      expect(resultado.value.every((c) => c.status === "inactive")).toBe(true);
-      expect(resultado.value.every((c) => c.type === "standard")).toBe(true);
-      expect(resultado.value.some((c) => c.name === "Sexo" && c.isSensitiveData)).toBe(true);
-      expect(resultado.value.some((c) => c.name === "Economía" && !c.isSensitiveData)).toBe(true);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value).toHaveLength(STANDARD_CATEGORIES.length);
+      expect(result.value.every((c) => c.status === "inactive")).toBe(true);
+      expect(result.value.every((c) => c.type === "standard")).toBe(true);
+      expect(result.value.some((c) => c.name === "Sexo" && c.isSensitiveData)).toBe(true);
+      expect(result.value.some((c) => c.name === "Economía" && !c.isSensitiveData)).toBe(true);
     }
   });
 
   it("no vuelve a sembrar si ya existen categorías (idempotente)", async () => {
     const repo = new InMemoryCategoryRepository();
     const listCategories = createListCategories(repo, new InMemoryCategoryCatalogRepository());
-    const primera = await listCategories("u1");
-    if (!primera.ok) throw new Error("setup falló");
-    await repo.save({ ...primera.value[0], status: "active" });
+    const first = await listCategories("u1");
+    if (!first.ok) throw new Error("setup falló");
+    await repo.save({ ...first.value[0], status: "active" });
 
-    const segunda = await listCategories("u1");
+    const second = await listCategories("u1");
 
-    expect(segunda.ok).toBe(true);
-    if (segunda.ok) {
-      expect(segunda.value).toHaveLength(STANDARD_CATEGORIES.length);
-      expect(segunda.value.find((c) => c.id === primera.value[0].id)?.status).toBe("active");
+    expect(second.ok).toBe(true);
+    if (second.ok) {
+      expect(second.value).toHaveLength(STANDARD_CATEGORIES.length);
+      expect(second.value.find((c) => c.id === first.value[0].id)?.status).toBe("active");
     }
   });
 
   it("rechaza un userId vacío", async () => {
     const listCategories = createListCategories(new InMemoryCategoryRepository(), new InMemoryCategoryCatalogRepository());
 
-    const resultado = await listCategories("");
+    const result = await listCategories("");
 
-    expect(resultado.ok).toBe(false);
-    if (!resultado.ok) expect(resultado.error.code).toBe("VALIDATION_ERROR");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
   });
 
   it("una categoría añadida al catálogo después llega, inactiva, a un usuario que ya tenía las suyas", async () => {
@@ -52,14 +52,14 @@ describe("ListCategories (RF-06)", () => {
     await listCategories("u1");
     await catalog.save({ id: "nueva", translations: { es: { name: "Creatividad", description: "Arte y hobbies." }, en: { name: "Creativity", description: "Art and hobbies." } }, isSensitiveData: false });
 
-    const resultado = await listCategories("u1");
+    const result = await listCategories("u1");
 
-    expect(resultado.ok).toBe(true);
-    if (resultado.ok) {
-      expect(resultado.value).toHaveLength(STANDARD_CATEGORIES.length + 1);
-      const nueva = resultado.value.find((c) => c.name === "Creatividad");
-      expect(nueva?.status).toBe("inactive");
-      expect(nueva?.type).toBe("standard");
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value).toHaveLength(STANDARD_CATEGORIES.length + 1);
+      const newValue = result.value.find((c) => c.name === "Creatividad");
+      expect(newValue?.status).toBe("inactive");
+      expect(newValue?.type).toBe("standard");
     }
   });
 
@@ -68,12 +68,12 @@ describe("ListCategories (RF-06)", () => {
     const catalog = new InMemoryCategoryCatalogRepository();
     const listCategories = createListCategories(repo, catalog);
     await listCategories("u1");
-    const economia = (await catalog.findAll()).find((c) => c.key === "economia")!;
-    await catalog.save({ ...economia, retiredAt: new Date("2026-09-19T10:00:00Z") });
+    const finances = (await catalog.findAll()).find((c) => c.key === "economia")!;
+    await catalog.save({ ...finances, retiredAt: new Date("2026-09-19T10:00:00Z") });
 
-    const resultado = await listCategories("u1");
+    const result = await listCategories("u1");
 
-    expect(resultado.ok && resultado.value.some((c) => c.name === "Economía")).toBe(false);
+    expect(result.ok && result.value.some((c) => c.name === "Economía")).toBe(false);
     expect((await repo.findByUserId("u1")).some((c) => c.name === "Economía")).toBe(true);
   });
 
@@ -81,11 +81,11 @@ describe("ListCategories (RF-06)", () => {
     const repo = new InMemoryCategoryRepository();
     const catalog = new InMemoryCategoryCatalogRepository();
 
-    const resultado = await createListCategories(repo, catalog)("u1");
+    const result = await createListCategories(repo, catalog)("u1");
 
-    const economiaCatalogo = (await catalog.findAll()).find((entry) => entry.key === "economia")!;
-    const economia = resultado.ok ? resultado.value.find((category) => category.catalogId === economiaCatalogo.id) : undefined;
-    expect(economia).toMatchObject({ name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas." });
+    const financesCatalogEntry = (await catalog.findAll()).find((entry) => entry.key === "economia")!;
+    const finances = result.ok ? result.value.find((category) => category.catalogId === financesCatalogEntry.id) : undefined;
+    expect(finances).toMatchObject({ name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas." });
   });
 
   it("si cambia el texto de una entrada del catálogo, no se crea una copia duplicada (la identidad es el id)", async () => {
@@ -93,11 +93,11 @@ describe("ListCategories (RF-06)", () => {
     const catalog = new InMemoryCategoryCatalogRepository();
     const listCategories = createListCategories(repo, catalog);
     await listCategories("u1");
-    const economia = (await catalog.findAll()).find((entry) => entry.key === "economia")!;
-    await catalog.save({ ...economia, translations: { ...economia.translations, es: { name: "Dinero", description: "d" } } });
+    const finances = (await catalog.findAll()).find((entry) => entry.key === "economia")!;
+    await catalog.save({ ...finances, translations: { ...finances.translations, es: { name: "Dinero", description: "d" } } });
 
-    const resultado = await listCategories("u1");
+    const result = await listCategories("u1");
 
-    expect(resultado.ok && resultado.value).toHaveLength(STANDARD_CATEGORIES.length);
+    expect(result.ok && result.value).toHaveLength(STANDARD_CATEGORIES.length);
   });
 });

@@ -1,19 +1,19 @@
 import type { ServerResponse } from "node:http";
 import { z } from "zod";
 import type { Result } from "../../../../domain/Result.js";
-import type { UsuarioAutenticado } from "../../../../../modules/cuentas/domain/AuthProvider.js";
-import { type AppContext, obtenerAppContext } from "../../../container.js";
-import { leerCookie } from "../../../cookies.js";
+import type { AuthenticatedUser } from "../../../../../modules/accounts/domain/AuthProvider.js";
+import { type AppContext, getAppContext } from "../../../container.js";
+import { readCookie } from "../../../cookies.js";
 import { logger } from "../../../logger.js";
-import type { ManejadorHttp, PeticionHttp } from "../../router.js";
+import type { HttpHandler, HttpRequest } from "../../router.js";
 
-function responder(res: ServerResponse, status: number, cuerpo: unknown) {
+function responder(res: ServerResponse, status: number, body: unknown) {
   // Datos de administración: que ninguna caché intermedia los conserve.
   res.writeHead(status, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-  res.end(JSON.stringify(cuerpo));
+  res.end(JSON.stringify(body));
 }
 
-const ESTADO_POR_CODIGO: Record<string, number> = {
+const STATUS_BY_CODE: Record<string, number> = {
   FORBIDDEN: 403,
   // 403, no 401: la sesión es válida; lo que falla es la confirmación con la contraseña.
   AUTHENTICATION_ERROR: 403,
@@ -21,7 +21,7 @@ const ESTADO_POR_CODIGO: Record<string, number> = {
   CONFLICT: 409,
 };
 
-interface ErrorConCodigo {
+interface ErrorWithCode {
   code: string;
   message: string;
 }
@@ -34,46 +34,46 @@ interface ErrorConCodigo {
  * `metodo` GET no lee cuerpo.
  */
 export function adminHandler<S extends z.ZodTypeAny, T>(options: {
-  ruta: string;
-  metodo: "GET" | "POST";
+  route: string;
+  method: "GET" | "POST";
   schema?: S;
-  ejecutar: (contexto: AppContext, actor: UsuarioAutenticado, cuerpo: z.infer<S>) => Promise<Result<T, ErrorConCodigo>>;
-}): ManejadorHttp {
-  return async (req: PeticionHttp, res: ServerResponse) => {
+  execute: (context: AppContext, actor: AuthenticatedUser, body: z.infer<S>) => Promise<Result<T, ErrorWithCode>>;
+}): HttpHandler {
+  return async (req: HttpRequest, res: ServerResponse) => {
     try {
-      if (req.method !== options.metodo) {
+      if (req.method !== options.method) {
         responder(res, 405, { error: "Método no permitido" });
         return;
       }
 
-      const contexto = obtenerAppContext();
-      const sesion = await contexto.verificarSesion(leerCookie(req.headers.cookie, "sesion"));
-      if (!sesion.ok) {
+      const context = getAppContext();
+      const session = await context.verifySession(readCookie(req.headers.cookie, "sesion"));
+      if (!session.ok) {
         responder(res, 401, { error: "No autenticado" });
         return;
       }
 
-      let cuerpo: z.infer<S> = undefined as z.infer<S>;
+      let body: z.infer<S> = undefined as z.infer<S>;
       if (options.schema) {
-        const datos = options.schema.safeParse(req.body);
-        if (!datos.success) {
+        const data = options.schema.safeParse(req.body);
+        if (!data.success) {
           responder(res, 400, { error: "Petición mal formada" });
           return;
         }
-        cuerpo = datos.data;
+        body = data.data;
       }
 
-      const resultado = await options.ejecutar(contexto, sesion.value, cuerpo);
-      if (!resultado.ok) {
-        if (resultado.error.code === "FORBIDDEN") {
-          logger.warn("Acceso de administración denegado", { ruta: options.ruta, usuario: sesion.value.id });
+      const result = await options.execute(context, session.value, body);
+      if (!result.ok) {
+        if (result.error.code === "FORBIDDEN") {
+          logger.warn("Acceso de administración denegado", { route: options.route, userId: session.value.id });
         }
-        responder(res, ESTADO_POR_CODIGO[resultado.error.code] ?? 400, { error: resultado.error.message, code: resultado.error.code });
+        responder(res, STATUS_BY_CODE[result.error.code] ?? 400, { error: result.error.message, code: result.error.code });
         return;
       }
-      responder(res, 200, resultado.value ?? { ok: true });
+      responder(res, 200, result.value ?? { ok: true });
     } catch (error) {
-      logger.error(`Error inesperado en ${options.ruta}`, error, { ruta: options.ruta });
+      logger.error(`Error inesperado en ${options.route}`, error, { route: options.route });
       responder(res, 500, { error: "Error interno del servidor" });
     }
   };

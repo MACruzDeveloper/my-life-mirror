@@ -110,10 +110,6 @@ Restricciones del entorno gratuito (Vercel Hobby, Supabase Free) que condicionan
   - *Límites honestos:* Supabase no garantiza por escrito qué cuenta como "actividad suficiente" (es una práctica muy extendida que funciona, no una promesa) — antes de la demo, comprobar igualmente el panel. GitHub solo ejecuta workflows programados desde la **rama por defecto**, que se cambia a `develop` mientras dure el desarrollo (poner el workflow en `main` dispararía un despliegue de producción, prohibido hasta el MVP); al publicar el MVP se vuelve a `main`. En repositorios **públicos**, GitHub desactiva los workflows programados tras 60 días sin actividad en el repositorio.
   - *Descartado por ahora:* Supabase Pro (~25 $/mes), solo si hiciera falta certeza durante las semanas de evaluación.
 
-## 7. Próximo paso
-
-Con arquitectura y almacenamiento de datos ya decididos ([04_Almacenamiento_Datos.md](04_Almacenamiento_Datos.md)), el siguiente paso son las historias de usuario del Ciclo 1, módulo por módulo, cada una como un Caso de Uso — empezando por el adaptador en memoria antes que la conexión real a MongoDB Atlas.
-
 ---
 
 ## Historial de cambios
@@ -129,3 +125,4 @@ Con arquitectura y almacenamiento de datos ya decididos ([04_Almacenamiento_Dato
 - **v2.7 (27 sept. 2026)** — apartado 6.1: funciones en `dub1`, junto a Supabase; `getClaims` descartado por seguridad; endpoint combinado de la entrevista aplazado hasta medir.
 - **v2.8 (27 sept. 2026)** — fallo real en la *preview*: login y registro devolvían 500 (`ERR_MODULE_NOT_FOUND …/http/router`). Con `"type": "module"`, Vercel ejecuta las funciones como ESM nativo de Node, que exige extensión en los imports relativos; `api/tsconfig.json` usaba `bundler`, que los acepta sin ella, así que los tipos pasaban y el fallo solo aparecía al arrancar. Corrección: `.js` en los imports de todo lo alcanzable desde `api/` (84 archivos, con las sugerencias del propio compilador), `api/tsconfig.json` en `nodenext` y `check:api` ampliado: revisa también los archivos de `src/` que `api/` alcanza (antes solo `api/`) y carga cada función compilada en Node, sin ejecutar ningún handler.
 - **v2.9 (28 sept. 2026)** — numeración: los apartados "bis/ter" pasan a subapartados decimales del apartado anterior (convención del proyecto, AGENTS.md); referencias actualizadas en todo el repositorio. Sin cambios de contenido.
+- **v2.10 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

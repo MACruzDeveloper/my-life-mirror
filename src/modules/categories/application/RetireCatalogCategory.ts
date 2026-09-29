@@ -12,16 +12,16 @@ import type { CategoryRepository } from "../domain/CategoryRepository.js";
  */
 export function createRetireCatalogCategory(catalog: CategoryCatalogRepository, categoryRepository: CategoryRepository, now: () => Date = () => new Date()) {
   return async function retireCatalogCategory(actor: Actor, categoryId: string): Promise<Result<void, ForbiddenError | NotFoundError>> {
-    const permiso = requireAdmin(actor);
-    if (!permiso.ok) return permiso;
+    const permission = requireAdmin(actor);
+    if (!permission.ok) return permission;
 
-    const entrada = (await catalog.findAll()).find((c) => c.id === categoryId);
-    if (!entrada) return err(new NotFoundError("Category not found"));
+    const entry = (await catalog.findAll()).find((c) => c.id === categoryId);
+    if (!entry) return err(new NotFoundError("Category not found"));
 
-    if (!entrada.retiredAt) {
-      await catalog.save({ ...entrada, retiredAt: now() });
+    if (!entry.retiredAt) {
+      await catalog.save({ ...entry, retiredAt: now() });
     }
-    await categoryRepository.deactivateByCatalogId(entrada.id);
+    await categoryRepository.deactivateByCatalogId(entry.id);
     return ok(undefined);
   };
 }

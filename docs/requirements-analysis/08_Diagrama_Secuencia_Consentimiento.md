@@ -1,5 +1,7 @@
 # Diagrama de Secuencia — Activación de Categoría y Consentimiento
 
+> **Análisis inicial (5-12 sept. 2026), no el diseño actual.** Es el modelo conceptual previo al código y se conserva como parte del proceso del TFM. Usa los nombres del análisis; en el código son: `Usuario` → `User` (módulo `accounts`), `Evaluacion` → `Assessment`, "check-in" → la entrevista (RF-10), `Recomendacion` → `Recommendation`, `Consentimiento` → `Consent`, `Categoria` → `Category`. `Conexion` y `Suscripcion` no están construidas (Ciclo 3 o posterior). El diseño real: [ADR-03](../architecture-decisions/03_Arquitectura_Software.md), las [historias de usuario](../user-stories/) y `src/modules/`.
+
 **Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.4 (RF-04, RF-07, RD-02, RD-05), [07_Diagrama_Casos_Uso.md](07_Diagrama_Casos_Uso.md) apartado 3-4
 **Fecha:** 7 de septiembre de 2026
 **Formato:** Mermaid.
@@ -51,13 +53,8 @@ sequenceDiagram
 - Este es el flujo que corresponde a la relación `<<extend>>` del diagrama de casos de uso ([07_Diagrama_Casos_Uso.drawio](07_Diagrama_Casos_Uso.drawio)): "Otorgar consentimiento" extiende a "Configurar categorías de vida" solo bajo esta condición.
 
 ---
-
-## 3. Próximo paso
-
-Con el flujo de consentimiento separado y correcto, el check-in ([06](06_Diagrama_Secuencia_CheckIn.md)) y la activación de categorías (este archivo) quedan consistentes entre sí y con el diagrama de casos de uso. Siguiente diagrama pendiente de la lista: **diagrama de estados de `Recomendación`** (pendiente de respuesta → hecha/descartada/pospuesta) — dime si quieres continuar con ese o prefieres pasar ya a las historias de usuario del Ciclo 1 (MVP).
-
----
-
 ## Historial de cambios
 
 - **v1.0 (7 sept. 2026)** — versión inicial: flujo de activación de categoría con consentimiento condicional, extraído de `06_Diagrama_Secuencia_CheckIn.md` para resolver la inconsistencia detectada en el diagrama de casos de uso.
+- **v1.1 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v1.2 (29 sept. 2026)** — nota inicial: es el análisis de septiembre, no el diseño actual, con la equivalencia de nombres.

@@ -87,6 +87,7 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 
 ## Documentación
 
+- [docs/README.md](docs/README.md) — **mapa de toda la documentación** y por dónde empezar.
 - [AGENTS.md](AGENTS.md) — convenciones del proyecto y comandos (punto de entrada).
 - [Requisitos](docs/requirements-analysis/) · [Decisiones de arquitectura (ADR)](docs/architecture-decisions/) · [Historias de usuario](docs/user-stories/) · [Tablero](docs/project-management/01_Backlog_MVP.md) · [Validación](docs/validation/)
 - [CHANGELOG.md](CHANGELOG.md) — cambios por versión.

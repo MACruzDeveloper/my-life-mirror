@@ -27,11 +27,11 @@ import { HttpError } from "@shared/ui/api/getJson";
 import { useOptionalSession } from "@shared/ui/context/SessionContext";
 import { ADMIN_AUDIT_KEY, ADMIN_USERS_KEY, postAdmin, useAdminUsers, type AdminUserDto } from "./adminQueries";
 
-type TipoAccion = "role" | "email" | "name" | "suspend" | "delete" | "recovery";
+type ActionType = "role" | "email" | "name" | "suspend" | "delete" | "recovery";
 
 /** Acciones que exigen la contraseña del admin (las mismas que exige el servidor). */
-const CON_CONTRASENA: TipoAccion[] = ["role", "email", "suspend", "delete"];
-const ENDPOINT: Record<TipoAccion, string> = {
+const WITH_PASSWORD: ActionType[] = ["role", "email", "suspend", "delete"];
+const ENDPOINT: Record<ActionType, string> = {
   role: "user-role",
   email: "user-email",
   name: "user-name",
@@ -50,139 +50,139 @@ const ROLES = ["usuario", "premium", "admin"] as const;
 export function AdminUsers() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const usuarios = useAdminUsers();
-  const yoEmail = useOptionalSession()?.email;
-  const [menu, setMenu] = useState<{ ancla: HTMLElement; usuario: AdminUserDto } | null>(null);
-  const [accion, setAccion] = useState<{ tipo: TipoAccion; usuario: AdminUserDto } | null>(null);
+  const users = useAdminUsers();
+  const myEmail = useOptionalSession()?.email;
+  const [menu, setMenu] = useState<{ anchor: HTMLElement; user: AdminUserDto } | null>(null);
+  const [action, setAction] = useState<{ kind: ActionType; user: AdminUserDto } | null>(null);
   const [password, setPassword] = useState("");
-  const [rol, setRol] = useState<AdminUserDto["rol"]>("usuario");
-  const [valor, setValor] = useState("");
-  const [enviando, setEnviando] = useState(false);
+  const [role, setRole] = useState<AdminUserDto["rol"]>("usuario");
+  const [value, setValue] = useState("");
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [errorLista, setErrorLista] = useState<string | undefined>();
-  const [creando, setCreando] = useState(false);
-  const [nuevo, setNuevo] = useState({ email: "", name: "" });
-  const [creada, setCreada] = useState<{ email: string; temporaryPassword: string } | null>(null);
+  const [listError, setListError] = useState<string | undefined>();
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState({ email: "", name: "" });
+  const [created, setCreated] = useState<{ email: string; temporaryPassword: string } | null>(null);
 
-  const sinPermiso = usuarios.error instanceof HttpError && usuarios.error.status === 403;
-  const fecha = (iso?: string) => (iso ? new Date(iso).toLocaleDateString(i18n.language) : t("admin.nunca"));
+  const noPermission = users.error instanceof HttpError && users.error.status === 403;
+  const date = (iso?: string) => (iso ? new Date(iso).toLocaleDateString(i18n.language) : t("admin.nunca"));
 
-  async function refrescar() {
+  async function refresh() {
     await Promise.all([queryClient.invalidateQueries({ queryKey: ADMIN_USERS_KEY }), queryClient.invalidateQueries({ queryKey: ADMIN_AUDIT_KEY })]);
   }
 
   /** Errores de las acciones, explicados en el idioma de la interfaz (los mensajes del servidor están en inglés). */
-  function explicar(status: number, esCreacionOEmail: boolean): string {
+  function explain(status: number, isCreationOrEmail: boolean): string {
     if (status === 403) return t("admin.errorContrasena");
-    if (status === 409) return esCreacionOEmail ? t("admin.errorEmailEnUso") : t("admin.errorRegla");
+    if (status === 409) return isCreationOrEmail ? t("admin.errorEmailEnUso") : t("admin.errorRegla");
     if (status === 404) return t("admin.errorNoEncontrado");
     if (status === 400) return t("admin.errorDatos");
     return t("admin.errorGuardar");
   }
 
-  function abrirAccion(tipo: TipoAccion, usuario: AdminUserDto) {
+  function openAction(kind: ActionType, user: AdminUserDto) {
     setMenu(null);
     setPassword("");
     setError(undefined);
-    setValor(tipo === "name" ? (usuario.name ?? "") : "");
-    setRol(usuario.rol);
-    setAccion({ tipo, usuario });
+    setValue(kind === "name" ? (user.name ?? "") : "");
+    setRole(user.rol);
+    setAction({ kind: kind, user: user });
   }
 
-  function cerrarAccion() {
-    if (enviando) return;
-    setAccion(null);
+  function closeAction() {
+    if (sending) return;
+    setAction(null);
   }
 
-  async function reactivar(usuario: AdminUserDto) {
+  async function reactivate(user: AdminUserDto) {
     setMenu(null);
-    setErrorLista(undefined);
+    setListError(undefined);
     try {
-      const r = await postAdmin("user-reactivate", { userId: usuario.id });
-      if (!r.ok) setErrorLista(explicar(r.status, false));
-      else await refrescar();
+      const r = await postAdmin("user-reactivate", { userId: user.id });
+      if (!r.ok) setListError(explain(r.status, false));
+      else await refresh();
     } catch {
-      setErrorLista(t("comun.errorServidor"));
+      setListError(t("comun.errorServidor"));
     }
   }
 
-  async function confirmar() {
-    if (!accion) return;
-    const { tipo, usuario } = accion;
-    const cuerpo: Record<string, unknown> = { userId: usuario.id };
-    if (tipo === "role") cuerpo.rol = rol;
-    if (tipo === "email") cuerpo.email = valor;
-    if (tipo === "name") cuerpo.name = valor;
-    if (CON_CONTRASENA.includes(tipo)) cuerpo.password = password;
+  async function confirmAction() {
+    if (!action) return;
+    const { kind: tipo, user: usuario } = action;
+    const body: Record<string, unknown> = { userId: usuario.id };
+    if (tipo === "role") body.rol = role;
+    if (tipo === "email") body.email = value;
+    if (tipo === "name") body.name = value;
+    if (WITH_PASSWORD.includes(tipo)) body.password = password;
 
-    setEnviando(true);
+    setSending(true);
     setError(undefined);
     try {
-      const r = await postAdmin(ENDPOINT[tipo], cuerpo);
+      const r = await postAdmin(ENDPOINT[tipo], body);
       if (!r.ok) {
-        setError(explicar(r.status, tipo === "email"));
+        setError(explain(r.status, tipo === "email"));
         return;
       }
-      setAccion(null);
-      await refrescar();
+      setAction(null);
+      await refresh();
     } catch {
       setError(t("comun.errorServidor"));
     } finally {
-      setEnviando(false);
+      setSending(false);
     }
   }
 
-  async function crear() {
-    setEnviando(true);
+  async function create() {
+    setSending(true);
     setError(undefined);
     try {
-      const r = await postAdmin<{ email: string; temporaryPassword: string }>("user-create", nuevo);
+      const r = await postAdmin<{ email: string; temporaryPassword: string }>("user-create", draft);
       if (!r.ok) {
-        setError(explicar(r.status, true));
+        setError(explain(r.status, true));
         return;
       }
-      setCreada({ email: r.data.email, temporaryPassword: r.data.temporaryPassword });
-      await refrescar();
+      setCreated({ email: r.data.email, temporaryPassword: r.data.temporaryPassword });
+      await refresh();
     } catch {
       setError(t("comun.errorServidor"));
     } finally {
-      setEnviando(false);
+      setSending(false);
     }
   }
 
-  function cerrarCreacion() {
+  function closeCreation() {
     // La contraseña temporal no se conserva en memoria una vez cerrado el cuadro.
-    setCreando(false);
-    setCreada(null);
-    setNuevo({ email: "", name: "" });
+    setCreating(false);
+    setCreated(null);
+    setDraft({ email: "", name: "" });
     setError(undefined);
   }
 
-  if (usuarios.isPending) {
+  if (users.isPending) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
         <CircularProgress />
       </Box>
     );
   }
-  if (sinPermiso) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;
-  if (usuarios.isError) return <Alert severity="error">{t("admin.errorCarga")}</Alert>;
+  if (noPermission) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;
+  if (users.isError) return <Alert severity="error">{t("admin.errorCarga")}</Alert>;
 
-  const lista = usuarios.data;
-  const necesitaContrasena = accion ? CON_CONTRASENA.includes(accion.tipo) : false;
-  const faltaDato = accion ? ((accion.tipo === "email" || accion.tipo === "name") && valor.trim().length === 0) : false;
+  const list = users.data;
+  const needsPassword = action ? WITH_PASSWORD.includes(action.kind) : false;
+  const missingValue = action ? ((action.kind === "email" || action.kind === "name") && value.trim().length === 0) : false;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
         <Typography variant="subtitle1">
-          {t("admin.usuarios")} · {t("admin.total", { count: lista.length })}
+          {t("admin.usuarios")} · {t("admin.total", { count: list.length })}
         </Typography>
-        <Button variant="contained" size="small" onClick={() => setCreando(true)}>
+        <Button variant="contained" size="small" onClick={() => setCreating(true)}>
           {t("admin.crearUsuario")}
         </Button>
       </Box>
-      {errorLista && <Alert severity="error">{errorLista}</Alert>}
+      {listError && <Alert severity="error">{listError}</Alert>}
 
       <TableContainer sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
         <Table size="small">
@@ -198,18 +198,18 @@ export function AdminUsers() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {lista.map((usuario) => (
-              <TableRow key={usuario.id}>
-                <TableCell>{usuario.name ?? t("admin.nunca")}</TableCell>
-                <TableCell>{usuario.email}</TableCell>
-                <TableCell>{usuario.rol}</TableCell>
+            {list.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.name ?? t("admin.nunca")}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.rol}</TableCell>
                 <TableCell>
-                  {usuario.suspendido ? <Chip size="small" color="warning" label={t("admin.suspendida")} /> : t("admin.activa")}
+                  {user.suspendido ? <Chip size="small" color="warning" label={t("admin.suspendida")} /> : t("admin.activa")}
                 </TableCell>
-                <TableCell>{fecha(usuario.createdAt)}</TableCell>
-                <TableCell>{fecha(usuario.lastSignInAt)}</TableCell>
+                <TableCell>{date(user.createdAt)}</TableCell>
+                <TableCell>{date(user.lastSignInAt)}</TableCell>
                 <TableCell>
-                  <IconButton size="small" aria-label={t("admin.accionesDe", { email: usuario.email })} onClick={(e) => setMenu({ ancla: e.currentTarget, usuario })}>
+                  <IconButton size="small" aria-label={t("admin.accionesDe", { email: user.email })} onClick={(e) => setMenu({ anchor: e.currentTarget, user: user })}>
                     <MoreVertIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -219,39 +219,39 @@ export function AdminUsers() {
         </Table>
       </TableContainer>
 
-      <Menu anchorEl={menu?.ancla} open={menu !== null} onClose={() => setMenu(null)}>
+      <Menu anchorEl={menu?.anchor} open={menu !== null} onClose={() => setMenu(null)}>
         {menu && (
-          <MenuItem disabled={menu.usuario.email === yoEmail} onClick={() => abrirAccion("role", menu.usuario)}>
+          <MenuItem disabled={menu.user.email === myEmail} onClick={() => openAction("role", menu.user)}>
             {t("admin.cambiarRol")}
           </MenuItem>
         )}
-        {menu && <MenuItem onClick={() => abrirAccion("email", menu.usuario)}>{t("admin.cambiarEmail")}</MenuItem>}
-        {menu && <MenuItem onClick={() => abrirAccion("name", menu.usuario)}>{t("admin.cambiarNombre")}</MenuItem>}
-        {menu && <MenuItem onClick={() => abrirAccion("recovery", menu.usuario)}>{t("admin.enlaceRecuperacion")}</MenuItem>}
+        {menu && <MenuItem onClick={() => openAction("email", menu.user)}>{t("admin.cambiarEmail")}</MenuItem>}
+        {menu && <MenuItem onClick={() => openAction("name", menu.user)}>{t("admin.cambiarNombre")}</MenuItem>}
+        {menu && <MenuItem onClick={() => openAction("recovery", menu.user)}>{t("admin.enlaceRecuperacion")}</MenuItem>}
         {menu &&
-          (menu.usuario.suspendido ? (
-            <MenuItem onClick={() => void reactivar(menu.usuario)}>{t("admin.reactivar")}</MenuItem>
+          (menu.user.suspendido ? (
+            <MenuItem onClick={() => void reactivate(menu.user)}>{t("admin.reactivar")}</MenuItem>
           ) : (
-            <MenuItem disabled={menu.usuario.rol === "admin"} onClick={() => abrirAccion("suspend", menu.usuario)}>
+            <MenuItem disabled={menu.user.rol === "admin"} onClick={() => openAction("suspend", menu.user)}>
               {t("admin.suspender")}
             </MenuItem>
           ))}
         {menu && (
-          <MenuItem disabled={menu.usuario.rol === "admin"} onClick={() => abrirAccion("delete", menu.usuario)} sx={{ color: "error.main" }}>
+          <MenuItem disabled={menu.user.rol === "admin"} onClick={() => openAction("delete", menu.user)} sx={{ color: "error.main" }}>
             {t("admin.eliminar")}
           </MenuItem>
         )}
       </Menu>
 
-      <Dialog open={accion !== null} onClose={cerrarAccion} fullWidth maxWidth="xs">
-        {accion && (
+      <Dialog open={action !== null} onClose={closeAction} fullWidth maxWidth="xs">
+        {action && (
           <>
-            <DialogTitle>{t(`admin.dialogo.${accion.tipo}`, { email: accion.usuario.email })}</DialogTitle>
+            <DialogTitle>{t(`admin.dialogo.${action.kind}`, { email: action.user.email })}</DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <DialogContentText>{t(`admin.dialogoTexto.${accion.tipo}`)}</DialogContentText>
+              <DialogContentText>{t(`admin.dialogoTexto.${action.kind}`)}</DialogContentText>
               {error && <Alert severity="error">{error}</Alert>}
-              {accion.tipo === "role" && (
-                <TextField select label={t("admin.rol")} value={rol} onChange={(e) => setRol(e.target.value as AdminUserDto["rol"])} fullWidth>
+              {action.kind === "role" && (
+                <TextField select label={t("admin.rol")} value={role} onChange={(e) => setRole(e.target.value as AdminUserDto["rol"])} fullWidth>
                   {ROLES.map((r) => (
                     <MenuItem key={r} value={r}>
                       {r}
@@ -259,21 +259,21 @@ export function AdminUsers() {
                   ))}
                 </TextField>
               )}
-              {accion.tipo === "email" && <TextField label={t("admin.nuevoEmail")} type="email" value={valor} onChange={(e) => setValor(e.target.value)} fullWidth autoFocus />}
-              {accion.tipo === "name" && <TextField label={t("admin.nuevoNombre")} value={valor} onChange={(e) => setValor(e.target.value)} fullWidth autoFocus />}
-              {necesitaContrasena && (
+              {action.kind === "email" && <TextField label={t("admin.nuevoEmail")} type="email" value={value} onChange={(e) => setValue(e.target.value)} fullWidth autoFocus />}
+              {action.kind === "name" && <TextField label={t("admin.nuevoNombre")} value={value} onChange={(e) => setValue(e.target.value)} fullWidth autoFocus />}
+              {needsPassword && (
                 <TextField label={t("admin.tuContrasena")} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth />
               )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={cerrarAccion} disabled={enviando}>
+              <Button onClick={closeAction} disabled={sending}>
                 {t("admin.cancelar")}
               </Button>
               <Button
-                onClick={() => void confirmar()}
+                onClick={() => void confirmAction()}
                 variant="contained"
-                color={accion.tipo === "delete" ? "error" : "primary"}
-                disabled={enviando || faltaDato || (necesitaContrasena && password.length === 0)}
+                color={action.kind === "delete" ? "error" : "primary"}
+                disabled={sending || missingValue || (needsPassword && password.length === 0)}
               >
                 {t("admin.confirmar")}
               </Button>
@@ -282,23 +282,23 @@ export function AdminUsers() {
         )}
       </Dialog>
 
-      <Dialog open={creando} onClose={cerrarCreacion} fullWidth maxWidth="xs">
+      <Dialog open={creating} onClose={closeCreation} fullWidth maxWidth="xs">
         <DialogTitle>{t("admin.crearUsuario")}</DialogTitle>
-        {creada ? (
+        {created ? (
           <>
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Alert severity="warning">{t("admin.contrasenaTemporalAviso")}</Alert>
-              <Typography variant="body2">{creada.email}</Typography>
+              <Typography variant="body2">{created.email}</Typography>
               <Typography variant="h6" component="p" sx={{ fontFamily: "monospace", wordBreak: "break-all" }}>
-                {creada.temporaryPassword}
+                {created.temporaryPassword}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {t("admin.contrasenaTemporalConsejo")}
               </Typography>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => void navigator.clipboard?.writeText(creada.temporaryPassword)}>{t("admin.copiar")}</Button>
-              <Button variant="contained" onClick={cerrarCreacion}>
+              <Button onClick={() => void navigator.clipboard?.writeText(created.temporaryPassword)}>{t("admin.copiar")}</Button>
+              <Button variant="contained" onClick={closeCreation}>
                 {t("admin.cerrar")}
               </Button>
             </DialogActions>
@@ -308,14 +308,14 @@ export function AdminUsers() {
             <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <DialogContentText>{t("admin.dialogoTexto.create")}</DialogContentText>
               {error && <Alert severity="error">{error}</Alert>}
-              <TextField label={t("admin.email")} type="email" value={nuevo.email} onChange={(e) => setNuevo({ ...nuevo, email: e.target.value })} fullWidth autoFocus />
-              <TextField label={t("admin.nombre")} value={nuevo.name} onChange={(e) => setNuevo({ ...nuevo, name: e.target.value })} fullWidth />
+              <TextField label={t("admin.email")} type="email" value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} fullWidth autoFocus />
+              <TextField label={t("admin.nombre")} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} fullWidth />
             </DialogContent>
             <DialogActions>
-              <Button onClick={cerrarCreacion} disabled={enviando}>
+              <Button onClick={closeCreation} disabled={sending}>
                 {t("admin.cancelar")}
               </Button>
-              <Button variant="contained" onClick={() => void crear()} disabled={enviando || nuevo.email.trim().length === 0 || nuevo.name.trim().length === 0}>
+              <Button variant="contained" onClick={() => void create()} disabled={sending || draft.email.trim().length === 0 || draft.name.trim().length === 0}>
                 {t("admin.crear")}
               </Button>
             </DialogActions>
