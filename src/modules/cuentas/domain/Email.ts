@@ -3,7 +3,7 @@ import { ValidationError } from "../../../shared/domain/DomainError.js";
 
 const PATRON_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Value Object — inmutable, se valida a sí mismo en `crear` (ADR-03 §3.2). */
+/** Value Object — inmutable, se valida a sí mismo en `crear` (ADR-03 apartado 3.2). */
 export class Email {
   readonly valor: string;
 

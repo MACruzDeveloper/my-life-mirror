@@ -1,7 +1,7 @@
 -- RF-18: recomendaciones propuestas a un usuario cuando una categoría puntúa
 -- bajo (RD-04). Persistencia real desde el principio (se escribe al guardar la
 -- entrevista y se lee al ver resultados: funciones distintas, ver
--- 04_Almacenamiento_Datos.md §5.1). Guarda la CLAVE de la plantilla, no el
+-- 04_Almacenamiento_Datos.md apartado 5.1). Guarda la CLAVE de la plantilla, no el
 -- texto (la interfaz lo traduce). Cubierta por el derecho al olvido (RF-05):
 -- se borra con la cuenta (on delete cascade) y también explícitamente.
 -- Ejecutar a mano en el SQL Editor de Supabase (como 0001-0006).

@@ -1,7 +1,7 @@
 # Guion del test de usabilidad — Ciclo 1 (MVP)
 
 **Para quién:** la persona que dirige la sesión (el autor del TFM). Se puede imprimir o tener abierto en otra pantalla.
-**Qué valida:** RN-04 (experiencia motivadora y no punitiva) y RES-07 (sin *dark patterns*) sobre el flujo completo, y RNF-01 (evaluar las categorías en menos de 2 minutos). Plan general en [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) §2.
+**Qué valida:** RN-04 (experiencia motivadora y no punitiva) y RES-07 (sin *dark patterns*) sobre el flujo completo, y RNF-01 (evaluar las categorías en menos de 2 minutos). Plan general en [04_Plan_Verificacion_Validacion.md](../requirements-analysis/04_Plan_Verificacion_Validacion.md) apartado 2.
 **Participante:** una persona (n = 1), sin conocimientos técnicos del proyecto.
 **Duración:** 45-60 minutos.
 **Resultados:** se anotan en [02_Resultados_Test_Usabilidad.md](02_Resultados_Test_Usabilidad.md).

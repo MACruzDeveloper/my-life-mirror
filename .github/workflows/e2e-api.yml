@@ -1,7 +1,7 @@
 # Tests E2E con api/ contra un Supabase local, en cada PR (y a mano desde la pestaña Actions).
 # Lo mismo que `npm run test:e2e:api` en local: la máquina de GitHub trae Docker, así que
 # levanta su propio Supabase vacío con supabase/migrations y nunca toca la base real.
-# Por eso no necesita ningún secreto. Ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md §1.2.
+# Por eso no necesita ningún secreto. Ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md apartado 1.2.
 name: E2E con api
 
 on:

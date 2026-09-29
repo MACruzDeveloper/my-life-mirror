@@ -15,7 +15,7 @@ export interface RegisterUserInput {
 /**
  * Caso de uso — RF-01. Delega la creación real de la cuenta a Supabase Auth
  * a través del puerto AuthProvider (ADR-06); nunca instancia un adaptador
- * él mismo (ADR-03 §3.4).
+ * él mismo (ADR-03 apartado 3.4).
  *
  * También guarda el `name` como perfil inicial (RF-03) en la misma
  * operación — así el Header nunca tiene que mostrar el email en bruto

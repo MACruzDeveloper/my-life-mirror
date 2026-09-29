@@ -25,7 +25,7 @@ export class SupabaseAuthProvider implements AuthProvider {
     const { data, error } = await this.cliente.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // sin confirmación por email en el Ciclo 1 — ver ADR-06 §1
+      email_confirm: true, // sin confirmación por email en el Ciclo 1 — ver ADR-06 apartado 1
       // Rol explícito desde el alta (RNF-13) — nadie se autorregistra como
       // premium/admin; esos roles se conceden a mano después, vía dashboard.
       app_metadata: { rol: ROL_POR_DEFECTO },

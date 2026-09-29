@@ -4,7 +4,7 @@ import { ValidationError } from "../../../shared/domain/DomainError.js";
 export const MIN_SCORE = 1;
 export const MAX_SCORE = 10;
 
-/** Value Object — RF-10. Inmutable y se valida a sí mismo en `create` (ADR-03 §3.2). */
+/** Value Object — RF-10. Inmutable y se valida a sí mismo en `create` (ADR-03 apartado 3.2). */
 export class Score {
   readonly value: number;
 

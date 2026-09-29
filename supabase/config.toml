@@ -2,7 +2,7 @@
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
 # working directory name when running `supabase init`.
-# Supabase local (Docker) para los tests E2E contra api/ — ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md §1.1.
+# Supabase local (Docker) para los tests E2E contra api/ — ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md apartado 1.1.
 # Nunca se conecta al proyecto real: `supabase start` levanta una copia vacía y aplica supabase/migrations.
 project_id = "my-sims"
 

@@ -35,7 +35,7 @@ stateDiagram-v2
 - **RF-20 (adaptación futura)** no participa en este diagrama de estados — usa el *historial* de instancias ya resueltas (`Hecha`/`Descartada`) como señal para decidir qué recomendar después, es lógica de generación, no un estado adicional de la entidad.
 
 ## 3. Idea previa, ahora parcialmente resuelta por RF-34
-La preocupación de que una `Pospuesta` nunca retomada "se pierda" queda cubierta por **RF-34** (§4): el usuario puede consultar y filtrar por estado en cualquier momento, así que las pospuestas no desaparecen. Queda abierta una versión más proactiva —que el resumen mensual (RF-31) las saque a relucir solas, sin que el usuario tenga que ir a buscarlas— como posible extensión futura si quieres reforzarlo. No lo añado sin que lo confirmes.
+La preocupación de que una `Pospuesta` nunca retomada "se pierda" queda cubierta por **RF-34** (apartado 4): el usuario puede consultar y filtrar por estado en cualquier momento, así que las pospuestas no desaparecen. Queda abierta una versión más proactiva —que el resumen mensual (RF-31) las saque a relucir solas, sin que el usuario tenga que ir a buscarlas— como posible extensión futura si quieres reforzarlo. No lo añado sin que lo confirmes.
 
 ---
 
