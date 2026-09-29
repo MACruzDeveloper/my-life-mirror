@@ -1,0 +1,3 @@
+# Quality gate antes de subir (~40 s): lo mismo que comprobará Vercel, y más.
+# Saltarlo en una emergencia: git push --no-verify (y dejarlo anotado).
+npm run verify

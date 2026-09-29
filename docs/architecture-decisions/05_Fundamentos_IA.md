@@ -1,0 +1,85 @@
+# ADR-05: Fundamentos de IA Aplicados al Proyecto
+
+**Estado:** Aceptado
+**Fecha:** 10 de septiembre de 2026
+**Relacionado con:** [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md) apartado 7 (Python para avatares), [02_Requisitos_Fase1.md](../requirements-analysis/02_Requisitos_Fase1.md) apartado 2.11 (RF-26, RF-35, RF-36, RF-37), RES-09
+
+---
+
+## 1. Contexto
+
+El objetivo de este documento es responder a tres preguntas que se plantearon juntas: qué plataformas de IA usar y para qué, si técnicas como RAG/fine-tuning/LangChain tienen sitio aquí, y dónde se pueden demostrar de forma real (no decorativa) técnicas como Chain-of-Thought y test-time compute. La disciplina aplicada es la misma de todo el proyecto hasta ahora: usar cada técnica donde gana su coste, no porque "es un máster de IA y hay que meterlo todo".
+
+## 2. Plataformas — una por modalidad, no una única elección
+
+| Necesidad | Plataforma recomendada | Por qué |
+|---|---|---|
+| Generación de avatares (RF-26) | **HuggingFace** (modelo de texto-a-imagen preentrenado, p. ej. Stable Diffusion/FLUX) | Ya decidido como script Python offline en [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md) apartado 7. No hace falta entrenar nada — un modelo preentrenado + buen prompting basta. Capa gratuita suficiente para un lote único de ~10-20 imágenes. Google AI Studio/Imagen es alternativa válida si se prefiere el ecosistema Gemini. |
+| Funciones de texto/razonamiento (RF-36, RF-37) | **API de Anthropic (Claude)** | Es la que mejor conozco de primera mano para ayudarte a integrarla, y tiene SDK oficial en TypeScript/Node — encaja directamente con [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md) sin fricción añadida. |
+| Voz a texto (RF-35) | **Whisper** (API de OpenAI, o un modelo Whisper abierto vía HuggingFace) | Ni Anthropic ni el resto de plataformas de la tabla tienen un modelo de audio propio — esta elección es independiente de cuál se use para el resto de funciones de IA del proyecto. |
+| GitHub Models | — | Útil para comparar/probar varios modelos de texto en un mismo sitio durante la fase de exploración, pero no aporta nada específico que las opciones de arriba no den ya para las necesidades reales del proyecto. |
+
+## 3. RAG y fine-tuning — dónde sí y dónde no
+
+**Fine-tuning: descartado.** No hay ningún RF que lo justifique, y entrenar un modelo para generar texto de recomendaciones iría directamente en contra de una decisión ya tomada: RD-09 mantiene el catálogo de recomendaciones fijo y curado editorialmente precisamente porque RES-09 prohíbe contenido generado sin ese control editorial. Un modelo afinado erosionaría exactamente el control que esa restricción protege.
+
+**RAG: sin caso de uso en el núcleo del producto, pero sí en RF-36.** El motor de recomendaciones (RD-09) es deliberadamente no generativo, por el mismo motivo de RES-09. Donde sí encaja de forma natural es RF-36: responder preguntas en lenguaje natural sobre el propio historial del usuario es exactamente el patrón RAG — recuperar datos relevantes (las `Evaluación`/`Recomendación` propias del usuario) y dárselos como contexto a un modelo para que redacte la respuesta, sin inventar datos ni acceder a los de otros usuarios. Una forma intuitiva de verlo: lo que ha pasado en esta misma conversación —adjuntar documentos y que yo fundamente mis respuestas en su contenido real— es la versión manual e interactiva de lo que RAG automatiza en tiempo de consulta.
+
+**LangChain/LlamaIndex: no hacen falta a esta escala.** Su valor crece con la complejidad de orquestación (múltiples proveedores, cadenas de varios pasos, una base de datos vectorial real, agentes con herramientas). El historial de un usuario en RF-36 es, como mucho, unos cientos de registros — no justifica una base de datos vectorial dedicada. Basta con: (1) generar embeddings de las `Evaluación`/`Recomendación` relevantes con una API de embeddings, (2) una búsqueda de similitud por coseno sobre un array en memoria (un cálculo trivial a este volumen), (3) construir el prompt con lo recuperado. Es la misma disciplina de "comprobar la alternativa nativa antes de traer un framework" que ya aplica [02_Principios_Diseño.md](02_Principios_Diseño.md) apartado 4 a los patrones de diseño, extendida aquí a herramientas de IA.
+
+## 4. Chain-of-Thought y test-time compute — ejemplos reales, no decorativos
+
+Punto de partida honesto: **ningún RF actual genera texto libre con un LLM** — el motor de recomendaciones es un catálogo fijo por diseño (RES-09). Para que estas técnicas se demuestren de verdad y no como una mención de examen, hacen falta sitios concretos donde ya se justifican por un requisito real:
+
+### 4.1 Chain-of-Thought en la construcción de prompts de RF-26
+Antes de enviar cada prompt de imagen al modelo de avatares, un paso de razonamiento explícito comprueba si la descripción evita estereotipos culturales, de género o de apariencia — el propio objetivo que ya exige RF-26. No es una demostración añadida sin propósito: es CoT aplicado al único punto del proyecto donde ya había un requisito de "verificar antes de generar".
+
+### 4.2 Chain-of-Thought + test-time compute en RF-37 (asistente de redacción)
+Este es el ejemplo más completo, porque cierra el círculo con una decisión ya tomada: RF-32 nació precisamente de rechazar un diseño que sonaba a "alarde" (ver el historial de decisiones de RN-08). RF-37 usa un paso de razonamiento estructurado que comprueba explícitamente, antes de mostrar cualquier borrador al usuario emisor: (1) ¿contiene lenguaje diagnóstico o clínico? (RES-09), (2) ¿suena a alarde en vez de a apoyo? (el motivo original del rediseño de RF-32). Aquí es donde el **test-time compute** gana su sitio, y no en todas partes: al ser una comprobación de seguridad con consecuencias reales si falla, repetir el juicio más de una vez (autoconsistencia) o usar un modelo con más capacidad de razonamiento específicamente en este punto está justificado — no como política general del proyecto, sino en el único checkpoint donde un falso negativo importa de verdad.
+
+### 4.3 RF-40: recomendaciones personalizadas con IA, ancladas al catálogo (27 sept. 2026)
+
+Esta sección matiza la decisión de apartado 3 de que el motor de recomendaciones sea "no generativo". La validación mostró que el usuario echa de menos sugerencias más personales, y el autor quiere que eso sea el corazón del producto. **Se mantiene el control editorial que protege RES-09, pero ahora lo hace una verificación automática en vez de un catálogo inmóvil:**
+
+1. **Anclaje:** el modelo no inventa ideas. Recibe la categoría, la puntuación, la tendencia y las 2-3 ideas del catálogo curado de esa categoría; elige una y la reescribe en 2-3 frases. La salida es estructurada (JSON: clave de la plantilla elegida + texto), no texto libre.
+2. **Verificación automática** (CoT + *test-time compute*, igual que RF-37): una lista de términos determinista y una segunda pasada del modelo comprueban que no hay lenguaje diagnóstico (RES-09), consejo médico/financiero/psicológico (RES-05) ni tono de juicio (RN-04).
+3. **Caída segura:** si la verificación falla, el proveedor no responde o no hay consentimiento, se muestra el texto del catálogo. El usuario nunca ve texto sin verificar y **nunca espera a un moderador humano**: no hay ninguno en el bucle; la persona que decide es el propio usuario (activar o no la personalización).
+4. **Privacidad:** enviar datos a un proveedor externo lo convierte en encargado del tratamiento. Por eso es *opt-in* (desactivado por defecto), se explica qué se envía, y la primera versión **excluye las notas de texto libre y las categorías sensibles** (RGPD art. 9). Se amplía solo tras evaluar el comportamiento.
+5. **Arquitectura:** puerto de dominio (p. ej. `IdeaWriter`) con un *Fake* para los tests y el adaptador de Anthropic en infraestructura; clave de API solo en el servidor. Se desarrolla primero contra el *Fake*; el adaptador real llega cuando haya crédito de API (la suscripción de claude.ai no incluye uso de la API).
+6. **Evaluación:** un conjunto de ~20 casos (incluidos casos límite) con lo que se espera de cada uno, reutilizable como evidencia en la memoria del TFM.
+7. **Coste:** con un modelo pequeño (Haiku), del orden de una décima de céntimo por idea; se genera una vez y se guarda con la recomendación (entra en la exportación de RF-05), no en cada visita.
+
+## 5. Resumen de lo añadido a los requisitos
+
+| RF | Qué añade | Prioridad | Plataforma |
+|---|---|---|---|
+| RF-35 | Comentario reflexivo por voz al completar una recomendación | Could | Whisper |
+| RF-36 | Consulta en lenguaje natural sobre el propio historial (RAG) | Could | Claude API + embeddings, sin LangChain |
+| RF-37 | Asistente de redacción del mensaje de RF-32, con verificación CoT + test-time compute | Could | Claude API |
+| RF-40 | Recomendaciones personalizadas con IA, ancladas al catálogo, con verificación y caída segura (apartado 4.3) | Should (Ciclo 2) | Claude API (Haiku) |
+
+Los tres quedan como Could — candidatos de Ciclo 3 o posteriores, no del MVP. Dado el alcance real del proyecto (RES-01, RES-02), es razonable que alguno de los tres no llegue a implementarse a tiempo; quedan documentados igualmente para la memoria del TFM como parte del razonamiento arquitectónico, se construyan o no.
+
+## 6. Idea discutida y explícitamente aplazada (no añadida)
+
+Durante esta misma conversación surgió una idea relacionada pero distinta: niveles de progreso (básico/medio/avanzado) para habilidades u hábitos de largo recorrido (el ejemplo usado fue aprender a tocar el piano), frente a acciones puntuales donde "hecha" ya funciona bien tal cual. Se decidió **no** formalizarla ahora — encaja mejor como extensión futura de la gamificación (RF-24/RF-25) que como cambio a RD-04, y necesitaría su propia entidad de seguimiento de habilidad. Queda registrada en [Historial_Prompts.md](../Historial_Prompts.md), no en los requisitos, hasta que se aborde gamificación explícitamente.
+
+## 7. Agentes autónomos y MCP — considerados, no adoptados
+
+**Agentes autónomos:** un agente (bucle planificar → actuar/usar herramienta → observar → repetir, con mínima intervención humana entre pasos) es cualitativamente distinto de todo lo demás en este documento. RF-36 y RF-37 son pipelines de un solo paso, con una persona aprobando el resultado final — nunca un bucle autónomo. Esto no es una omisión: es coherente con una decisión ya tomada. RES-09 existe precisamente para que el sistema no tome acciones o juicios autónomos en un dominio sensible (bienestar personal) sin una persona en el bucle. Un agente que decidiera de forma autónoma, por ejemplo, enviar un mensaje a un usuario conectado o actuar sobre un patrón de puntuación baja sin aprobación explícita, no sería solo más caro — contradiría directamente RN-04 y RES-09. El coste en tokens de un bucle agente (cada paso reenvía contexto y añade idas y vueltas de herramientas) es real pero secundario: la razón principal para descartarlo es que ningún requisito pide autonomía, y construirla iría en contra de una restricción de seguridad ya documentada.
+
+**Model Context Protocol (MCP):** es un estándar para que una aplicación de IA descubra y llame herramientas/fuentes de datos externas de forma uniforme (una analogía habitual: "USB-C para aplicaciones de IA") — no es exclusivo de agentes (sirve igual para una llamada de un solo paso) ni implica autonomía por sí mismo. Su valor crece con el número de herramientas heterogéneas a integrar. RF-36 solo necesita una fuente de datos (las `Evaluación`/`Recomendación` propias del usuario en MongoDB) — es el mismo argumento de "innecesario a esta escala" ya aplicado a LangChain en apartado 3. Idea genuinamente interesante pero fuera de alcance: si en el futuro se quisiera que un asistente de IA externo (el Claude o ChatGPT personal del usuario) consultara los propios datos de MyLifeMirror, exponer MyLifeMirror como servidor MCP sería la forma estándar de hacerlo — no se persigue ahora, queda solo nombrada.
+
+---
+
+## 8. Próximo paso
+
+Con arquitectura, almacenamiento y fundamentos de IA decididos, no quedan bloqueos de diseño previos a las historias de usuario del Ciclo 1. RF-35/36/37 no son parte de ese Ciclo — se especifican cuando les toque, con el mismo formato Nivel 2 Spec Anchored del resto.
+
+---
+
+## Historial de cambios
+
+- **v1.0 (10 sept. 2026)** — versión inicial: plataformas por modalidad (HuggingFace/Google AI Studio para avatares, Claude API para texto, Whisper para voz), veredicto sobre RAG/fine-tuning/LangChain (RAG solo en RF-36, fine-tuning descartado, LangChain innecesario a esta escala), dos ejemplos reales de Chain-of-Thought/test-time compute (RF-26, RF-37). Se documentan RF-35, RF-36, RF-37 como Could, y se registra la idea de niveles de habilidad como aplazada, no añadida.
+- **v1.1 (10 sept. 2026)** — se añade apartado 7: agentes autónomos y MCP considerados y descartados explícitamente, con la razón principal ligada a RES-09 (no autonomía sin persona en el bucle) más que al coste.
+- **v1.2 (27 sept. 2026)** — nueva apartado 4.3 (RF-40): la IA reescribe ideas del catálogo con verificación automática y caída al texto curado, sin moderación humana. Matiza apartado 3 ("motor no generativo"): el control editorial se mantiene, pero automatizado.

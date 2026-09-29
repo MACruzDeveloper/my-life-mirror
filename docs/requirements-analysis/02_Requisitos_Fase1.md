@@ -1,7 +1,7 @@
 # Especificación de Requisitos — Fase 1 (Visión General)
-## Proyecto: "LifeScore" (nombre provisional) — App de auto-evaluación y mejora de vida por categorías
+## Proyecto: "MyLifeMirror" (nombre provisional) — App de auto-evaluación y mejora de vida por categorías
 
-**Versión:** 0.3 (incorpora cierre de hallazgos de la matriz de trazabilidad)
+**Versión:** 0.9
 **Fecha:** Septiembre 2026 (última actualización: 5 de septiembre de 2026)
 **Estado:** Borrador para validación con tutor/stakeholders — pendiente de Fase 2 (verificación, consistencia, trazabilidad)
 **Fecha límite del proyecto (TFM):** 31 de octubre de 2026 — alcance incremental (MVP → fases adicionales según tiempo disponible).
@@ -62,6 +62,8 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-04 | El sistema debe solicitar consentimiento explícito y granular antes de activar categorías sensibles (sexo, espiritualidad/religión, salud/deporte). | Must |
 | RF-05 | El sistema debe permitir al usuario exportar y eliminar completamente sus datos ("derecho al olvido"). | Must |
 | RF-26 | El sistema debe ofrecer al usuario, durante el registro, un catálogo cerrado de avatares predefinidos generados con IA y revisados editorialmente por el equipo (el usuario elige entre las opciones existentes, no genera avatares nuevos), evitando estereotipos culturales, de género o de apariencia. Relacionado con RF-25. | Should |
+| RF-38 | El sistema debe permitir a un usuario recuperar el acceso a su cuenta mediante un enlace de restablecimiento de contraseña enviado a su email, sin necesidad de contactar con soporte. | Should |
+| RF-39 | El sistema debe mostrar una página de inicio (landing) pública con una introducción al proyecto, accesible sin necesidad de autenticarse. | Should |
 
 ### 2.2 Configuración de categorías de vida
 | ID | Descripción | Prioridad |
@@ -95,6 +97,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-19 | El sistema debe permitir al usuario marcar una recomendación como "hecha", "descartada" o "pospuesta". | Should |
 | RF-20 | El sistema debe adaptar las recomendaciones futuras en función de qué recomendaciones ha aceptado o descartado el usuario previamente (personalización básica). | Could |
 | RF-21 | El sistema debe permitir al usuario pedir una recomendación alternativa si la propuesta no le convence. | Could |
+| RF-34 | El sistema debe permitir al usuario consultar el historial completo de sus recomendaciones (en cualquier estado: pendiente de respuesta, hecha, descartada, pospuesta), con filtros por estado, categoría y rango de fechas. | Should |
 
 ### 2.6 Notificaciones
 | ID | Descripción | Prioridad |
@@ -126,6 +129,14 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-32 | Cuando un usuario mejora significativamente su puntuación en una categoría, el sistema podrá sugerirle —nunca de forma automática— compartir su caso de éxito como recomendación motivacional con un usuario conectado (RF-33) que tenga una puntuación baja sostenida en esa misma categoría. El envío requiere una acción explícita del usuario emisor, y solo llega a usuarios receptores que hayan activado previamente, en sus ajustes de notificación (RF-23), la opción de recibir este tipo de recomendaciones de sus conexiones. El sistema no debe revelar la puntuación exacta de ningún usuario al otro; únicamente el hecho de la mejora y el mensaje que el emisor decida compartir (ver RES-11). | Could |
 | RF-33 | El sistema debe permitir a un usuario enviar y aceptar solicitudes de conexión con otros usuarios (relación mutuamente confirmada por ambas partes), como prerrequisito de las funciones sociales opcionales (RF-32). | Should |
 
+### 2.11 Funcionalidades asistidas por IA
+| ID | Descripción | Prioridad |
+|---|---|---|
+| RF-35 | Al marcar una recomendación como "hecha" (RF-19), el sistema podrá permitir al usuario dejar opcionalmente un comentario reflexivo sobre la experiencia, en texto libre o dictado por voz mediante reconocimiento de voz. | Could |
+| RF-36 | El sistema podrá ofrecer una función de consulta en lenguaje natural sobre el propio historial de evaluaciones y recomendaciones del usuario (p. ej. "¿cómo ha evolucionado mi categoría deporte este trimestre?"), respondida mediante recuperación de los datos del propio usuario (RAG) y nunca datos de otros usuarios. | Could |
+| RF-37 | Al redactar el mensaje de RF-32, el sistema podrá ofrecer ayuda de redacción asistida por IA sobre el borrador del usuario, verificando mediante razonamiento explícito que el texto final no contenga lenguaje diagnóstico (RES-09) ni tono de alarde, antes de mostrarlo al usuario emisor para su aprobación final. | Could |
+| RF-40 | El sistema podrá personalizar con IA la redacción de una recomendación (RF-18): el modelo elige entre las ideas del catálogo curado para esa categoría y la reescribe según la puntuación y su tendencia, con salida estructurada. Antes de mostrarla, una verificación automática (lista de términos + segunda pasada del modelo) descarta lenguaje diagnóstico (RES-09), consejo profesional (RES-05) y tono de juicio (RN-04); si la verificación falla o el proveedor no responde, se muestra el texto del catálogo. Solo con consentimiento explícito del usuario (desactivado por defecto), marcada como "personalizada con IA" y con el aviso de RES-05. Primera versión: sin notas de texto libre ni categorías sensibles. Sin moderación humana: el usuario nunca espera a nadie. | Should |
+
 ---
 
 ## 3. Requisitos No Funcionales (RNF)
@@ -137,13 +148,14 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RNF-03 | Disponibilidad | El sistema debe tener una disponibilidad objetivo del 99% (fuera de ventanas de mantenimiento planificado). | Should |
 | RNF-04 | Seguridad | Todos los datos sensibles (categoría 9 RGPD: sexo, salud, religión) deben almacenarse cifrados en reposo y en tránsito (TLS 1.2+, AES-256). | Must |
 | RNF-05 | Privacidad | El sistema debe cumplir el RGPD, incluyendo base legal de consentimiento explícito para datos de categoría especial. | Must |
-| RNF-06 | Compatibilidad | La interfaz debe ser responsive y funcionar correctamente en los navegadores principales (Chrome, Safari, Firefox) en móvil y escritorio. | Must |
+| RNF-06 | Compatibilidad | La interfaz debe ser responsive y funcionar correctamente en los navegadores principales (Chrome, Safari, Firefox), diseñada mobile-first y adaptada explícitamente a móvil, tablet y escritorio (no solo un contenedor que se ensancha). | Must |
 | RNF-07 | Escalabilidad | La arquitectura debe soportar un crecimiento de usuarios sin rediseño mayor (al menos hasta un orden de magnitud sobre el volumen inicial estimado). | Could |
 | RNF-08 | Mantenibilidad | El código debe seguir una arquitectura modular que permita añadir nuevas categorías sin modificar el core del sistema. | Should |
 | RNF-09 | Accesibilidad | La interfaz debe cumplir como mínimo el nivel AA de WCAG 2.1 en las pantallas principales. | Could |
 | RNF-10 | Internacionalización | El sistema debe soportar como mínimo español e inglés desde el lanzamiento. | Could |
 | RNF-11 | Auditabilidad | El sistema debe registrar (log) los accesos y modificaciones a datos sensibles con fines de auditoría de seguridad. | Should |
 | RNF-12 | Portabilidad de datos | El usuario debe poder exportar sus datos en un formato estructurado y legible (JSON/CSV). | Should |
+| RNF-13 | Control de acceso | El sistema debe soportar roles de usuario (estándar, premium, administrador) que diferencien permisos y funcionalidad disponible. El rol de administrador es de uso interno del equipo, no autoasignable; el rol premium es la base de RN-11 (sus ventajas concretas se definen en una fase posterior). | Should |
 
 ---
 
@@ -202,3 +214,9 @@ Para la siguiente fase, propongo:
 - **v0.2 (5 sept. 2026)** — primera ronda de comentarios de revisión: RN-11 (premium, RD-10), RF-26 (catálogo de avatares con IA), sección 2.8 Localización y comunidad (RF-27, RF-28), sección 2.9 Apoyo profesional y bienestar (RF-29, RF-30), RES-09 (sin detección algorítmica de riesgo) y RES-10 (alcance de contenido ilustrativo/ficticio para el TFM), fecha límite explícita (31 oct. 2026) en RES-01.
 - **v0.3 (5 sept. 2026)** — cierre de hallazgos de la matriz de trazabilidad ([03_Matriz_Trazabilidad_Fase1.md](03_Matriz_Trazabilidad_Fase1.md)): RF-31 (resumen mensual, cierra RN-06); RN-08 reescrito y sección 2.10 Conexiones sociales y recomendaciones entre usuarios (RF-32 recomendación entre iguales con doble consentimiento, RF-33 conexiones), RES-11 (salvaguarda de privacidad entre usuarios), RD-11 (entidad `Conexión`).
 - **v0.4 (7 sept. 2026)** — cierre de hallazgos del diagrama de clases ([05_Diagrama_Clases.md](05_Diagrama_Clases.md)): RD-04 ahora incluye explícitamente el usuario destinatario, y el estado pasa a `pendiente de respuesta / hecha / descartada / pospuesta`, alineado con RF-19.
+- **v0.5 (7 sept. 2026)** — RF-34 (historial de recomendaciones con filtros por estado/categoría/fecha), derivado del diagrama de estados ([09_Diagrama_Estados_Recomendacion.md](09_Diagrama_Estados_Recomendacion.md)).
+- **v0.6 (10 sept. 2026)** — nueva sección 2.11 Funcionalidades asistidas por IA: RF-35 (comentario reflexivo por voz al completar una recomendación), RF-36 (consulta en lenguaje natural sobre el propio historial, vía RAG), RF-37 (asistente de redacción del mensaje de RF-32 con verificación explícita anti-diagnóstico/anti-alarde). Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) para la justificación técnica.
+- **v0.7 (14 sept. 2026)** — RF-38 (recuperación de contraseña) y RF-39 (landing pública), ambas extensión de RF-01/Sprint 1.
+- **v0.8 (14 sept. 2026)** — RNF-13 (control de acceso por roles: estándar/premium/administrador), preparación de RN-11 y de un futuro rol de administrador para el equipo. Se corrige el campo "Versión" de este documento, desactualizado desde v0.3.
+- **v0.9 (14 sept. 2026)** — RNF-06 explicita mobile-first con adaptación real a tablet ([07_UI.md](../architecture-decisions/07_UI.md) apartado 6), no solo "responsive" en abstracto.
+- **v0.10 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA, ancladas al catálogo curado y con verificación automática), Should, Ciclo 2. Surge de la validación (la participante pidió sugerencias más personales) y lo confirma el autor. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) apartado 4.3.

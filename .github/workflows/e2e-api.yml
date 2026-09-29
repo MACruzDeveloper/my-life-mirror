@@ -1,0 +1,48 @@
+# Tests E2E con api/ contra un Supabase local, en cada PR (y a mano desde la pestaña Actions).
+# Lo mismo que `npm run test:e2e:api` en local: la máquina de GitHub trae Docker, así que
+# levanta su propio Supabase vacío con supabase/migrations y nunca toca la base real.
+# Por eso no necesita ningún secreto. Ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md apartado 1.2.
+name: E2E con api
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Un push nuevo al mismo PR cancela la ejecución anterior.
+concurrency:
+  group: e2e-api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HUSKY: "0" # los hooks de Git no pintan nada aquí
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Tests E2E con api/ (arranca Supabase local, vacía la base y ejecuta Playwright)
+        run: npm run test:e2e:api -- --reporter=list,html
+
+      - name: Guardar el informe de Playwright
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-playwright
+          path: playwright-report/
+          retention-days: 14

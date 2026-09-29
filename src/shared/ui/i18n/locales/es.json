@@ -1,0 +1,429 @@
+{
+  "comun": {
+    "email": "Email",
+    "contrasena": "Contraseña",
+    "contrasenaAyuda": "Al menos 8 caracteres",
+    "errorServidor": "No se pudo contactar con el servidor",
+    "reintentar": "Reintentar",
+    "idioma": "Idioma",
+    "abrirMenu": "Abrir menú"
+  },
+  "breadcrumbs": {
+    "inicio": "Inicio",
+    "crearCuenta": "Crear cuenta",
+    "iniciarSesion": "Iniciar sesión",
+    "recuperarContrasena": "Recuperar contraseña",
+    "restablecerContrasena": "Restablecer contraseña",
+    "perfil": "Perfil",
+    "miPerfil": "Mi perfil",
+    "politicaPrivacidad": "Política de privacidad",
+    "administracion": "Administración"
+  },
+  "landing": {
+    "titulo": "MyLifeMirror",
+    "descripcion": "Evalúa cómo va tu vida por categorías, a tu ritmo, y recibe sugerencias concretas para lo que tú decidas mejorar — sin juicios, sin comparaciones con nadie. Un espejo honesto, no un examen.",
+    "crearCuenta": "Crear cuenta",
+    "iniciarSesion": "Iniciar sesión"
+  },
+  "registro": {
+    "titulo": "Crear cuenta",
+    "boton": "Registrarse",
+    "botonEnviando": "Creando cuenta…",
+    "exito": "Cuenta creada para {{email}}.",
+    "irALogin": "Iniciar sesión",
+    "errorGenerico": "No se pudo completar el registro"
+  },
+  "login": {
+    "titulo": "Iniciar sesión",
+    "boton": "Iniciar sesión",
+    "botonEnviando": "Iniciando sesión…",
+    "olvideContrasena": "¿Olvidaste tu contraseña?",
+    "errorGenerico": "No se pudo iniciar sesión"
+  },
+  "olvidePassword": {
+    "titulo": "Recuperar contraseña",
+    "boton": "Enviar enlace",
+    "botonEnviando": "Enviando…",
+    "confirmacion": "Si el email existe, recibirás un enlace de recuperación.",
+    "errorGenerico": "No se pudo procesar la solicitud"
+  },
+  "restablecerPassword": {
+    "titulo": "Elegir nueva contraseña",
+    "nuevaContrasena": "Nueva contraseña",
+    "boton": "Cambiar contraseña",
+    "botonEnviando": "Guardando…",
+    "exito": "Contraseña actualizada. Ya puedes iniciar sesión con ella.",
+    "enlaceInvalido": "Enlace no válido o caducado. Pide uno nuevo desde \"Recuperar contraseña\".",
+    "errorGenerico": "No se pudo cambiar la contraseña"
+  },
+  "panel": {
+    "bienvenida": "Bienvenido",
+    "cerrarSesion": "Cerrar sesión",
+    "bienvenidaTitulo": "Empecemos por conocerte",
+    "bienvenidaTexto": "El primer paso es una entrevista tranquila: eliges de qué hablar y te puntúas de 1 a 10. Sin juicios, a tu ritmo.",
+    "empezar": "Empezar mi entrevista"
+  },
+  "perfil": {
+    "titulo": "Tu perfil",
+    "nombre": "Nombre",
+    "fechaNacimiento": "Fecha de nacimiento",
+    "genero": "Género (opcional)",
+    "generoSinEspecificar": "Prefiero no decirlo ahora",
+    "generoMujer": "Mujer",
+    "generoHombre": "Hombre",
+    "generoNoBinario": "No binario",
+    "generoPrefieroNoDecirlo": "Prefiero no decirlo",
+    "zonaHoraria": "Zona horaria",
+    "boton": "Guardar",
+    "botonEnviando": "Guardando…",
+    "exito": "Perfil guardado.",
+    "errorGenerico": "No se pudo guardar el perfil",
+    "errorCarga": "No se pudo cargar tu perfil"
+  },
+  "categorias": {
+    "errorCarga": "No se pudieron cargar tus categorías",
+    "errorGenerico": "No se pudo actualizar la categoría",
+    "modalTitulo": "Se necesita tu consentimiento",
+    "modalTexto": "\"{{categoria}}\" incluye datos sensibles. Antes de activarla, confirma que aceptas que se traten según nuestra política de privacidad.",
+    "modalAceptar": "Aceptar y activar",
+    "modalCancelar": "Cancelar",
+    "leerPolitica": "Leer la política de privacidad"
+  },
+  "politicaPrivacidad": {
+    "titulo": "Política de privacidad",
+    "version": "Versión {{version}} — borrador para el TFM, no redactado por asesoría legal.",
+    "queDatosTitulo": "Qué datos recopilamos",
+    "queDatosTexto": "Tu email, el nombre que nos das al registrarte, y las respuestas que registras en las categorías que actives (fecha de nacimiento, género si lo indicas, zona horaria, y tus evaluaciones por categoría).",
+    "datosSensiblesTitulo": "Categorías de datos especialmente protegidas",
+    "datosSensiblesTexto": "Algunas categorías (sexo, deporte/salud, espiritualidad) se consideran datos de categoría especial según el RGPD (art. 9). Solo se activan y registran con tu consentimiento explícito, que puedes retirar en cualquier momento desactivando la categoría.",
+    "paraQueTitulo": "Para qué los usamos",
+    "paraQueTexto": "Únicamente para ofrecerte tu propio panel de seguimiento y sugerencias personalizadas dentro de la app. No se comparten con terceros ni se usan con fines publicitarios.",
+    "tusDerechosTitulo": "Tus derechos",
+    "tusDerechosTexto": "Puedes acceder, corregir o eliminar tus datos en cualquier momento desde tu perfil. Desactivar una categoría no borra tu historial — usa la exportación/eliminación de datos si quieres borrarlo todo.",
+    "contactoTitulo": "Contacto",
+    "contactoTexto": "Este es un proyecto académico (TFM) — para cualquier duda sobre tus datos, contacta directamente con quien desarrolla el proyecto."
+  },
+  "entrevista": {
+    "titulo": "Tu entrevista",
+    "descripcion": "Vamos a charlar un rato, sin prisa. Marca las categorías que quieres seguir y cuéntame cómo te sientes en cada una. Puedes volver cuando quieras a cambiar tus categorías o tus puntuaciones: cada cambio se guarda como un registro nuevo y tu historial se conserva.",
+    "elegirTitulo": "Tus categorías",
+    "seleccionarTodas": "Seleccionar todas",
+    "pregunta": "¿Cómo te sientes con {{categoria}}?",
+    "escala": "1 = muy mal · 10 = muy bien",
+    "puntuacionDe": "Puntuación de {{categoria}}",
+    "anadirNota": "Añadir una nota",
+    "nota": "Nota (opcional)",
+    "elegirAlgo": "Marca al menos una categoría para empezar.",
+    "guardar": "Guardar cambios",
+    "guardando": "Guardando…",
+    "exito": "Cambios guardados. Gracias por mirarte con honestidad.",
+    "verResultados": "Ver mis resultados",
+    "errorCarga": "No se pudieron cargar tus categorías",
+    "errorGenerico": "No se pudo guardar la entrevista",
+    "entrevistador": "Entrevistador",
+    "tu": "Tú",
+    "verEjemplos": "Ver ejemplos de {{categoria}}",
+    "ejemplosTitulo": "Para ayudarte a pensar:",
+    "errorActivar": "No se pudo activar la categoría",
+    "sinCambios": "Cambia alguna puntuación para poder guardar.",
+    "sensiblesTitulo": "Requieren tu consentimiento",
+    "sensiblesExplicacion": "Contienen datos sensibles. Antes de activar una te pediremos tu consentimiento y podrás leer la política de privacidad; puedes desactivarla cuando quieras.",
+    "historialTitulo": "Historial de cambios",
+    "historialVacio": "Todavía no has guardado nada.",
+    "actualizarRespuestas": "Actualizar mis respuestas",
+    "tituloActualizar": "Actualiza tus respuestas",
+    "descripcionActualizar": "¿Ha cambiado algo desde la última vez? Revisa tus respuestas y cambia solo lo que quieras. Cada cambio se guarda como un registro nuevo y tu historial se conserva.",
+    "irA": "Ir a una categoría",
+    "sinResponder": "Sin responder",
+    "pasosTitulo": "Qué vamos a hacer",
+    "pasosPrimeraVez": [
+      "Marca abajo las categorías de las que quieres hablar.",
+      "En cada una, toca un número del 1 al 10. Puedes dejar alguna para otro día.",
+      "Al final, pulsa «{{boton}}»."
+    ]
+  },
+  "resultados": {
+    "titulo": "Tus resultados",
+    "descripcion": "Tu última puntuación en cada categoría.",
+    "sinPuntuar": "Sin puntuar todavía",
+    "ultima": "Última vez: {{fecha}}",
+    "errorCarga": "No se pudieron cargar tus resultados",
+    "sinCategorias": "Todavía no hay puntuaciones.",
+    "empezar": "Hacer una entrevista",
+    "bandaLow": "Bajo",
+    "bandaMediumLow": "Casi bajo",
+    "bandaMedium": "Medio",
+    "bandaHigh": "Bueno"
+  },
+  "cuenta": {
+    "menu": "Menú de mi perfil",
+    "perfil": "Perfil",
+    "entrevista": "Entrevista",
+    "resultados": "Resultados",
+    "datos": "Privacidad y datos"
+  },
+  "ejemplos": {
+    "economia": [
+      "¿Cómo es tu salario y te llega para el mes?",
+      "¿Ahorras algo de forma regular?",
+      "¿Tienes deudas que te preocupen?",
+      "¿Sabes en qué gastas tu dinero?"
+    ],
+    "vidaSocial": [
+      "¿Con qué frecuencia ves a tus amistades?",
+      "¿Tienes a quién llamar cuando lo necesitas?",
+      "¿Te sientes acompañado/a o más bien solo/a?"
+    ],
+    "pareja": [
+      "¿Te sientes comprendido/a y apoyado/a?",
+      "¿Habláis con facilidad de lo importante?",
+      "¿Dedicáis tiempo de calidad juntos?"
+    ],
+    "sexo": [
+      "¿Estás satisfecho/a con tu vida sexual?",
+      "¿Te sientes a gusto con tu cuerpo y tus deseos?",
+      "¿Hay comunicación sobre ello, si tienes pareja?"
+    ],
+    "deporte": [
+      "¿Te mueves con regularidad?",
+      "¿Cómo está tu energía durante el día?",
+      "¿Cuidas tu sueño y tu alimentación?"
+    ],
+    "aventura": [
+      "¿Cuándo fue la última vez que probaste algo nuevo?",
+      "¿Tienes algún viaje o reto en mente?",
+      "¿Sales de tu rutina de vez en cuando?"
+    ],
+    "espiritualidad": [
+      "¿Tienes momentos de calma, reflexión o meditación?",
+      "¿Sientes que tu vida tiene sentido o propósito?",
+      "¿Practicas alguna creencia que te sostenga?"
+    ],
+    "familia": [
+      "¿Cómo es tu relación con tus padres y hermanos?",
+      "¿Pasas tiempo con tu familia como te gustaría?",
+      "¿Hay conflictos pendientes que te pesen?"
+    ],
+    "inversiones": [
+      "¿Tienes inversiones o un plan para el largo plazo?",
+      "¿Sabes cuánto necesitarías para tu jubilación?",
+      "¿Entiendes bien dónde está tu dinero?"
+    ]
+  },
+  "admin": {
+    "titulo": "Administración",
+    "usuarios": "Usuarios registrados",
+    "email": "Email",
+    "rol": "Rol",
+    "alta": "Alta",
+    "ultimoAcceso": "Último acceso",
+    "nunca": "—",
+    "sinPermiso": "No tienes permiso para ver esta página.",
+    "errorCarga": "No se pudieron cargar los usuarios",
+    "total": "{{count}} usuarios",
+    "pestanaUsuarios": "Usuarios",
+    "pestanaCategorias": "Categorías",
+    "catalogoTitulo": "Catálogo de categorías",
+    "catalogoAyuda": "Las categorías nuevas aparecen, sin activar, en la entrevista de todos los usuarios, en español y en inglés según el idioma de cada uno. Retirar una la oculta y la desactiva para todos, pero las puntuaciones ya guardadas se conservan.",
+    "nombre": "Nombre",
+    "descripcion": "Descripción",
+    "estado": "Estado",
+    "vigente": "Vigente",
+    "retirada": "Retirada",
+    "sensible": "Sensible",
+    "retirar": "Retirar",
+    "anadirTitulo": "Añadir categoría",
+    "anadirDatosSensibles": "Contiene datos sensibles (pedirá consentimiento y no se podrá cambiar después)",
+    "anadir": "Añadir categoría",
+    "anadiendo": "Añadiendo…",
+    "errorGuardar": "No se pudo completar la operación",
+    "retirarTitulo": "¿Retirar \"{{nombre}}\"?",
+    "retirarTexto": "Dejará de ofrecerse y se desactivará para todos los usuarios. Las puntuaciones ya guardadas se conservan.",
+    "retirarConfirmar": "Confirmar retirada",
+    "cancelar": "Cancelar",
+    "acciones": "Acciones",
+    "crearUsuario": "Crear usuario",
+    "crear": "Crear",
+    "cerrar": "Cerrar",
+    "copiar": "Copiar",
+    "confirmar": "Confirmar",
+    "activa": "Activa",
+    "suspendida": "Suspendida",
+    "accionesDe": "Acciones de {{email}}",
+    "cambiarRol": "Cambiar rol",
+    "cambiarEmail": "Cambiar email",
+    "cambiarNombre": "Cambiar nombre",
+    "enlaceRecuperacion": "Enviar enlace de recuperación",
+    "suspender": "Suspender",
+    "reactivar": "Reactivar",
+    "eliminar": "Eliminar",
+    "nuevoEmail": "Nuevo email",
+    "nuevoNombre": "Nuevo nombre",
+    "tuContrasena": "Tu contraseña (para confirmar)",
+    "pestanaAuditoria": "Auditoría",
+    "dialogo": {
+      "role": "Cambiar el rol de {{email}}",
+      "email": "Cambiar el email de {{email}}",
+      "name": "Cambiar el nombre de {{email}}",
+      "suspend": "¿Suspender la cuenta de {{email}}?",
+      "delete": "¿Eliminar la cuenta de {{email}}?",
+      "recovery": "Enviar enlace de recuperación a {{email}}"
+    },
+    "dialogoTexto": {
+      "role": "El rol determina lo que puede hacer en la aplicación. Solo puedes cambiar el rol de otras personas, nunca el tuyo.",
+      "email": "Cambia el email con el que inicia sesión (por ejemplo, para corregir un error al escribirlo). Quedará anotado en la auditoría.",
+      "name": "Corrige el nombre que se muestra en su perfil.",
+      "suspend": "No podrá iniciar sesión ni usar su sesión abierta, pero se conservan todos sus datos. Puedes reactivarla cuando quieras.",
+      "delete": "Se borrarán su perfil, categorías, consentimientos, puntuaciones y su cuenta de acceso. Esto no se puede deshacer.",
+      "recovery": "Se envía un correo con un enlace para que elija una contraseña nueva. Tú no ves ni fijas su contraseña.",
+      "create": "Se crea la cuenta con una contraseña temporal aleatoria que verás una sola vez. Entrégasela a la persona; conviene que la cambie con «He olvidado mi contraseña»."
+    },
+    "contrasenaTemporalAviso": "Contraseña temporal: solo se muestra ahora. Cópiala antes de cerrar, no se puede volver a ver.",
+    "contrasenaTemporalConsejo": "Recomienda a la persona que la cambie en cuanto pueda.",
+    "errorContrasena": "Tu contraseña no es correcta.",
+    "errorEmailEnUso": "Ese email ya está en uso.",
+    "errorRegla": "Acción no permitida: siempre debe existir un administrador, y no se puede actuar sobre uno mismo ni sobre otro administrador sin degradarlo antes.",
+    "errorNoEncontrado": "No se encontró a ese usuario (puede que ya no exista).",
+    "errorDatos": "Revisa los datos: alguno no es válido.",
+    "auditoriaAyuda": "Últimas acciones de administración. Solo se guardan ids y la acción, nunca contraseñas ni emails.",
+    "auditoriaVacia": "Todavía no hay acciones registradas.",
+    "fecha": "Fecha",
+    "quien": "Quién",
+    "accion": "Acción",
+    "sobre": "Sobre",
+    "detalle": "Detalle",
+    "acciones_role_changed": "Cambio de rol",
+    "acciones_user_suspended": "Suspensión",
+    "acciones_user_reactivated": "Reactivación",
+    "acciones_user_deleted": "Eliminación",
+    "acciones_user_created": "Creación",
+    "acciones_user_email_changed": "Cambio de email",
+    "acciones_user_name_changed": "Cambio de nombre",
+    "acciones_user_recovery_sent": "Enlace de recuperación enviado",
+    "acciones_reauth_failed": "Contraseña de confirmación incorrecta",
+    "nombreEnIdioma": "Nombre ({{idioma}})",
+    "descripcionEnIdioma": "Descripción ({{idioma}})"
+  },
+  "datos": {
+    "titulo": "Privacidad y datos",
+    "exportarTitulo": "Descargar mis datos",
+    "exportarTexto": "Un archivo JSON con todo lo que hay sobre ti: tu cuenta, tu perfil, tus categorías, tus consentimientos y todas tus puntuaciones con sus notas.",
+    "exportar": "Descargar mis datos",
+    "exportando": "Preparando…",
+    "errorExportar": "No se pudieron exportar tus datos",
+    "eliminarTitulo": "Eliminar mi cuenta",
+    "eliminarTexto": "Borra tu cuenta y todo lo asociado: perfil, categorías, consentimientos y puntuaciones. Es tu derecho y no tiene coste, pero no se puede deshacer.",
+    "eliminar": "Eliminar mi cuenta",
+    "dialogoTitulo": "¿Eliminar tu cuenta para siempre?",
+    "dialogoTexto": "Esto no se puede deshacer. Se borrarán tu perfil, tus categorías, tus consentimientos y todas tus puntuaciones y notas, y no podrás volver a entrar con este email. Si quieres conservar algo, descarga tus datos antes.",
+    "contrasena": "Tu contraseña (para confirmar)",
+    "confirmar": "Eliminar definitivamente",
+    "eliminando": "Eliminando…",
+    "cancelar": "Cancelar",
+    "errorEliminar": "No se pudo eliminar la cuenta",
+    "errorUltimoAdmin": "Eres el único administrador y siempre debe existir uno: no puedes eliminar tu cuenta hasta que crees otro administrador (concediendo el rol a otra cuenta)."
+  },
+  "recomendaciones": {
+    "titulo": "Una idea para ti",
+    "aviso": "Estas ideas son sugerencias generales de bienestar y no sustituyen el asesoramiento médico, financiero o psicológico profesional.",
+    "plantillas": {
+      "economia": {
+        "1": "Si te apetece, anota durante una semana en qué se va tu dinero, sin juzgarte: solo mirarlo ya ayuda.",
+        "2": "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica. Lo importante es el hábito."
+      },
+      "vidaSocial": {
+        "1": "Escribe hoy a alguien con quien hace tiempo que no hablas: un mensaje corto basta para reconectar.",
+        "2": "Propón un plan sencillo esta semana, como un café o un paseo con alguien con quien te sientas a gusto."
+      },
+      "pareja": {
+        "1": "Reserva un rato sin pantallas esta semana para estar juntos, aunque sean veinte minutos.",
+        "2": "Cuéntale a tu pareja algo que hayas agradecido de ella últimamente; los detalles pequeños suman."
+      },
+      "sexo": {
+        "1": "Hablar con calma sobre lo que os apetece o os incomoda suele ayudar; elige un momento sin prisas y sin presión.",
+        "2": "Dedica un rato a cuidarte y a conocer qué te sienta bien, sin objetivos ni expectativas."
+      },
+      "deporte": {
+        "1": "Sal a caminar veinte minutos hoy: empezar en pequeño es mejor que no empezar.",
+        "2": "Elige una actividad que te resulte agradable y ponla en el calendario dos veces esta semana."
+      },
+      "aventura": {
+        "1": "Cambia una pequeña rutina esta semana: un camino distinto, un plato nuevo, un sitio que no conozcas.",
+        "2": "Apunta un plan que te haga ilusión, aunque sea pequeño, y ponle una fecha."
+      },
+      "espiritualidad": {
+        "1": "Regálate cinco minutos de silencio al día, sin móvil, para estar contigo.",
+        "2": "Escribe qué te da sentido últimamente y qué te gustaría cuidar más."
+      },
+      "familia": {
+        "1": "Llama a alguien de tu familia esta semana solo para preguntarle cómo está.",
+        "2": "Propón una comida o un rato compartido: a veces basta con una pequeña iniciativa."
+      },
+      "inversiones": {
+        "1": "Dedica media hora a revisar dónde está tu dinero y qué objetivo tiene cada parte.",
+        "2": "Infórmate en fuentes fiables sobre una idea básica, como diversificar, antes de decidir nada."
+      },
+      "general": {
+        "1": "Elige una acción pequeña relacionada con {{categoria}} que puedas hacer esta semana y anótala.",
+        "2": "Piensa qué es lo que más te pesa de {{categoria}} y qué cambio pequeño lo aliviaría.",
+        "3": "Pregúntate qué te ayudaría más ahora mismo en {{categoria}} y da un primer paso, por pequeño que sea."
+      }
+    },
+    "dialogoTitulo": "Una idea para {{categoria}}",
+    "cerrar": "Cerrar",
+    "resumenTitulo": "Ideas para ti",
+    "resumenTexto": "Para las áreas con la puntuación más baja. Tú decides si te sirven.",
+    "ideaPara": "Idea para {{categoria}}"
+  },
+  "evolucion": {
+    "titulo": "Tu evolución",
+    "descripcion": "Cómo ha cambiado cada categoría en tus respuestas, mes a mes. Todas las gráficas muestran el mismo periodo.",
+    "sinPuntuar": "Sin puntuar todavía",
+    "unaSola": "La evolución aparece a partir de la segunda respuesta.",
+    "actual": "Ahora",
+    "resumen": "Evolución de {{categoria}}: {{primera}} el {{fechaPrimera}} y {{ultima}} el {{fechaUltima}}, {{count}} respuestas",
+    "resumenUno": "{{categoria}}: {{score}} el {{fecha}}, una sola respuesta",
+    "verDetalle": "Ver el detalle en Resultados",
+    "errorCarga": "No se pudo cargar la evolución.",
+    "verDatos": "Ver datos",
+    "ocultarDatos": "Ocultar datos",
+    "tablaDe": "Puntuaciones de {{categoria}}",
+    "fecha": "Fecha",
+    "puntuacion": "Puntuación",
+    "periodo": "Periodo mostrado",
+    "periodo6": "6 meses",
+    "periodo12": "12 meses",
+    "periodoTodo": "Todo",
+    "anterior": "Periodo anterior",
+    "siguiente": "Periodo siguiente"
+  },
+  "equilibrio": {
+    "titulo": "Tu equilibrio",
+    "descripcion": "Cada eje es una categoría con tu última puntuación, todas en la misma escala de 0 a 10.",
+    "resumen": "Equilibrio actual por categoría: {{lista}}",
+    "pocasCategorias": "El equilibrio aparece a partir de la tercera categoría puntuada.",
+    "faltan": "Faltan por puntuar: {{lista}}",
+    "categoria": "Categoría",
+    "tabla": "Última puntuación por categoría"
+  },
+  "idiomas": {
+    "es": "español",
+    "en": "inglés"
+  },
+  "guia": {
+    "comoFunciona": "Cómo funciona",
+    "pasos": [
+      "Elige las áreas de tu vida que quieres mirar.",
+      "Puntúa cada una del 1 al 10: son unos dos minutos, y puedes dejar alguna para otro día.",
+      "Mira tu equilibrio, cómo cambia con el tiempo e ideas para las áreas que quieras mejorar."
+    ],
+    "panelTitulo": "Cómo leer esta página",
+    "panelPuntos": [
+      "«{{equilibrio}}»: tu última puntuación en cada área, todas juntas en la misma escala.",
+      "«{{evolucion}}»: cómo ha cambiado cada área cada vez que has actualizado tus respuestas.",
+      "«{{idea}}» aparece en las áreas con una puntuación baja: tócala para ver una sugerencia.",
+      "Cuando algo cambie en tu vida, usa «{{actualizar}}»."
+    ],
+    "entendido": "Entendido"
+  }
+}
