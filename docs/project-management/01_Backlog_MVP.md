@@ -11,11 +11,11 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-_(nada en curso)_
+- [ ] **Primera entrega a producción (v1.0.0)** (desde el 29 sept.) — variables de Vercel (Production y Preview), `APP_URL` con la URL de producción, URLs de Supabase, limpiar cuentas de prueba y crear la de administrador, PR `develop` → `main`, comprobación en la URL real, rama por defecto a `main`. Pasos en el [guion de la demo](../validation/04_Guion_Demo_Cierre.md), apartado 1.1.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
-- [ ] **Demo de cierre del Ciclo 1** — la última tarea del MVP, para enseñar la versión final. Se reserva tiempo para validación y demo **siempre**: es lo último que se recorta, no lo primero.
+- [ ] **Demo final** — al terminar el proyecto, para la revisión de los profesores (no antes: solo revisan el proyecto terminado). [Guion](../validation/04_Guion_Demo_Cierre.md) ya preparado; se actualiza entonces con lo que haya del Ciclo 2.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
 
@@ -115,3 +115,5 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.26 (27 sept. 2026)** — Playwright contra `api/` hecho (Docker). Quedan métricas DORA/Flow y la demo.
 - **v2.27 (28 sept. 2026)** — E2E con `api/` en GitHub Actions, `dev:local` y README.
 - **v2.28 (29 sept. 2026)** — métricas DORA/Flow revisadas; dos reglas de flujo nuevas (una PR por historia; corregir los avisos en su causa). Solo queda la demo de cierre.
+- **v2.29 (29 sept. 2026)** — la demo de cierre pasa a "En curso", con su guion y la lista de la primera entrega a producción.
+- **v2.30 (29 sept. 2026)** — la demo se aplaza al final del proyecto (los profesores solo revisan el proyecto terminado); la primera entrega a producción (v1.0.0) se hace ya, para encontrar ahora los problemas que solo aparecen en producción.
