@@ -81,13 +81,13 @@ describe("AdminPage (ADM-01)", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     const client = createTestClient();
-    const primera = renderPage(client);
+    const first = renderPage(client);
     await screen.findByText("ana@ejemplo.com");
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
     await screen.findByText("Economía");
     fireEvent.click(screen.getByRole("tab", { name: "Usuarios" }));
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
-    primera.unmount();
+    first.unmount();
 
     renderPage(client);
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));

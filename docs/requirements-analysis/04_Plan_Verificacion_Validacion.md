@@ -57,7 +57,7 @@ Requisito: Docker Desktop abierto. La primera vez, `supabase start` descarga las
 | En directo | `npm run test:e2e:api -- --headed` | Los navegadores (móvil y escritorio) se abren y la app se usa sola, paso a paso. |
 | Modo interactivo | `npm run test:e2e:api -- --ui` | La ventana de Playwright: se elige un test, se ejecuta y se recorre cada acción hacia atrás con su captura ("viaje en el tiempo"). La mejor opción para la demo. Mientras está abierta ocupa el puerto 5174. |
 | Informe | `npm run test:e2e:api -- --reporter=html` y después `npx playwright show-report` | Una página con cada test, su resultado y su duración (y la traza si alguno falla). Útil como captura para la memoria. |
-| Solo un test | `npm run test:e2e:api -- -g "consentimiento"` | Ejecuta solo los tests cuyo nombre contiene el texto. |
+| Solo un test | `npm run test:e2e:api -- -g "consent"` | Ejecuta solo los tests cuyo nombre contiene el texto. |
 | Solo un dispositivo | `npm run test:e2e:api -- --project=mobile` | `mobile` (Pixel 7) o `desktop`. |
 | Los datos que crean | Supabase Studio local: http://127.0.0.1:54323 | *Authentication → Users* (cuentas `e2e-…@example.com`), *Table Editor* (`assessments`, `recommendations`…). La siguiente ejecución los borra. |
 | En GitHub | Pestaña *Actions* → `E2E con api`, o el apartado de *checks* del PR | El resultado en cada PR; el informe HTML se descarga desde el artefacto `informe-playwright`. |
@@ -121,13 +121,6 @@ Dado el alcance real (RES-01, RES-02):
 Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras funcionalidades: priorizar la demostración rigurosa del concepto y del método sobre la cobertura exhaustiva, dado el marco temporal del TFM.
 
 ---
-
-## 5. Próximo paso
-
-Con este plan aprobado, seguimos con el archivo 3: **justificación del ciclo de vida** (por qué un modelo espiral ligero encaja con este proyecto, y cómo se estructuran los ciclos desde el MVP).
-
----
-
 ## Historial de cambios
 
 - **v1.0 (5 sept. 2026)** — versión inicial: técnicas de verificación (peer review, tests unitarios/integración, UAT Given/When/Then, criterios ejecutables opcionales) y validación (demos, usability testing 5 personas, piloto 5-10 personas, métricas, A/B documental).
@@ -140,3 +133,4 @@ Con este plan aprobado, seguimos con el archivo 3: **justificación del ciclo de
 - **v1.3 (26 sept. 2026)** — apartado 4 corregido: decía "usability test de 5 personas", contradiciendo el ajuste a n = 1 de apartado 2. Enlaces al guion y a la hoja de resultados del test del MVP.
 - **v1.4 (27 sept. 2026)** — nueva apartado 1.2: E2E con `api/` contra Supabase local en Docker, con un servidor propio en Vite (no `vercel dev`, que carga siempre la base real) y aislamiento entre funciones que mantiene cubierto el fallo de apartado 1.1. Primera batería de 9 tests × 2 dispositivos.
 - **v1.5 (28 sept. 2026)** — apartado 1.2: workflow de GitHub Actions en cada PR y nuevo apartado 1.2.1 "Cómo ver que funciona" (modos `--headed`, `--ui`, informe HTML, Studio local, `npm run dev:local`). Los apartados "1bis/1ter" pasan a numeración decimal (1.1, 1.2), igual que en el resto de documentos.
+- **v1.6 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

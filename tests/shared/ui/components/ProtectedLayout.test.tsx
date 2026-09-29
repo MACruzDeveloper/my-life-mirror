@@ -20,7 +20,7 @@ describe("ProtectedLayout", () => {
     render(
       <MemoryRouter>
         <SessionProvider>
-          <ProtectedLayout breadcrumbs={[{ etiqueta: "Inicio", ruta: "/inicio" }, { etiqueta: "Perfil" }]}>
+          <ProtectedLayout breadcrumbs={[{ label: "Inicio", path: "/inicio" }, { label: "Perfil" }]}>
             <div>Contenido de la página</div>
           </ProtectedLayout>
         </SessionProvider>
@@ -29,9 +29,9 @@ describe("ProtectedLayout", () => {
 
     await waitFor(() => expect(screen.getByText("ana@ejemplo.com")).toBeInTheDocument());
     expect(screen.getByText("MyLifeMirror")).toBeInTheDocument();
-    const migas = screen.getByRole("navigation");
-    expect(within(migas).getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/inicio");
-    expect(within(migas).getByText("Perfil")).toBeInTheDocument();
+    const breadcrumbs = screen.getByRole("navigation");
+    expect(within(breadcrumbs).getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/inicio");
+    expect(within(breadcrumbs).getByText("Perfil")).toBeInTheDocument();
     expect(screen.getByText("Contenido de la página")).toBeInTheDocument();
   });
 
@@ -113,7 +113,7 @@ describe("ProtectedLayout", () => {
       .mockResolvedValueOnce({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com", name: "Ana" }) });
     vi.stubGlobal("fetch", fetchMock);
 
-    function ContenidoConBotonRefrescar() {
+    function ContentWithRefreshButton() {
       const { refresh } = useSession();
       return (
         <button type="button" onClick={refresh}>
@@ -126,7 +126,7 @@ describe("ProtectedLayout", () => {
       <MemoryRouter>
         <SessionProvider>
           <ProtectedLayout>
-            <ContenidoConBotonRefrescar />
+            <ContentWithRefreshButton />
           </ProtectedLayout>
         </SessionProvider>
       </MemoryRouter>,

@@ -63,10 +63,10 @@ Para atender casos reales: alguien que da problemas, alguien que no consigue reg
 
 ## Cómo quedó
 
-- `AdminUserActions` (`cuentas/application`): `changeRole`, `suspendUser`, `reactivateUser`, `deleteUser`, `updateEmail`, `updateName`, `createUser`, `sendRecoveryLink`, `listAudit`. `requireAdmin` en cada una; contraseña del admin (`iniciarSesion` con su email de sesión) en rol, email, suspender y eliminar; el intento fallido se anota.
+- `AdminUserActions` (`accounts/application`): `changeRole`, `suspendUser`, `reactivateUser`, `deleteUser`, `updateEmail`, `updateName`, `createUser`, `sendRecoveryLink`, `listAudit`. `requireAdmin` en cada una; contraseña del admin (`iniciarSesion` con su email de sesión) en rol, email, suspender y eliminar; el intento fallido se anota.
 - **Siempre un administrador:** nadie cambia su propio rol; no se suspende ni se elimina a un administrador (se le degrada antes) ni a uno mismo por esta vía (eso es RF-05, con su propia regla del último admin).
 - El borrado reutiliza `EraseUser`, el mismo de RF-05 (datos primero, cuenta la última, repetible).
-- Suspender usa el bloqueo de Supabase (`ban_duration`); además `verificarSesion` rechaza una sesión ya abierta de una cuenta suspendida.
+- Suspender usa el bloqueo de Supabase (`ban_duration`); además `verifySession` rechaza una sesión ya abierta de una cuenta suspendida.
 - Endpoints en una única función `api/admin/[action].ts` (`users`, `audit`, `user-role`, `user-suspend`, `user-reactivate`, `user-delete`, `user-email`, `user-name`, `user-create`, `user-recovery`); solo `POST` las de escritura; respuestas con `Cache-Control: no-store`.
 - Interfaz: `/admin` con pestañas Usuarios (menú de acciones por fila, crear usuario, cuadros de confirmación), Categorías y Auditoría.
 - **Límite conocido:** la anotación de auditoría se escribe *después* de la acción; si fallara la escritura de la anotación, la acción ya estaría hecha y el error se vería (500). Se prefirió eso a ocultarlo.

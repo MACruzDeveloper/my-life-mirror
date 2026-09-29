@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Recommendation, RecommendationStatus } from "../domain/Recommendation.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
-interface FilaRecomendacion {
+interface RecommendationRow {
   id: string;
   user_id: string;
   category_id: string;
@@ -12,7 +12,7 @@ interface FilaRecomendacion {
   created_at: string;
 }
 
-const COLUMNAS = "id, user_id, category_id, template_key, threshold, status, created_at";
+const COLUMNS = "id, user_id, category_id, template_key, threshold, status, created_at";
 
 /** Adaptador real (supabase/migrations/0007_recommendations.sql). Sin test propio: solo mapea filas. */
 export class SupabaseRecommendationRepository implements RecommendationRepository {
@@ -23,9 +23,9 @@ export class SupabaseRecommendationRepository implements RecommendationRepositor
   }
 
   async findByUserId(userId: string): Promise<Recommendation[]> {
-    const { data, error } = await this.client.from("recommendations").select(COLUMNAS).eq("user_id", userId);
+    const { data, error } = await this.client.from("recommendations").select(COLUMNS).eq("user_id", userId);
     if (error) throw new Error(`No se pudieron leer las recomendaciones: ${error.message}`);
-    return (data as FilaRecomendacion[]).map((f) => ({
+    return (data as RecommendationRow[]).map((f) => ({
       id: f.id,
       userId: f.user_id,
       categoryId: f.category_id,

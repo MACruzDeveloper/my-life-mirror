@@ -40,17 +40,17 @@ export function createListRecommendations({ recommendationRepository, categoryRe
       const actual = latest.get(a.categoryId);
       if (!actual || a.recordedAt.getTime() > actual.at) latest.set(a.categoryId, { score: a.score, at: a.recordedAt.getTime() });
     }
-    const activas = new Map(categories.filter((c) => c.status === "active").map((c) => [c.id, c.name]));
+    const activeOnes = new Map(categories.filter((c) => c.status === "active").map((c) => [c.id, c.name]));
     const catalogIds = new Map(categories.filter((c) => c.catalogId).map((c) => [c.id, c.catalogId as string]));
 
     return ok(
       recommendations
         .filter(isOpen)
-        .filter((r) => activas.has(r.categoryId) && (latest.get(r.categoryId)?.score ?? Infinity) < r.threshold)
+        .filter((r) => activeOnes.has(r.categoryId) && (latest.get(r.categoryId)?.score ?? Infinity) < r.threshold)
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
         .map((r) => ({
           ...r,
-          categoryName: activas.get(r.categoryId) as string,
+          categoryName: activeOnes.get(r.categoryId) as string,
           ...(catalogIds.has(r.categoryId) ? { catalogId: catalogIds.get(r.categoryId) } : {}),
         })),
     );

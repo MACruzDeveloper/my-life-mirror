@@ -5,7 +5,7 @@ import type { CategoryRepository } from "../domain/CategoryRepository.js";
 export class InMemoryCategoryRepository implements CategoryRepository {
   private readonly categories = new Map<string, Category>();
 
-  private clave(userId: string, categoryId: string): string {
+  private key(userId: string, categoryId: string): string {
     return `${userId}:${categoryId}`;
   }
 
@@ -14,11 +14,11 @@ export class InMemoryCategoryRepository implements CategoryRepository {
   }
 
   async findById(userId: string, categoryId: string): Promise<Category | undefined> {
-    return this.categories.get(this.clave(userId, categoryId));
+    return this.categories.get(this.key(userId, categoryId));
   }
 
   async save(category: Category): Promise<void> {
-    this.categories.set(this.clave(category.userId, category.id), category);
+    this.categories.set(this.key(category.userId, category.id), category);
   }
 
   async saveMany(categories: Category[]): Promise<void> {
@@ -34,8 +34,8 @@ export class InMemoryCategoryRepository implements CategoryRepository {
   }
 
   async deleteByUserId(userId: string): Promise<void> {
-    for (const [clave, category] of this.categories) {
-      if (category.userId === userId) this.categories.delete(clave);
+    for (const [key, category] of this.categories) {
+      if (category.userId === userId) this.categories.delete(key);
     }
   }
 }

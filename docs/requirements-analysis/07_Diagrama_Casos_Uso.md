@@ -1,5 +1,7 @@
 # Diagrama de Casos de Uso
 
+> **Análisis inicial (5-12 sept. 2026), no el diseño actual.** Es el modelo conceptual previo al código y se conserva como parte del proceso del TFM. Usa los nombres del análisis; en el código son: `Usuario` → `User` (módulo `accounts`), `Evaluacion` → `Assessment`, "check-in" → la entrevista (RF-10), `Recomendacion` → `Recommendation`, `Consentimiento` → `Consent`, `Categoria` → `Category`. `Conexion` y `Suscripcion` no están construidas (Ciclo 3 o posterior). El diseño real: [ADR-03](../architecture-decisions/03_Arquitectura_Software.md), las [historias de usuario](../user-stories/) y `src/modules/`.
+
 **Diagrama:** [07_Diagrama_Casos_Uso.drawio](07_Diagrama_Casos_Uso.drawio) — ábrelo con la app de draw.io (desktop/web, "Abrir archivo") o la extensión "Draw.io Integration" de VS Code.
 **Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.4
 **Fecha:** 7 de septiembre de 2026
@@ -56,3 +58,4 @@ Este es el único diagrama que vive fuera de Markdown, así que el flujo de edic
 
 - **v1.0 (7 sept. 2026)** — versión inicial: 14 casos de uso consolidados a partir de todos los RF, 2 actores, relación `<<extend>>` de consentimiento, nota RES-09. Se detecta un hallazgo (punto de disparo del consentimiento) pendiente de decisión.
 - **v1.1 (7 sept. 2026)** — hallazgo resuelto: consentimiento se dispara al activar la categoría (onboarding o gestión posterior), confirmado por el usuario. Diagrama de secuencia del check-in corregido; nuevo diagrama dedicado en `08_Diagrama_Secuencia_Consentimiento.md`.
+- **v1.2 (29 sept. 2026)** — nota inicial: es el análisis de septiembre, no el diseño actual, con la equivalencia de nombres.

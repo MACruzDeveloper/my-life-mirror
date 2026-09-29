@@ -1,14 +1,14 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../container.js";
+import { getAppContext } from "../../../container.js";
 import { logger } from "../../../logger.js";
 
-type PeticionConCuerpo = IncomingMessage & { body: unknown };
+type RequestWithBody = IncomingMessage & { body: unknown };
 
 const Schema = z.object({ email: z.string() });
 
 /** RF-38. La respuesta es intencionalmente idéntica exista o no el email — solo el formato se valida. */
-export default async function handler(req: PeticionConCuerpo, res: ServerResponse) {
+export default async function handler(req: RequestWithBody, res: ServerResponse) {
   try {
     if (req.method !== "POST") {
       res.writeHead(405, { "Content-Type": "application/json" });
@@ -16,19 +16,19 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
       return;
     }
 
-    const datos = Schema.safeParse(req.body);
-    if (!datos.success) {
+    const data = Schema.safeParse(req.body);
+    if (!data.success) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Petición mal formada" }));
       return;
     }
 
-    const { solicitarRecuperacion } = obtenerAppContext();
-    const resultado = await solicitarRecuperacion(datos.data);
+    const { requestPasswordReset: solicitarRecuperacion } = getAppContext();
+    const result = await solicitarRecuperacion(data.data);
 
-    if (!resultado.ok) {
+    if (!result.ok) {
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: resultado.error.message }));
+      res.end(JSON.stringify({ error: result.error.message }));
       return;
     }
 
@@ -36,7 +36,7 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
     res.end(JSON.stringify({ mensaje: "Si el email existe, recibirás un enlace de recuperación." }));
   } catch (error) {
     logger.error("Error inesperado en /api/accounts/request-password-reset", error, {
-      ruta: "/api/accounts/request-password-reset",
+      route: "/api/accounts/request-password-reset",
     });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));

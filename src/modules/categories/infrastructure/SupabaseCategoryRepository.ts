@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Category, CategoryStatus, CategoryType } from "../domain/Category.js";
 import type { CategoryRepository } from "../domain/CategoryRepository.js";
 
-interface FilaCategoria {
+interface CategoryRow {
   id: string;
   user_id: string;
   name: string;
@@ -13,20 +13,20 @@ interface FilaCategoria {
   is_sensitive_data: boolean;
 }
 
-function categoriaDesdeFila(fila: FilaCategoria): Category {
+function categoryFromRow(row: CategoryRow): Category {
   return {
-    id: fila.id,
-    userId: fila.user_id,
-    name: fila.name,
-    description: fila.description,
-    ...(fila.catalog_id ? { catalogId: fila.catalog_id } : {}),
-    type: fila.type as CategoryType,
-    status: fila.status as CategoryStatus,
-    isSensitiveData: fila.is_sensitive_data,
+    id: row.id,
+    userId: row.user_id,
+    name: row.name,
+    description: row.description,
+    ...(row.catalog_id ? { catalogId: row.catalog_id } : {}),
+    type: row.type as CategoryType,
+    status: row.status as CategoryStatus,
+    isSensitiveData: row.is_sensitive_data,
   };
 }
 
-function filaDesdeCategoria(category: Category): Omit<FilaCategoria, never> {
+function rowFromCategory(category: Category): Omit<CategoryRow, never> {
   return {
     id: category.id,
     user_id: category.userId,
@@ -47,14 +47,14 @@ function filaDesdeCategoria(category: Category): Omit<FilaCategoria, never> {
  * Supabase de este proyecto.
  */
 export class SupabaseCategoryRepository implements CategoryRepository {
-  private readonly cliente: SupabaseClient;
+  private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.cliente = createClient(url, serviceRoleKey);
+    this.client = createClient(url, serviceRoleKey);
   }
 
   async findByUserId(userId: string): Promise<Category[]> {
-    const { data, error } = await this.cliente
+    const { data, error } = await this.client
       .from("categories")
       .select("id, user_id, catalog_id, name, description, type, status, is_sensitive_data")
       .eq("user_id", userId);
@@ -62,11 +62,11 @@ export class SupabaseCategoryRepository implements CategoryRepository {
     if (error) {
       throw new Error(`No se pudieron leer las categorías: ${error.message}`);
     }
-    return (data as FilaCategoria[]).map(categoriaDesdeFila);
+    return (data as CategoryRow[]).map(categoryFromRow);
   }
 
   async findById(userId: string, categoryId: string): Promise<Category | undefined> {
-    const { data, error } = await this.cliente
+    const { data, error } = await this.client
       .from("categories")
       .select("id, user_id, catalog_id, name, description, type, status, is_sensitive_data")
       .eq("user_id", userId)
@@ -77,18 +77,18 @@ export class SupabaseCategoryRepository implements CategoryRepository {
       throw new Error(`No se pudo leer la categoría: ${error.message}`);
     }
     if (!data) return undefined;
-    return categoriaDesdeFila(data as FilaCategoria);
+    return categoryFromRow(data as CategoryRow);
   }
 
   async save(category: Category): Promise<void> {
-    const { error } = await this.cliente.from("categories").upsert(filaDesdeCategoria(category));
+    const { error } = await this.client.from("categories").upsert(rowFromCategory(category));
     if (error) {
       throw new Error(`No se pudo guardar la categoría: ${error.message}`);
     }
   }
 
   async deactivateByCatalogId(catalogId: string): Promise<void> {
-    const { error } = await this.cliente.from("categories").update({ status: "inactive" }).eq("catalog_id", catalogId);
+    const { error } = await this.client.from("categories").update({ status: "inactive" }).eq("catalog_id", catalogId);
     if (error) {
       throw new Error(`No se pudo desactivar la categoría: ${error.message}`);
     }
@@ -101,16 +101,16 @@ export class SupabaseCategoryRepository implements CategoryRepository {
    */
   async saveMany(categories: Category[]): Promise<void> {
     if (categories.length === 0) return;
-    const { error } = await this.cliente
+    const { error } = await this.client
       .from("categories")
-      .upsert(categories.map(filaDesdeCategoria), { onConflict: "user_id,name", ignoreDuplicates: true });
+      .upsert(categories.map(rowFromCategory), { onConflict: "user_id,name", ignoreDuplicates: true });
     if (error) {
       throw new Error(`No se pudieron guardar las categorías: ${error.message}`);
     }
   }
 
   async deleteByUserId(userId: string): Promise<void> {
-    const { error } = await this.cliente.from("categories").delete().eq("user_id", userId);
+    const { error } = await this.client.from("categories").delete().eq("user_id", userId);
     if (error) {
       throw new Error(`No se pudieron borrar las categorías: ${error.message}`);
     }

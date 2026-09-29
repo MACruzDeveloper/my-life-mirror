@@ -71,15 +71,9 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 **Model Context Protocol (MCP):** es un estándar para que una aplicación de IA descubra y llame herramientas/fuentes de datos externas de forma uniforme (una analogía habitual: "USB-C para aplicaciones de IA") — no es exclusivo de agentes (sirve igual para una llamada de un solo paso) ni implica autonomía por sí mismo. Su valor crece con el número de herramientas heterogéneas a integrar. RF-36 solo necesita una fuente de datos (las `Evaluación`/`Recomendación` propias del usuario en MongoDB) — es el mismo argumento de "innecesario a esta escala" ya aplicado a LangChain en apartado 3. Idea genuinamente interesante pero fuera de alcance: si en el futuro se quisiera que un asistente de IA externo (el Claude o ChatGPT personal del usuario) consultara los propios datos de MyLifeMirror, exponer MyLifeMirror como servidor MCP sería la forma estándar de hacerlo — no se persigue ahora, queda solo nombrada.
 
 ---
-
-## 8. Próximo paso
-
-Con arquitectura, almacenamiento y fundamentos de IA decididos, no quedan bloqueos de diseño previos a las historias de usuario del Ciclo 1. RF-35/36/37 no son parte de ese Ciclo — se especifican cuando les toque, con el mismo formato Nivel 2 Spec Anchored del resto.
-
----
-
 ## Historial de cambios
 
 - **v1.0 (10 sept. 2026)** — versión inicial: plataformas por modalidad (HuggingFace/Google AI Studio para avatares, Claude API para texto, Whisper para voz), veredicto sobre RAG/fine-tuning/LangChain (RAG solo en RF-36, fine-tuning descartado, LangChain innecesario a esta escala), dos ejemplos reales de Chain-of-Thought/test-time compute (RF-26, RF-37). Se documentan RF-35, RF-36, RF-37 como Could, y se registra la idea de niveles de habilidad como aplazada, no añadida.
 - **v1.1 (10 sept. 2026)** — se añade apartado 7: agentes autónomos y MCP considerados y descartados explícitamente, con la razón principal ligada a RES-09 (no autonomía sin persona en el bucle) más que al coste.
 - **v1.2 (27 sept. 2026)** — nueva apartado 4.3 (RF-40): la IA reescribe ideas del catálogo con verificación automática y caída al texto curado, sin moderación humana. Matiza apartado 3 ("motor no generativo"): el control editorial se mantiene, pero automatizado.
+- **v1.3 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

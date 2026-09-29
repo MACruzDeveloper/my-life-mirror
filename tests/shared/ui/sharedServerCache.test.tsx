@@ -18,28 +18,28 @@ afterEach(() => vi.unstubAllGlobals());
 describe("Caché de datos compartida entre pantallas", () => {
   it("ir de Inicio a la Entrevista no vuelve a pedir el historial ni las puntuaciones", async () => {
     const fetchMock = vi.fn((url: string) => {
-      const cuerpos: Record<string, unknown> = {
+      const bodies: Record<string, unknown> = {
         "/api/assessments": [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" }],
         "/api/assessments/history": [{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7 }] }],
         "/api/categories": [{ id: "c1", catalogId: "k-economia", name: "Economía", status: "active", isSensitiveData: false }],
         "/api/recommendations": [],
         "/api/categories/translations": categoryLabelsFixture(),
       };
-      return Promise.resolve({ ok: true, status: 200, json: async () => cuerpos[url] ?? [] });
+      return Promise.resolve({ ok: true, status: 200, json: async () => bodies[url] ?? [] });
     });
     vi.stubGlobal("fetch", fetchMock);
     const client = createTestClient();
 
-    const inicio = render(withClient(<MemoryRouter><Home /></MemoryRouter>, client));
+    const start = render(withClient(<MemoryRouter><Home /></MemoryRouter>, client));
     await screen.findByRole("region", { name: "Economía" });
     await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => u === "/api/assessments/history")).toBe(true));
-    inicio.unmount();
+    start.unmount();
 
     render(withClient(<MemoryRouter><InterviewPage /></MemoryRouter>, client));
     await screen.findByRole("checkbox", { name: /economía/i });
 
-    const veces = (url: string) => fetchMock.mock.calls.filter(([u]) => u === url).length;
-    expect(veces("/api/assessments/history")).toBe(1);
-    expect(veces("/api/assessments")).toBe(1);
+    const countCalls = (url: string) => fetchMock.mock.calls.filter(([u]) => u === url).length;
+    expect(countCalls("/api/assessments/history")).toBe(1);
+    expect(countCalls("/api/assessments")).toBe(1);
   });
 });

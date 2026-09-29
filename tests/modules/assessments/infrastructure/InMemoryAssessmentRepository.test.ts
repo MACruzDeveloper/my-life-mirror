@@ -22,9 +22,9 @@ describe("InMemoryAssessmentRepository", () => {
     const repo = new InMemoryAssessmentRepository();
     await repo.saveMany([assessment({ id: "a1" }), assessment({ id: "a2", categoryId: "c2" }), assessment({ id: "a3", userId: "u2" })]);
 
-    const delUsuario = await repo.findByUserId("u1");
+    const ofUser = await repo.findByUserId("u1");
 
-    expect(delUsuario.map((a) => a.id).sort()).toEqual(["a1", "a2"]);
+    expect(ofUser.map((a) => a.id).sort()).toEqual(["a1", "a2"]);
   });
 
   it("no sobrescribe: guardar otra evaluación de la misma categoría añade, no reemplaza (registro inmutable)", async () => {

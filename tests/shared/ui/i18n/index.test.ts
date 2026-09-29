@@ -3,11 +3,11 @@ import i18n from "@shared/ui/i18n";
 import es from "@shared/ui/i18n/locales/es.json";
 import en from "@shared/ui/i18n/locales/en.json";
 
-function clavesPlanas(objeto: object, prefijo = ""): string[] {
-  return Object.entries(objeto).flatMap(([clave, valor]) =>
-    typeof valor === "object" && valor !== null
-      ? clavesPlanas(valor as object, `${prefijo}${clave}.`)
-      : [`${prefijo}${clave}`],
+function flatKeys(object: object, prefix = ""): string[] {
+  return Object.entries(object).flatMap(([key, value]) =>
+    typeof value === "object" && value !== null
+      ? flatKeys(value as object, `${prefix}${key}.`)
+      : [`${prefix}${key}`],
   );
 }
 
@@ -17,7 +17,7 @@ describe("i18n (RNF-10)", () => {
   });
 
   it("es y en tienen exactamente el mismo conjunto de claves", () => {
-    expect(clavesPlanas(es).sort()).toEqual(clavesPlanas(en).sort());
+    expect(flatKeys(es).sort()).toEqual(flatKeys(en).sort());
   });
 
   it("permite cambiar de idioma y traduce con el nuevo", async () => {

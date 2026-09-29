@@ -30,7 +30,10 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 - **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
 - **RF-17** (puntuación global ponderada, Could): sin planificar; decidir según el tiempo que quede tras la validación. (RF-15 ya está hecho.)
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
-- **Renombrado a inglés** del código anterior al 14 sept.: solo cuando se toque por otro motivo (AGENTS.md).
+- **Campos JSON de la API en español** (`autenticado`, `sesionIniciada`, `rol`, `creadoEn`, `ultimoAcceso`, `suspendido`, `mensaje`): lo único del código que sigue en español sin ser dato guardado. Cambiarlos exige tocar servidor, cliente y tests a la vez; se hará en una PR aparte si compensa.
+- **Validación ética con el tutor** (pendiente, sin fecha): comentar el enfoque de RF-29/RES-09 (sugerir apoyo profesional sin detección algorítmica de riesgo), por si el máster exige alguna revisión ética adicional al tratarse de bienestar emocional. Pesa más ahora con RF-40 (IA). Venía de los "Próximos pasos" de los requisitos.
+- **`requestId` en los logs** (idea): un id por petición para seguirla entre funciones distintas en los logs de Vercel. Venía del "Próximo paso" de ADR-08.
+- **Volver a ejecutar los E2E con `api/` en todas las PRs** (a final de octubre): quitar `branches: [main]` en `.github/workflows/e2e-api.yml`. Hasta entonces solo en las PRs a `main`, a petición del autor (tardaban en cada PR).
 - **Política de privacidad**: borrador de TFM, no revisado legalmente ([PrivacyPolicyPage](../../src/pages/PrivacyPolicyPage.tsx)).
 
 ## Hecho
@@ -118,3 +121,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.29 (29 sept. 2026)** — la demo de cierre pasa a "En curso", con su guion y la lista de la primera entrega a producción.
 - **v2.30 (29 sept. 2026)** — la demo se aplaza al final del proyecto (los profesores solo revisan el proyecto terminado); la primera entrega a producción (v1.0.0) se hace ya, para encontrar ahora los problemas que solo aparecen en producción.
 - **v2.31 (29 sept. 2026)** — v1.0.0 en producción; fallo de rutas detectado a los ~10 minutos y corregido en la v1.0.1, con un control nuevo (*smoke* de producción).
+- **v2.32 (29 sept. 2026)** — limpieza: código en inglés (con excepciones anotadas), módulos vacíos o duplicados fuera, E2E solo en PRs a `main` hasta final de octubre.

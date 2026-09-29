@@ -5,33 +5,33 @@
  * (RegistrarAuditoria, ADR-04 apartado 4) — eso es un registro de negocio en la
  * base de datos, esto es observabilidad operativa.
  */
-type Nivel = "info" | "warn" | "error";
+type LogLevel = "info" | "warn" | "error";
 
-interface Campos {
-  [clave: string]: unknown;
+interface Fields {
+  [key: string]: unknown;
 }
 
-function serializarError(error: unknown): unknown {
+function serializeError(error: unknown): unknown {
   if (error instanceof Error) {
-    return { mensaje: error.message, stack: error.stack };
+    return { message: error.message, stack: error.stack };
   }
   return error;
 }
 
-function registrar(nivel: Nivel, mensaje: string, campos?: Campos) {
-  const entrada = {
+function write(level: LogLevel, message: string, fields?: Fields) {
+  const entry = {
     timestamp: new Date().toISOString(),
-    nivel,
-    mensaje,
-    ...campos,
+    level,
+    message,
+    ...fields,
   };
-  const salida = nivel === "error" ? console.error : nivel === "warn" ? console.warn : console.log;
-  salida(JSON.stringify(entrada));
+  const output = level === "error" ? console.error : level === "warn" ? console.warn : console.log;
+  output(JSON.stringify(entry));
 }
 
 export const logger = {
-  info: (mensaje: string, campos?: Campos) => registrar("info", mensaje, campos),
-  warn: (mensaje: string, campos?: Campos) => registrar("warn", mensaje, campos),
-  error: (mensaje: string, error?: unknown, campos?: Campos) =>
-    registrar("error", mensaje, { ...campos, error: serializarError(error) }),
+  info: (message: string, fields?: Fields) => write("info", message, fields),
+  warn: (message: string, fields?: Fields) => write("warn", message, fields),
+  error: (message: string, error?: unknown, fields?: Fields) =>
+    write("error", message, { ...fields, error: serializeError(error) }),
 };

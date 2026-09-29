@@ -6,8 +6,8 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { AdminRoute } from "@modules/admin/ui/AdminRoute";
 import { SessionProvider } from "@shared/ui/context/SessionContext";
 
-function renderConSesion(sesion: unknown) {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ json: async () => sesion }));
+function renderWithSession(session: unknown) {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ json: async () => session }));
   return render(
     <MemoryRouter initialEntries={["/admin"]}>
       <SessionProvider>
@@ -24,12 +24,12 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("AdminRoute (ADM-01)", () => {
   it("deja pasar a un admin", async () => {
-    renderConSesion({ autenticado: true, email: "a@b.c", rol: "admin" });
+    renderWithSession({ autenticado: true, email: "a@b.c", rol: "admin" });
     expect(await screen.findByText("Zona admin")).toBeInTheDocument();
   });
 
   it("redirige a /inicio a un usuario normal", async () => {
-    renderConSesion({ autenticado: true, email: "a@b.c", rol: "usuario" });
+    renderWithSession({ autenticado: true, email: "a@b.c", rol: "usuario" });
     expect(await screen.findByText("Inicio")).toBeInTheDocument();
     expect(screen.queryByText("Zona admin")).not.toBeInTheDocument();
   });

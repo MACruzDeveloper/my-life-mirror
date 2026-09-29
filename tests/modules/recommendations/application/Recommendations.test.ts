@@ -13,23 +13,23 @@ import type { Clock } from "@shared/domain/Clock";
 const THRESHOLD = 5;
 
 async function setup() {
-  let ahora = new Date("2026-09-20T10:00:00Z");
-  const clock: Clock = { now: () => ahora };
+  let now = new Date("2026-09-20T10:00:00Z");
+  const clock: Clock = { now: () => now };
   const categoryRepository = new InMemoryCategoryRepository();
   const catalog = new InMemoryCategoryCatalogRepository();
   const assessmentRepository = new InMemoryAssessmentRepository();
   const recommendationRepository = new InMemoryRecommendationRepository();
   await createListCategories(categoryRepository, catalog)("u1");
-  const categorias = await categoryRepository.findByUserId("u1");
-  const economia = categorias.find((c) => c.name === "Economía")!;
-  const deporte = categorias.find((c) => c.name === "Deporte")!;
-  await categoryRepository.save({ ...economia, status: "active" });
-  await categoryRepository.save({ ...deporte, status: "active" });
+  const categories = await categoryRepository.findByUserId("u1");
+  const finances = categories.find((c) => c.name === "Economía")!;
+  const sport = categories.find((c) => c.name === "Deporte")!;
+  await categoryRepository.save({ ...finances, status: "active" });
+  await categoryRepository.save({ ...sport, status: "active" });
 
   const generate = createGenerateRecommendations({ recommendationRepository, categoryRepository, catalog, clock, threshold: THRESHOLD });
   const list = createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository });
-  const record = createRecordAssessments(assessmentRepository, categoryRepository, clock, (userId, guardadas) => generate(userId, guardadas));
-  return { generate, list, record, recommendationRepository, categoryRepository, assessmentRepository, economia, deporte, avanzar: (d: Date) => (ahora = d) };
+  const record = createRecordAssessments(assessmentRepository, categoryRepository, clock, (userId, saved) => generate(userId, saved));
+  return { generate, list, record, recommendationRepository, categoryRepository, assessmentRepository, economia: finances, deporte: sport, advance: (d: Date) => (now = d) };
 }
 
 describe("GenerateRecommendations (RF-18)", () => {
@@ -38,10 +38,10 @@ describe("GenerateRecommendations (RF-18)", () => {
 
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 3 }] });
 
-    const guardadas = await recommendationRepository.findByUserId("u1");
-    expect(guardadas).toHaveLength(1);
-    expect(guardadas[0]).toMatchObject({ userId: "u1", categoryId: economia.id, status: "pending", threshold: THRESHOLD });
-    expect(templateKeysFor("economia")).toContain(guardadas[0].templateKey);
+    const saved = await recommendationRepository.findByUserId("u1");
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toMatchObject({ userId: "u1", categoryId: economia.id, status: "pending", threshold: THRESHOLD });
+    expect(templateKeysFor("economia")).toContain(saved[0].templateKey);
   });
 
   it("no crea nada con una puntuación igual o superior al umbral", async () => {
@@ -58,8 +58,8 @@ describe("GenerateRecommendations (RF-18)", () => {
 
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 2 }, { categoryId: deporte.id, score: 8 }] });
 
-    const guardadas = await recommendationRepository.findByUserId("u1");
-    expect(guardadas.map((r) => r.categoryId)).toEqual([economia.id]);
+    const saved = await recommendationRepository.findByUserId("u1");
+    expect(saved.map((r) => r.categoryId)).toEqual([economia.id]);
   });
 
   it("no acumula: si ya hay una abierta para esa categoría, otra puntuación baja no crea más", async () => {
@@ -73,23 +73,23 @@ describe("GenerateRecommendations (RF-18)", () => {
 
   it("al generar otra tras cerrar la anterior elige una plantilla que aún no había recibido, y repite al agotarlas", async () => {
     const { generate, record, recommendationRepository, economia } = await setup();
-    const claves = templateKeysFor("economia");
-    const cerrar = async () => {
+    const keys = templateKeysFor("economia");
+    const closeRecommendation = async () => {
       for (const r of await recommendationRepository.findByUserId("u1")) await recommendationRepository.saveMany([{ ...r, status: "done" }]);
     };
 
-    const recibidas: string[] = [];
-    for (let i = 0; i < claves.length; i++) {
+    const received: string[] = [];
+    for (let i = 0; i < keys.length; i++) {
       await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 2 }] });
-      const abiertas = (await recommendationRepository.findByUserId("u1")).filter((r) => r.status === "pending");
-      recibidas.push(abiertas[0].templateKey);
-      await cerrar();
+      const openOnes = (await recommendationRepository.findByUserId("u1")).filter((r) => r.status === "pending");
+      received.push(openOnes[0].templateKey);
+      await closeRecommendation();
     }
-    expect(new Set(recibidas).size).toBe(claves.length);
+    expect(new Set(received).size).toBe(keys.length);
 
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 2 }] });
-    const nueva = (await recommendationRepository.findByUserId("u1")).filter((r) => r.status === "pending");
-    expect(nueva[0].templateKey).toBe(claves[0]);
+    const newValue = (await recommendationRepository.findByUserId("u1")).filter((r) => r.status === "pending");
+    expect(newValue[0].templateKey).toBe(keys[0]);
     void generate;
   });
 
@@ -106,9 +106,9 @@ describe("GenerateRecommendations (RF-18)", () => {
   it("ignora una categoría inactiva o inexistente sin fallar", async () => {
     const { generate, recommendationRepository } = await setup();
 
-    const resultado = await generate("u1", [{ id: "a", userId: "u1", categoryId: "no-existe", score: 1, recordedAt: new Date() }]);
+    const result = await generate("u1", [{ id: "a", userId: "u1", categoryId: "no-existe", score: 1, recordedAt: new Date() }]);
 
-    expect(resultado.ok).toBe(true);
+    expect(result.ok).toBe(true);
     expect(await recommendationRepository.findByUserId("u1")).toEqual([]);
   });
 });
@@ -120,23 +120,23 @@ describe("RecordAssessments avisa al oyente después de guardar (RF-18)", () => 
       throw new Error("fallo en el generador");
     });
 
-    const resultado = await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 2 }] });
+    const result = await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 2 }] });
 
-    expect(resultado.ok).toBe(true);
+    expect(result.ok).toBe(true);
     expect(await assessmentRepository.findByUserId("u1")).toHaveLength(1);
   });
 
   it("no avisa si el guardado se rechaza", async () => {
     const { categoryRepository, assessmentRepository } = await setup();
-    let avisos = 0;
+    let notices = 0;
     const record = createRecordAssessments(assessmentRepository, categoryRepository, { now: () => new Date() }, async () => {
-      avisos++;
+      notices++;
     });
 
-    const resultado = await record({ userId: "u1", entries: [{ categoryId: "no-existe", score: 2 }] });
+    const result = await record({ userId: "u1", entries: [{ categoryId: "no-existe", score: 2 }] });
 
-    expect(resultado.ok).toBe(false);
-    expect(avisos).toBe(0);
+    expect(result.ok).toBe(false);
+    expect(notices).toBe(0);
   });
 });
 
@@ -145,24 +145,24 @@ describe("ListRecommendations (RF-18)", () => {
     const { record, list, economia } = await setup();
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 3 }] });
 
-    const resultado = await list("u1");
+    const result = await list("u1");
 
-    expect(resultado.ok).toBe(true);
-    if (resultado.ok) {
-      expect(resultado.value).toHaveLength(1);
-      expect(resultado.value[0]).toMatchObject({ categoryId: economia.id, categoryName: "Economía", status: "pending" });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value).toHaveLength(1);
+      expect(result.value[0]).toMatchObject({ categoryId: economia.id, categoryName: "Economía", status: "pending" });
     }
   });
 
   it("deja de mostrarla cuando la puntuación mejora (el registro se conserva)", async () => {
-    const { record, list, recommendationRepository, economia, avanzar } = await setup();
+    const { record, list, recommendationRepository, economia, advance: avanzar } = await setup();
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 3 }] });
     avanzar(new Date("2026-09-27T10:00:00Z"));
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 8 }] });
 
-    const resultado = await list("u1");
+    const result = await list("u1");
 
-    expect(resultado.ok && resultado.value).toEqual([]);
+    expect(result.ok && result.value).toEqual([]);
     expect(await recommendationRepository.findByUserId("u1")).toHaveLength(1);
   });
 
@@ -171,9 +171,9 @@ describe("ListRecommendations (RF-18)", () => {
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 3 }] });
     await categoryRepository.save({ ...economia, status: "inactive" });
 
-    const resultado = await list("u1");
+    const result = await list("u1");
 
-    expect(resultado.ok && resultado.value).toEqual([]);
+    expect(result.ok && result.value).toEqual([]);
   });
 
   it("no muestra las cerradas (hecha/descartada) y rechaza un usuario vacío", async () => {
@@ -192,8 +192,8 @@ describe("ListRecommendations — identidad de la categoría", () => {
     const { record, list, economia } = await setup();
     await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 3 }] });
 
-    const resultado = await list("u1");
+    const result = await list("u1");
 
-    expect(resultado.ok && resultado.value[0].catalogId).toBe(economia.catalogId);
+    expect(result.ok && result.value[0].catalogId).toBe(economia.catalogId);
   });
 });
