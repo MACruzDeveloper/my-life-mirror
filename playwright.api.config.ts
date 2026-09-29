@@ -16,6 +16,9 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:5174",
     trace: "retain-on-failure",
+    // `E2E_VIDEO=1 npm run test:e2e:api`: graba un vídeo de cada test en test-results/
+    // (material para la demo o la memoria). Desactivado por defecto: ralentiza.
+    video: process.env.E2E_VIDEO ? "on" : "off",
   },
   projects: [
     { name: "mobile", use: { ...devices["Pixel 7"] } },

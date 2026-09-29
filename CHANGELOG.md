@@ -1,9 +1,13 @@
 # Changelog
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
-Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — versión `0.x`: en desarrollo inicial, la API/estructura puede cambiar sin previo aviso hasta la `1.0.0`.
+Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta la `1.0.0` (primera entrega a producción, 29 sept. 2026) fue `0.x`, en desarrollo inicial. Desde entonces: MINOR = funcionalidad nueva, PATCH = corrección, MAJOR = un cambio que obligue a migrar datos o rompa lo existente.
 
 ## [Sin publicar]
+
+## [1.0.0] - 2026-09-29
+
+Primera entrega a producción (`main`): cierre del Ciclo 1 (MVP). Reúne todo lo fusionado en `develop` desde la 0.1.0.
 
 ### Añadido
 
@@ -41,6 +45,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/) — ver
 
 ### Añadido (gestión)
 
+- Guion de la demo de cierre ([04_Guion_Demo_Cierre.md](docs/validation/04_Guion_Demo_Cierre.md)): preparación de la primera entrega a producción, demo de 25 minutos, preguntas probables. `E2E_VIDEO=1 npm run test:e2e:api` graba un vídeo de cada test (plan B de la demo).
 - `scripts/sql/simulated-history.sql`: historial simulado de 12 meses para un usuario (una entrevista al mes, solo en sus categorías activas, antes de su primera respuesta real y enlazando con su puntuación actual), para ver la evolución y el radar en desarrollo y en la demo. Repetible y reversible (marca en los microsegundos de `recorded_at`). Probado sobre las 9 migraciones con PGlite.
 - Primera revisión de métricas DORA y Flow ([02_Metricas_DORA_y_Flujo.md](docs/project-management/02_Metricas_DORA_y_Flujo.md) apartado 7) y dos reglas de flujo nuevas en el tablero.
 
