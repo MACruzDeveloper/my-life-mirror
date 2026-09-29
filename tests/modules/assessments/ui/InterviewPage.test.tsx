@@ -228,11 +228,12 @@ describe("InterviewPage (RF-10)", () => {
     expect(screen.getByRole("checkbox", { name: /deporte/i })).toBeChecked();
   });
 
-  it("muestra a la derecha el historial de cambios, del más reciente al más antiguo", async () => {
+  it("muestra a la derecha el historial de cambios, plegado; al abrirlo, del más reciente al más antiguo (UX-04)", async () => {
     stubFetch();
     renderPage();
 
     const historyPanel = await screen.findByRole("complementary", { name: /historial/i });
+    fireEvent.click(await within(historyPanel).findByRole("button", { name: /ver mi historial \(2\)/i }));
     await waitFor(() => expect(within(historyPanel).getAllByRole("listitem")).toHaveLength(2));
     const items = within(historyPanel).getAllByRole("listitem");
     expect(items[0]).toHaveTextContent(/septiembre de 2026/i);
