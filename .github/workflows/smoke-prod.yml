@@ -1,0 +1,35 @@
+# Comprobación del despliegue de producción, justo después de que Vercel lo termine.
+# Vercel informa a GitHub de cada despliegue (evento `deployment_status`); este job solo
+# actúa cuando el de Producción termina bien, y ejecuta `scripts/smoke-prod.mjs` contra
+# la URL pública: páginas de la app (también al recargar una ruta), funciones de api/
+# en Dublín y conexión con Supabase. No crea datos ni necesita secretos.
+# Nació del fallo de la v1.0.0: las rutas de la app daban 404 al recargar y ningún
+# control lo veía (Vite y los E2E sirven la app de otra forma). Ver
+# docs/project-management/02_Metricas_DORA_y_Flujo.md, apartado 7.6 (regla 2).
+name: Smoke producción
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # La URL pública (alias de producción), no la del despliegue concreto: esa
+      # queda detrás del inicio de sesión de Vercel (Deployment Protection).
+      - name: Comprobar https://my-life-mirror.vercel.app
+        run: node scripts/smoke-prod.mjs https://my-life-mirror.vercel.app
