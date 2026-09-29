@@ -140,7 +140,10 @@
       "Marca abajo las categorías de las que quieres hablar.",
       "En cada una, toca un número del 1 al 10. Puedes dejar alguna para otro día.",
       "Al final, pulsa «{{boton}}»."
-    ]
+    ],
+    "verHistorial": "Ver mi historial ({{count}})",
+    "ocultarHistorial": "Ocultar historial",
+    "verMasHistorial": "Ver más"
   },
   "resultados": {
     "titulo": "Tus resultados",

@@ -11,19 +11,23 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **Primera entrega a producción** (desde el 29 sept.) — **v1.0.0 desplegada** en https://my-life-mirror.vercel.app (funciones en Dublín, variables en Production y Preview, etiqueta `v1.0.0`, rama por defecto `main`). Tenía un fallo: recargar una ruta de la app daba 404 → **v1.0.1** lo corrige y añade `npm run smoke:prod` y su workflow. Pendiente: URLs de Supabase (*Authentication → URL Configuration*), limpiar cuentas de prueba y confirmar la cuenta de administrador.
+- [ ] **UX-04** historial de cambios plegado (desde el 29 sept.) — [historia](../user-stories/UX-04-historial-plegable.md). PR 1 del plan del Ciclo 2.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
+Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
+
+- [ ] **RF-41** experiencias por categoría (nuevo, Should, Ciclo 2): en cada pregunta de la entrevista, opciones para marcar "¿Qué te ayuda en esta área?" (las únicas que puede usar la IA, si el usuario lo activa) y la nota pasa a "Tu experiencia (privada)", que nunca sale hacia la IA ni se comparte. PR 2.
+- [ ] **RF-40a** ideas personalizadas con IA, contra un *Fake*: activación voluntaria en Privacidad y datos, la IA reescribe una idea del catálogo (ampliado a ~5 por categoría, revisado por el autor) la primera vez que se abre, con filtro de palabras y segunda revisión, y caída al texto curado; sin categorías sensibles ni texto libre ([ADR-05](../architecture-decisions/05_Fundamentos_IA.md), apartado 4.3). PR 3.
+- [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
+- [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
 - [ ] **Demo final** — al terminar el proyecto, para la revisión de los profesores (no antes: solo revisan el proyecto terminado). [Guion](../validation/04_Guion_Demo_Cierre.md) ya preparado; se actualiza entonces con lo que haya del Ciclo 2.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
 
 - [ ] **RF-23** — Caso de uso `ConfigurarNotificaciones`. Ningún otro RF del Ciclo 1 depende de él.
-- [ ] Primeras historias del Ciclo 2. Ideas **importantes** que salen de la validación (27 sept.), pendientes de convertirse en RF con su prioridad:
+- [ ] Más ideas del Ciclo 2 que salen de la validación (27 sept.), pendientes de convertirse en RF (la pregunta por categoría ya es RF-41 y las sugerencias, RF-40):
   - **Perfil ampliado** tras el registro: aficiones, estado civil, hijos (y sus edades o necesidades especiales), ubicación, peso/altura, salud, religión… Hoy RF-03 solo tiene nombre, fecha de nacimiento, género y zona horaria. **Salud y religión son datos de categoría especial (RGPD art. 9):** solo con consentimiento explícito (como las categorías sensibles), cada campo opcional y ligado a un uso concreto (minimización). Su uso con IA sigue sujeto a RD-09 y RES-09.
-  - **Pregunta abierta por categoría** en la entrevista (p. ej. "¿Cuál es la mejor aventura que has vivido?"). Las notas actuales no se entendieron: sustituirlas o integrarlas, y dejar claro para qué sirven y quién las ve (solo el usuario).
-  - **Sugerencias personalizadas → RF-40** (decidido el 27 sept., Should): la IA reescribe ideas del catálogo con verificación automática y caída al texto curado, sin moderación humana ([05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) apartado 4.3). Se empieza contra un *Fake*; el adaptador real de Anthropic cuando haya crédito de API. Primera versión sin notas ni categorías sensibles; el perfil ampliado y la pregunta abierta la enriquecerán después.
 
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
@@ -38,6 +42,7 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## Hecho
 
+- [x] **Primera entrega a producción** (29 sept.): v1.0.0 y v1.0.1 en https://my-life-mirror.vercel.app, con el *smoke* de producción tras cada despliegue.
 - [x] **Métricas DORA y Flow** (primera revisión, 29 sept.): 11 PRs, 1 fallo que llegó a `develop` (5 más parados antes de fusionar), *flow time* mediano de 0 días y dos reglas de flujo nuevas — [resultados](02_Metricas_DORA_y_Flujo.md) apartado 7.
 - [x] **E2E con `api/` en GitHub Actions** (`E2E con api`, en cada PR, sin secretos) y **`npm run dev:local`** para probar la app completa contra el Supabase local; README reescrito para quien quiera probarla.
 - [x] **Playwright contra `api/`**: Supabase local en Docker, servidor propio en Vite con salvaguarda (nunca la base real) y aislamiento entre funciones; 9 tests × móvil/escritorio sobre RF-01, RF-04, RF-05, RF-10, RF-14, RF-15, RF-18, RF-39, UX-01 y UX-02 (`npm run test:e2e:api`, [plan de V&V](../requirements-analysis/04_Plan_Verificacion_Validacion.md) apartado 1.2).
@@ -122,3 +127,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.30 (29 sept. 2026)** — la demo se aplaza al final del proyecto (los profesores solo revisan el proyecto terminado); la primera entrega a producción (v1.0.0) se hace ya, para encontrar ahora los problemas que solo aparecen en producción.
 - **v2.31 (29 sept. 2026)** — v1.0.0 en producción; fallo de rutas detectado a los ~10 minutos y corregido en la v1.0.1, con un control nuevo (*smoke* de producción).
 - **v2.32 (29 sept. 2026)** — limpieza: código en inglés (con excepciones anotadas), módulos vacíos o duplicados fuera, E2E solo en PRs a `main` hasta final de octubre.
+- **v2.33 (29 sept. 2026)** — plan del Ciclo 2 en "Listo": UX-04, RF-41, RF-40a, RF-40b, RF-30, y la demo al final. Primera entrega a producción, hecha.

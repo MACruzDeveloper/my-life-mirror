@@ -140,7 +140,10 @@
       "Tick below the categories you want to talk about.",
       "In each one, tap a number from 1 to 10. You can leave some for another day.",
       "At the end, press “{{boton}}”."
-    ]
+    ],
+    "verHistorial": "See my history ({{count}})",
+    "ocultarHistorial": "Hide history",
+    "verMasHistorial": "Show more"
   },
   "resultados": {
     "titulo": "Your results",
