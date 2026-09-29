@@ -41,6 +41,7 @@ Este documento da contexto general del proyecto a cualquier asistente de IA (o p
 * `npm run preview` — sirve el build de producción localmente.
 * `npm run test` / `npm run test:watch` — Vitest. Todos los tests viven en `tests/`, con la misma estructura de carpetas que `src/` (nunca colocados junto al archivo que prueban) — p. ej. `src/shared/domain/Result.ts` se prueba en `tests/shared/domain/Result.test.ts`. React Testing Library ya en uso para componentes.
 * `npm run test:e2e` — Playwright, tests en `e2e/` (no en `tests/` — es un tipo de test distinto, contra un navegador real, no contra Vitest). Arranca `vite` solo (puerto 5173) automáticamente — sirve para lo que no toca `api/`. Va en el pre-push.
+* `npm run smoke:prod` — comprueba producción (https://my-life-mirror.vercel.app) sin crear datos: rutas de la app al recargar, funciones en Dublín y conexión con Supabase. Se ejecuta solo tras cada despliegue de producción (workflow *Smoke producción*); a mano, `node scripts/smoke-prod.mjs <url>` sirve para otra URL.
 * `npm run test:e2e:api` — Playwright con `api/` (tests en `e2e/api/`, Page Objects en `e2e/api/pages/`) contra un **Supabase local en Docker** (Docker Desktop abierto), que se vacía en cada ejecución. Lo sirve un plugin de Vite que se niega a arrancar si la base no es local; **nunca usar `vercel dev` para esto**: carga siempre el `.env` real. Se ejecuta solo en cada PR (GitHub Actions, `.github/workflows/e2e-api.yml`) y a mano cuando se quiera (~35 s; `-- --ui` para verlo). Detalle en [04_Plan_Verificacion_Validacion.md](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) apartado 1.2.
 
 ## 🔴🟢 TDD (obligatorio desde RF-01)
@@ -116,3 +117,4 @@ No se escribe implementación antes que su test correspondiente.
 - **v1.24 (28 sept. 2026)** — `npm run dev:local` (probar la app contra el Supabase local), E2E con `api/` en GitHub Actions y numeración decimal de apartados en lugar de "bis/ter" (referencias actualizadas en todo el repositorio).
 - **v1.25 (29 sept. 2026)** — referencias a apartados con la palabra "apartado" en lugar del símbolo de sección, en todo el repositorio.
 - **v1.26 (29 sept. 2026)** — versión 1.0.0 (primera entrega a producción): reglas de SemVer a partir de ahora.
+- **v1.27 (29 sept. 2026)** — `npm run smoke:prod` y workflow *Smoke producción* tras el fallo de rutas de la v1.0.0.
