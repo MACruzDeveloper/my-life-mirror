@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { Breadcrumbs, type MigaDePan } from "./Breadcrumbs";
+import { Breadcrumbs, type BreadcrumbItem } from "./Breadcrumbs";
 import { Header } from "./Header";
 import { useSession } from "../context/SessionContext";
 
@@ -10,7 +10,7 @@ export interface ProtectedLayoutProps {
    * Tipo `MigaDePan` (de Breadcrumbs.tsx) sin traducir todavía — pendiente,
    * ver AGENTS.md sobre nombres en inglés.
    */
-  breadcrumbs?: MigaDePan[];
+  breadcrumbs?: BreadcrumbItem[];
   children: ReactNode;
 }
 

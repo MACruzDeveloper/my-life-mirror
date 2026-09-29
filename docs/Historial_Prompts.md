@@ -167,6 +167,12 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **29 sept. 2026** — *"I think the demo script is not necessary for now because my teachers only will review the project when it's totally finished. So let's try only to deploy to production unless you consider that it's better to wait for the end of the project."*
 → Se despliega a producción ya (v1.0.0, cierre del Ciclo 1): encontrar ahora lo que solo falla en producción (como las variables de Vercel que faltaban) y empezar a medir DORA de verdad. La demo pasa al final del proyecto; su guion se conserva.
 
+**29 sept. 2026** — *"review and clean the project… we have too much docs, maybe it's a good moment to organize them better… before removing something please ask me… I see a duplicated folder: recomendaciones and recommendations. And if you can convert everything in english without breaking anything please do it… the tests e2e take long time in every PR… could we desactivate or something during the project development?"*
+→ Código en inglés en un pase completo con el servicio de lenguaje de TypeScript. Se dejan en español lo que rompería datos o contratos: base de datos, claves de categoría, i18n, cookie y campos JSON de la API (estos, anotados para una PR aparte). Carpeta duplicada fuera. E2E solo en las PRs a `main` hasta final de octubre. La reorganización de la documentación se propone antes de tocar nada.
+
+**29 sept. 2026** — *"A-yes B-ok C-don't delete it… it's interesting to show that I tried too. D-don't delete it… E-yes. Also how will you add the next cycle 2 docs? My worry it's just that we have too much documentation so nobody will read it. Maybe it's easier to build a wiki? Or creating the documentation in GitHub? Another thing you could delete is all the 'Próximos pasos'…"*
+→ Mapa `docs/README.md` con recorrido de 20 minutos; diagramas de análisis marcados como tales; se conservan el `.drawio` y el guion completo del test; fuera los esqueletos vacíos y los "Próximo paso" (lo único con contenido propio, al tablero). **Sin wiki:** la documentación sigue en el repositorio, versionada y revisada con el código; el problema no es dónde está sino cuánto crece, así que se fijan reglas de crecimiento (una historia por funcionalidad, ADR solo para decisiones nuevas, lo pendiente solo en el tablero). Si más adelante hace falta navegación con búsqueda, se publica esa misma carpeta como web (GitHub Pages), sin moverla.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

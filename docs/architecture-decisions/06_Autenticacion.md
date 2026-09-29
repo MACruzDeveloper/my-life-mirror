@@ -17,11 +17,11 @@ Se usa la autenticación gestionada de Supabase — contraseñas y sesión dejan
 - **Entorno de desarrollo**: se usa el proyecto real de Supabase también en `dev` (no hay un sustituto en memoria razonable para autenticación completa); los tests de caso de uso sí usan un `InMemoryAuthProvider` (Fake), igual que el resto del proyecto (ADR-03 apartado 3.6).
 - **RF-02** (login con Google/Apple): queda mucho más barato con Supabase Auth, que ya trae proveedores OAuth — no se implementa todavía (Should, no Ciclo 1), pero la vía de menor coste era justamente parte de la razón para cambiar de proveedor de datos ([04_Almacenamiento_Datos.md](04_Almacenamiento_Datos.md) apartado 3).
 - **Sesión desde el navegador (RF-39)**: la cookie es httpOnly a propósito — el frontend no puede leerla. `/api/accounts/session` (handler `session.ts`) la comprueba en el servidor (`auth.getUser(token)`) y responde `{autenticado, email, name}`; `/api/accounts/logout` la borra (`Max-Age=0`).
-- **Recuperación de contraseña (RF-38)**: `auth.resetPasswordForEmail` con `redirectTo` apuntando a `<APP_URL>/restablecer-password` (env var nueva, ver `.env.example` — debe coincidir con una URL permitida en Supabase: Authentication > URL Configuration > Redirect URLs). El enlace del email lleva el token en el *hash* de la URL, no en query params; el frontend lo extrae (`extraerTokenDeHash`) y lo envía a `/api/accounts/reset-password`, que lo valida con `auth.getUser(token)` y aplica el cambio con `auth.admin.updateUserById` — el SDK de Supabase sigue sin tocarse desde el navegador. La respuesta de "solicitar recuperación" es idéntica exista o no el email, para no permitir enumerar cuentas.
+- **Recuperación de contraseña (RF-38)**: `auth.resetPasswordForEmail` con `redirectTo` apuntando a `<APP_URL>/restablecer-password` (env var nueva, ver `.env.example` — debe coincidir con una URL permitida en Supabase: Authentication > URL Configuration > Redirect URLs). El enlace del email lleva el token en el *hash* de la URL, no en query params; el frontend lo extrae (`extractTokenFromHash`) y lo envía a `/api/accounts/reset-password`, que lo valida con `auth.getUser(token)` y aplica el cambio con `auth.admin.updateUserById` — el SDK de Supabase sigue sin tocarse desde el navegador. La respuesta de "solicitar recuperación" es idéntica exista o no el email, para no permitir enumerar cuentas.
 
 ### 1.1 Roles de usuario (RNF-13)
 
-Se añade `rol: "usuario" | "premium" | "admin"` a `UsuarioAutenticado` (puerto `AuthProvider`), con `"usuario"` como valor por defecto — nadie se autorregistra como premium o admin.
+Se añade `rol: "usuario" | "premium" | "admin"` a `AuthenticatedUser` (puerto `AuthProvider`), con `"usuario"` como valor por defecto — nadie se autorregistra como premium o admin.
 
 - **Dónde vive**: `app_metadata` de Supabase Auth, no `user_metadata`. La diferencia importa: `user_metadata` lo puede escribir el propio usuario autenticado desde el cliente; `app_metadata` solo se escribe con la *service role key* (servidor). Guardar el rol ahí es defensa en profundidad — aunque hoy ningún endpoint propio permita a un usuario cambiar su rol, si algún día se filtrara ese error, `user_metadata` sería explotable y `app_metadata` no.
 - **Lectura defensiva**: `leerRolDesdeMetadata` (dominio, con test propio) valida el valor recibido contra la lista de roles conocidos y cae a `"usuario"` ante cualquier dato ausente, corrupto o no reconocido — nunca se asume un rol con más privilegios de los que constan explícitamente.
@@ -45,10 +45,6 @@ Se añade `rol: "usuario" | "premium" | "admin"` a `UsuarioAutenticado` (puerto 
 
 El proyecto de Supabase devolvía `PGRST125` ("Invalid path specified in request URL") en **todas** las rutas del gateway de API, confirmado con `curl` directo sin pasar por el SDK — la base de datos en sí funcionaba bien. Descartado por evidencia directa: elección de clave, código/SDK propios, reinicio del proyecto. **Causa real: `SUPABASE_URL` estaba mal** (a pesar de tener el formato correcto a simple vista). Corregido; registro y login verificados funcionando de extremo a extremo.
 
-## 3. Próximo paso
-
-Con registro, login, sesión, logout y recuperación de contraseña completos, el resto de Ciclo 1 continúa según [01_Backlog_MVP.md](../project-management/01_Backlog_MVP.md) (siguiente: RF-04, consentimiento). Pendiente de tu parte: añadir `<APP_URL>/restablecer-password` a las Redirect URLs permitidas en el dashboard de Supabase, y `APP_URL` tanto en `.env` como en las variables de entorno de Vercel.
-
 ---
 
 ## Historial de cambios
@@ -64,3 +60,4 @@ Con registro, login, sesión, logout y recuperación de contraseña completos, e
 - **v2.7 (19 sept. 2026)** — los handlers de `accounts` viven ahora en `src/shared/infrastructure/http/handlers/accounts/` y se sirven desde `api/accounts/[action].ts` (límite de funciones de Vercel Hobby, ver ADR-03 v2.3); las URLs no cambian.
 - **v2.8 (20 sept. 2026)** — ADM-03: el rol ya se puede cambiar desde la app (`/api/admin/user-role`, sustituye al SQL manual de apartado 1.1, con contraseña del admin y la regla del último administrador). Se añade la suspensión de cuentas (`ban_duration` de Supabase) y `verificarSesion` rechaza sesiones abiertas de cuentas suspendidas. `AuthProvider` gana `cambiarRol`, `actualizarEmail`, `suspender`, `reactivar` y `eliminarUsuario`.
 - **v2.9 (28 sept. 2026)** — numeración: los apartados "bis/ter" pasan a subapartados decimales del apartado anterior (convención del proyecto, AGENTS.md); referencias actualizadas en todo el repositorio. Sin cambios de contenido.
+- **v2.10 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

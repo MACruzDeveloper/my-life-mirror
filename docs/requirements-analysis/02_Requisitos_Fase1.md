@@ -185,7 +185,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RD-02 | El sistema debe modelar una entidad `Categoría` con: nombre, descripción, tipo (estándar/personalizada), estado (activa/inactiva), es_dato_sensible (booleano). | Must |
 | RD-03 | El sistema debe modelar una entidad `Evaluación` (check-in) con: usuario, categoría, puntuación, fecha, nota opcional. | Must |
 | RD-04 | El sistema debe modelar una entidad `Recomendación` con: usuario destinatario, categoría asociada, texto, condición de disparo (umbral), estado (pendiente de respuesta / hecha / descartada / pospuesta). Cada recomendación queda registrada como propuesta a un usuario concreto, con el estado de su respuesta. | Must |
-| RD-05 | El sistema debe modelar un registro de `Consentimiento` por usuario y por categoría sensible, con fecha y versión de política aceptada. | Must |
+| RD-05 | El sistema debe modelar un registro de `Consent` por usuario y por categoría sensible, con fecha y versión de política aceptada. | Must |
 | RD-06 | Los datos de categorías sensibles (sexo, espiritualidad, salud) deben estar lógicamente separados/etiquetados para poder aplicarles cifrado y controles de acceso diferenciados. | Must |
 | RD-07 | El sistema debe conservar el histórico de evaluaciones sin sobrescritura, para permitir análisis de evolución temporal. | Should |
 | RD-08 | El sistema debe poder anonimizar o pseudonimizar datos de usuario en caso de eliminación de cuenta, si existen registros necesarios por obligación legal (p. ej. facturación). | Could |
@@ -194,20 +194,6 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RD-11 | El sistema debe modelar una entidad `Conexión` (usuario_a, usuario_b, estado: pendiente/aceptada/rechazada, fecha) para representar relaciones confirmadas mutuamente entre usuarios, necesarias para RF-32/RF-33. | Should |
 
 ---
-
-## 6. Próximos pasos (Fase 2 sugerida)
-
-Para la siguiente fase, propongo:
-
-1. **Verificación de consistencia**: matriz de trazabilidad RN → RF/RNF/RD, comprobando que cada RN de negocio esté cubierto por al menos un requisito funcional.
-2. **Revisión de ambigüedad**: pasar cada requisito por un checklist (¿es verificable? ¿es atómico? ¿tiene criterio de aceptación medible?).
-3. **Priorización validada**: revisar el MoSCoW con criterios objetivos (p. ej. método de puntuación ponderada, o técnica de priorización por valor/esfuerzo).
-4. **Prototipado/validación con usuarios**: mockups de las pantallas clave (onboarding, check-in, dashboard, recomendación) para validar RN-04 (tono no punitivo) antes de programar nada.
-5. **Casos de uso / historias de usuario**: derivar de cada RF al menos un caso de uso o user story con criterios de aceptación, para la fase de diseño.
-6. **Validación con tutor**: comentar específicamente el enfoque de RF-29/RES-09 (sugerencia de apoyo profesional sin detección algorítmica de riesgo) por si el programa del máster requiere alguna revisión ética adicional al tratarse de bienestar emocional. *(⏸️ en espera — sin fecha de interview con el tutor todavía; ver [02_Plan_Verificacion_Validacion.md](02_Plan_Verificacion_Validacion.md))*
-
----
-
 ## Historial de cambios
 
 - **v0.1 (baseline, sept. 2026)** — versión inicial: RN-01 a RN-10, RF-01 a RF-25, RNF-01 a RNF-12, RES-01 a RES-08, RD-01 a RD-09.
@@ -220,3 +206,4 @@ Para la siguiente fase, propongo:
 - **v0.8 (14 sept. 2026)** — RNF-13 (control de acceso por roles: estándar/premium/administrador), preparación de RN-11 y de un futuro rol de administrador para el equipo. Se corrige el campo "Versión" de este documento, desactualizado desde v0.3.
 - **v0.9 (14 sept. 2026)** — RNF-06 explicita mobile-first con adaptación real a tablet ([07_UI.md](../architecture-decisions/07_UI.md) apartado 6), no solo "responsive" en abstracto.
 - **v0.10 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA, ancladas al catálogo curado y con verificación automática), Should, Ciclo 2. Surge de la validación (la participante pidió sugerencias más personales) y lo confirma el autor. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) apartado 4.3.
+- **v0.11 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

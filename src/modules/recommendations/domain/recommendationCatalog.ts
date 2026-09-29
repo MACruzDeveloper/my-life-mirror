@@ -32,8 +32,8 @@ const MAX_THRESHOLD = 10;
 
 /** Lee el umbral configurable (variable de entorno); cualquier valor ausente o inválido usa el de por defecto. */
 export function parseThreshold(value: string | undefined): number {
-  const texto = value?.trim() ?? "";
-  if (!/^\d+$/.test(texto)) return DEFAULT_THRESHOLD;
-  const numero = Number(texto);
-  return numero >= MIN_THRESHOLD && numero <= MAX_THRESHOLD ? numero : DEFAULT_THRESHOLD;
+  const text = value?.trim() ?? "";
+  if (!/^\d+$/.test(text)) return DEFAULT_THRESHOLD;
+  const parsed = Number(text);
+  return parsed >= MIN_THRESHOLD && parsed <= MAX_THRESHOLD ? parsed : DEFAULT_THRESHOLD;
 }

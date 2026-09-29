@@ -10,9 +10,9 @@ export class HttpError extends Error {
 
 /** GET que devuelve JSON y lanza `HttpError` si la respuesta no es 2xx (para que la caché lo trate como error). */
 export async function getJson<T>(url: string): Promise<T> {
-  const respuesta = await fetch(url);
-  if (!respuesta.ok) {
-    throw new HttpError(respuesta.status, url);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new HttpError(response.status, url);
   }
-  return (await respuesta.json()) as T;
+  return (await response.json()) as T;
 }

@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { obtenerAppContext } from "../../../container.js";
-import { leerCookie } from "../../../cookies.js";
+import { getAppContext } from "../../../container.js";
+import { readCookie } from "../../../cookies.js";
 import { logger } from "../../../logger.js";
 
 /**
@@ -17,8 +17,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return;
     }
 
-    const { verificarSesion, listCatalogLabels } = obtenerAppContext();
-    const session = await verificarSesion(leerCookie(req.headers.cookie, "sesion"));
+    const { verifySession: verificarSesion, listCatalogLabels } = getAppContext();
+    const session = await verificarSesion(readCookie(req.headers.cookie, "sesion"));
     if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));
@@ -28,7 +28,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(await listCatalogLabels()));
   } catch (error) {
-    logger.error("Error inesperado en /api/categories/translations", error, { ruta: "/api/categories/translations" });
+    logger.error("Error inesperado en /api/categories/translations", error, { route: "/api/categories/translations" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

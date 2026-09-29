@@ -50,8 +50,8 @@ describe("AdminCategories (ADM-02)", () => {
     render(withClient(<AdminCategories />));
 
     await screen.findByText("Economía");
-    const economia = rowOf("Economía");
-    expect(within(economia).getByText("Finances")).toBeInTheDocument();
+    const finances = rowOf("Economía");
+    expect(within(finances).getByText("Finances")).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Nombre (español)" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Nombre (inglés)" })).toBeInTheDocument();
     expect(within(rowOf("Sexo")).getByText(/sensible/i)).toBeInTheDocument();

@@ -48,7 +48,7 @@ En [01_Justificacion_Ciclo_Vida.md](../requirements-analysis/01_Justificacion_Ci
 - Ecosistema maduro para accesibilidad (RNF-09, `eslint-plugin-jsx-a11y`) e internacionalización (RNF-10, `react-i18next`).
 
 **A vigilar:**
-- Al no ser un lenguaje funcional puro, la inmutabilidad no viene gratis — hay que imponerla por disciplina propia, especialmente en el motor de recomendaciones y en el manejo de `Consentimiento`/datos sensibles, donde un error de mutación sería grave (RES-04, RNF-04).
+- Al no ser un lenguaje funcional puro, la inmutabilidad no viene gratis — hay que imponerla por disciplina propia, especialmente en el motor de recomendaciones y en el manejo de `Consent`/datos sensibles, donde un error de mutación sería grave (RES-04, RNF-04).
 
 ---
 
@@ -62,16 +62,10 @@ Esta decisión no contradice apartado 4/apartado 5 — es exactamente el tipo de
 - **No establece precedente** para meter Python en el runtime — cualquier otro uso de Python que se plantee más adelante se evalúa aparte, con el mismo criterio de apartado 4/apartado 5.
 
 ---
-
-## 8. Próximo paso
-
-Con el stack confirmado, las historias de usuario del Ciclo 1 (Nivel 2 Spec Anchored, según [10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md)) ya pueden incluir referencias a tipos/contratos TypeScript concretos donde aplique. Dijiste que aún quedan más especificaciones de proyecto por definir antes de las historias — ¿cuál es la siguiente?
-
----
-
 ## Historial de cambios
 
 - **v1.0 (9 sept. 2026)** — versión inicial: confirmación del stack, explicación de por qué JS/TS/Node son multiparadigma (no funcionales puros), alternativas consideradas, relación con la incertidumbre técnica deliberada del ciclo de vida.
 - **v1.1 (9 sept. 2026)** — se añade apartado 7: uso acotado de Python como herramienta offline para generar el catálogo de avatares de RF-26 (no forma parte del runtime de producción, no cambia el stack de la app).
 - **v1.2 (20 sept. 2026)** — se añade `@tanstack/react-query` para la caché de datos del servidor en el frontend (ver [07_UI.md](07_UI.md) v1.14).
 - **v1.3 (26 sept. 2026)** — se añade **Apache ECharts** (`echarts`, Apache-2.0) para los gráficos del panel (RF-16), con importación por partes y carga diferida solo en Inicio (~175 kB comprimidos fuera del paquete principal). Sin envoltorio de React: se usa directamente.
+- **v1.4 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

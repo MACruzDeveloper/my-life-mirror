@@ -9,9 +9,9 @@ Para que mis datos sensibles solo se traten con mi autorización informada (RGPD
 
 ## Alcance
 
-Cubre el módulo `consentimiento` (dominio + aplicación): la entidad `Consentimiento` y los casos de uso `OtorgarConsentimiento`/`VerificarConsentimiento`. Persistencia real en Supabase desde el principio (`SupabaseConsentimientoRepository`), no en memoria — ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) apartado 5.1.
+Cubre el módulo `consent` (dominio + aplicación): la entidad `Consent` y los casos de uso `GrantConsent`/`CheckConsent`. Persistencia real en Supabase desde el principio (`SupabaseConsentRepository`), no en memoria — ver [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) apartado 5.1.
 
-**Disparador real conectado (15 sept. 2026, RF-06/RF-07)**: `ActivateCategory` llama a `VerificarConsentimiento` al activar una categoría sensible; si no hay consentimiento, devuelve `ConsentRequiredError` y el frontend muestra el modal, que llama a `api/consent/grant.ts` (primer endpoint real de esta historia) antes de reintentar la activación. Ver [RF-06-RF-07-categorias.md](RF-06-RF-07-categorias.md).
+**Disparador real conectado (15 sept. 2026, RF-06/RF-07)**: `ActivateCategory` llama a `CheckConsent` al activar una categoría sensible; si no hay consentimiento, devuelve `ConsentRequiredError` y el frontend muestra el modal, que llama a `api/consent/grant.ts` (primer endpoint real de esta historia) antes de reintentar la activación. Ver [RF-06-RF-07-categorias.md](RF-06-RF-07-categorias.md).
 
 ## Criterios de aceptación
 
@@ -33,7 +33,7 @@ Cubre el módulo `consentimiento` (dominio + aplicación): la entidad `Consentim
 
 ## Nota de diseño — por qué la versión de política forma parte de la clave
 
-Un consentimiento no es una casilla que se marca una vez para siempre: cubre una política concreta. Si el texto legal cambia de forma sustancial (nueva versión), el consentimiento previo no debería contar como válido para la nueva — de ahí que `versionPolitica` sea parte de la búsqueda en `ConsentimientoRepository.buscar`, no solo un campo informativo (RD-05).
+Un consentimiento no es una casilla que se marca una vez para siempre: cubre una política concreta. Si el texto legal cambia de forma sustancial (nueva versión), el consentimiento previo no debería contar como válido para la nueva — de ahí que `versionPolitica` sea parte de la búsqueda en `ConsentRepository.buscar`, no solo un campo informativo (RD-05).
 
 ## Historial de cambios
 

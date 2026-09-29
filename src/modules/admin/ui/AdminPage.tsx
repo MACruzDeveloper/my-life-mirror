@@ -8,7 +8,7 @@ import { AdminAudit } from "./AdminAudit";
 import { AdminCategories } from "./AdminCategories";
 import { AdminUsers } from "./AdminUsers";
 
-type Pestana = "usuarios" | "categorias" | "auditoria";
+type AdminTab = "usuarios" | "categorias" | "auditoria";
 
 /**
  * Panel de administración (ADM-01/02/03): usuarios, catálogo de categorías y
@@ -18,21 +18,21 @@ type Pestana = "usuarios" | "categorias" | "auditoria";
  */
 export function AdminPage() {
   const { t } = useTranslation();
-  const [pestana, setPestana] = useState<Pestana>("usuarios");
+  const [tab, setTab] = useState<AdminTab>("usuarios");
 
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", mt: 3, px: 2 }}>
       <Typography variant="h5" component="h1" gutterBottom>
         {t("admin.titulo")}
       </Typography>
-      <Tabs value={pestana} onChange={(_evento, valor: Pestana) => setPestana(valor)} variant="scrollable" sx={{ mb: 2 }}>
+      <Tabs value={tab} onChange={(_evento, value: AdminTab) => setTab(value)} variant="scrollable" sx={{ mb: 2 }}>
         <Tab label={t("admin.pestanaUsuarios")} value="usuarios" />
         <Tab label={t("admin.pestanaCategorias")} value="categorias" />
         <Tab label={t("admin.pestanaAuditoria")} value="auditoria" />
       </Tabs>
-      {pestana === "usuarios" && <AdminUsers />}
-      {pestana === "categorias" && <AdminCategories />}
-      {pestana === "auditoria" && <AdminAudit />}
+      {tab === "usuarios" && <AdminUsers />}
+      {tab === "categorias" && <AdminCategories />}
+      {tab === "auditoria" && <AdminAudit />}
     </Box>
   );
 }

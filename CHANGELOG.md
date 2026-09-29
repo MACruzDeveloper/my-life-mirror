@@ -5,6 +5,24 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado
+
+- Código en inglés en un pase completo: módulos `cuentas` → `accounts`, `consentimiento` → `consent`, `bienestar` → `wellbeing`, `notificaciones` → `notifications`; ~60 archivos renombrados (`IniciarSesion` → `LogIn`, `OtorgarConsentimiento` → `GrantConsent`, `RolUsuario` → `UserRole`…) y ~750 identificadores (`obtenerAppContext` → `getAppContext`…). Hecho con el servicio de lenguaje de TypeScript, que cambia cada referencia y rechaza un nombre que choque con otro ya visible. Sin cambios de comportamiento: 419 tests, E2E con base de datos local y `check:api` en verde.
+- Se quedan en español a propósito: columnas de la base de datos, claves de categoría, claves y variables de i18n, la cookie `sesion` y los campos JSON de la API (ver AGENTS.md).
+- Los campos del log estructurado pasan a inglés: `level`, `message`, `route`, `userId`.
+- E2E con `api/` en GitHub Actions solo en las PRs a `main` (entregas a producción) hasta final de octubre; a mano desde la pestaña *Actions* cuando se quiera.
+
+### Añadido (documentación)
+
+- `docs/README.md`: mapa de toda la documentación (una línea por documento), recorrido de 20 minutos y reglas para que no crezca sin control.
+- Aviso al principio de los 5 diagramas de análisis: son el modelo conceptual de septiembre, no el diseño actual, con la equivalencia de nombres.
+
+### Eliminado
+
+- `src/modules/recomendaciones/`: carpeta vacía, duplicada de `recommendations/`.
+- Esqueletos vacíos de módulo (`notifications/`, capas vacías de `panel/` y `wellbeing/`) y los `.gitkeep` de carpetas que ya tienen código.
+- Los apartados "Próximo paso" de 15 documentos (eran notas de la conversación de trabajo; lo pendiente vive en el tablero). Los dos con contenido propio pasan al tablero: la validación ética con el tutor (RF-29/RES-09) y la idea de `requestId` en los logs. El de ADR-02 era una regla de uso y pasa a llamarse "Mantenimiento".
+
 ## [1.0.1] - 2026-09-29
 
 ### Corregido

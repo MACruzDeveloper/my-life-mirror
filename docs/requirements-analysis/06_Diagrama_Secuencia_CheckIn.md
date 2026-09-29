@@ -1,5 +1,7 @@
 # Diagrama de Secuencia — Flujo de Check-in
 
+> **Análisis inicial (5-12 sept. 2026), no el diseño actual.** Es el modelo conceptual previo al código y se conserva como parte del proceso del TFM. Usa los nombres del análisis; en el código son: `Usuario` → `User` (módulo `accounts`), `Evaluacion` → `Assessment`, "check-in" → la entrevista (RF-10), `Recomendacion` → `Recommendation`, `Consentimiento` → `Consent`, `Categoria` → `Category`. `Conexion` y `Suscripcion` no están construidas (Ciclo 3 o posterior). El diseño real: [ADR-03](../architecture-decisions/03_Arquitectura_Software.md), las [historias de usuario](../user-stories/) y `src/modules/`.
+
 **Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.4, [05_Diagrama_Clases.md](05_Diagrama_Clases.md) v1.1
 **Fecha:** 7 de septiembre de 2026
 **Formato:** Mermaid (renderiza automáticamente en GitHub al ver el archivo .md — sin plugin ni configuración adicional).
@@ -53,14 +55,9 @@ sequenceDiagram
 Al hacer commit y push de este archivo, GitHub renderiza el bloque \`\`\`mermaid automáticamente en la vista del archivo — no hace falta ninguna extensión ni configuración.
 
 ---
-
-## 4. Próximo paso
-
-Siguiente diagrama: **casos de uso** (mejor candidato para draw.io, por la notación UML completa que necesita) o el **diagrama de estados de `Recomendación`** (pendiente_respuesta → hecha/descartada/pospuesta) — dime cuál prefieres.
-
----
-
 ## Historial de cambios
 
 - **v1.0 (7 sept. 2026)** — versión inicial: secuencia completa del check-in, desde apertura hasta actualización del panel, incluyendo consentimiento condicional y respuesta a recomendación.
 - **v1.1 (7 sept. 2026)** — se retira el paso de consentimiento de este flujo: RF-04 dispara al activar la categoría, no en cada check-in (ver hallazgo resuelto en [07_Diagrama_Casos_Uso.md](07_Diagrama_Casos_Uso.md) apartado 4). El flujo de consentimiento pasa a su propio diagrama, [08_Diagrama_Secuencia_Consentimiento.md](08_Diagrama_Secuencia_Consentimiento.md).
+- **v1.2 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v1.3 (29 sept. 2026)** — nota inicial: es el análisis de septiembre, no el diseño actual, con la equivalencia de nombres.

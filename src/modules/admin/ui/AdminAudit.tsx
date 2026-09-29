@@ -20,9 +20,9 @@ import { useAdminAudit, useAdminUsers } from "./adminQueries";
 export function AdminAudit() {
   const { t, i18n } = useTranslation();
   const auditoria = useAdminAudit();
-  const usuarios = useAdminUsers();
-  const emails = new Map((usuarios.data ?? []).map((u) => [u.id, u.email]));
-  const quien = (id?: string) => (id ? (emails.get(id) ?? id.slice(0, 8)) : "—");
+  const users = useAdminUsers();
+  const emails = new Map((users.data ?? []).map((u) => [u.id, u.email]));
+  const who = (id?: string) => (id ? (emails.get(id) ?? id.slice(0, 8)) : "—");
 
   if (auditoria.isPending) {
     return (
@@ -54,13 +54,13 @@ export function AdminAudit() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {auditoria.data.map((entrada) => (
-                <TableRow key={entrada.id}>
-                  <TableCell>{new Date(entrada.occurredAt).toLocaleString(i18n.language)}</TableCell>
-                  <TableCell>{quien(entrada.actorId)}</TableCell>
-                  <TableCell>{t(`admin.acciones_${entrada.action.replaceAll(".", "_")}`, { defaultValue: entrada.action })}</TableCell>
-                  <TableCell>{quien(entrada.targetId)}</TableCell>
-                  <TableCell>{entrada.detail ?? ""}</TableCell>
+              {auditoria.data.map((entry) => (
+                <TableRow key={entry.id}>
+                  <TableCell>{new Date(entry.occurredAt).toLocaleString(i18n.language)}</TableCell>
+                  <TableCell>{who(entry.actorId)}</TableCell>
+                  <TableCell>{t(`admin.acciones_${entry.action.replaceAll(".", "_")}`, { defaultValue: entry.action })}</TableCell>
+                  <TableCell>{who(entry.targetId)}</TableCell>
+                  <TableCell>{entry.detail ?? ""}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
