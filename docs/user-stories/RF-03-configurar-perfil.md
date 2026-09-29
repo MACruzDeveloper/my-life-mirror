@@ -9,7 +9,7 @@ Para que la app me trate como a mí y calcule cosas dependientes de mi edad/zona
 
 ## Alcance
 
-Aunque el diagrama de clases modela estos campos sobre la propia entidad `Usuario` (RD-01), viven en el módulo `cuentas` (misma sección de requisitos 2.1) pero en su propio sub-almacén (`ProfileRepository`, adaptador en memoria) — no en Supabase Auth, que solo custodia identidad y credenciales (ADR-06). `avatarId` (RF-26) queda fuera: es Should, Ciclo 1 no lo cubre todavía.
+Aunque el diagrama de clases modela estos campos sobre la propia entidad `Usuario` (RD-01), viven en el módulo `accounts` (misma sección de requisitos 2.1) pero en su propio sub-almacén (`ProfileRepository`, adaptador en memoria) — no en Supabase Auth, que solo custodia identidad y credenciales (ADR-06). `avatarId` (RF-26) queda fuera: es Should, Ciclo 1 no lo cubre todavía.
 
 **`name` se captura ya en el registro (RF-01)**, no aquí: sin él, el `Header` tendría que mostrar el email en bruto hasta que el usuario pasara por esta pantalla, y eso es peor experiencia que pedirlo una vez, al principio. El resto (`birthDate`, `gender`, `timeZone`) se rellena en esta pantalla, más tarde. Por eso el caso de uso `UpdateProfile` es un **upsert parcial**: cualquier subconjunto de campos es válido, y se fusiona sobre lo que ya hubiera — `RegisterUser` lo llama con solo `{ name }` al crear la cuenta; esta pantalla lo vuelve a llamar después con el resto.
 

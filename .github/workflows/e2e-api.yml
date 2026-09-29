@@ -1,11 +1,16 @@
-# Tests E2E con api/ contra un Supabase local, en cada PR (y a mano desde la pestaña Actions).
+# Tests E2E con api/ contra un Supabase local, en las PRs a `main` (y a mano desde la pestaña Actions).
 # Lo mismo que `npm run test:e2e:api` en local: la máquina de GitHub trae Docker, así que
 # levanta su propio Supabase vacío con supabase/migrations y nunca toca la base real.
 # Por eso no necesita ningún secreto. Ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md apartado 1.2.
 name: E2E con api
 
+# Durante el desarrollo (hasta final de octubre de 2026) solo en las PRs a `main`, es decir,
+# en cada entrega a producción: las PRs a `develop` quedan rápidas y nada llega a producción
+# sin pasar los E2E. Para volver a ejecutarlo en todas las PRs, quitar `branches`.
+# A mano, cuando se quiera: pestaña Actions → "E2E con api" → Run workflow.
 on:
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

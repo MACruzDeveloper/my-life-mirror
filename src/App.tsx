@@ -2,14 +2,14 @@ import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { Landing } from '@pages/Landing'
 import { PrivacyPolicyPage } from '@pages/PrivacyPolicyPage'
-import { RegisterForm } from '@modules/cuentas/ui/RegisterForm'
-import { LoginForm } from '@modules/cuentas/ui/LoginForm'
-import { SolicitarRecuperacionForm } from '@modules/cuentas/ui/SolicitarRecuperacionForm'
-import { RestablecerPasswordForm } from '@modules/cuentas/ui/RestablecerPasswordForm'
-import { DataPrivacyPage } from '@modules/cuentas/ui/DataPrivacyPage'
-import { ProfileForm } from '@modules/cuentas/ui/ProfileForm'
-import { AccountPage } from '@modules/cuentas/ui/AccountPage'
-import { ProtectedRoute } from '@modules/cuentas/ui/ProtectedRoute'
+import { RegisterForm } from '@modules/accounts/ui/RegisterForm'
+import { LoginForm } from '@modules/accounts/ui/LoginForm'
+import { RequestPasswordResetForm } from '@modules/accounts/ui/RequestPasswordResetForm'
+import { ResetPasswordForm } from '@modules/accounts/ui/ResetPasswordForm'
+import { DataPrivacyPage } from '@modules/accounts/ui/DataPrivacyPage'
+import { ProfileForm } from '@modules/accounts/ui/ProfileForm'
+import { AccountPage } from '@modules/accounts/ui/AccountPage'
+import { ProtectedRoute } from '@modules/accounts/ui/ProtectedRoute'
 import { Home } from '@modules/panel/ui/home/Home'
 import { InterviewPage } from '@modules/assessments/ui/InterviewPage'
 import { ResultsPage } from '@modules/assessments/ui/ResultsPage'
@@ -29,8 +29,8 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/registro" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/olvide-password" element={<SolicitarRecuperacionForm />} />
-          <Route path="/restablecer-password" element={<RestablecerPasswordForm />} />
+          <Route path="/olvide-password" element={<RequestPasswordResetForm />} />
+          <Route path="/restablecer-password" element={<ResetPasswordForm />} />
           <Route path="/politica-privacidad" element={<PrivacyPolicyPage />} />
         </Route>
         {/* Ruta de diseño: un único SessionProvider para todas las pantallas protegidas (no se remonta al navegar). */}
@@ -48,8 +48,8 @@ function App() {
             element={
               <ProtectedLayout
                 breadcrumbs={[
-                  { etiqueta: t('breadcrumbs.inicio'), ruta: '/inicio' },
-                  { etiqueta: t('breadcrumbs.miPerfil') },
+                  { label: t('breadcrumbs.inicio'), path: '/inicio' },
+                  { label: t('breadcrumbs.miPerfil') },
                 ]}
               >
                 <AccountPage />
@@ -67,8 +67,8 @@ function App() {
               <AdminRoute>
                 <ProtectedLayout
                   breadcrumbs={[
-                    { etiqueta: t('breadcrumbs.inicio'), ruta: '/inicio' },
-                    { etiqueta: t('breadcrumbs.administracion') },
+                    { label: t('breadcrumbs.inicio'), path: '/inicio' },
+                    { label: t('breadcrumbs.administracion') },
                   ]}
                 >
                   <AdminPage />

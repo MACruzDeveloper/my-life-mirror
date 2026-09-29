@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../src/shared/infrastructure/container.js";
-import { leerCookie } from "../../src/shared/infrastructure/cookies.js";
+import { getAppContext } from "../../src/shared/infrastructure/container.js";
+import { readCookie } from "../../src/shared/infrastructure/cookies.js";
 import { logger } from "../../src/shared/infrastructure/logger.js";
-import { VERSION_POLITICA_ACTUAL } from "../../src/modules/consentimiento/domain/PoliticaActual.js";
+import { CURRENT_POLICY_VERSION } from "../../src/modules/consent/domain/CurrentPolicy.js";
 
 const GrantConsentSchema = z.object({
   categoryId: z.string(),
@@ -23,39 +23,39 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
-    const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, otorgarConsentimiento } = obtenerAppContext();
-    const sesion = await verificarSesion(token);
+    const token = readCookie(req.headers.cookie, "sesion");
+    const { verifySession: verificarSesion, grantConsent: otorgarConsentimiento } = getAppContext();
+    const session = await verificarSesion(token);
 
-    if (!sesion.ok) {
+    if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));
       return;
     }
 
-    const datos = GrantConsentSchema.safeParse(req.body);
-    if (!datos.success) {
+    const data = GrantConsentSchema.safeParse(req.body);
+    if (!data.success) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Petición mal formada" }));
       return;
     }
 
-    const resultado = await otorgarConsentimiento({
-      usuarioId: sesion.value.id,
-      categoriaId: datos.data.categoryId,
-      versionPolitica: VERSION_POLITICA_ACTUAL,
+    const result = await otorgarConsentimiento({
+      userId: session.value.id,
+      categoryId: data.data.categoryId,
+      policyVersion: CURRENT_POLICY_VERSION,
     });
 
-    if (!resultado.ok) {
+    if (!result.ok) {
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: resultado.error.message }));
+      res.end(JSON.stringify({ error: result.error.message }));
       return;
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ ok: true }));
   } catch (error) {
-    logger.error("Error inesperado en /api/consent/grant", error, { ruta: "/api/consent/grant" });
+    logger.error("Error inesperado en /api/consent/grant", error, { route: "/api/consent/grant" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

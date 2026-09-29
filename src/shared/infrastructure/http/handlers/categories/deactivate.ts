@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../container.js";
-import { leerCookie } from "../../../cookies.js";
+import { getAppContext } from "../../../container.js";
+import { readCookie } from "../../../cookies.js";
 import { logger } from "../../../logger.js";
 
 const DeactivateCategorySchema = z.object({
@@ -17,35 +17,35 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
-    const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, deactivateCategory } = obtenerAppContext();
-    const sesion = await verificarSesion(token);
+    const token = readCookie(req.headers.cookie, "sesion");
+    const { verifySession: verificarSesion, deactivateCategory } = getAppContext();
+    const session = await verificarSesion(token);
 
-    if (!sesion.ok) {
+    if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));
       return;
     }
 
-    const datos = DeactivateCategorySchema.safeParse(req.body);
-    if (!datos.success) {
+    const data = DeactivateCategorySchema.safeParse(req.body);
+    if (!data.success) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Petición mal formada" }));
       return;
     }
 
-    const resultado = await deactivateCategory({ userId: sesion.value.id, categoryId: datos.data.categoryId });
-    if (!resultado.ok) {
-      const status = resultado.error.code === "NOT_FOUND" ? 404 : 400;
+    const result = await deactivateCategory({ userId: session.value.id, categoryId: data.data.categoryId });
+    if (!result.ok) {
+      const status = result.error.code === "NOT_FOUND" ? 404 : 400;
       res.writeHead(status, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: resultado.error.message }));
+      res.end(JSON.stringify({ error: result.error.message }));
       return;
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(resultado.value));
+    res.end(JSON.stringify(result.value));
   } catch (error) {
-    logger.error("Error inesperado en /api/categories/deactivate", error, { ruta: "/api/categories/deactivate" });
+    logger.error("Error inesperado en /api/categories/deactivate", error, { route: "/api/categories/deactivate" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

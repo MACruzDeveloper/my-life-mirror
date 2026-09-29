@@ -33,10 +33,10 @@ export function useAdminAudit() {
 
 /** POST de una acción de administración; devuelve el estado y el cuerpo para que la pantalla explique el error. */
 export async function postAdmin<T = unknown>(action: string, body: unknown): Promise<{ ok: boolean; status: number; data: T }> {
-  const respuesta = await fetch(`/api/admin/${action}`, {
+  const response = await fetch(`/api/admin/${action}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  return { ok: respuesta.ok, status: respuesta.status, data: (await respuesta.json()) as T };
+  return { ok: response.ok, status: response.status, data: (await response.json()) as T };
 }

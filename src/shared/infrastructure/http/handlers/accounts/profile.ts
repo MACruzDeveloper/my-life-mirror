@@ -1,11 +1,11 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 // Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
-import { obtenerAppContext } from "../../../container.js";
-import { leerCookie } from "../../../cookies.js";
+import { getAppContext } from "../../../container.js";
+import { readCookie } from "../../../cookies.js";
 import { logger } from "../../../logger.js";
 
-type PeticionConCuerpo = IncomingMessage & { body: unknown };
+type RequestWithBody = IncomingMessage & { body: unknown };
 
 const UpdateProfileSchema = z.object({
   name: z.string().optional(),
@@ -21,22 +21,22 @@ const UpdateProfileSchema = z.object({
  * de la cookie, nunca del cuerpo de la petición (evita que alguien edite el
  * perfil de otro usuario).
  */
-export default async function handler(req: PeticionConCuerpo, res: ServerResponse) {
+export default async function handler(req: RequestWithBody, res: ServerResponse) {
   try {
-    const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, updateProfile, getProfile } = obtenerAppContext();
-    const sesion = await verificarSesion(token);
+    const token = readCookie(req.headers.cookie, "sesion");
+    const { verifySession: verificarSesion, updateProfile, getProfile } = getAppContext();
+    const session = await verificarSesion(token);
 
-    if (!sesion.ok) {
+    if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));
       return;
     }
 
     if (req.method === "GET") {
-      const resultado = await getProfile(sesion.value.id);
+      const result = await getProfile(session.value.id);
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(resultado.ok ? (resultado.value ?? null) : null));
+      res.end(JSON.stringify(result.ok ? (result.value ?? null) : null));
       return;
     }
 
@@ -46,24 +46,24 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
       return;
     }
 
-    const datos = UpdateProfileSchema.safeParse(req.body);
-    if (!datos.success) {
+    const data = UpdateProfileSchema.safeParse(req.body);
+    if (!data.success) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Petición mal formada" }));
       return;
     }
 
-    const resultado = await updateProfile({ userId: sesion.value.id, ...datos.data });
-    if (!resultado.ok) {
+    const result = await updateProfile({ userId: session.value.id, ...data.data });
+    if (!result.ok) {
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: resultado.error.message }));
+      res.end(JSON.stringify({ error: result.error.message }));
       return;
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(resultado.value));
+    res.end(JSON.stringify(result.value));
   } catch (error) {
-    logger.error("Error inesperado en /api/accounts/profile", error, { ruta: "/api/accounts/profile" });
+    logger.error("Error inesperado en /api/accounts/profile", error, { route: "/api/accounts/profile" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

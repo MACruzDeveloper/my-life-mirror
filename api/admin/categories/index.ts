@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../src/shared/infrastructure/container.js";
-import { leerCookie } from "../../../src/shared/infrastructure/cookies.js";
+import { getAppContext } from "../../../src/shared/infrastructure/container.js";
+import { readCookie } from "../../../src/shared/infrastructure/cookies.js";
 import { logger } from "../../../src/shared/infrastructure/logger.js";
 
 // Un texto por idioma; el caso de uso comprueba que estén todos los soportados (RNF-10).
@@ -10,9 +10,9 @@ const AddSchema = z.object({
   isSensitiveData: z.boolean(),
 });
 
-function responder(res: ServerResponse, status: number, cuerpo: unknown) {
+function responder(res: ServerResponse, status: number, body: unknown) {
   res.writeHead(status, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(cuerpo));
+  res.end(JSON.stringify(body));
 }
 
 /**
@@ -27,39 +27,39 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
-    const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, listCatalog, addCatalogCategory } = obtenerAppContext();
-    const sesion = await verificarSesion(token);
-    if (!sesion.ok) {
+    const token = readCookie(req.headers.cookie, "sesion");
+    const { verifySession: verificarSesion, listCatalog, addCatalogCategory } = getAppContext();
+    const session = await verificarSesion(token);
+    if (!session.ok) {
       responder(res, 401, { error: "No autenticado" });
       return;
     }
 
     if (req.method === "GET") {
-      const resultado = await listCatalog(sesion.value);
-      if (!resultado.ok) {
-        responder(res, 403, { error: "Forbidden", code: resultado.error.code });
+      const result = await listCatalog(session.value);
+      if (!result.ok) {
+        responder(res, 403, { error: "Forbidden", code: result.error.code });
         return;
       }
-      responder(res, 200, resultado.value);
+      responder(res, 200, result.value);
       return;
     }
 
-    const datos = AddSchema.safeParse(req.body);
-    if (!datos.success) {
+    const data = AddSchema.safeParse(req.body);
+    if (!data.success) {
       responder(res, 400, { error: "Petición mal formada" });
       return;
     }
 
-    const resultado = await addCatalogCategory(sesion.value, datos.data as Parameters<typeof addCatalogCategory>[1]);
-    if (!resultado.ok) {
-      const status = resultado.error.code === "FORBIDDEN" ? 403 : resultado.error.code === "CONFLICT" ? 409 : 400;
-      responder(res, status, { error: resultado.error.message, code: resultado.error.code });
+    const result = await addCatalogCategory(session.value, data.data as Parameters<typeof addCatalogCategory>[1]);
+    if (!result.ok) {
+      const status = result.error.code === "FORBIDDEN" ? 403 : result.error.code === "CONFLICT" ? 409 : 400;
+      responder(res, status, { error: result.error.message, code: result.error.code });
       return;
     }
-    responder(res, 201, resultado.value);
+    responder(res, 201, result.value);
   } catch (error) {
-    logger.error("Error inesperado en /api/admin/categories", error, { ruta: "/api/admin/categories" });
+    logger.error("Error inesperado en /api/admin/categories", error, { route: "/api/admin/categories" });
     responder(res, 500, { error: "Error interno del servidor" });
   }
 }

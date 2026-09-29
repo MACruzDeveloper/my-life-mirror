@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
-import { VERSION_POLITICA_ACTUAL } from "@modules/consentimiento/domain/PoliticaActual";
+import { CURRENT_POLICY_VERSION } from "@modules/consent/domain/CurrentPolicy";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 
 /**
@@ -18,14 +18,14 @@ export function PrivacyPolicyPage() {
   return (
     <>
       <Breadcrumbs
-        items={[{ etiqueta: t("breadcrumbs.inicio"), ruta: "/" }, { etiqueta: t("breadcrumbs.politicaPrivacidad") }]}
+        items={[{ label: t("breadcrumbs.inicio"), path: "/" }, { label: t("breadcrumbs.politicaPrivacidad") }]}
       />
       <Box sx={{ maxWidth: { xs: "100%", sm: 640 }, mx: "auto", mt: 2, px: 2, pb: 6 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           {t("politicaPrivacidad.titulo")}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {t("politicaPrivacidad.version", { version: VERSION_POLITICA_ACTUAL })}
+          {t("politicaPrivacidad.version", { version: CURRENT_POLICY_VERSION })}
         </Typography>
 
         <Typography variant="h6" component="h2" gutterBottom sx={{ mt: 3 }}>

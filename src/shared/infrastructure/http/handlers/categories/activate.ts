@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../../container.js";
-import { leerCookie } from "../../../cookies.js";
+import { getAppContext } from "../../../container.js";
+import { readCookie } from "../../../cookies.js";
 import { logger } from "../../../logger.js";
-import { VERSION_POLITICA_ACTUAL } from "../../../../../modules/consentimiento/domain/PoliticaActual.js";
+import { CURRENT_POLICY_VERSION } from "../../../../../modules/consent/domain/CurrentPolicy.js";
 
 const ActivateCategorySchema = z.object({
   categoryId: z.string(),
@@ -24,40 +24,40 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
-    const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, activateCategory } = obtenerAppContext();
-    const sesion = await verificarSesion(token);
+    const token = readCookie(req.headers.cookie, "sesion");
+    const { verifySession: verificarSesion, activateCategory } = getAppContext();
+    const session = await verificarSesion(token);
 
-    if (!sesion.ok) {
+    if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));
       return;
     }
 
-    const datos = ActivateCategorySchema.safeParse(req.body);
-    if (!datos.success) {
+    const data = ActivateCategorySchema.safeParse(req.body);
+    if (!data.success) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Petición mal formada" }));
       return;
     }
 
-    const resultado = await activateCategory({
-      userId: sesion.value.id,
-      categoryId: datos.data.categoryId,
-      policyVersion: VERSION_POLITICA_ACTUAL,
+    const result = await activateCategory({
+      userId: session.value.id,
+      categoryId: data.data.categoryId,
+      policyVersion: CURRENT_POLICY_VERSION,
     });
 
-    if (!resultado.ok) {
-      const status = resultado.error.code === "NOT_FOUND" ? 404 : resultado.error.code === "CONSENT_REQUIRED" ? 409 : 400;
+    if (!result.ok) {
+      const status = result.error.code === "NOT_FOUND" ? 404 : result.error.code === "CONSENT_REQUIRED" ? 409 : 400;
       res.writeHead(status, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: resultado.error.message, code: resultado.error.code }));
+      res.end(JSON.stringify({ error: result.error.message, code: result.error.code }));
       return;
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(resultado.value));
+    res.end(JSON.stringify(result.value));
   } catch (error) {
-    logger.error("Error inesperado en /api/categories/activate", error, { ruta: "/api/categories/activate" });
+    logger.error("Error inesperado en /api/categories/activate", error, { route: "/api/categories/activate" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

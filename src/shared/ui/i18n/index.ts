@@ -11,12 +11,12 @@ import { initReactI18next } from "react-i18next";
 import es from "./locales/es.json";
 import en from "./locales/en.json";
 
-const CLAVE_IDIOMA_GUARDADO = "mylifemirror_idioma";
+const SAVED_LANGUAGE_KEY = "mylifemirror_idioma";
 
-function leerIdiomaGuardado(): string | null {
+function readSavedLanguage(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    return window.localStorage.getItem(CLAVE_IDIOMA_GUARDADO);
+    return window.localStorage.getItem(SAVED_LANGUAGE_KEY);
   } catch {
     return null;
   }
@@ -24,7 +24,7 @@ function leerIdiomaGuardado(): string | null {
 
 void i18n.use(initReactI18next).init({
   resources: { es: { translation: es }, en: { translation: en } },
-  lng: leerIdiomaGuardado() ?? "es",
+  lng: readSavedLanguage() ?? "es",
   fallbackLng: "es",
   interpolation: { escapeValue: false },
   // Sin esto, init() difiere la carga de recursos a un setTimeout: en tests
@@ -42,11 +42,11 @@ function syncDocumentLanguage(language: string) {
 }
 syncDocumentLanguage(i18n.language);
 
-i18n.on("languageChanged", (idioma) => {
-  syncDocumentLanguage(idioma);
+i18n.on("languageChanged", (language) => {
+  syncDocumentLanguage(language);
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(CLAVE_IDIOMA_GUARDADO, idioma);
+    window.localStorage.setItem(SAVED_LANGUAGE_KEY, language);
   } catch {
     // localStorage puede fallar (modo privado, cuota agotada) — no es crítico.
   }
