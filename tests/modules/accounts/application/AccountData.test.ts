@@ -26,8 +26,8 @@ async function setup() {
   const recommendationRepository = new InMemoryRecommendationRepository();
   const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository };
 
-  const ana = await authProvider.registrar("ana@ejemplo.com", "12345678");
-  const luis = await authProvider.registrar("luis@ejemplo.com", "abcdefgh");
+  const ana = await authProvider.register("ana@ejemplo.com", "12345678");
+  const luis = await authProvider.register("luis@ejemplo.com", "abcdefgh");
   const updateProfile = createUpdateProfile(profileRepository);
   await updateProfile({ userId: ana.id, name: "Ana", birthDate: "1996-05-20", timeZone: "Europe/Madrid" });
   await updateProfile({ userId: luis.id, name: "Luis" });
@@ -38,7 +38,7 @@ async function setup() {
   const categoriesLuis = (await listCategories(luis.id)).ok ? await categoryRepository.findByUserId(luis.id) : [];
   const financesAna = categoriesAna.find((c) => c.name === "Economía")!;
   const sexAna = categoriesAna.find((c) => c.name === "Sexo")!;
-  await categoryRepository.save({ ...financesAna, status: "active" });
+  await categoryRepository.save({ ...financesAna, status: "active", experienceTags: ["economia.presupuesto"] });
   await categoryRepository.save({ ...sexAna, status: "active" });
   await categoryRepository.save({ ...categoriesLuis[0], status: "active" });
   await recordAssessments({ userId: ana.id, entries: [{ categoryId: financesAna.id, score: 6, note: "mes justo" }, { categoryId: sexAna.id, score: 8 }] });
@@ -71,7 +71,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     expect(data.exportedAt).toBe("2026-09-20T10:00:00.000Z");
     expect(data.account).toEqual({ id: ana.id, email: "ana@ejemplo.com" });
     expect(data.profile).toEqual({ name: "Ana", birthDate: "1996-05-20", timeZone: "Europe/Madrid" });
-    expect(data.categories.find((c) => c.name === "Economía")).toMatchObject({ status: "active", isSensitiveData: false });
+    expect(data.categories.find((c) => c.name === "Economía")).toMatchObject({ status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"] });
     expect(data.assessments).toEqual(
       expect.arrayContaining([
         { category: "Economía", score: 6, note: "mes justo", recordedAt: "2026-09-20T10:00:00.000Z" },
@@ -95,7 +95,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
 
   it("sin perfil ni datos devuelve un documento válido con listas vacías", async () => {
     const { exportUserData, authProvider } = await setup();
-    const draft = await authProvider.registrar("nuevo@ejemplo.com", "12345678");
+    const draft = await authProvider.register("nuevo@ejemplo.com", "12345678");
 
     const result = await exportUserData({ id: draft.id, email: draft.email });
 

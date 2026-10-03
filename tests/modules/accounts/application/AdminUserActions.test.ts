@@ -24,9 +24,9 @@ async function setup() {
   const auditRepository = new InMemoryAdminAuditRepository();
   const updateProfile = createUpdateProfile(profileRepository);
 
-  const admin = { ...(await authProvider.registrar("admin@ejemplo.com", "adminpass1")), rol: "admin" as const };
+  const admin = { ...(await authProvider.register("admin@ejemplo.com", "adminpass1")), rol: "admin" as const };
   authProvider.assignRoleForTest("admin@ejemplo.com", "admin");
-  const ana = await authProvider.registrar("ana@ejemplo.com", "12345678");
+  const ana = await authProvider.register("ana@ejemplo.com", "12345678");
   await updateProfile({ userId: ana.id, name: "Ana" });
   await assessmentRepository.saveMany([{ id: "a1", userId: ana.id, categoryId: "c1", score: 5, recordedAt: new Date() }]);
 
@@ -52,19 +52,19 @@ async function recordedActions(auditRepository: InMemoryAdminAuditRepository) {
 describe("Gestión de usuarios por el admin (ADM-03)", () => {
   describe("control de acceso", () => {
     it("un usuario no admin recibe Forbidden en todas las operaciones y no cambia nada", async () => {
-      const { actions: acciones, ana, admin, authProvider } = await setup();
+      const { actions, ana, admin, authProvider } = await setup();
       const noAdmin = { ...ana, rol: "usuario" as const };
 
       const results = [
-        await acciones.changeRole({ actor: noAdmin, userId: admin.id, rol: "usuario", password: "12345678" }),
-        await acciones.suspendUser({ actor: noAdmin, userId: admin.id, password: "12345678" }),
-        await acciones.reactivateUser({ actor: noAdmin, userId: ana.id }),
-        await acciones.deleteUser({ actor: noAdmin, userId: admin.id, password: "12345678" }),
-        await acciones.updateEmail({ actor: noAdmin, userId: admin.id, email: "x@y.zz", password: "12345678" }),
-        await acciones.updateName({ actor: noAdmin, userId: admin.id, name: "X" }),
-        await acciones.createUser({ actor: noAdmin, email: "nuevo@ejemplo.com", name: "N" }),
-        await acciones.sendRecoveryLink({ actor: noAdmin, userId: admin.id }),
-        await acciones.listAudit(noAdmin),
+        await actions.changeRole({ actor: noAdmin, userId: admin.id, rol: "usuario", password: "12345678" }),
+        await actions.suspendUser({ actor: noAdmin, userId: admin.id, password: "12345678" }),
+        await actions.reactivateUser({ actor: noAdmin, userId: ana.id }),
+        await actions.deleteUser({ actor: noAdmin, userId: admin.id, password: "12345678" }),
+        await actions.updateEmail({ actor: noAdmin, userId: admin.id, email: "x@y.zz", password: "12345678" }),
+        await actions.updateName({ actor: noAdmin, userId: admin.id, name: "X" }),
+        await actions.createUser({ actor: noAdmin, email: "nuevo@ejemplo.com", name: "N" }),
+        await actions.sendRecoveryLink({ actor: noAdmin, userId: admin.id }),
+        await actions.listAudit(noAdmin),
       ];
 
       for (const r of results) {
@@ -78,9 +78,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
 
   describe("confirmación con la contraseña del admin", () => {
     it("una contraseña incorrecta se rechaza, no cambia nada y queda anotado el intento", async () => {
-      const { actions: acciones, admin, ana, authProvider, auditRepository } = await setup();
+      const { actions, admin, ana, authProvider, auditRepository } = await setup();
 
-      const r = await acciones.suspendUser({ actor: admin, userId: ana.id, password: "equivocada" });
+      const r = await actions.suspendUser({ actor: admin, userId: ana.id, password: "equivocada" });
 
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.error).toBeInstanceOf(AuthenticationError);
@@ -89,9 +89,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("una contraseña vacía es un error de validación", async () => {
-      const { actions: acciones, admin, ana } = await setup();
+      const { actions, admin, ana } = await setup();
 
-      const r = await acciones.deleteUser({ actor: admin, userId: ana.id, password: "" });
+      const r = await actions.deleteUser({ actor: admin, userId: ana.id, password: "" });
 
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.error).toBeInstanceOf(ValidationError);
@@ -100,9 +100,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
 
   describe("cambiar el rol", () => {
     it("cambia el rol y lo anota (sin contenido personal)", async () => {
-      const { actions: acciones, admin, ana, authProvider, auditRepository } = await setup();
+      const { actions, admin, ana, authProvider, auditRepository } = await setup();
 
-      const r = await acciones.changeRole({ actor: admin, userId: ana.id, rol: "premium", password: "adminpass1" });
+      const r = await actions.changeRole({ actor: admin, userId: ana.id, rol: "premium", password: "adminpass1" });
 
       expect(r.ok).toBe(true);
       expect((await authProvider.listAllUsers()).find((u) => u.id === ana.id)?.rol).toBe("premium");
@@ -111,18 +111,18 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("rechaza un rol que no existe", async () => {
-      const { actions: acciones, admin, ana } = await setup();
+      const { actions, admin, ana } = await setup();
 
-      const r = await acciones.changeRole({ actor: admin, userId: ana.id, rol: "superadmin" as never, password: "adminpass1" });
+      const r = await actions.changeRole({ actor: admin, userId: ana.id, rol: "superadmin" as never, password: "adminpass1" });
 
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.error).toBeInstanceOf(ValidationError);
     });
 
     it("un admin no puede cambiarse el rol a sí mismo (siempre debe quedar un administrador)", async () => {
-      const { actions: acciones, admin, authProvider } = await setup();
+      const { actions, admin, authProvider } = await setup();
 
-      const r = await acciones.changeRole({ actor: admin, userId: admin.id, rol: "usuario", password: "adminpass1" });
+      const r = await actions.changeRole({ actor: admin, userId: admin.id, rol: "usuario", password: "adminpass1" });
 
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.error).toBeInstanceOf(ConflictError);
@@ -130,19 +130,19 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("un usuario inexistente da NotFound", async () => {
-      const { actions: acciones, admin } = await setup();
+      const { actions, admin } = await setup();
 
-      const r = await acciones.changeRole({ actor: admin, userId: "no-existe", rol: "premium", password: "adminpass1" });
+      const r = await actions.changeRole({ actor: admin, userId: "no-existe", rol: "premium", password: "adminpass1" });
 
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.error).toBeInstanceOf(NotFoundError);
     });
 
     it("un admin puede degradar a otro admin (queda el suyo)", async () => {
-      const { actions: acciones, admin, ana, authProvider } = await setup();
+      const { actions, admin, ana, authProvider } = await setup();
       authProvider.assignRoleForTest("ana@ejemplo.com", "admin");
 
-      const r = await acciones.changeRole({ actor: admin, userId: ana.id, rol: "usuario", password: "adminpass1" });
+      const r = await actions.changeRole({ actor: admin, userId: ana.id, rol: "usuario", password: "adminpass1" });
 
       expect(r.ok).toBe(true);
     });
@@ -150,27 +150,27 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
 
   describe("suspender y reactivar", () => {
     it("suspender bloquea el inicio de sesión y la sesión abierta; reactivar lo devuelve todo", async () => {
-      const { actions: acciones, admin, ana, authProvider } = await setup();
+      const { actions, admin, ana, authProvider } = await setup();
       const session = await authProvider.logIn("ana@ejemplo.com", "12345678");
 
-      const suspended = await acciones.suspendUser({ actor: admin, userId: ana.id, password: "adminpass1" });
+      const suspended = await actions.suspendUser({ actor: admin, userId: ana.id, password: "adminpass1" });
 
       expect(suspended.ok).toBe(true);
       await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).rejects.toBeInstanceOf(AuthenticationError);
       await expect(authProvider.verifySession(session.token)).rejects.toBeInstanceOf(AuthenticationError);
 
-      const reactivated = await acciones.reactivateUser({ actor: admin, userId: ana.id });
+      const reactivated = await actions.reactivateUser({ actor: admin, userId: ana.id });
 
       expect(reactivated.ok).toBe(true);
       await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).resolves.toBeDefined();
     });
 
     it("no se puede suspender a un administrador ni a uno mismo", async () => {
-      const { actions: acciones, admin, ana, authProvider } = await setup();
+      const { actions, admin, ana, authProvider } = await setup();
       authProvider.assignRoleForTest("ana@ejemplo.com", "admin");
 
-      const toOtherAdmin = await acciones.suspendUser({ actor: admin, userId: ana.id, password: "adminpass1" });
-      const toSelf = await acciones.suspendUser({ actor: admin, userId: admin.id, password: "adminpass1" });
+      const toOtherAdmin = await actions.suspendUser({ actor: admin, userId: ana.id, password: "adminpass1" });
+      const toSelf = await actions.suspendUser({ actor: admin, userId: admin.id, password: "adminpass1" });
 
       for (const r of [toOtherAdmin, toSelf]) {
         expect(r.ok).toBe(false);
@@ -181,9 +181,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
 
   describe("eliminar a otro usuario", () => {
     it("borra sus datos y su cuenta, con la contraseña del admin, y anota solo el id", async () => {
-      const { actions: acciones, admin, ana, authProvider, profileRepository, assessmentRepository, auditRepository } = await setup();
+      const { actions, admin, ana, authProvider, profileRepository, assessmentRepository, auditRepository } = await setup();
 
-      const r = await acciones.deleteUser({ actor: admin, userId: ana.id, password: "adminpass1" });
+      const r = await actions.deleteUser({ actor: admin, userId: ana.id, password: "adminpass1" });
 
       expect(r.ok).toBe(true);
       expect(await profileRepository.findByUserId(ana.id)).toBeUndefined();
@@ -195,11 +195,11 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("no se puede eliminar a un administrador (hay que degradarlo antes) ni a uno mismo por esta vía", async () => {
-      const { actions: acciones, admin, ana, authProvider } = await setup();
+      const { actions, admin, ana, authProvider } = await setup();
       authProvider.assignRoleForTest("ana@ejemplo.com", "admin");
 
-      const toOtherAdmin = await acciones.deleteUser({ actor: admin, userId: ana.id, password: "adminpass1" });
-      const toSelf = await acciones.deleteUser({ actor: admin, userId: admin.id, password: "adminpass1" });
+      const toOtherAdmin = await actions.deleteUser({ actor: admin, userId: ana.id, password: "adminpass1" });
+      const toSelf = await actions.deleteUser({ actor: admin, userId: admin.id, password: "adminpass1" });
 
       for (const r of [toOtherAdmin, toSelf]) {
         expect(r.ok).toBe(false);
@@ -211,9 +211,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
 
   describe("crear un usuario", () => {
     it("crea la cuenta con rol usuario, su perfil y una contraseña temporal que solo se devuelve una vez", async () => {
-      const { actions: acciones, admin, authProvider, profileRepository } = await setup();
+      const { actions, admin, authProvider, profileRepository } = await setup();
 
-      const r = await acciones.createUser({ actor: admin, email: " Nuevo@Ejemplo.com ", name: "Nuria" });
+      const r = await actions.createUser({ actor: admin, email: " Nuevo@Ejemplo.com ", name: "Nuria" });
 
       expect(r.ok).toBe(true);
       if (!r.ok) return;
@@ -225,20 +225,20 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("cada contraseña temporal es distinta", async () => {
-      const { actions: acciones, admin } = await setup();
+      const { actions, admin } = await setup();
 
-      const a = await acciones.createUser({ actor: admin, email: "a1@ejemplo.com", name: "A" });
-      const b = await acciones.createUser({ actor: admin, email: "b1@ejemplo.com", name: "B" });
+      const a = await actions.createUser({ actor: admin, email: "a1@ejemplo.com", name: "A" });
+      const b = await actions.createUser({ actor: admin, email: "b1@ejemplo.com", name: "B" });
 
       expect(a.ok && b.ok && a.value.temporaryPassword !== b.value.temporaryPassword).toBe(true);
     });
 
     it("rechaza un email ya registrado y un email o nombre inválidos", async () => {
-      const { actions: acciones, admin } = await setup();
+      const { actions, admin } = await setup();
 
-      const duplicate = await acciones.createUser({ actor: admin, email: "ana@ejemplo.com", name: "Otra Ana" });
-      const badEmail = await acciones.createUser({ actor: admin, email: "no-es-email", name: "X" });
-      const noName = await acciones.createUser({ actor: admin, email: "z@ejemplo.com", name: "  " });
+      const duplicate = await actions.createUser({ actor: admin, email: "ana@ejemplo.com", name: "Otra Ana" });
+      const badEmail = await actions.createUser({ actor: admin, email: "no-es-email", name: "X" });
+      const noName = await actions.createUser({ actor: admin, email: "z@ejemplo.com", name: "  " });
 
       expect(!duplicate.ok && duplicate.error).toBeInstanceOf(ConflictError);
       expect(!badEmail.ok && badEmail.error).toBeInstanceOf(ValidationError);
@@ -246,9 +246,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("la anotación de auditoría no incluye la contraseña", async () => {
-      const { actions: acciones, admin, auditRepository } = await setup();
+      const { actions, admin, auditRepository } = await setup();
 
-      const r = await acciones.createUser({ actor: admin, email: "nuevo@ejemplo.com", name: "Nuria" });
+      const r = await actions.createUser({ actor: admin, email: "nuevo@ejemplo.com", name: "Nuria" });
 
       const text = JSON.stringify(await auditRepository.findRecent(10));
       expect(text).toContain("user.created");
@@ -258,9 +258,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
 
   describe("modificar email y nombre, y enviar el enlace de recuperación", () => {
     it("cambia el email (con contraseña) y lo anota sin guardar los emails", async () => {
-      const { actions: acciones, admin, ana, authProvider, auditRepository } = await setup();
+      const { actions, admin, ana, authProvider, auditRepository } = await setup();
 
-      const r = await acciones.updateEmail({ actor: admin, userId: ana.id, email: "ana.nueva@ejemplo.com", password: "adminpass1" });
+      const r = await actions.updateEmail({ actor: admin, userId: ana.id, email: "ana.nueva@ejemplo.com", password: "adminpass1" });
 
       expect(r.ok).toBe(true);
       await expect(authProvider.logIn("ana.nueva@ejemplo.com", "12345678")).resolves.toBeDefined();
@@ -270,20 +270,20 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("rechaza un email inválido o ya en uso", async () => {
-      const { actions: acciones, admin, ana } = await setup();
+      const { actions, admin, ana } = await setup();
 
-      const malo = await acciones.updateEmail({ actor: admin, userId: ana.id, email: "malo", password: "adminpass1" });
-      const inUse = await acciones.updateEmail({ actor: admin, userId: ana.id, email: "admin@ejemplo.com", password: "adminpass1" });
+      const malo = await actions.updateEmail({ actor: admin, userId: ana.id, email: "malo", password: "adminpass1" });
+      const inUse = await actions.updateEmail({ actor: admin, userId: ana.id, email: "admin@ejemplo.com", password: "adminpass1" });
 
       expect(!malo.ok && malo.error).toBeInstanceOf(ValidationError);
       expect(!inUse.ok && inUse.error).toBeInstanceOf(ConflictError);
     });
 
     it("cambia el nombre (sin contraseña) y rechaza uno vacío", async () => {
-      const { actions: acciones, admin, ana, profileRepository } = await setup();
+      const { actions, admin, ana, profileRepository } = await setup();
 
-      const ok = await acciones.updateName({ actor: admin, userId: ana.id, name: " Ana María " });
-      const empty = await acciones.updateName({ actor: admin, userId: ana.id, name: " " });
+      const ok = await actions.updateName({ actor: admin, userId: ana.id, name: " Ana María " });
+      const empty = await actions.updateName({ actor: admin, userId: ana.id, name: " " });
 
       expect(ok.ok).toBe(true);
       expect((await profileRepository.findByUserId(ana.id))?.name).toBe("Ana María");
@@ -291,9 +291,9 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
     });
 
     it("envía el enlace de recuperación y lo anota", async () => {
-      const { actions: acciones, admin, ana, authProvider, auditRepository } = await setup();
+      const { actions, admin, ana, authProvider, auditRepository } = await setup();
 
-      const r = await acciones.sendRecoveryLink({ actor: admin, userId: ana.id });
+      const r = await actions.sendRecoveryLink({ actor: admin, userId: ana.id });
 
       expect(r.ok).toBe(true);
       expect(authProvider.resetTokenForTest("ana@ejemplo.com")).toBeDefined();
@@ -303,11 +303,11 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
 
   describe("auditoría", () => {
     it("el admin lista las anotaciones, la más reciente primero", async () => {
-      const { actions: acciones, admin, ana } = await setup();
-      await acciones.reactivateUser({ actor: admin, userId: ana.id });
-      await acciones.sendRecoveryLink({ actor: admin, userId: ana.id });
+      const { actions, admin, ana } = await setup();
+      await actions.reactivateUser({ actor: admin, userId: ana.id });
+      await actions.sendRecoveryLink({ actor: admin, userId: ana.id });
 
-      const r = await acciones.listAudit(admin);
+      const r = await actions.listAudit(admin);
 
       expect(r.ok && r.value.map((e) => e.action)).toEqual(["user.recovery.sent", "user.reactivated"]);
     });

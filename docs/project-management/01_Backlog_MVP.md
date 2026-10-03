@@ -11,13 +11,12 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **UX-04** historial de cambios plegado (desde el 29 sept.) — [historia](../user-stories/UX-04-historial-plegable.md). PR 1 del plan del Ciclo 2.
+- [ ] **RF-41** experiencias por categoría (desde el 29 sept.; [historia](../user-stories/RF-41-experiencias-categoria.md)): en cada pregunta de la entrevista, opciones para marcar "¿Qué te ayuda en esta área?" (las únicas que puede usar la IA, si el usuario lo activa) y la nota pasa a "Tu experiencia (privada)", que nunca sale hacia la IA ni se comparte. PR 2.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
-- [ ] **RF-41** experiencias por categoría (nuevo, Should, Ciclo 2): en cada pregunta de la entrevista, opciones para marcar "¿Qué te ayuda en esta área?" (las únicas que puede usar la IA, si el usuario lo activa) y la nota pasa a "Tu experiencia (privada)", que nunca sale hacia la IA ni se comparte. PR 2.
 - [ ] **RF-40a** ideas personalizadas con IA, contra un *Fake*: activación voluntaria en Privacidad y datos, la IA reescribe una idea del catálogo (ampliado a ~5 por categoría, revisado por el autor) la primera vez que se abre, con filtro de palabras y segunda revisión, y caída al texto curado; sin categorías sensibles ni texto libre ([ADR-05](../architecture-decisions/05_Fundamentos_IA.md), apartado 4.3). PR 3.
 - [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
 - [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
@@ -42,6 +41,7 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
 ## Hecho
 
+- [x] **UX-04** historial de cambios plegado, con línea de tiempo por meses — [historia](../user-stories/UX-04-historial-plegable.md).
 - [x] **Primera entrega a producción** (29 sept.): v1.0.0 y v1.0.1 en https://my-life-mirror.vercel.app, con el *smoke* de producción tras cada despliegue.
 - [x] **Métricas DORA y Flow** (primera revisión, 29 sept.): 11 PRs, 1 fallo que llegó a `develop` (5 más parados antes de fusionar), *flow time* mediano de 0 días y dos reglas de flujo nuevas — [resultados](02_Metricas_DORA_y_Flujo.md) apartado 7.
 - [x] **E2E con `api/` en GitHub Actions** (`E2E con api`, en cada PR, sin secretos) y **`npm run dev:local`** para probar la app completa contra el Supabase local; README reescrito para quien quiera probarla.
@@ -128,3 +128,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.31 (29 sept. 2026)** — v1.0.0 en producción; fallo de rutas detectado a los ~10 minutos y corregido en la v1.0.1, con un control nuevo (*smoke* de producción).
 - **v2.32 (29 sept. 2026)** — limpieza: código en inglés (con excepciones anotadas), módulos vacíos o duplicados fuera, E2E solo en PRs a `main` hasta final de octubre.
 - **v2.33 (29 sept. 2026)** — plan del Ciclo 2 en "Listo": UX-04, RF-41, RF-40a, RF-40b, RF-30, y la demo al final. Primera entrega a producción, hecha.
+- **v2.34 (29 sept. 2026)** — UX-04 hecha; RF-41 en curso.

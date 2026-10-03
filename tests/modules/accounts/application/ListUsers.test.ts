@@ -6,10 +6,10 @@ import { ForbiddenError } from "@shared/domain/DomainError";
 
 async function scenario() {
   const auth = new InMemoryAuthProvider();
-  const admin = await auth.registrar("admin@ejemplo.com", "12345678");
+  const admin = await auth.register("admin@ejemplo.com", "12345678");
   auth.assignRoleForTest("admin@ejemplo.com", "admin");
-  const user = await auth.registrar("ana@ejemplo.com", "12345678");
-  await auth.registrar("luis@ejemplo.com", "12345678");
+  const user = await auth.register("ana@ejemplo.com", "12345678");
+  await auth.register("luis@ejemplo.com", "12345678");
   const profiles = new InMemoryProfileRepository();
   await profiles.save({ userId: user.id, name: "Ana" });
   return { listUsers: createListUsers(auth, profiles), admin: { ...admin, rol: "admin" as const }, usuario: user };

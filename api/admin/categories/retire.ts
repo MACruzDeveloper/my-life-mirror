@@ -20,8 +20,8 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
     }
 
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession: verificarSesion, retireCatalogCategory } = getAppContext();
-    const session = await verificarSesion(token);
+    const { verifySession, retireCatalogCategory } = getAppContext();
+    const session = await verifySession(token);
     if (!session.ok) {
       responder(res, 401, { error: "No autenticado" });
       return;

@@ -7,7 +7,7 @@ import { InMemoryAuthProvider } from "@modules/accounts/infrastructure/InMemoryA
 describe("IniciarSesion (RF-01)", () => {
   it("inicia sesión con credenciales correctas y devuelve un token", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await authProvider.registrar("ana@ejemplo.com", "12345678");
+    await authProvider.register("ana@ejemplo.com", "12345678");
     const logIn = createLogIn(authProvider);
 
     const result = await logIn({ email: "ana@ejemplo.com", password: "12345678" });
@@ -21,7 +21,7 @@ describe("IniciarSesion (RF-01)", () => {
 
   it("rechaza credenciales incorrectas", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await authProvider.registrar("ana@ejemplo.com", "12345678");
+    await authProvider.register("ana@ejemplo.com", "12345678");
     const logIn = createLogIn(authProvider);
 
     const result = await logIn({ email: "ana@ejemplo.com", password: "incorrecta" });

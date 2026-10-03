@@ -40,7 +40,7 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
       return;
     }
 
-    const { registerUser, logIn: iniciarSesion } = getAppContext();
+    const { registerUser, logIn } = getAppContext();
     const result = await registerUser(data.data);
 
     if (!result.ok) {
@@ -54,7 +54,7 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
     // pedírselos otra vez en /login es fricción sin ganancia de seguridad. Si
     // este paso fallara, la cuenta ya existe: se responde 201 sin cookie y el
     // frontend le ofrece iniciar sesión a mano.
-    const session = await iniciarSesion({ email: data.data.email, password: data.data.password });
+    const session = await logIn({ email: data.data.email, password: data.data.password });
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (session.ok) headers["Set-Cookie"] = sessionCookie(session.value.token);
 

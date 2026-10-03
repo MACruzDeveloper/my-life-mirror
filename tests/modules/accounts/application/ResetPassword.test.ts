@@ -5,7 +5,7 @@ import { InMemoryAuthProvider } from "@modules/accounts/infrastructure/InMemoryA
 describe("RestablecerPassword (RF-38)", () => {
   it("cambia la contraseña con un token válido", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await authProvider.registrar("ana@ejemplo.com", "12345678");
+    await authProvider.register("ana@ejemplo.com", "12345678");
     await authProvider.requestPasswordReset("ana@ejemplo.com");
     const token = authProvider.resetTokenForTest("ana@ejemplo.com")!;
     const resetPassword = createResetPassword(authProvider);

@@ -4,7 +4,7 @@ import type { AuthProvider, AuthenticatedUser } from "../domain/AuthProvider.js"
 
 /** Caso de uso — comprueba la cookie de sesión (ADR-06, RF-39 nota "spec viva"). */
 export function createVerifySession(authProvider: AuthProvider) {
-  return async function verificarSesion(
+  return async function verifySession(
     token: string | undefined,
   ): Promise<Result<AuthenticatedUser, ValidationError | AuthenticationError>> {
     if (!token) {

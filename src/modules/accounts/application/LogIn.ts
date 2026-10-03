@@ -15,7 +15,7 @@ export interface LogInInput {
  * correctas (ADR-06).
  */
 export function createLogIn(authProvider: AuthProvider) {
-  return async function iniciarSesion(
+  return async function logIn(
     input: LogInInput,
   ): Promise<Result<LoggedInSession, ValidationError | AuthenticationError>> {
     const email = Email.create(input.email);

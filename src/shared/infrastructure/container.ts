@@ -48,6 +48,7 @@ import { createRetireCatalogCategory } from "../../modules/categories/applicatio
 import { createListCategories } from "../../modules/categories/application/ListCategories.js";
 import { createActivateCategory } from "../../modules/categories/application/ActivateCategory.js";
 import { createDeactivateCategory } from "../../modules/categories/application/DeactivateCategory.js";
+import { createSetCategoryExperience } from "../../modules/categories/application/SetCategoryExperience.js";
 import type { AssessmentRepository } from "../../modules/assessments/domain/AssessmentRepository.js";
 import { InMemoryAssessmentRepository } from "../../modules/assessments/infrastructure/InMemoryAssessmentRepository.js";
 import { SupabaseAssessmentRepository } from "../../modules/assessments/infrastructure/SupabaseAssessmentRepository.js";
@@ -209,6 +210,7 @@ export interface AppContext {
   listCategories: ReturnType<typeof createListCategories>;
   activateCategory: ReturnType<typeof createActivateCategory>;
   deactivateCategory: ReturnType<typeof createDeactivateCategory>;
+  setCategoryExperience: ReturnType<typeof createSetCategoryExperience>;
   assessmentRepository: AssessmentRepository;
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
@@ -239,7 +241,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   });
 
   return {
-    environment: environment,
+    environment,
     clock,
     authProvider,
     // registerUser depende de updateProfile (guarda el nombre como perfil
@@ -252,7 +254,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
       authProvider,
       profileRepository,
       categoryRepository,
-      consentRepository: consentRepository,
+      consentRepository,
       assessmentRepository,
       recommendationRepository,
       auditRepository: createAdminAuditRepository(environment),
@@ -260,13 +262,13 @@ export function createAppContext(environment: Environment = detectEnvironment())
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
-    consentRepository: consentRepository,
+    consentRepository,
     grantConsent: createGrantConsent(consentRepository, clock),
-    checkConsent: checkConsent,
+    checkConsent,
     profileRepository,
     updateProfile,
     getProfile: createGetProfile(profileRepository),
@@ -277,16 +279,17 @@ export function createAppContext(environment: Environment = detectEnvironment())
     addCatalogCategory: createAddCatalogCategory(categoryCatalogRepository),
     retireCatalogCategory: createRetireCatalogCategory(categoryCatalogRepository, categoryRepository, () => clock.now()),
     listCategories: createListCategories(categoryRepository, categoryCatalogRepository),
-    // activateCategory depende de verificarConsentimiento (RF-04 extiende a RF-07 para categorías sensibles).
+    // activateCategory depende de checkConsent (RF-04 extiende a RF-07 para categorías sensibles).
     activateCategory: createActivateCategory(categoryRepository, checkConsent, categoryCatalogRepository),
     deactivateCategory: createDeactivateCategory(categoryRepository),
+    setCategoryExperience: createSetCategoryExperience(categoryRepository, categoryCatalogRepository),
     assessmentRepository,
     // Las recomendaciones son secundarias: un fallo se registra pero nunca deshace el guardado de la entrevista.
     recordAssessments: createRecordAssessments(assessmentRepository, categoryRepository, clock, async (userId, saved) => {
       try {
         await generateRecommendations(userId, saved);
       } catch (error) {
-        logger.error("No se pudieron generar las recomendaciones (el guardado sigue siendo válido)", error, { userId: userId });
+        logger.error("No se pudieron generar las recomendaciones (el guardado sigue siendo válido)", error, { userId });
       }
     }),
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
