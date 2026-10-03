@@ -1,9 +1,9 @@
 import { type Result, err, ok } from "../../../shared/domain/Result.js";
 import { ValidationError } from "../../../shared/domain/DomainError.js";
-import type { Gender, Profile } from "../domain/Profile.js";
+import { GENDERS, type Gender, type Profile } from "../domain/Profile.js";
 import type { ProfileRepository } from "../domain/ProfileRepository.js";
 
-const VALID_GENDERS: readonly Gender[] = ["woman", "man", "non-binary", "prefer-not-to-say"];
+
 const MIN_AGE = 0;
 const MAX_AGE = 120;
 
@@ -64,7 +64,7 @@ export function createUpdateProfile(repository: ProfileRepository) {
       return err(new ValidationError(`Birth date must be a valid date, not in the future, for an age between ${MIN_AGE} and ${MAX_AGE}`));
     }
 
-    if (input.gender !== undefined && !VALID_GENDERS.includes(input.gender)) {
+    if (input.gender !== undefined && !(GENDERS as readonly string[]).includes(input.gender)) {
       return err(new ValidationError("Gender is not valid"));
     }
 
@@ -77,7 +77,9 @@ export function createUpdateProfile(repository: ProfileRepository) {
       return err(new ValidationError("A name is required to create a profile"));
     }
 
+    // Se parte del perfil existente: lo que este caso de uso no toca (p. ej. la elección de RF-40) se conserva.
     const profile: Profile = {
+      ...existing,
       userId,
       name: name ?? existing!.name,
       ...(input.birthDate !== undefined ? { birthDate: input.birthDate } : existing?.birthDate !== undefined ? { birthDate: existing.birthDate } : {}),

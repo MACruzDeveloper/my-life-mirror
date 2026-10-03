@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
+import { useAiIdeasActive } from "@modules/accounts/ui/queries";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
 import { ScoreCards } from "./ScoreCards";
 import { useLatestScores } from "./queries";
@@ -21,6 +22,7 @@ export function ResultsPage() {
   const { data: latestScores, isPending, isError } = useLatestScores();
   // Secundarias: si fallan o tardan, los resultados se ven igual.
   const recommendations = useRecommendations().data ?? [];
+  const personalize = useAiIdeasActive();
   const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
 
   if (isPending || labelsPending) {
@@ -52,7 +54,9 @@ export function ResultsPage() {
           latestScores={latestScores}
           renderCardExtra={(categoryId) => {
             const recommendation = recommendations.find((candidate) => candidate.categoryId === categoryId);
-            return recommendation ? <RecommendationButton templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} /> : null;
+            return recommendation ? (
+              <RecommendationButton recommendationId={recommendation.id} personalize={personalize} templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} />
+            ) : null;
           }}
         />
       )}

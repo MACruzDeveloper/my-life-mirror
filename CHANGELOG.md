@@ -5,6 +5,31 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (código)
+
+- Los términos del filtro de ideas con IA pasan a `ideaSafetyTerms.json` (por idioma y tipo, con `*` para "y lo que siga"), fuera del código y solo en el servidor.
+- Listas de valores en un solo sitio (`as const` con el tipo derivado): roles (estaban copiados en 4 sitios), género (en 3), estados de categoría y de recomendación, tendencias, bandas, periodos, entornos. Las validaciones de la API (`z.enum`) y la interfaz las importan.
+
+### Cambiado (infraestructura)
+
+- *Keep-alive* de Supabase cada 5 días en lugar de a diario (la pausa llega a los 7; el hueco más largo entre ejecuciones es de 5 días).
+- El Supabase local vuelve a arrancar solo al abrir Docker Desktop: `scripts/local-supabase.mjs` marca sus contenedores "reiniciar salvo que se paren" (sin docker-compose). `npx supabase stop` lo apaga.
+
+### Añadido (RF-40a, ideas personalizadas con IA contra un *Fake*)
+
+- Interruptor "Ideas personalizadas con IA" en *Privacidad y datos* (desactivado por defecto, solo si el despliegue tiene proveedor), con qué se envía y qué nunca. Desactivarlo borra las ideas personalizadas.
+- Al abrir una idea, si está activado: la IA elige una de las ideas curadas de esa categoría y la reescribe con lo que le ayuda al usuario (RF-41) y su tendencia; se ve con la etiqueta "Personalizada con IA" y la original a un clic, siempre con el aviso de RES-05. Se guarda y no se vuelve a pedir.
+- Caída segura al texto curado en cualquier duda: sin activar, sin proveedor, categoría sensible, error, tiempo agotado, filtro (`checkIdeaSafety`, con un conjunto de evaluación de 22 casos) o revisión.
+- Catálogo de ideas de 2 a 5 por categoría (es/en), redactadas con ayuda de IA y **pendientes de revisión del autor**.
+- Migración `0011_personalized_ideas.sql`; `api/recommendations/[action].ts` con `personalize` (11/12 funciones) y la acción `/api/accounts/ai-ideas`; la sesión dice si la función está disponible. Variable `AI_IDEAS_PROVIDER` (`fake` en local y E2E; sin valor en producción hasta RF-40b).
+- Política de privacidad: apartado de ideas con IA. Exportación y borrado de datos (RF-05) incluyen la elección y las ideas.
+
+### Corregido
+
+- Escribir en "Tu experiencia (privada)" iba lento (~1 s por palabra en un móvil medio): cada tecla volvía a pintar la entrevista entera. El campo guarda su texto en su propio componente (`ExperienceNote`) y la entrevista solo se entera de si tiene texto o no: de 169 ms a 24 ms por tecla con la CPU 6 veces más lenta.
+- `UpdateProfile` reconstruía el perfil campo a campo: guardar el nombre habría desactivado sin avisar la elección de RF-40. Ahora parte del perfil existente.
+- El test "todas las plantillas tienen texto en es/en" pasaba nombres de categoría en vez de claves y solo comprobaba las generales; ahora comprueba las 45 de categoría y las 3 generales.
+
 ### Añadido (RF-41, experiencias por categoría)
 
 - "¿Qué te ayuda en esta área?" en cada pregunta de la entrevista: 5-7 opciones propias de cada categoría estándar, que se guardan al momento (optimista, se deshace si el servidor falla). Son lo único que podrá usar la IA de RF-40, y solo si el usuario lo activa.

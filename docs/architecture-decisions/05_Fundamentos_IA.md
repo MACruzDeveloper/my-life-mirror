@@ -49,6 +49,17 @@ Esta sección matiza la decisión de apartado 3 de que el motor de recomendacion
 6. **Evaluación:** un conjunto de ~20 casos (incluidos casos límite) con lo que se espera de cada uno, reutilizable como evidencia en la memoria del TFM.
 7. **Coste:** con un modelo pequeño (Haiku), del orden de una décima de céntimo por idea; se genera una vez y se guarda con la recomendación (entra en la exportación de RF-05), no en cada visita.
 
+#### 4.3.1 Lo construido en RF-40a (2 oct. 2026)
+
+El diseño de arriba, concretado en la [historia RF-40](../user-stories/RF-40-ideas-personalizadas-ia.md) (Nivel 3: sus contratos mandan sobre el código):
+
+- **Qué recibe la IA:** clave de la categoría, última puntuación, tendencia (sube, baja, igual o primera vez), los textos de las opciones de "¿Qué te ayuda?" (RF-41, lista cerrada) y las **cinco** ideas curadas de esa categoría (el catálogo pasó de 2 a 5 por categoría para que haya entre qué elegir; redactadas con ayuda de IA y revisadas por el autor). Nunca: nombre, email, ids, la experiencia privada ni nada de categorías sensibles.
+- **Cuándo:** la primera vez que el usuario abre la idea; se guarda por recomendación e idioma (`personalized_ideas`, migración 0011) y las siguientes veces se lee lo guardado. Así solo se paga por lo que se lee y se sabe el idioma.
+- **Filtro determinista** (`checkIdeaSafety`; los términos, en `recommendations/domain/ideaSafetyTerms.json`, por idioma y tipo, editables sin tocar la lógica y solo en el servidor: no van en las traducciones porque esas viajan completas al navegador): la idea elegida tiene que estar entre las candidatas, entre 40 y 400 caracteres, y sin ningún término bloqueado en español o inglés (diagnósticos y lenguaje clínico, medicación, productos financieros, obligación, juicio, enlaces, correos y teléfonos). Su conjunto de evaluación (22 casos) es un test y se reutilizará con el modelo real. Filtra **lo que escribe la IA, no lo que escribe la persona** (RES-09).
+- **Caída segura:** sin proveedor, sin activar, recomendación cerrada, categoría sensible o sin clave, error, más de 8 s, filtro o revisión fallidos → la interfaz pinta la plantilla curada de siempre. Nunca un error para el usuario.
+- **Proveedor:** `AI_IDEAS_PROVIDER=fake` (escritor determinista) en desarrollo local y E2E; **sin valor en producción**, donde la opción ni se ofrece hasta RF-40b. Cada idea guarda qué la escribió (`model`).
+- **Consentimiento:** interruptor en *Privacidad y datos* (desactivado por defecto), con qué se envía y qué no; se guarda la fecha de activación y desactivarlo borra las ideas personalizadas. La política de privacidad tiene su apartado. Exportación y borrado (RF-05) las incluyen.
+
 ## 5. Resumen de lo añadido a los requisitos
 
 | RF | Qué añade | Prioridad | Plataforma |
@@ -77,3 +88,5 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 - **v1.1 (10 sept. 2026)** — se añade apartado 7: agentes autónomos y MCP considerados y descartados explícitamente, con la razón principal ligada a RES-09 (no autonomía sin persona en el bucle) más que al coste.
 - **v1.2 (27 sept. 2026)** — nueva apartado 4.3 (RF-40): la IA reescribe ideas del catálogo con verificación automática y caída al texto curado, sin moderación humana. Matiza apartado 3 ("motor no generativo"): el control editorial se mantiene, pero automatizado.
 - **v1.3 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v1.3 (2 oct. 2026)** — apartado 4.3.1: RF-40a construido contra un *Fake* (qué recibe la IA, cuándo, filtro y su conjunto de evaluación, caída segura, proveedor por variable de entorno, consentimiento).
+- **v1.4 (3 oct. 2026)** — los términos del filtro pasan a un archivo de datos propio (`ideaSafetyTerms.json`).

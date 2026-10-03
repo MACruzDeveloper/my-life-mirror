@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
@@ -17,7 +17,6 @@ import IconButton from "@mui/material/IconButton";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
 import ToggleButton from "@mui/material/ToggleButton";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
@@ -29,6 +28,7 @@ import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
 import { experienceOptionsFor } from "@modules/categories/domain/experienceOptions";
 import { InterviewHistory } from "./InterviewHistory";
+import { ExperienceNote } from "./ExperienceNote";
 import { ASSESSMENTS_KEY, LATEST_SCORES_KEY, useLatestScores } from "./queries";
 import type { LatestScoreDto } from "./ScoreCards";
 import { scoreBand, type ScoreBand } from "./scoreBand";
@@ -132,8 +132,12 @@ export function InterviewPage() {
   const categories = categoriesQuery.data ?? [];
   // Solo lo que el usuario ha cambiado en esta pantalla; el resto sale de la última puntuación guardada.
   const [draftScores, setDraftScores] = useState<Record<string, number>>({});
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
+  // Texto de "Tu experiencia" por categoría: en una ref para que escribir no vuelva a pintar la
+  // entrevista (ver ExperienceNote); en estado solo qué categorías tienen texto.
+  const notesRef = useRef<Record<string, string>>({});
+  const [notedCategoryIds, setNotedCategoryIds] = useState<ReadonlySet<string>>(new Set());
+  // Al guardar, los campos de experiencia vuelven a empezar vacíos y cerrados.
+  const [notesVersion, setNotesVersion] = useState(0);
   const [openHelps, setOpenHelps] = useState<Record<string, boolean>>({});
   const [openExamples, setOpenExamples] = useState<Record<string, boolean>>({});
   const [categoryAwaitingConsent, setCategoryAwaitingConsent] = useState<CategoryDto | null>(null);
@@ -153,7 +157,20 @@ export function InterviewPage() {
   const allRegularActive = regularCategories.length > 0 && regularCategories.every((category) => category.status === "active");
   const anyActive = activeCategories.length > 0;
   const anyRegularActive = regularCategories.some((category) => category.status === "active");
-  const changedCategories = activeCategories.filter((category) => scores[category.id] !== undefined && (scores[category.id] !== savedScores[category.id] || notes[category.id]?.trim()));
+  const changedCategories = activeCategories.filter((category) => scores[category.id] !== undefined && (scores[category.id] !== savedScores[category.id] || notedCategoryIds.has(category.id)));
+
+  const handleNoteChange = useCallback((categoryId: string, text: string) => {
+    notesRef.current[categoryId] = text;
+    const hasText = text.trim().length > 0;
+    // Mismo conjunto si no cambia de vacío a con texto (o al revés): React no vuelve a pintar.
+    setNotedCategoryIds((current) => {
+      if (current.has(categoryId) === hasText) return current;
+      const next = new Set(current);
+      if (hasText) next.add(categoryId);
+      else next.delete(categoryId);
+      return next;
+    });
+  }, []);
 
   function setCategoryStatus(id: string, status: "active" | "inactive") {
     queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, status } : category)));
@@ -244,7 +261,7 @@ export function InterviewPage() {
     setCategoryStatus(category.id, "inactive");
     // Lo que estaba a medias de esa categoría se descarta; las evaluaciones ya guardadas se conservan.
     setDraftScores((current) => omitKey(current, category.id));
-    setNotes((current) => omitKey(current, category.id));
+    handleNoteChange(category.id, "");
 
     try {
       const response = await fetch("/api/categories/deactivate", categoryRequest(category.id));
@@ -312,7 +329,7 @@ export function InterviewPage() {
           entries: changedCategories.map((category) => ({
             categoryId: category.id,
             score: scores[category.id],
-            ...(notes[category.id]?.trim() ? { note: notes[category.id].trim() } : {}),
+            ...(notesRef.current[category.id]?.trim() ? { note: notesRef.current[category.id].trim() } : {}),
           })),
         }),
       });
@@ -328,8 +345,9 @@ export function InterviewPage() {
         current?.map((latestScore) => (draftScores[latestScore.categoryId] !== undefined && changedCategories.some((category) => category.id === latestScore.categoryId) ? { ...latestScore, score: draftScores[latestScore.categoryId] } : latestScore)),
       );
       setDraftScores({});
-      setNotes({});
-      setOpenNotes({});
+      notesRef.current = {};
+      setNotedCategoryIds(new Set());
+      setNotesVersion((version) => version + 1);
       void queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
       setSaveState({ kind: "saved" });
     } catch {
@@ -579,22 +597,7 @@ export function InterviewPage() {
                 </Collapse>
               </Box>
             )}
-            {openNotes[category.id] ? (
-              <TextField
-                label={t("entrevista.nota")}
-                value={notes[category.id] ?? ""}
-                onChange={(event) => setNotes((current) => ({ ...current, [category.id]: event.target.value }))}
-                helperText={t("entrevista.notaPrivada")}
-                slotProps={{ htmlInput: { maxLength: 500 } }}
-                size="small"
-                fullWidth
-                sx={{ mt: 1.5 }}
-              />
-            ) : (
-              <Button size="small" onClick={() => setOpenNotes((current) => ({ ...current, [category.id]: true }))} sx={{ mt: 0.5 }}>
-                {t("entrevista.anadirNota")}
-              </Button>
-            )}
+            <ExperienceNote key={`${category.id}-${notesVersion}`} categoryId={category.id} onChange={handleNoteChange} />
           </Bubble>
         </Box>
       ))}

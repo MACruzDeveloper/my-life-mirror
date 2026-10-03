@@ -50,7 +50,7 @@ Lo que se descarta deliberadamente del espiral formal, y por qué: el análisis 
 - **Cierre de ciclo:** demo.
 
 ### Ciclo 2 — Should restante
-- **Alcance:** RF-02, RF-08, RF-09, RF-11, RF-12, RF-13, RF-22 (resto de cuenta/check-in/notificaciones) · RF-15, RF-16, RF-31 (visualización y resumen mensual) · RF-26 (avatares) · RF-29 (apoyo profesional) · RF-27, RF-28 (localización, contenido ilustrativo per RES-10) · RF-40 (recomendaciones personalizadas con IA, ancladas al catálogo) · RF-41 (experiencias por categoría).
+- **Alcance:** RF-02, RF-08, RF-09, RF-11, RF-12, RF-13, RF-22 (resto de cuenta/check-in/notificaciones) · RF-15, RF-16, RF-31 (visualización y resumen mensual) · RF-26 (avatares) · RF-29 (apoyo profesional) · RF-27, RF-28 (localización, contenido ilustrativo per RES-10) · RF-40 (recomendaciones personalizadas con IA, ancladas al catálogo) · RF-41 (experiencias por categoría) · RF-42 (situaciones que lo ponen difícil) · RF-43 (lo que funciona a otros, anónimo).
 - **Riesgo principal:** RES-10 (contenido ficticio) — asegurar que quede explícito en la UI que ciertos datos son ilustrativos, para no inducir a error incluso en una demo académica.
 - **V&V aplicado:** piloto corto con datos reales (RN-01/02/03), checklist manual sobre el resto de Should.
 
@@ -71,3 +71,4 @@ RN-09 (comparativa social), app nativa (RES-06), contenido real (no ficticio) de
 - **v1.3 (27 sept. 2026)** — RF-40 entra en el Ciclo 2; la exclusión de "personalización avanzada basada en IA" se acota a lo que va más allá de RF-40.
 - **v1.4 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
 - **v1.4 (29 sept. 2026)** — RF-41 en el alcance del Ciclo 2.
+- **v1.5 (3 oct. 2026)** — RF-42 y RF-43 en el alcance del Ciclo 2.
