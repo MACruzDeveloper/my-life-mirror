@@ -5,6 +5,16 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-41, experiencias por categoría)
+
+- "¿Qué te ayuda en esta área?" en cada pregunta de la entrevista: 5-7 opciones propias de cada categoría estándar, que se guardan al momento (optimista, se deshace si el servidor falla). Son lo único que podrá usar la IA de RF-40, y solo si el usuario lo activa.
+- La nota pasa a "Tu experiencia (privada)", con el aviso de que solo la ve el usuario y nunca se envía a la IA ni se comparte.
+- Migración `0010_category_experience.sql` (`categories.experience_tags`), caso de uso `SetCategoryExperience` (solo acepta opciones de esa categoría), acción `/api/categories/experience` (sin función nueva: 10/12). Las opciones entran en la exportación de datos (RF-05). E2E: se guarda y sigue marcada al recargar.
+
+### Cambiado (limpieza)
+
+- Últimos restos en español del pase anterior: nombres locales en las desestructuraciones de los handlers (`verifySession: verificarSesion`), el método `registrar` de `AuthProvider` (→ `register`) y los nombres de las funciones internas de seis casos de uso.
+
 ### Cambiado (UX-04)
 
 - El historial de cambios de la entrevista empieza plegado ("Ver mi historial (N)"); al abrirlo, una línea de tiempo por meses con los 5 guardados más recientes y "Ver más". Mismos datos y caché: abrir y cerrar no repite llamadas.

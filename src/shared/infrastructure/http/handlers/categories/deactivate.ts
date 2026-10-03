@@ -18,8 +18,8 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
     }
 
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession: verificarSesion, deactivateCategory } = getAppContext();
-    const session = await verificarSesion(token);
+    const { verifySession, deactivateCategory } = getAppContext();
+    const session = await verifySession(token);
 
     if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });

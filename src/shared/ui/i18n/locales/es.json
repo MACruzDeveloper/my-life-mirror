@@ -111,8 +111,8 @@
     "pregunta": "¿Cómo te sientes con {{categoria}}?",
     "escala": "1 = muy mal · 10 = muy bien",
     "puntuacionDe": "Puntuación de {{categoria}}",
-    "anadirNota": "Añadir una nota",
-    "nota": "Nota (opcional)",
+    "anadirNota": "Tu experiencia (privada)",
+    "nota": "Tu experiencia (privada)",
     "elegirAlgo": "Marca al menos una categoría para empezar.",
     "guardar": "Guardar cambios",
     "guardando": "Guardando…",
@@ -143,7 +143,12 @@
     ],
     "verHistorial": "Ver mi historial ({{count}})",
     "ocultarHistorial": "Ocultar historial",
-    "verMasHistorial": "Ver más"
+    "verMasHistorial": "Ver más",
+    "queTeAyuda": "¿Qué te ayuda en esta área?",
+    "queTeAyudaMarcadas": "¿Qué te ayuda en esta área? ({{count}})",
+    "queTeAyudaTexto": "Opcional. Sirve para que las ideas de la app encajen contigo.",
+    "notaPrivada": "Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.",
+    "errorExperiencia": "No se pudo guardar tu elección"
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -428,5 +433,78 @@
       "Cuando algo cambie en tu vida, usa «{{actualizar}}»."
     ],
     "entendido": "Entendido"
+  },
+  "experiencias": {
+    "economia": {
+      "presupuesto": "Llevar un presupuesto",
+      "ahorroAlCobrar": "Ahorrar nada más cobrar",
+      "apps": "Apps de finanzas",
+      "hablarlo": "Hablarlo con alguien de confianza",
+      "aprender": "Aprender sobre dinero",
+      "ingresosExtra": "Ingresos extra"
+    },
+    "vidaSocial": {
+      "quedarEnPersona": "Quedar en persona",
+      "mensajesYLlamadas": "Mensajes y llamadas",
+      "actividadesEnGrupo": "Actividades en grupo",
+      "voluntariado": "Voluntariado",
+      "conocerGente": "Conocer gente nueva",
+      "planesTranquilos": "Planes tranquilos"
+    },
+    "pareja": {
+      "tiempoJuntos": "Tiempo de calidad juntos",
+      "hablarLasCosas": "Hablar las cosas",
+      "pequenosDetalles": "Pequeños detalles",
+      "planesNuevos": "Planes nuevos",
+      "espacioPropio": "Tener mi espacio",
+      "rutinasCompartidas": "Rutinas compartidas"
+    },
+    "sexo": {
+      "comunicacion": "Comunicación",
+      "tiempoSinPrisa": "Tiempo sin prisa",
+      "bienestarCorporal": "Sentirme bien con mi cuerpo",
+      "explorar": "Explorar",
+      "informarme": "Informarme"
+    },
+    "deporte": {
+      "caminar": "Caminar",
+      "gimnasio": "Gimnasio",
+      "deporteEnEquipo": "Deporte en equipo",
+      "naturaleza": "Naturaleza",
+      "bailar": "Bailar",
+      "yogaEstiramientos": "Yoga o estiramientos",
+      "ejercicioEnCasa": "Ejercicio en casa"
+    },
+    "aventura": {
+      "viajar": "Viajar",
+      "escapadas": "Escapadas cortas",
+      "aprenderAlgoNuevo": "Aprender algo nuevo",
+      "naturaleza": "Naturaleza",
+      "comidaNueva": "Probar comidas nuevas",
+      "retosPersonales": "Retos personales"
+    },
+    "espiritualidad": {
+      "meditacion": "Meditación",
+      "naturaleza": "Naturaleza",
+      "lectura": "Lectura",
+      "comunidad": "Comunidad o grupo",
+      "silencio": "Momentos de silencio",
+      "gratitud": "Gratitud"
+    },
+    "familia": {
+      "comidasJuntos": "Comidas juntos",
+      "llamadas": "Llamadas",
+      "planesFinDeSemana": "Planes de fin de semana",
+      "tradiciones": "Tradiciones",
+      "ayudarnos": "Ayudarnos",
+      "hablar": "Hablar"
+    },
+    "inversiones": {
+      "aprenderAntes": "Aprender antes de invertir",
+      "largoPlazo": "Pensar a largo plazo",
+      "consultarProfesional": "Consultar a un profesional",
+      "pocoAPoco": "Aportar poco a poco",
+      "revisarDeVezEnCuando": "Revisar de vez en cuando"
+    }
   }
 }

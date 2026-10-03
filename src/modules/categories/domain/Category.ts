@@ -23,4 +23,9 @@ export interface Category {
   readonly type: CategoryType;
   readonly status: CategoryStatus;
   readonly isSensitiveData: boolean;
+  /**
+   * RF-41: opciones de "¿Qué te ayuda en esta área?" marcadas por el usuario
+   * (claves de `experienceOptions`). Ausente o vacío = ninguna.
+   */
+  readonly experienceTags?: readonly string[];
 }

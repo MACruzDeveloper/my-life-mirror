@@ -5,6 +5,7 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Collapse from "@mui/material/Collapse";
 import Dialog from "@mui/material/Dialog";
@@ -26,6 +27,7 @@ import userAvatar from "../../../assets/avatars/user.svg";
 import { BandBackground } from "./BandBackground";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
+import { experienceOptionsFor } from "@modules/categories/domain/experienceOptions";
 import { InterviewHistory } from "./InterviewHistory";
 import { ASSESSMENTS_KEY, LATEST_SCORES_KEY, useLatestScores } from "./queries";
 import type { LatestScoreDto } from "./ScoreCards";
@@ -132,6 +134,7 @@ export function InterviewPage() {
   const [draftScores, setDraftScores] = useState<Record<string, number>>({});
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
+  const [openHelps, setOpenHelps] = useState<Record<string, boolean>>({});
   const [openExamples, setOpenExamples] = useState<Record<string, boolean>>({});
   const [categoryAwaitingConsent, setCategoryAwaitingConsent] = useState<CategoryDto | null>(null);
   const [isSendingConsent, setIsSendingConsent] = useState(false);
@@ -154,6 +157,32 @@ export function InterviewPage() {
 
   function setCategoryStatus(id: string, status: "active" | "inactive") {
     queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, status } : category)));
+  }
+
+  function setCategoryExperienceTags(id: string, experienceTags: string[]) {
+    queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, experienceTags } : category)));
+  }
+
+  /**
+   * RF-41: marcar o desmarcar "qué te ayuda" se guarda al momento, como marcar
+   * una categoría (optimista, se deshace si el servidor falla); no espera a
+   * "Guardar cambios", que es solo para las puntuaciones.
+   */
+  async function toggleExperienceTag(category: CategoryDto, tag: string) {
+    const previous = category.experienceTags ?? [];
+    const next = previous.includes(tag) ? previous.filter((current) => current !== tag) : [...previous, tag];
+    setCategoryExperienceTags(category.id, next);
+    try {
+      const response = await fetch("/api/categories/experience", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categoryId: category.id, tags: next }),
+      });
+      if (!response.ok) throw new Error("rejected");
+    } catch {
+      setCategoryExperienceTags(category.id, previous);
+      setSaveState({ kind: "error", message: t("entrevista.errorExperiencia") });
+    }
   }
 
   function markPending(id: string, isPending: boolean) {
@@ -511,11 +540,51 @@ export function InterviewPage() {
                 );
               })}
             </Box>
+            {experienceOptionsFor(categoryLabel(category.catalogId).key).length > 0 && (
+              <Box sx={{ mt: 1 }}>
+                <Button
+                  size="small"
+                  aria-expanded={openHelps[category.id] === true}
+                  onClick={() => setOpenHelps((current) => ({ ...current, [category.id]: !current[category.id] }))}
+                >
+                  {(category.experienceTags ?? []).length > 0
+                    ? t("entrevista.queTeAyudaMarcadas", { count: (category.experienceTags ?? []).length })
+                    : t("entrevista.queTeAyuda")}
+                </Button>
+                <Collapse in={openHelps[category.id] === true} unmountOnExit>
+                  <Typography variant="caption" color="text.secondary" component="p">
+                    {t("entrevista.queTeAyudaTexto")}
+                  </Typography>
+                  <Box
+                    role="group"
+                    aria-label={`${t("entrevista.queTeAyuda")} ${categoryLabel(category.catalogId).name}`}
+                    sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mt: 0.75 }}
+                  >
+                    {experienceOptionsFor(categoryLabel(category.catalogId).key).map((option) => {
+                      const selected = (category.experienceTags ?? []).includes(option);
+                      return (
+                        <Chip
+                          key={option}
+                          label={t(`experiencias.${option}`)}
+                          clickable
+                          size="small"
+                          color={selected ? "primary" : "default"}
+                          variant={selected ? "filled" : "outlined"}
+                          aria-pressed={selected}
+                          onClick={() => void toggleExperienceTag(category, option)}
+                        />
+                      );
+                    })}
+                  </Box>
+                </Collapse>
+              </Box>
+            )}
             {openNotes[category.id] ? (
               <TextField
                 label={t("entrevista.nota")}
                 value={notes[category.id] ?? ""}
                 onChange={(event) => setNotes((current) => ({ ...current, [category.id]: event.target.value }))}
+                helperText={t("entrevista.notaPrivada")}
                 slotProps={{ htmlInput: { maxLength: 500 } }}
                 size="small"
                 fullWidth

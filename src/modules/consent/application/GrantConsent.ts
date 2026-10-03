@@ -19,7 +19,7 @@ export interface GrantConsentInput {
  * consentimiento nuevo — uno viejo no cubre una política distinta (RD-05).
  */
 export function createGrantConsent(repository: ConsentRepository, clock: Clock) {
-  return async function otorgarConsentimiento(
+  return async function grantConsent(
     input: GrantConsentInput,
   ): Promise<Result<Consent, ValidationError>> {
     const userId = input.userId.trim();

@@ -24,8 +24,8 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
     }
 
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession: verificarSesion, grantConsent: otorgarConsentimiento } = getAppContext();
-    const session = await verificarSesion(token);
+    const { verifySession, grantConsent } = getAppContext();
+    const session = await verifySession(token);
 
     if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
@@ -40,7 +40,7 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
-    const result = await otorgarConsentimiento({
+    const result = await grantConsent({
       userId: session.value.id,
       categoryId: data.data.categoryId,
       policyVersion: CURRENT_POLICY_VERSION,

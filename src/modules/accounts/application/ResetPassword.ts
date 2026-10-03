@@ -10,7 +10,7 @@ export interface ResetPasswordInput {
 
 /** Caso de uso — RF-38. Valida la nueva contraseña antes de gastar el token con el proveedor de auth. */
 export function createResetPassword(authProvider: AuthProvider) {
-  return async function restablecerPassword(
+  return async function resetPassword(
     input: ResetPasswordInput,
   ): Promise<Result<void, ValidationError | AuthenticationError>> {
     const password = Password.create(input.password);

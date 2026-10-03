@@ -45,7 +45,7 @@ export function createRegisterUser(authProvider: AuthProvider, updateProfile: Re
 
     let user: User;
     try {
-      user = await authProvider.registrar(email.value.value, password.value.value);
+      user = await authProvider.register(email.value.value, password.value.value);
     } catch (error) {
       if (error instanceof DomainError) return err(error as ValidationError | ConflictError);
       return err(new ValidationError("No se pudo completar el registro"));
