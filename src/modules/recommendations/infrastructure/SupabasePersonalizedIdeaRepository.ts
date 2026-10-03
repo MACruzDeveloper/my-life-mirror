@@ -8,6 +8,7 @@ interface PersonalizedIdeaRow {
   locale: string;
   template_key: string;
   text: string;
+  experience_tags: string[];
   model: string;
   created_at: string;
 }
@@ -19,14 +20,15 @@ function ideaFromRow(row: PersonalizedIdeaRow): PersonalizedIdea {
     locale: row.locale as Locale,
     templateKey: row.template_key,
     text: row.text,
+    experienceTags: row.experience_tags ?? [],
     model: row.model,
     createdAt: new Date(row.created_at),
   };
 }
 
-const COLUMNS = "recommendation_id, user_id, locale, template_key, text, model, created_at";
+const COLUMNS = "recommendation_id, user_id, locale, template_key, text, experience_tags, model, created_at";
 
-/** Adaptador real (migración 0011). Sin test propio: solo mapea filas, como el resto de adaptadores Supabase. */
+/** Adaptador real (migraciones 0011 y 0012). Sin test propio: solo mapea filas, como el resto de adaptadores Supabase. */
 export class SupabasePersonalizedIdeaRepository implements PersonalizedIdeaRepository {
   private readonly client: SupabaseClient;
 
@@ -34,8 +36,14 @@ export class SupabasePersonalizedIdeaRepository implements PersonalizedIdeaRepos
     this.client = createClient(url, serviceRoleKey);
   }
 
-  async find(recommendationId: string, locale: Locale): Promise<PersonalizedIdea | undefined> {
-    const { data, error } = await this.client.from("personalized_ideas").select(COLUMNS).eq("recommendation_id", recommendationId).eq("locale", locale).maybeSingle();
+  async find(recommendationId: string, templateKey: string, locale: Locale): Promise<PersonalizedIdea | undefined> {
+    const { data, error } = await this.client
+      .from("personalized_ideas")
+      .select(COLUMNS)
+      .eq("recommendation_id", recommendationId)
+      .eq("template_key", templateKey)
+      .eq("locale", locale)
+      .maybeSingle();
     if (error) throw new Error(`No se pudo leer la idea personalizada: ${error.message}`);
     return data ? ideaFromRow(data as PersonalizedIdeaRow) : undefined;
   }
@@ -53,9 +61,10 @@ export class SupabasePersonalizedIdeaRepository implements PersonalizedIdeaRepos
       locale: idea.locale,
       template_key: idea.templateKey,
       text: idea.text,
+      experience_tags: idea.experienceTags,
       model: idea.model,
       created_at: idea.createdAt.toISOString(),
-    });
+    }, { onConflict: "recommendation_id,template_key,locale" });
     if (error) throw new Error(`No se pudo guardar la idea personalizada: ${error.message}`);
   }
 

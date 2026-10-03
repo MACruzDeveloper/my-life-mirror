@@ -24,7 +24,14 @@ test.describe("primer uso: registro → entrevista → panel", () => {
     await interview.score("Economía", 2);
     await interview.score("Familia", 8);
     await interview.score("Vida social", 6);
-    await interview.save();
+    // UX-05: cada área se guarda con su botón; la baja abre "Cambios guardados" con su idea.
+    await interview.save("Economía");
+    await expect(interview.savedIdeaDialog()).toContainText(/tienes una idea para economía/i);
+    await expect(interview.savedIdeaDialog()).toContainText(/no sustituyen el asesoramiento/i);
+    await interview.savedIdeaDialog().getByRole("button", { name: "Seguir aquí" }).click();
+    await interview.save("Familia");
+    await interview.save("Vida social");
+    await expect(interview.savedIdeaDialog()).toHaveCount(0);
 
     const home = new HomePage(page);
     await home.open();
@@ -48,7 +55,7 @@ test.describe("primer uso: registro → entrevista → panel", () => {
     await interview.open();
     await interview.activate("Familia");
     await interview.score("Familia", 7);
-    await interview.save();
+    await interview.save("Familia");
 
     await account.logout();
     await account.login(user);

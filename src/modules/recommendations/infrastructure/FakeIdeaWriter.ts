@@ -2,7 +2,7 @@ import type { IdeaDraft, IdeaRequest, IdeaReviewer, IdeaWriter } from "../domain
 
 /**
  * RF-40a: escritor determinista para desarrollo local, E2E y tests, mientras no
- * hay crédito de API (RF-40b traerá el de Anthropic). Elige la primera idea del
+ * hay crédito de API (RF-40b traerá el de Anthropic). Toma la idea pedida del
  * catálogo y la antepone con lo que le ayuda al usuario, sin inventar nada.
  */
 export class FakeIdeaWriter implements IdeaWriter {
@@ -10,8 +10,9 @@ export class FakeIdeaWriter implements IdeaWriter {
 
   async write(request: IdeaRequest): Promise<IdeaDraft> {
     const candidate = request.candidates[0];
-    const helpful = request.helpfulThings[0];
-    const lead = helpful ? (request.locale === "es" ? `Ya que te ayuda «${helpful.toLowerCase()}»: ` : `Since "${helpful.toLowerCase()}" helps you: `) : "";
+    // Todas las opciones marcadas: así se nota cuando cambian y la idea se reescribe (RF-40 v1.1).
+    const helpful = request.helpfulThings.map((thing) => (request.locale === "es" ? `«${thing.toLowerCase()}»` : `"${thing.toLowerCase()}"`)).join(", ");
+    const lead = helpful ? (request.locale === "es" ? `Ya que te ayuda ${helpful}: ` : `Since ${helpful} helps you: `) : "";
     return { templateKey: candidate.templateKey, text: `${lead}${candidate.text}` };
   }
 }

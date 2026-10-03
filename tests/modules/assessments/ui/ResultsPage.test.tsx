@@ -13,12 +13,16 @@ function stub(ok: boolean, body: unknown, recommendations: unknown = []) {
     vi.fn((url: string) =>
       url === "/api/recommendations"
         ? Promise.resolve({ ok: true, json: async () => recommendations })
+        : url === "/api/assessments/history"
+          ? Promise.resolve({ ok: true, json: async () => HISTORY })
         : url === "/api/categories/translations"
           ? Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() })
           : Promise.resolve({ ok, json: async () => body }),
     ),
   );
 }
+
+const HISTORY = [{ recordedAt: "2026-09-19T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, previousScore: 5 }] }];
 
 function renderPage() {
   return render(
@@ -127,5 +131,14 @@ describe("ResultsPage", () => {
     } finally {
       await i18n.changeLanguage("es");
     }
+  });
+
+  it("incluye el historial de cambios, plegado; al abrirlo se ven los cambios por día (UX-05)", async () => {
+    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+    renderPage();
+
+    const history = await screen.findByRole("region", { name: /historial de cambios/i });
+    fireEvent.click(await within(history).findByRole("button", { name: /ver mi historial \(1\)/i }));
+    expect(within(history).getByText(/Economía: 5 → 8/)).toBeInTheDocument();
   });
 });

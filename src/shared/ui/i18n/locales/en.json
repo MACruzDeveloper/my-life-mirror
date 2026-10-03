@@ -116,9 +116,8 @@
     "anadirNota": "Your experience (private)",
     "nota": "Your experience (private)",
     "elegirAlgo": "Tick at least one category to start.",
-    "guardar": "Save changes",
+    "guardar": "Save",
     "guardando": "Saving…",
-    "exito": "Changes saved. Thanks for looking at yourself honestly.",
     "verResultados": "See my results",
     "errorCarga": "Could not load your categories",
     "errorGenerico": "Could not save the interview",
@@ -127,7 +126,6 @@
     "verEjemplos": "See examples for {{categoria}}",
     "ejemplosTitulo": "To help you think:",
     "errorActivar": "Could not activate the category",
-    "sinCambios": "Change a score to be able to save.",
     "sensiblesTitulo": "Require your consent",
     "sensiblesExplicacion": "They contain sensitive data. Before turning one on we'll ask for your consent and you can read the privacy policy; you can turn it off any time.",
     "historialTitulo": "Change history",
@@ -141,7 +139,7 @@
     "pasosPrimeraVez": [
       "Tick below the categories you want to talk about.",
       "In each one, tap a number from 1 to 10. You can leave some for another day.",
-      "At the end, press “{{boton}}”."
+      "When you finish each one, press “{{boton}}” next to it."
     ],
     "verHistorial": "See my history ({{count}})",
     "ocultarHistorial": "Hide history",
@@ -150,7 +148,22 @@
     "queTeAyudaMarcadas": "What helps you in this area? ({{count}})",
     "queTeAyudaTexto": "Optional. It helps the app's ideas fit you.",
     "notaPrivada": "Only you can see it. It's never sent to the AI or shared with anyone.",
-    "errorExperiencia": "Your choice could not be saved"
+    "errorExperiencia": "Your choice could not be saved",
+    "ultimaExperiencia": "Your last experience (private) · {{fecha}}",
+    "tienesIdea": "You have an idea for {{categoria}}:",
+    "guardarCategoria": "Save {{categoria}}",
+    "guardadoAhora": "Saved just now",
+    "ultimaActualizacion": "Last update: {{fecha}} · {{cambio}}",
+    "guardadoTitulo": "Changes saved",
+    "gracias": "Thanks for looking at yourself honestly.",
+    "irInicio": "Go to Home",
+    "seguirAqui": "Stay here",
+    "ideasPara": "Ideas for {{categoria}}",
+    "progresoTitulo": "Your progress",
+    "progresoResumen": "{{respondidas}} of {{total}} answered",
+    "estadoSinGuardar": "Not saved",
+    "estadoGuardadaHoy": "Saved today",
+    "estadoGuardada": "Saved on {{fecha}}"
   },
   "resultados": {
     "titulo": "Your results",
@@ -340,6 +353,9 @@
     "iaError": "The change could not be saved"
   },
   "recomendaciones": {
+    "ideaAnterior": "Previous idea",
+    "ideaSiguiente": "Next idea",
+    "ideaPosicion": "Idea {{actual}} of {{total}}",
     "titulo": "An idea for you",
     "aviso": "These ideas are general wellbeing suggestions and do not replace professional medical, financial or psychological advice.",
     "plantillas": {

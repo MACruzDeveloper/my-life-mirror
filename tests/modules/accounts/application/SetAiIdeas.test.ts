@@ -27,7 +27,7 @@ describe("SetAiIdeas (RF-40)", () => {
   it("desactivarlo quita la fecha y borra las ideas ya personalizadas", async () => {
     const { setAiIdeas, profileRepository, personalizedIdeaRepository } = await setup();
     await setAiIdeas({ userId: "u1", enabled: true });
-    await personalizedIdeaRepository.save({ recommendationId: "r1", userId: "u1", locale: "es", templateKey: "economia.1", text: "…", model: "fake", createdAt: clock.now() });
+    await personalizedIdeaRepository.save({ recommendationId: "r1", userId: "u1", locale: "es", templateKey: "economia.1", text: "…", experienceTags: [], model: "fake", createdAt: clock.now() });
 
     await setAiIdeas({ userId: "u1", enabled: false });
 

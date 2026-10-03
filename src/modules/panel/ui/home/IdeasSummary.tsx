@@ -6,6 +6,8 @@ import { RecommendationButton } from "@modules/recommendations/ui/Recommendation
 
 export interface IdeaSummaryItem {
   id: string;
+  /** Para volver a pedir la idea personalizada si cambia "¿Qué te ayuda?" (RF-40 v1.1). */
+  categoryId?: string;
   templateKey: string;
   /** Nombre ya en el idioma de la interfaz. */
   categoryName: string;
@@ -35,6 +37,7 @@ export function IdeasSummary({ ideas, personalize = false }: { ideas: IdeaSummar
         {ideas.map((idea) => (
           <RecommendationButton
             recommendationId={idea.id}
+            categoryId={idea.categoryId}
             personalize={personalize}
             key={idea.id}
             templateKey={idea.templateKey}

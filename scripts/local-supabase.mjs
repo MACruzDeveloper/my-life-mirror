@@ -56,7 +56,29 @@ export function ensureLocalSupabase({ appUrl }) {
 }
 
 /** Vacía la base local y reaplica las migraciones. */
-export function resetLocalDatabase() {
+export async function resetLocalDatabase() {
   console.log("Vaciando la base local y reaplicando las migraciones…");
   supabase("db", "reset");
+  await waitForSchema();
 }
+
+/**
+ * Tras `db reset`, la API de Supabase (PostgREST) tarda un instante en volver a leer qué
+ * tablas existen: si los tests empiezan antes, las primeras peticiones fallan con
+ * "Could not find the table … in the schema cache" (1 de cada 4-5 ejecuciones, 3 oct.).
+ * Se espera a que responda por las tablas que usa la app, incluida la de la última migración.
+ */
+async function waitForSchema({ tables = ["profiles", "categories", "assessments", "recommendations", "personalized_ideas"], timeoutMs = 30_000 } = {}) {
+  const status = readStatus();
+  const headers = { apikey: status.SERVICE_ROLE_KEY, Authorization: `Bearer ${status.SERVICE_ROLE_KEY}` };
+  const deadline = Date.now() + timeoutMs;
+  for (const table of tables) {
+    for (;;) {
+      const response = await fetch(`${status.API_URL}/rest/v1/${table}?select=*&limit=1`, { headers }).catch(() => undefined);
+      if (response?.ok) break;
+      if (Date.now() > deadline) throw new Error(`La API local no ve la tabla "${table}" tras ${timeoutMs / 1000} s`);
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
+}
+

@@ -12,7 +12,7 @@ Para poder usarla sin que nadie me lo explique
 Pistas breves en los tres momentos donde la participante necesitó ayuda. **Sin tutorial de pantallas seguidas**: se salta sin leer y retrasa llegar a lo importante.
 
 - **Portada y bienvenida de primera vez:** un bloque "Cómo funciona" con tres pasos numerados (elige tus áreas → puntúa del 1 al 10, unos dos minutos → mira tu equilibrio, tu evolución e ideas). Es el mismo componente en los dos sitios: en la portada, antes de tener cuenta; en la bienvenida de Inicio, justo después de registrarse (el momento donde empezó a necesitar ayuda).
-- **Entrevista, primera vez** (sin respuestas guardadas): la burbuja inicial del entrevistador añade los tres pasos concretos de la pantalla (marca las categorías → toca un número en cada una, puedes dejar alguna → pulsa "Guardar cambios"). Al actualizar respuestas no se muestran: ya los conoce.
+- **Entrevista, primera vez** (sin respuestas guardadas): la burbuja inicial del entrevistador añade los tres pasos concretos de la pantalla (marca las categorías → toca un número en cada una, puedes dejar alguna → al terminar cada una, pulsa "Guardar" junto a ella). Al actualizar respuestas no se muestran: ya los conoce.
 - **Inicio con datos:** una tarjeta "Cómo leer esta página" encima del panel, que explica el equilibrio, la evolución, "Una idea para ti" y "Actualizar mis respuestas".
   - Se cierra con "Entendido" y no vuelve a aparecer sola en ese dispositivo (`localStorage`).
   - Un botón de texto "Cómo leer esta página" la vuelve a abrir cuando se quiera.
@@ -54,9 +54,10 @@ Pistas breves en los tres momentos donde la participante necesitó ayuda. **Sin 
 
 - `HowItWorks` en `src/shared/ui/components/`: lo usan una página pública (`pages/Landing`) y un módulo (`panel`).
 - `DashboardGuide` en `src/modules/panel/ui/home/`, siguiendo la división del panel en subcomponentes.
-- Los textos que nombran otros elementos ("Una idea para ti", "Actualizar mis respuestas", "Guardar cambios") los interpolan desde su propia clave: si un botón cambia de nombre, la guía no se queda desfasada.
+- Los textos que nombran otros elementos ("Una idea para ti", "Actualizar mis respuestas", "Guardar") los interpolan desde su propia clave: si un botón cambia de nombre, la guía no se queda desfasada.
 - `localStorage` y no el perfil: es una preferencia de interfaz, sin valor para el usuario entre dispositivos; guardarla en el servidor costaría una columna y una llamada más.
 
 ## Historial de cambios
 
 - **v1.0 (27 sept. 2026)** — versión inicial, a partir del problema 1 de la validación.
+- **v1.1 (3 oct. 2026)** — el tercer paso nombra el "Guardar" de cada categoría (UX-05).

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 interface ExperienceNoteProps {
   categoryId: string;
-  /** Se llama en cada cambio con el texto completo; la entrevista lo guarda sin volver a pintarse. */
+  /** Se llama en cada cambio con el texto completo; la pregunta lo guarda sin volver a pintarse. */
   onChange: (categoryId: string, text: string) => void;
 }
 
@@ -13,8 +13,8 @@ interface ExperienceNoteProps {
  * "Tu experiencia (privada)" de una categoría (RF-11/RF-41). Guarda el texto en
  * su propio estado: escribir solo vuelve a pintar este campo, no la entrevista
  * entera (con todas las categorías abiertas, cada tecla tardaba ~170 ms en un
- * móvil medio, ~1 s por palabra). La entrevista solo se entera de si el campo
- * tiene texto o no (lo que decide si "Guardar cambios" se habilita).
+ * móvil medio, ~1 s por palabra). La pregunta solo se entera de si el campo
+ * tiene texto o no (lo que decide si su "Guardar" se habilita).
  */
 export const ExperienceNote = memo(function ExperienceNote({ categoryId, onChange }: ExperienceNoteProps) {
   const { t } = useTranslation();
