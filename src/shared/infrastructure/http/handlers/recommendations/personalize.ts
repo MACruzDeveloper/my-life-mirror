@@ -6,6 +6,8 @@ import { logger } from "#shared/infrastructure/logger.js";
 
 const PersonalizeSchema = z.object({
   recommendationId: z.string().min(1),
+  /** La idea del carrusel que se está viendo (UX-05); sin ella, la de la recomendación. */
+  templateKey: z.string().min(1).max(60).optional(),
   locale: z.string().min(2).max(5),
 });
 

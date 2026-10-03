@@ -64,6 +64,7 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
         personalize={personalize}
         ideas={recommendations.map((recommendation) => ({
           id: recommendation.id,
+          categoryId: recommendation.categoryId,
           templateKey: recommendation.templateKey,
           categoryName: categoryLabel(recommendation.catalogId).name,
         }))}
@@ -87,7 +88,7 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
           renderCardExtra={(categoryId) => {
             const recommendation = recommendations.find((candidate) => candidate.categoryId === categoryId);
             return recommendation ? (
-              <RecommendationButton recommendationId={recommendation.id} personalize={personalize} templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} />
+              <RecommendationButton recommendationId={recommendation.id} categoryId={recommendation.categoryId} personalize={personalize} templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} />
             ) : null;
           }}
         />

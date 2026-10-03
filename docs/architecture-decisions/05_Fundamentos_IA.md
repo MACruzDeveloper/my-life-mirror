@@ -60,6 +60,14 @@ El diseño de arriba, concretado en la [historia RF-40](../user-stories/RF-40-id
 - **Proveedor:** `AI_IDEAS_PROVIDER=fake` (escritor determinista) en desarrollo local y E2E; **sin valor en producción**, donde la opción ni se ofrece hasta RF-40b. Cada idea guarda qué la escribió (`model`).
 - **Consentimiento:** interruptor en *Privacidad y datos* (desactivado por defecto), con qué se envía y qué no; se guarda la fecha de activación y desactivarlo borra las ideas personalizadas. La política de privacidad tiene su apartado. Exportación y borrado (RF-05) las incluyen.
 
+#### 4.3.2 Carrusel de ideas y reescritura al cambiar "¿Qué te ayuda?" (3 oct. 2026)
+
+Con UX-05, la ventana de ideas pasa a ser un carrusel con las cinco ideas curadas de la categoría (primero la recomendada). Cambia qué hace la IA, no lo que recibe ni sus salvaguardas ([historia RF-40](../user-stories/RF-40-ideas-personalizadas-ia.md), v1.1):
+
+- **Ya no elige:** reescribe la idea que el usuario está viendo (recibe solo esa como candidata). El anclaje es más fuerte: no hay nada entre lo que escoger.
+- **Se guarda por recomendación, idea e idioma** (migración 0012), con las opciones de "¿Qué te ayuda?" con las que se escribió. Si cambian, la siguiente vez que se vea se reescribe. La experiencia escrita sigue sin ir nunca a la IA (RES-09).
+- **Coste con el modelo real:** una llamada por idea vista (como mucho cinco por recomendación) y otra cada vez que cambien las opciones; siempre al verla, nunca por adelantado.
+
 ## 5. Resumen de lo añadido a los requisitos
 
 | RF | Qué añade | Prioridad | Plataforma |
@@ -90,3 +98,4 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 - **v1.3 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
 - **v1.3 (2 oct. 2026)** — apartado 4.3.1: RF-40a construido contra un *Fake* (qué recibe la IA, cuándo, filtro y su conjunto de evaluación, caída segura, proveedor por variable de entorno, consentimiento).
 - **v1.4 (3 oct. 2026)** — los términos del filtro pasan a un archivo de datos propio (`ideaSafetyTerms.json`).
+- **v1.5 (3 oct. 2026)** — apartado 4.3.2: carrusel de ideas (la IA reescribe la que se ve, ya no elige) y reescritura cuando cambian las opciones de "¿Qué te ayuda?".

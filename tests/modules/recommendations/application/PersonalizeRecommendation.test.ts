@@ -74,7 +74,7 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
     clock,
     timeoutMs: 50,
   });
-  return { personalize, writer, personalizedIdeaRepository };
+  return { personalize, writer, personalizedIdeaRepository, categoryRepository, finances };
 }
 
 describe("PersonalizeRecommendation (RF-40)", () => {
@@ -85,12 +85,12 @@ describe("PersonalizeRecommendation (RF-40)", () => {
 
     expect(result.ok).toBe(true);
     if (!result.ok || result.value.source !== "ai") throw new Error("se esperaba una idea de IA");
-    expect(result.value.templateKey).toMatch(/^economia\.[1-5]$/);
+    expect(result.value.templateKey).toBe("economia.1");
     expect(result.value.text.length).toBeGreaterThan(40);
-    expect(await personalizedIdeaRepository.find("r-finances", "es")).toMatchObject({ userId: "u1", model: "fake", templateKey: result.value.templateKey });
+    expect(await personalizedIdeaRepository.find("r-finances", "economia.1", "es")).toMatchObject({ userId: "u1", model: "fake", experienceTags: ["economia.presupuesto"] });
   });
 
-  it("a la IA solo le llega lo necesario: clave, puntuación, tendencia, opciones marcadas y candidatas; nunca la nota privada", async () => {
+  it("a la IA solo le llega lo necesario: clave, puntuación, tendencia, opciones marcadas y la idea a reescribir; nunca la nota privada", async () => {
     const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Como llevar un presupuesto te ayuda, prueba a anotar tus gastos una semana, sin juzgarte." }));
     const { personalize } = await setup({ writer });
 
@@ -99,12 +99,12 @@ describe("PersonalizeRecommendation (RF-40)", () => {
     expect(writer.calls).toHaveLength(1);
     const request = writer.calls[0];
     expect(request).toMatchObject({ locale: "es", categoryKey: "economia", score: 3, trend: "down", helpfulThings: ["Llevar un presupuesto"] });
-    expect(request.candidates.map((candidate) => candidate.templateKey)).toEqual(["economia.1", "economia.2", "economia.3", "economia.4", "economia.5"]);
+    expect(request.candidates.map((candidate) => candidate.templateKey)).toEqual(["economia.1"]);
     expect(JSON.stringify(request)).not.toMatch(/texto privado|Ana|u1|r-finances/);
   });
 
   it("la segunda vez lee la idea guardada sin volver a llamar al escritor", async () => {
-    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[1].templateKey, text: "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica." }));
+    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica." }));
     const { personalize } = await setup({ writer });
 
     const first = await personalize({ userId: "u1", recommendationId: "r-finances", locale: "es" });
@@ -112,6 +112,50 @@ describe("PersonalizeRecommendation (RF-40)", () => {
 
     expect(writer.calls).toHaveLength(1);
     expect(second).toEqual(first);
+  });
+
+  it("con templateKey (el carrusel, UX-05) reescribe esa idea y la guarda aparte de las demás", async () => {
+    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Una versión personalizada de la tercera idea, con la longitud suficiente." }));
+    const { personalize, personalizedIdeaRepository } = await setup({ writer });
+
+    const third = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.3", locale: "es" });
+    await personalize({ userId: "u1", recommendationId: "r-finances", locale: "es" });
+
+    expect(third).toEqual({ ok: true, value: { source: "ai", templateKey: "economia.3", text: "Una versión personalizada de la tercera idea, con la longitud suficiente." } });
+    expect(writer.calls.map((request) => request.candidates.map((candidate) => candidate.templateKey))).toEqual([["economia.3"], ["economia.1"]]);
+    expect((await personalizedIdeaRepository.findByUserId("u1")).map((idea) => idea.templateKey).sort()).toEqual(["economia.1", "economia.3"]);
+  });
+
+  it("si cambian las opciones de '¿Qué te ayuda?', la idea guardada se reescribe con las nuevas (RF-40 v1.1)", async () => {
+    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: `Idea pensada para: ${request.helpfulThings.join(", ") || "nada"}, sin prisa.` }));
+    const { personalize, categoryRepository, finances } = await setup({ writer });
+
+    await personalize({ userId: "u1", recommendationId: "r-finances", locale: "es" });
+    await personalize({ userId: "u1", recommendationId: "r-finances", locale: "es" });
+    await categoryRepository.save({ ...(await categoryRepository.findById("u1", finances.id))!, experienceTags: ["economia.presupuesto", "economia.apps"] });
+    const rewritten = await personalize({ userId: "u1", recommendationId: "r-finances", locale: "es" });
+
+    expect(writer.calls).toHaveLength(2);
+    expect(writer.calls[1].helpfulThings).toEqual(["Llevar un presupuesto", "Apps de finanzas"]);
+    if (!rewritten.ok || rewritten.value.source !== "ai") throw new Error("se esperaba una idea de IA");
+    expect(rewritten.value.text).toContain("Apps de finanzas");
+  });
+
+  it("una idea que no es del catálogo de esa categoría se rechaza", async () => {
+    const { personalize } = await setup();
+
+    const result = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "deporte.1", locale: "es" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("sin IA, la idea pedida del carrusel se devuelve como curada", async () => {
+    const { personalize } = await setup({ aiIdeasEnabled: false });
+
+    const result = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.4", locale: "es" });
+
+    expect(result).toEqual({ ok: true, value: { source: "catalog", templateKey: "economia.4" } });
   });
 
   const catalogCases: [string, Parameters<typeof setup>[0], string][] = [

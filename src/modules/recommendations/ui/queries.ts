@@ -30,15 +30,20 @@ export type PersonalizedIdeaDto = { source: "ai"; templateKey: string; text: str
  */
 export const PERSONALIZED_IDEAS_KEY = ["personalized-ideas"] as const;
 
-export function usePersonalizedIdea(recommendationId: string, locale: string, enabled: boolean) {
+/**
+ * Una idea del carrusel (UX-05), personalizada si procede. `experienceTags` va
+ * en la clave: si cambian las opciones de "¿Qué te ayuda?" de la categoría, se
+ * pide de nuevo y el servidor la reescribe (RF-40 v1.1).
+ */
+export function usePersonalizedIdea(recommendationId: string, templateKey: string, locale: string, experienceTags: readonly string[], enabled: boolean) {
   return useQuery({
-    queryKey: [...PERSONALIZED_IDEAS_KEY, recommendationId, locale],
+    queryKey: [...PERSONALIZED_IDEAS_KEY, recommendationId, templateKey, locale, [...experienceTags].sort().join("|")],
     enabled,
     queryFn: async () => {
       const response = await fetch("/api/recommendations/personalize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recommendationId, locale }),
+        body: JSON.stringify({ recommendationId, templateKey, locale }),
       });
       if (!response.ok) throw new Error("personalize failed");
       return (await response.json()) as PersonalizedIdeaDto;

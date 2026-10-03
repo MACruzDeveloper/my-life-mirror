@@ -8,7 +8,7 @@ import { spawnSync } from "node:child_process";
 import { ensureLocalSupabase, resetLocalDatabase } from "./local-supabase.mjs";
 
 const { studioUrl, mailUrl, ...env } = ensureLocalSupabase({ appUrl: "http://localhost:5174" });
-resetLocalDatabase();
+await resetLocalDatabase();
 
 const result = spawnSync("npx", ["playwright", "test", "-c", "playwright.api.config.ts", ...process.argv.slice(2)], {
   stdio: "inherit",

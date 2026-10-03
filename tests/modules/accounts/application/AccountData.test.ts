@@ -49,7 +49,7 @@ async function setup() {
     { id: "r-ana", userId: ana.id, categoryId: financesAna.id, templateKey: "economia.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-luis", userId: luis.id, categoryId: categoriesLuis[0].id, templateKey: "general.1", threshold: 5, status: "pending", createdAt: clock.now() },
   ]);
-  await personalizedIdeaRepository.save({ recommendationId: "r-ana", userId: ana.id, locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: clock.now() });
+  await personalizedIdeaRepository.save({ recommendationId: "r-ana", userId: ana.id, locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", experienceTags: [], model: "fake", createdAt: clock.now() });
   await profileRepository.save({ ...(await profileRepository.findByUserId(ana.id))!, aiIdeasEnabled: true, aiIdeasEnabledAt: "2026-09-20T10:00:00.000Z" });
   await createGrantConsent(consentRepository, clock)({ userId: ana.id, categoryId: sexAna.id, policyVersion: "2026-09" });
 
