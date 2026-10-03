@@ -1,4 +1,5 @@
-export type ScoreBand = "low" | "mediumLow" | "medium" | "high";
+export const SCORE_BANDS = ["low", "mediumLow", "medium", "high"] as const;
+export type ScoreBand = (typeof SCORE_BANDS)[number];
 
 /**
  * Franjas de color de las puntuaciones (1-10). Colores suaves, no de

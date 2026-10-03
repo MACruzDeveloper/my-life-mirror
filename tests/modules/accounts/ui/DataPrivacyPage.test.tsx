@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { DataPrivacyPage } from "@modules/accounts/ui/DataPrivacyPage";
+import { SessionProvider } from "@shared/ui/context/SessionContext";
 import { createTestClient, withClient } from "../../../helpers/queryClient";
 import type { QueryClient } from "@tanstack/react-query";
 
@@ -129,5 +130,64 @@ describe("DataPrivacyPage (RF-05)", () => {
 
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  describe("ideas personalizadas con IA (RF-40)", () => {
+    function stubAi({ available, enabled }: { available: boolean; enabled: boolean }) {
+      const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ ok: true, json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable: available }) });
+        if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiIdeasEnabled: enabled }) });
+        if (url === "/api/accounts/ai-ideas") {
+          const { enabled: next } = JSON.parse(init?.body as string);
+          return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiIdeasEnabled: next }) });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      return fetchMock;
+    }
+
+    function renderWithSession() {
+      return render(
+        withClient(
+          <MemoryRouter initialEntries={["/perfil/datos"]}>
+            <SessionProvider>
+              <DataPrivacyPage />
+            </SessionProvider>
+          </MemoryRouter>,
+        ),
+      );
+    }
+
+    it("con la función disponible, se ofrece desactivada y explica qué se envía y qué nunca", async () => {
+      stubAi({ available: true, enabled: false });
+      renderWithSession();
+
+      const toggle = await screen.findByRole("switch", { name: /ideas personalizadas con ia/i });
+      expect(toggle).not.toBeChecked();
+      expect(screen.getByText(/nunca se envían tu nombre, tu email, tu experiencia privada ni las categorías sensibles/i)).toBeInTheDocument();
+    });
+
+    it("activarla y desactivarla lo guarda en el servidor", async () => {
+      const fetchMock = stubAi({ available: true, enabled: false });
+      renderWithSession();
+
+      fireEvent.click(await screen.findByRole("switch", { name: /ideas personalizadas con ia/i }));
+      await waitFor(() => expect(screen.getByRole("switch", { name: /ideas personalizadas con ia/i })).toBeChecked());
+      fireEvent.click(screen.getByRole("switch", { name: /ideas personalizadas con ia/i }));
+      await waitFor(() => expect(screen.getByRole("switch", { name: /ideas personalizadas con ia/i })).not.toBeChecked());
+
+      const bodies = fetchMock.mock.calls.filter(([url]) => url === "/api/accounts/ai-ideas").map(([, init]) => JSON.parse(init?.body as string));
+      expect(bodies).toEqual([{ enabled: true }, { enabled: false }]);
+    });
+
+    it("sin la función disponible (producción sin proveedor) no se ofrece", async () => {
+      stubAi({ available: false, enabled: false });
+      renderWithSession();
+
+      await screen.findByRole("button", { name: /descargar mis datos/i });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(screen.queryByRole("switch", { name: /ideas personalizadas con ia/i })).not.toBeInTheDocument();
+    });
   });
 });

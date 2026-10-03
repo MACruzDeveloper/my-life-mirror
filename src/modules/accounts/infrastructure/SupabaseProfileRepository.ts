@@ -8,6 +8,8 @@ interface ProfileRow {
   birth_date: string | null;
   gender: string | null;
   time_zone: string | null;
+  ai_ideas_enabled: boolean | null;
+  ai_ideas_enabled_at: string | null;
 }
 
 function profileFromRow(row: ProfileRow): Profile {
@@ -17,6 +19,8 @@ function profileFromRow(row: ProfileRow): Profile {
     ...(row.birth_date ? { birthDate: row.birth_date } : {}),
     ...(row.gender ? { gender: row.gender as Gender } : {}),
     ...(row.time_zone ? { timeZone: row.time_zone } : {}),
+    aiIdeasEnabled: row.ai_ideas_enabled === true,
+    ...(row.ai_ideas_enabled_at ? { aiIdeasEnabledAt: new Date(row.ai_ideas_enabled_at).toISOString() } : {}),
   };
 }
 
@@ -41,6 +45,8 @@ export class SupabaseProfileRepository implements ProfileRepository {
       birth_date: profile.birthDate ?? null,
       gender: profile.gender ?? null,
       time_zone: profile.timeZone ?? null,
+      ai_ideas_enabled: profile.aiIdeasEnabled === true,
+      ai_ideas_enabled_at: profile.aiIdeasEnabledAt ?? null,
       updated_at: new Date().toISOString(),
     });
 
@@ -52,7 +58,7 @@ export class SupabaseProfileRepository implements ProfileRepository {
   async findByUserId(userId: string): Promise<Profile | undefined> {
     const { data, error } = await this.client
       .from("profiles")
-      .select("user_id, name, birth_date, gender, time_zone")
+      .select("user_id, name, birth_date, gender, time_zone, ai_ideas_enabled, ai_ideas_enabled_at")
       .eq("user_id", userId)
       .maybeSingle();
 

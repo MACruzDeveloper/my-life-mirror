@@ -16,6 +16,14 @@ import { parseThreshold } from "../../modules/recommendations/domain/recommendat
 import type { RecommendationRepository } from "../../modules/recommendations/domain/RecommendationRepository.js";
 import { InMemoryRecommendationRepository } from "../../modules/recommendations/infrastructure/InMemoryRecommendationRepository.js";
 import { SupabaseRecommendationRepository } from "../../modules/recommendations/infrastructure/SupabaseRecommendationRepository.js";
+import { createPersonalizeRecommendation } from "../../modules/recommendations/application/PersonalizeRecommendation.js";
+import type { IdeaReviewer, IdeaWriter } from "../../modules/recommendations/domain/IdeaWriter.js";
+import type { PersonalizedIdeaRepository } from "../../modules/recommendations/domain/PersonalizedIdea.js";
+import { FakeIdeaReviewer, FakeIdeaWriter } from "../../modules/recommendations/infrastructure/FakeIdeaWriter.js";
+import { InMemoryPersonalizedIdeaRepository } from "../../modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository.js";
+import { JsonIdeaTexts } from "../../modules/recommendations/infrastructure/JsonIdeaTexts.js";
+import { SupabasePersonalizedIdeaRepository } from "../../modules/recommendations/infrastructure/SupabasePersonalizedIdeaRepository.js";
+import { createSetAiIdeas } from "../../modules/accounts/application/SetAiIdeas.js";
 import { logger } from "./logger.js";
 import { createAdminUserActions } from "../../modules/accounts/application/AdminUserActions.js";
 import type { AdminAuditRepository } from "../../modules/accounts/domain/AdminAuditRepository.js";
@@ -63,7 +71,8 @@ import { createGetLatestScores } from "../../modules/assessments/application/Get
  * directamente (los casos de uso corren en el servidor, no en el navegador).
  */
 
-export type Environment = "dev" | "test" | "production";
+export const ENVIRONMENTS = ["dev", "test", "production"] as const;
+export type Environment = (typeof ENVIRONMENTS)[number];
 
 function detectEnvironment(): Environment {
   const value = process.env.APP_ENV ?? process.env.NODE_ENV ?? "dev";
@@ -92,6 +101,27 @@ function createAuthProvider(environment: Environment): AuthProvider {
     throw new Error("Falta APP_URL — ver .env.example");
   }
   return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
+}
+
+function createPersonalizedIdeaRepository(environment: Environment): PersonalizedIdeaRepository {
+  if (environment === "test") {
+    return new InMemoryPersonalizedIdeaRepository();
+  }
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabasePersonalizedIdeaRepository(url, serviceRoleKey);
+}
+
+/**
+ * RF-40: quién escribe las ideas personalizadas, según `AI_IDEAS_PROVIDER`.
+ * - `fake`: escritor determinista (desarrollo local y E2E).
+ * - sin valor: función apagada (producción hasta RF-40b); la opción ni se ofrece.
+ * - `anthropic`: llegará con RF-40b; hasta entonces, apagada con un aviso en el log.
+ */
+function createIdeaProvider(): { writer?: IdeaWriter; reviewer: IdeaReviewer } {
+  const provider = process.env.AI_IDEAS_PROVIDER?.trim();
+  if (provider === "fake") return { writer: new FakeIdeaWriter(), reviewer: new FakeIdeaReviewer() };
+  if (provider) logger.warn("AI_IDEAS_PROVIDER desconocido o sin implementar: ideas con IA apagadas", { provider });
+  return { reviewer: new FakeIdeaReviewer() };
 }
 
 /**
@@ -217,6 +247,10 @@ export interface AppContext {
   getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
   recommendationRepository: RecommendationRepository;
   listRecommendations: ReturnType<typeof createListRecommendations>;
+  /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
+  aiIdeasAvailable: boolean;
+  personalizeRecommendation: ReturnType<typeof createPersonalizeRecommendation>;
+  setAiIdeas: ReturnType<typeof createSetAiIdeas>;
 }
 
 export function createAppContext(environment: Environment = detectEnvironment()): AppContext {
@@ -231,6 +265,8 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const assessmentRepository = createAssessmentRepository(environment);
   const registerUser = createRegisterUser(authProvider, updateProfile);
   const recommendationRepository = createRecommendationRepository(environment);
+  const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
+  const ideaProvider = createIdeaProvider();
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
   const generateRecommendations = createGenerateRecommendations({
     recommendationRepository,
@@ -257,13 +293,14 @@ export function createAppContext(environment: Environment = detectEnvironment())
       consentRepository,
       assessmentRepository,
       recommendationRepository,
+      personalizedIdeaRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -296,6 +333,21 @@ export function createAppContext(environment: Environment = detectEnvironment())
     getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
+    aiIdeasAvailable: ideaProvider.writer !== undefined,
+    personalizeRecommendation: createPersonalizeRecommendation({
+      recommendationRepository,
+      categoryRepository,
+      catalog: categoryCatalogRepository,
+      assessmentRepository,
+      profileRepository,
+      personalizedIdeaRepository,
+      ideaTexts: new JsonIdeaTexts(),
+      writer: ideaProvider.writer,
+      reviewer: ideaProvider.reviewer,
+      clock,
+      report: (reason, error) => logger.warn("Idea personalizada descartada: se muestra el texto curado", { reason, ...(error ? { error: String(error) } : {}) }),
+    }),
+    setAiIdeas: createSetAiIdeas({ profileRepository, personalizedIdeaRepository, clock }),
   };
 }
 
