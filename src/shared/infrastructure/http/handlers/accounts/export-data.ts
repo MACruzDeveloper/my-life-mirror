@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getAppContext } from "../../../container.js";
-import { readCookie } from "../../../cookies.js";
-import { logger } from "../../../logger.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { readCookie } from "#shared/infrastructure/cookies.js";
+import { logger } from "#shared/infrastructure/logger.js";
 
 /**
  * Controlador HTTP — RF-05/RNF-12. Devuelve un JSON descargable con todos los

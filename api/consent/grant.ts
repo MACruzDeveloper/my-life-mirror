@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { getAppContext } from "../../src/shared/infrastructure/container.js";
-import { readCookie } from "../../src/shared/infrastructure/cookies.js";
-import { logger } from "../../src/shared/infrastructure/logger.js";
-import { CURRENT_POLICY_VERSION } from "../../src/modules/consent/domain/CurrentPolicy.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { readCookie } from "#shared/infrastructure/cookies.js";
+import { logger } from "#shared/infrastructure/logger.js";
+import { CURRENT_POLICY_VERSION } from "#modules/consent/domain/CurrentPolicy.js";
 
 const GrantConsentSchema = z.object({
   categoryId: z.string(),

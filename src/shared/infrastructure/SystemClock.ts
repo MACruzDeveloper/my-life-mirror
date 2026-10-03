@@ -1,4 +1,4 @@
-import type { Clock } from "../domain/Clock.js";
+import type { Clock } from "#shared/domain/Clock.js";
 
 /** Adaptador real de Clock — usa el reloj del sistema. */
 export class SystemClock implements Clock {

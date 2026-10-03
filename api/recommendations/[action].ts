@@ -1,5 +1,5 @@
-import { createRouter } from "../../src/shared/infrastructure/http/router.js";
-import personalize from "../../src/shared/infrastructure/http/handlers/recommendations/personalize.js";
+import { createRouter } from "#shared/infrastructure/http/router.js";
+import personalize from "#shared/infrastructure/http/handlers/recommendations/personalize.js";
 
 /**
  * Función serverless de `/api/recommendations/personalize` (RF-40); `/api/recommendations`

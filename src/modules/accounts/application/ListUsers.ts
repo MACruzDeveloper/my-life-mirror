@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { ForbiddenError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { ForbiddenError } from "#shared/domain/DomainError.js";
 import type { AuthProvider, AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
 import type { ProfileRepository } from "../domain/ProfileRepository.js";
 

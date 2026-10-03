@@ -1,4 +1,4 @@
-import type { Locale } from "../../../shared/domain/locales.js";
+import type { Locale } from "#shared/domain/locales.js";
 import type { IdeaCandidate } from "./IdeaWriter.js";
 
 /** Puerto: textos curados que la IA puede usar, leídos en el servidor (RF-40). */

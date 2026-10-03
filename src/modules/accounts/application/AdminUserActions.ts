@@ -1,8 +1,8 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { requireAdmin } from "../../../shared/domain/Actor.js";
-import type { Clock } from "../../../shared/domain/Clock.js";
-import { AuthenticationError, ConflictError, DomainError, ForbiddenError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { requireAdmin } from "#shared/domain/Actor.js";
+import type { Clock } from "#shared/domain/Clock.js";
+import { AuthenticationError, ConflictError, DomainError, ForbiddenError, NotFoundError, ValidationError } from "#shared/domain/DomainError.js";
 import { Email } from "../domain/Email.js";
 import type { AdminAuditEntry } from "../domain/AdminAuditEntry.js";
 import type { AdminAuditRepository } from "../domain/AdminAuditRepository.js";

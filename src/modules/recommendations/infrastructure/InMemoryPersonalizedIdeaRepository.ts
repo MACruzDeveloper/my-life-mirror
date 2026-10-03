@@ -1,4 +1,4 @@
-import type { Locale } from "../../../shared/domain/locales.js";
+import type { Locale } from "#shared/domain/locales.js";
 import type { PersonalizedIdea, PersonalizedIdeaRepository } from "../domain/PersonalizedIdea.js";
 
 /** Fake para tests — ADR-03 apartado 3.6. */
