@@ -47,6 +47,8 @@ Decisión que apartado 1.1 dejaba pendiente: **cómo automatizar los flujos que 
 
 - **Lección de la primera ejecución en CI (28 sept.):** un test falló solo en móvil y solo en la máquina de GitHub, más lenta. El Page Object elegía entre el menú móvil y el botón de escritorio con `isVisible()`, que mira una vez sin esperar; justo después del registro la cabecera aún no estaba pintada. Ahora se decide por el ancho de pantalla (el mismo punto de corte que la cabecera) y se deja que Playwright espere. Regla para los Page Objects: nunca bifurcar con `isVisible()`; decidir con datos fijos (dispositivo, estado conocido) y dejar esperar a las acciones. En esa misma ejecución Docker Hub/ECR respondió varias veces `toomanyrequests` al descargar imágenes; la CLI de Supabase reintentó y siguió, pero es un riesgo conocido de la primera descarga en cada ejecución.
 
+- **Segunda lección (3 oct.):** fallos intermitentes (1 de cada 4-5) que no venían del código: tras vaciar la base (`db reset`), la API de Supabase tarda un instante en volver a leer qué tablas hay, y si los tests empiezan en ese momento sus primeras peticiones fallan. La solución no fue reintentar los tests, sino esperar a que la base esté lista de verdad (`waitForSchema` en `scripts/local-supabase.mjs`). Regla: un test intermitente se investiga hasta encontrar la causa; reintentar solo la esconde.
+
 #### 1.2.1 Cómo ver que funciona
 
 Requisito: Docker Desktop abierto. La primera vez, `supabase start` descarga las imágenes (unos minutos).
@@ -134,3 +136,4 @@ Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras f
 - **v1.4 (27 sept. 2026)** — nueva apartado 1.2: E2E con `api/` contra Supabase local en Docker, con un servidor propio en Vite (no `vercel dev`, que carga siempre la base real) y aislamiento entre funciones que mantiene cubierto el fallo de apartado 1.1. Primera batería de 9 tests × 2 dispositivos.
 - **v1.5 (28 sept. 2026)** — apartado 1.2: workflow de GitHub Actions en cada PR y nuevo apartado 1.2.1 "Cómo ver que funciona" (modos `--headed`, `--ui`, informe HTML, Studio local, `npm run dev:local`). Los apartados "1bis/1ter" pasan a numeración decimal (1.1, 1.2), igual que en el resto de documentos.
 - **v1.6 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v1.6 (3 oct. 2026)** — apartado 1.2: segunda lección de los E2E (carrera tras `db reset`, resuelta esperando a que la API vea las tablas).

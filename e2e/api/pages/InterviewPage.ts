@@ -30,15 +30,25 @@ export class InterviewPage {
     await this.page.getByRole("group", { name: `Puntuación de ${name}` }).getByRole("button", { name: String(value), exact: true }).click();
   }
 
+  /** La pregunta de una categoría (todo lo suyo: puntuación, experiencia, su "Guardar"). */
+  question(name: string) {
+    return this.page.locator(`[id^="pregunta-"]`).filter({ has: this.page.getByRole("group", { name: `Puntuación de ${name}` }) });
+  }
+
   /** RF-41: abre "¿Qué te ayuda en esta área?" de una categoría y devuelve su grupo de opciones. */
   async openHelps(name: string) {
-    const question = this.page.locator(`[id^="pregunta-"]`).filter({ has: this.page.getByRole("group", { name: `Puntuación de ${name}` }) });
-    await question.getByRole("button", { name: /qué te ayuda en esta área/i }).click();
+    await this.question(name).getByRole("button", { name: /qué te ayuda en esta área/i }).click();
     return this.page.getByRole("group", { name: new RegExp(`qué te ayuda en esta área\\? ${name}`, "i") });
   }
 
-  async save() {
-    await this.page.getByRole("button", { name: "Guardar cambios" }).click();
-    await expect(this.page.getByText(/cambios guardados/i)).toBeVisible();
+  /** UX-05: "Cambios guardados", que se abre solo si el guardado abre una idea nueva. */
+  savedIdeaDialog() {
+    return this.page.getByRole("dialog", { name: "Cambios guardados" });
+  }
+
+  /** UX-05: guarda una categoría con su botón; termina con "Guardado ahora" o con la ventana de la idea. */
+  async save(name: string) {
+    await this.page.getByRole("button", { name: `Guardar ${name}`, exact: true }).click();
+    await expect(this.question(name).getByRole("status").or(this.savedIdeaDialog())).toBeVisible();
   }
 }

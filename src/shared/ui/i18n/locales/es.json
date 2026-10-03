@@ -116,9 +116,8 @@
     "anadirNota": "Tu experiencia (privada)",
     "nota": "Tu experiencia (privada)",
     "elegirAlgo": "Marca al menos una categoría para empezar.",
-    "guardar": "Guardar cambios",
+    "guardar": "Guardar",
     "guardando": "Guardando…",
-    "exito": "Cambios guardados. Gracias por mirarte con honestidad.",
     "verResultados": "Ver mis resultados",
     "errorCarga": "No se pudieron cargar tus categorías",
     "errorGenerico": "No se pudo guardar la entrevista",
@@ -127,7 +126,6 @@
     "verEjemplos": "Ver ejemplos de {{categoria}}",
     "ejemplosTitulo": "Para ayudarte a pensar:",
     "errorActivar": "No se pudo activar la categoría",
-    "sinCambios": "Cambia alguna puntuación para poder guardar.",
     "sensiblesTitulo": "Requieren tu consentimiento",
     "sensiblesExplicacion": "Contienen datos sensibles. Antes de activar una te pediremos tu consentimiento y podrás leer la política de privacidad; puedes desactivarla cuando quieras.",
     "historialTitulo": "Historial de cambios",
@@ -141,7 +139,7 @@
     "pasosPrimeraVez": [
       "Marca abajo las categorías de las que quieres hablar.",
       "En cada una, toca un número del 1 al 10. Puedes dejar alguna para otro día.",
-      "Al final, pulsa «{{boton}}»."
+      "Al terminar cada una, pulsa «{{boton}}» junto a ella."
     ],
     "verHistorial": "Ver mi historial ({{count}})",
     "ocultarHistorial": "Ocultar historial",
@@ -150,7 +148,22 @@
     "queTeAyudaMarcadas": "¿Qué te ayuda en esta área? ({{count}})",
     "queTeAyudaTexto": "Opcional. Sirve para que las ideas de la app encajen contigo.",
     "notaPrivada": "Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.",
-    "errorExperiencia": "No se pudo guardar tu elección"
+    "errorExperiencia": "No se pudo guardar tu elección",
+    "ultimaExperiencia": "Tu última experiencia (privada) · {{fecha}}",
+    "tienesIdea": "Tienes una idea para {{categoria}}:",
+    "guardarCategoria": "Guardar {{categoria}}",
+    "guardadoAhora": "Guardado ahora",
+    "ultimaActualizacion": "Última actualización: {{fecha}} · {{cambio}}",
+    "guardadoTitulo": "Cambios guardados",
+    "gracias": "Gracias por mirarte con honestidad.",
+    "irInicio": "Ir a Inicio",
+    "seguirAqui": "Seguir aquí",
+    "ideasPara": "Ideas para {{categoria}}",
+    "progresoTitulo": "Tu progreso",
+    "progresoResumen": "{{respondidas}} de {{total}} respondidas",
+    "estadoSinGuardar": "Sin guardar",
+    "estadoGuardadaHoy": "Guardada hoy",
+    "estadoGuardada": "Guardada el {{fecha}}"
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -340,6 +353,9 @@
     "iaError": "No se pudo guardar el cambio"
   },
   "recomendaciones": {
+    "ideaAnterior": "Idea anterior",
+    "ideaSiguiente": "Idea siguiente",
+    "ideaPosicion": "Idea {{actual}} de {{total}}",
     "titulo": "Una idea para ti",
     "aviso": "Estas ideas son sugerencias generales de bienestar y no sustituyen el asesoramiento médico, financiero o psicológico profesional.",
     "plantillas": {

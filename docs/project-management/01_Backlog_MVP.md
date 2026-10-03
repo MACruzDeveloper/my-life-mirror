@@ -11,13 +11,13 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **RF-40a** ideas personalizadas con IA, contra un *Fake* (desde el 2 oct.; [historia](../user-stories/RF-40-ideas-personalizadas-ia.md), Nivel 3). Construida; pendiente de revisar las 27 ideas nuevas del catálogo y de los E2E con Docker: activación voluntaria en Privacidad y datos, la IA reescribe una idea del catálogo (ampliado a ~5 por categoría, revisado por el autor) la primera vez que se abre, con filtro de palabras y segunda revisión, y caída al texto curado; sin categorías sensibles ni texto libre ([ADR-05](../architecture-decisions/05_Fundamentos_IA.md), apartado 4.3). PR 3.
+- [ ] **UX-05** respuesta inmediata en la entrevista (desde el 3 oct.; [historia](../user-stories/UX-05-respuesta-inmediata-entrevista.md)): un "Guardar" por categoría, a la derecha de la puntuación; "Guardado ahora" en la categoría o, si el guardado abre una idea nueva, una ventana con ella; carrusel con las 5 ideas de la categoría y "Ideas para X" en la pregunta (con RF-40, se reescriben al cambiar "¿Qué te ayuda?", RF-40 v1.1); la última actualización y la última experiencia bajo cada pregunta; panel de progreso en la columna derecha; el historial pasa a Resultados, agrupado por día. Petición del autor (3 oct.): "si no, el usuario no sabe qué ha pasado".
+- [ ] **UX-06** distribución de la entrevista (detrás de UX-05, propuesta el 3 oct.): la selección de categorías en la columna derecha, bajo el progreso (que se adelantó a UX-05), y el menú lateral de Mi perfil, plegable.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
-- [ ] **UX-05** respuesta inmediata en la entrevista: tu última experiencia guardada (privada) bajo su pregunta y en el historial, y tras guardar una puntuación baja, su idea en el propio mensaje de "Cambios guardados" (personalizada si RF-40 está activado). Petición del autor (3 oct.): "si no, el usuario no sabe qué ha pasado".
 - [ ] **RF-42** situaciones que lo ponen difícil (nuevo, Should): con puntuación baja, la entrevista pregunta "¿Qué te lo pone difícil?" con una lista cerrada de situaciones (no rasgos ni salud); las ideas que choquen no se proponen, tampoco por IA. Sustituye la idea aplazada del 29 sept.
 - [ ] **RF-43** lo que funciona a otros (nuevo, Could): con puntuación alta, agregado anónimo de las opciones de RF-41 de quienes van bien en esa categoría, con tamaño mínimo de grupo y posibilidad de excluirse. Primer paso, ligero y sin texto libre, hacia RF-32/RF-33.
 - [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
@@ -44,6 +44,8 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
 ## Hecho
 
+- [x] **RF-40a** ideas personalizadas con IA contra un *Fake*: interruptor voluntario, la IA reescribe una idea del catálogo (ampliado a 5 por categoría) con filtro y caída al texto curado — [historia](../user-stories/RF-40-ideas-personalizadas-ia.md) (Nivel 3). Las 27 ideas nuevas, pendientes de una revisión a fondo del autor.
+- [x] **Imports `#shared`/`#modules`** en el código del servidor, probados con un `vercel build` real antes de convertir 265 imports.
 - [x] **RF-41** experiencias por categoría: "¿Qué te ayuda?" (opciones cerradas, guardado al momento) y la nota como "Tu experiencia (privada)" — [historia](../user-stories/RF-41-experiencias-categoria.md).
 - [x] **UX-04** historial de cambios plegado, con línea de tiempo por meses — [historia](../user-stories/UX-04-historial-plegable.md).
 - [x] **Primera entrega a producción** (29 sept.): v1.0.0 y v1.0.1 en https://my-life-mirror.vercel.app, con el *smoke* de producción tras cada despliegue.
@@ -135,4 +137,7 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.34 (29 sept. 2026)** — UX-04 hecha; RF-41 en curso.
 - **v2.35 (2 oct. 2026)** — RF-41 hecha; RF-40a en curso (construida contra el *Fake*).
 - **v2.36 (3 oct. 2026)** — nuevas en "Listo", detrás de RF-40a: UX-05, RF-42 y RF-43 (confirmadas por el autor). La idea de "situaciones a evitar" pasa a ser RF-42.
+- **v2.37 (3 oct. 2026)** — RF-40a e imports `#` hechos; UX-05 en curso.
 - **v2.36 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).
+- **v2.38 (3 oct. 2026)** — UX-05 rediseñada tras probarla (guardar por categoría, ventana solo con idea nueva, historial a Resultados); UX-06 añadida detrás.
+- **v2.39 (3 oct. 2026)** — UX-05 crece (decisión del autor): carrusel de ideas, ideas que cambian con "¿Qué te ayuda?" (RF-40 v1.1) y el panel de progreso, adelantado de UX-06.

@@ -9,7 +9,7 @@ Para que las ideas que me proponga la app encajen conmigo, sabiendo que lo que e
 
 ## Alcance
 
-- **"¿Qué te ayuda en esta área?"** bajo cada pregunta de la entrevista, plegado: entre 5 y 7 opciones para marcar, propias de cada categoría (p. ej. Deporte: caminar, gimnasio, deporte en equipo, naturaleza, bailar…). Se pueden marcar varias o ninguna. Se guardan al momento, como marcar una categoría: no esperan a "Guardar cambios".
+- **"¿Qué te ayuda en esta área?"** bajo cada pregunta de la entrevista, plegado: entre 5 y 7 opciones para marcar, propias de cada categoría (p. ej. Deporte: caminar, gimnasio, deporte en equipo, naturaleza, bailar…). Se pueden marcar varias o ninguna. Se guardan al momento, como marcar una categoría: no esperan al "Guardar" de la categoría.
 - **La nota pasa a "Tu experiencia (privada)"**, con un texto claro debajo: *solo la ves tú; nunca se envía a la IA ni se comparte con nadie*. Sigue guardándose con cada puntuación (RF-11), igual que ahora.
 - **Para qué sirven:** las opciones marcadas son lo único que podrá usar la IA para personalizar ideas (RF-40), y solo si el usuario lo activa. Las de categorías sensibles se guardan igual, pero nunca se enviarán.
 - **Solo las categorías estándar** (con clave) tienen opciones; las que crea el admin, de momento, no.
@@ -51,3 +51,4 @@ Para que las ideas que me proponga la app encajen conmigo, sabiendo que lo que e
 ## Historial de cambios
 
 - **v1.0 (29 sept. 2026)** — versión inicial (PR 2 del plan del Ciclo 2).
+- **v1.1 (3 oct. 2026)** — el botón de guardar pasa a ser uno por categoría (UX-05).

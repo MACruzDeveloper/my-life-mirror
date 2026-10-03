@@ -5,8 +5,8 @@ import type { PersonalizedIdea, PersonalizedIdeaRepository } from "../domain/Per
 export class InMemoryPersonalizedIdeaRepository implements PersonalizedIdeaRepository {
   private readonly ideas = new Map<string, PersonalizedIdea>();
 
-  async find(recommendationId: string, locale: Locale): Promise<PersonalizedIdea | undefined> {
-    return this.ideas.get(`${recommendationId}:${locale}`);
+  async find(recommendationId: string, templateKey: string, locale: Locale): Promise<PersonalizedIdea | undefined> {
+    return this.ideas.get(`${recommendationId}:${templateKey}:${locale}`);
   }
 
   async findByUserId(userId: string): Promise<PersonalizedIdea[]> {
@@ -14,7 +14,7 @@ export class InMemoryPersonalizedIdeaRepository implements PersonalizedIdeaRepos
   }
 
   async save(idea: PersonalizedIdea): Promise<void> {
-    this.ideas.set(`${idea.recommendationId}:${idea.locale}`, idea);
+    this.ideas.set(`${idea.recommendationId}:${idea.templateKey}:${idea.locale}`, idea);
   }
 
   async deleteByUserId(userId: string): Promise<void> {
