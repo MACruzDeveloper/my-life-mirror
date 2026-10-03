@@ -19,6 +19,21 @@ function readStatus() {
   }
 }
 
+/**
+ * Los contenedores del Supabase local se marcan "reiniciar salvo que se paren":
+ * así arrancan solos al abrir Docker Desktop, sin docker-compose. `npx supabase stop`
+ * los apaga (y los borra), y la próxima vez que se arranquen se vuelven a marcar.
+ * Si falla (p. ej. sin permisos), no es grave: solo habrá que arrancarlo a mano.
+ */
+function keepRunningWithDocker() {
+  try {
+    const ids = execFileSync("docker", ["ps", "-aq", "--filter", "name=_my-sims"], { encoding: "utf8" }).split("\n").filter(Boolean);
+    if (ids.length > 0) execFileSync("docker", ["update", "--restart", "unless-stopped", ...ids], { stdio: "ignore" });
+  } catch {
+    // Sin consecuencias para la app ni los tests.
+  }
+}
+
 /** Arranca el Supabase local si hace falta y devuelve las variables que necesita la app. */
 export function ensureLocalSupabase({ appUrl }) {
   let status = readStatus();
@@ -27,11 +42,14 @@ export function ensureLocalSupabase({ appUrl }) {
     supabase("start");
     status = readStatus();
   }
+  keepRunningWithDocker();
   return {
     SUPABASE_URL: status.API_URL,
     SUPABASE_SERVICE_ROLE_KEY: status.SERVICE_ROLE_KEY,
     APP_URL: appUrl,
     APP_ENV: "dev",
+    // RF-40a: en local y en los E2E, ideas personalizadas con el escritor *Fake*.
+    AI_IDEAS_PROVIDER: "fake",
     studioUrl: status.STUDIO_URL,
     mailUrl: status.MAILPIT_URL ?? status.INBUCKET_URL,
   };

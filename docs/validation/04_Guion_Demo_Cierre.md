@@ -87,7 +87,7 @@
 | ¿Cómo sabéis que funciona en producción y no solo en local? | `check:api` carga las funciones como Vercel, y los E2E con base de datos real (local) corren en cada PR. Lección aprendida con un fallo real. | Métricas, apartado 7.2 |
 | ¿Por qué una sola participante? | Era la persona disponible; está documentado como limitación y se buscaron problemas graves, no medir. | Resultados del test, apartado 6 |
 | ¿Por qué no Sentry u otro servicio de errores? | A esta escala basta el logger estructurado y los logs de Vercel (RES-03, YAGNI). | ADR-08 |
-| ¿Límites del plan gratuito? | 12 funciones en Vercel Hobby (una por capacidad) y pausa de Supabase tras 7 días (workflow diario). | ADR-03, apartado 6.1 |
+| ¿Límites del plan gratuito? | 12 funciones en Vercel Hobby (una por capacidad) y pausa de Supabase tras 7 días (workflow cada 5 días). | ADR-03, apartado 6.1 |
 
 ## 4. Después de la demo
 
@@ -101,3 +101,4 @@
 
 - **v1.0 (29 sept. 2026)** — versión inicial: preparación (incluida la primera entrega a producción), guion de 25 minutos, preguntas probables y qué hacer después.
 - **v1.1 (29 sept. 2026)** — la demo pasa al final del proyecto; la lista de la primera entrega a producción (apartado 1.1) se usa ya.
+- **v1.2 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).

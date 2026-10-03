@@ -7,7 +7,8 @@
  * Estados de [09_Diagrama_Estados_Recomendacion.md]: en el corte de RF-18 solo
  * se crea `pending`; el resto llega con RF-19.
  */
-export type RecommendationStatus = "pending" | "done" | "discarded" | "postponed";
+export const RECOMMENDATION_STATUSES = ["pending", "done", "discarded", "postponed"] as const;
+export type RecommendationStatus = (typeof RECOMMENDATION_STATUSES)[number];
 
 export interface Recommendation {
   readonly id: string;

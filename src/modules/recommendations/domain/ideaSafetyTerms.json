@@ -1,0 +1,17 @@
+{
+  "_comentario": "RF-40: términos que una idea escrita por la IA nunca puede contener (ver ideaSafety.ts). Por idioma y tipo, para editarlos sin tocar la lógica. Se aplican las dos listas siempre, por si el modelo mezcla idiomas. Sintaxis: palabra o frase (se comparan sin tildes ni mayúsculas, y la frase admite cualquier espacio entre palabras); un * al final significa 'y lo que siga de la palabra' (fracas* → fracaso, fracasado…). Ante la duda, bloquear: el coste de un falso positivo es ver el texto curado, que es seguro. Solo lo lee el servidor: no está en las traducciones porque esas viajan completas al navegador.",
+  "es": {
+    "lenguajeClinico": ["depresión", "deprimid*", "trastorno*", "diagnóstic*", "ansiedad"],
+    "consejoProfesional": ["terapia*", "terapeuta*", "medicación*", "medicamento*", "pastilla", "pastillas", "dosis", "antidepresiv*"],
+    "consejoFinanciero": ["criptomoneda*", "bitcoin*", "invierte en", "inviertas en", "rentabilidad garantizada*", "préstamo*"],
+    "obligacion": ["tienes que", "debes", "deberías", "es obligatorio", "sin excusas"],
+    "juicio": ["vago", "vaga", "vagos", "vagas", "perezos*", "fracas*", "patétic*", "inútil*"]
+  },
+  "en": {
+    "lenguajeClinico": ["depressed", "depression", "disorder*", "diagnos*", "anxiety"],
+    "consejoProfesional": ["therapy", "therapist*", "medication*", "pill", "pills", "dose", "doses", "antidepressant*"],
+    "consejoFinanciero": ["crypto*", "invest in", "guaranteed return*", "loan", "loans"],
+    "obligacion": ["you must", "you have to", "you should", "no excuses"],
+    "juicio": ["lazy", "failure*", "pathetic", "useless"]
+  }
+}

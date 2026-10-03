@@ -12,6 +12,11 @@ export class DataPrivacyPage {
     await this.page.goto("/perfil/datos");
   }
 
+  /** RF-40: el interruptor de las ideas personalizadas con IA. */
+  aiIdeasSwitch() {
+    return this.page.getByRole("switch", { name: /ideas personalizadas con ia/i });
+  }
+
   async exportData() {
     const download = this.page.waitForEvent("download");
     await this.page.getByRole("button", { name: "Descargar mis datos" }).click();

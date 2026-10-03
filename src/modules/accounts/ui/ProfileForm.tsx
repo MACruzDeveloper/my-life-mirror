@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
@@ -10,20 +10,12 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import type { Gender } from "@modules/accounts/domain/Profile";
-import { getJson } from "@shared/ui/api/getJson";
+import { PROFILE_KEY, useProfile, type ProfileResponse } from "./queries";
 import { useSession } from "@shared/ui/context/SessionContext";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
 const DETECTED_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-interface ProfileResponse {
-  name: string;
-  birthDate?: string;
-  gender?: Gender;
-  timeZone?: string;
-}
-
-const PROFILE_KEY = ["profile"] as const;
 
 type FormState =
   | { kind: "listo" }
@@ -42,10 +34,7 @@ type FormState =
 export function ProfileForm() {
   const { t } = useTranslation();
   // `null` = el usuario todavía no tiene perfil (react-query no admite `undefined` como dato).
-  const { data, isPending, isError } = useQuery({
-    queryKey: PROFILE_KEY,
-    queryFn: () => getJson<ProfileResponse | null>("/api/accounts/profile"),
-  });
+  const { data, isPending, isError } = useProfile();
 
   if (isPending) {
     return (

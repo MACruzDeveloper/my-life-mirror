@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { USER_ROLES } from "../../../../../modules/accounts/domain/UserRole.js";
 import { adminHandler } from "./adminHandler.js";
 
 const userId = z.string().min(1);
@@ -8,7 +9,7 @@ const password = z.string();
 export const changeRole = adminHandler({
   route: "/api/admin/user-role",
   method: "POST",
-  schema: z.object({ userId, rol: z.enum(["usuario", "premium", "admin"]), password }),
+  schema: z.object({ userId, rol: z.enum(USER_ROLES), password }),
   execute: (c, actor, body) => c.adminUsers.changeRole({ actor, ...body }),
 });
 

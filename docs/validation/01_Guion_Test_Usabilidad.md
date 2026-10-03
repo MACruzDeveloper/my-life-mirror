@@ -30,7 +30,7 @@ No se evalúa: el registro con correo real, la recuperación de contraseña ni e
   - **En local** (`npm run dev:full`) en el portátil: más sencillo, pero sin móvil.
 - [ ] **Migraciones aplicadas** en Supabase: de la 0001 a la 0007 (sin la 0007 no aparece ninguna recomendación; sin la 0005, la entrevista no carga las categorías).
 - [ ] **Variables de entorno de la *preview*** (si se usa Vercel): en *Settings → Environment Variables*, `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` deben estar marcadas también para el entorno *Preview*; si no, el registro falla con un error 500.
-- [ ] **Supabase activo.** Abrir el panel de Supabase y comprobar que el proyecto no está pausado (el *keep-alive* diario debería mantenerlo, pero se comprueba).
+- [ ] **Supabase activo.** Abrir el panel de Supabase y comprobar que el proyecto no está pausado (el *keep-alive* cada 5 días debería mantenerlo, pero se comprueba).
 - [ ] **Ensayo completo** del recorrido con una cuenta propia de prueba, en el mismo dispositivo y URL que se usarán. Borrarla después.
 - [ ] **Umbral de recomendaciones** en su valor por defecto (5): una categoría puntuada de 1 a 4 debe mostrar "Una idea para ti".
 - [ ] Hoja de resultados abierta, cronómetro (el del móvil vale) y, si la participante lo acepta, grabación de pantalla.
@@ -164,3 +164,4 @@ Misma escala de 1 a 5:
 
 - **v1.0 (26 sept. 2026)** — versión inicial para el test del MVP (Ciclo 1).
 - **v1.1 (26 sept. 2026)** — enlace a la versión corta en inglés, que es la que se usa en la sesión.
+- **v1.2 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).

@@ -5,11 +5,11 @@
  * "usuario": premium/admin se conceden a mano (Supabase dashboard,
  * app_metadata) hasta que exista un flujo de gestión dedicado.
  */
-export type UserRole = "usuario" | "premium" | "admin";
+export const USER_ROLES = ["usuario", "premium", "admin"] as const;
+export type UserRole = (typeof USER_ROLES)[number];
 
 export const DEFAULT_ROLE: UserRole = "usuario";
 
-export const VALID_ROLES: readonly UserRole[] = ["usuario", "premium", "admin"];
 
 /**
  * Traduce el `app_metadata` de Supabase a un RolUsuario válido, con
@@ -19,7 +19,7 @@ export const VALID_ROLES: readonly UserRole[] = ["usuario", "premium", "admin"];
  */
 export function readRoleFromMetadata(appMetadata: unknown): UserRole {
   const value = (appMetadata as { rol?: unknown } | null | undefined)?.rol;
-  return typeof value === "string" && (VALID_ROLES as readonly string[]).includes(value)
+  return typeof value === "string" && (USER_ROLES as readonly string[]).includes(value)
     ? (value as UserRole)
     : DEFAULT_ROLE;
 }

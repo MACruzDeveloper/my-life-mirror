@@ -13,7 +13,7 @@ import { logger } from "../../../logger.js";
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession, getProfile } = getAppContext();
+    const { verifySession, getProfile, aiIdeasAvailable } = getAppContext();
     const result = await verifySession(token);
 
     if (!result.ok) {
@@ -38,7 +38,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, rol: result.value.rol }));
+    res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, rol: result.value.rol, aiIdeasAvailable }));
   } catch (error) {
     logger.error("Error inesperado en /api/accounts/session", error, { route: "/api/accounts/session" });
     res.writeHead(500, { "Content-Type": "application/json" });

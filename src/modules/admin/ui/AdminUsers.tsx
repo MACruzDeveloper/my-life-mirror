@@ -27,6 +27,8 @@ import { HttpError } from "@shared/ui/api/getJson";
 import { useOptionalSession } from "@shared/ui/context/SessionContext";
 import { ADMIN_AUDIT_KEY, ADMIN_USERS_KEY, postAdmin, useAdminUsers, type AdminUserDto } from "./adminQueries";
 
+import { USER_ROLES } from "@modules/accounts/domain/UserRole";
+
 type ActionType = "role" | "email" | "name" | "suspend" | "delete" | "recovery";
 
 /** Acciones que exigen la contraseña del admin (las mismas que exige el servidor). */
@@ -39,7 +41,6 @@ const ENDPOINT: Record<ActionType, string> = {
   delete: "user-delete",
   recovery: "user-recovery",
 };
-const ROLES = ["usuario", "premium", "admin"] as const;
 
 /**
  * Gestión de usuarios por el admin (ADM-03). La interfaz solo desactiva lo que
@@ -252,7 +253,7 @@ export function AdminUsers() {
               {error && <Alert severity="error">{error}</Alert>}
               {action.kind === "role" && (
                 <TextField select label={t("admin.rol")} value={role} onChange={(e) => setRole(e.target.value as AdminUserDto["rol"])} fullWidth>
-                  {ROLES.map((r) => (
+                  {USER_ROLES.map((r) => (
                     <MenuItem key={r} value={r}>
                       {r}
                     </MenuItem>

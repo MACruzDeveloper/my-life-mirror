@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { GENDERS } from "../../../../../modules/accounts/domain/Profile.js";
 import { z } from "zod";
 // Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
 import { getAppContext } from "../../../container.js";
@@ -10,7 +11,7 @@ type RequestWithBody = IncomingMessage & { body: unknown };
 const UpdateProfileSchema = z.object({
   name: z.string().optional(),
   birthDate: z.string().optional(),
-  gender: z.enum(["woman", "man", "non-binary", "prefer-not-to-say"]).optional(),
+  gender: z.enum(GENDERS).optional(),
   timeZone: z.string().optional(),
 });
 

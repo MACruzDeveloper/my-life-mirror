@@ -11,6 +11,7 @@ import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastru
 import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/InMemoryCategoryRepository";
 import { createGrantConsent } from "@modules/consent/application/GrantConsent";
 import { InMemoryConsentRepository } from "@modules/consent/infrastructure/InMemoryConsentRepository";
+import { InMemoryPersonalizedIdeaRepository } from "@modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository";
 import { InMemoryRecommendationRepository } from "@modules/recommendations/infrastructure/InMemoryRecommendationRepository";
 import { AuthenticationError, ConflictError, ValidationError } from "@shared/domain/DomainError";
 import type { Clock } from "@shared/domain/Clock";
@@ -24,7 +25,8 @@ async function setup() {
   const consentRepository = new InMemoryConsentRepository();
   const assessmentRepository = new InMemoryAssessmentRepository();
   const recommendationRepository = new InMemoryRecommendationRepository();
-  const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository };
+  const personalizedIdeaRepository = new InMemoryPersonalizedIdeaRepository();
+  const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository };
 
   const ana = await authProvider.register("ana@ejemplo.com", "12345678");
   const luis = await authProvider.register("luis@ejemplo.com", "abcdefgh");
@@ -47,6 +49,8 @@ async function setup() {
     { id: "r-ana", userId: ana.id, categoryId: financesAna.id, templateKey: "economia.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-luis", userId: luis.id, categoryId: categoriesLuis[0].id, templateKey: "general.1", threshold: 5, status: "pending", createdAt: clock.now() },
   ]);
+  await personalizedIdeaRepository.save({ recommendationId: "r-ana", userId: ana.id, locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: clock.now() });
+  await profileRepository.save({ ...(await profileRepository.findByUserId(ana.id))!, aiIdeasEnabled: true, aiIdeasEnabledAt: "2026-09-20T10:00:00.000Z" });
   await createGrantConsent(consentRepository, clock)({ userId: ana.id, categoryId: sexAna.id, policyVersion: "2026-09" });
 
   return {
@@ -80,6 +84,9 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     );
     expect(data.recommendations).toEqual([{ category: "Economía", templateKey: "economia.1", status: "pending", createdAt: "2026-09-20T10:00:00.000Z" }]);
     expect(data.consents).toEqual([{ category: "Sexo", policyVersion: "2026-09", grantedAt: "2026-09-20T10:00:00.000Z" }]);
+    // RF-40: la elección y las ideas personalizadas también son datos suyos.
+    expect(data.aiIdeas).toEqual({ enabled: true, enabledAt: "2026-09-20T10:00:00.000Z" });
+    expect(data.personalizedIdeas).toEqual([{ category: "Economía", locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: "2026-09-20T10:00:00.000Z" }]);
   });
 
   it("no incluye nada de otros usuarios", async () => {
@@ -109,12 +116,13 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
 
 describe("DeleteAccount (RF-05, derecho al olvido)", () => {
   it("con la contraseña correcta borra evaluaciones, categorías, consentimientos, perfil y la cuenta de acceso", async () => {
-    const { deleteAccount, ana, authProvider, assessmentRepository, categoryRepository, consentRepository, profileRepository, recommendationRepository } = await setup();
+    const { deleteAccount, ana, authProvider, assessmentRepository, categoryRepository, consentRepository, profileRepository, recommendationRepository, personalizedIdeaRepository } = await setup();
 
     const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" });
 
     expect(result.ok).toBe(true);
     expect(await recommendationRepository.findByUserId(ana.id)).toEqual([]);
+    expect(await personalizedIdeaRepository.findByUserId(ana.id)).toEqual([]);
     expect(await assessmentRepository.findByUserId(ana.id)).toEqual([]);
     expect(await categoryRepository.findByUserId(ana.id)).toEqual([]);
     expect(await consentRepository.findByUser(ana.id)).toEqual([]);
