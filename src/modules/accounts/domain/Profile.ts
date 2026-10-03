@@ -8,7 +8,8 @@
  * desde el principio; el resto se rellena más tarde en la pantalla de perfil
  * y por eso son opcionales (ver UpdateProfile, que hace upsert parcial).
  */
-export type Gender = "woman" | "man" | "non-binary" | "prefer-not-to-say";
+export const GENDERS = ["woman", "man", "non-binary", "prefer-not-to-say"] as const;
+export type Gender = (typeof GENDERS)[number];
 
 export interface Profile {
   readonly userId: string;
@@ -16,4 +17,8 @@ export interface Profile {
   readonly birthDate?: string; // ISO "YYYY-MM-DD"
   readonly gender?: Gender;
   readonly timeZone?: string;
+  /** RF-40: ideas personalizadas con IA, activadas por el propio usuario (desactivadas por defecto). */
+  readonly aiIdeasEnabled?: boolean;
+  /** Cuándo las activó (ISO), como constancia del consentimiento; sin valor si están desactivadas. */
+  readonly aiIdeasEnabledAt?: string;
 }

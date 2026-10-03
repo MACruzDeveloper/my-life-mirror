@@ -81,6 +81,8 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-12 | El sistema debe guardar cada evaluación con marca de tiempo, de forma inmutable (no editable retroactivamente, salvo corrección en las siguientes 24h). | Should |
 | RF-13 | El sistema debe recordar al usuario (notificación) cuándo toca una nueva evaluación según la frecuencia configurada. | Should |
 | RF-41 | El usuario podrá indicar en cada categoría qué le ayuda, eligiendo entre opciones de una lista cerrada por categoría, y la nota de RF-11 se presentará como su experiencia privada. Solo las opciones elegidas pueden usarse para personalizar ideas (RF-40), y solo si el usuario lo activa; el texto libre nunca se envía a la IA ni se comparte. | Should |
+| RF-42 | Cuando la puntuación de una categoría esté por debajo del umbral de recomendación, el usuario podrá indicar qué se lo pone difícil eligiendo entre situaciones de una lista cerrada (p. ej. mucha gente, hablar en público, gastar dinero), nunca rasgos ni condiciones de salud. Las ideas que choquen con esas situaciones no se le proponen, tampoco las personalizadas por IA (RF-40). | Should |
+| RF-43 | Cuando la puntuación de una categoría sea alta (8 o más), el usuario podrá ver, de forma anónima y agregada, qué opciones de "¿Qué te ayuda?" (RF-41) marcan otras personas a las que esa categoría les va bien, solo si el grupo alcanza un tamaño mínimo que impida identificar a nadie. Sin texto libre. El usuario puede excluir sus datos del agregado. | Could |
 
 ### 2.4 Panel / Dashboard
 | ID | Descripción | Prioridad |
@@ -209,3 +211,4 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 - **v0.10 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA, ancladas al catálogo curado y con verificación automática), Should, Ciclo 2. Surge de la validación (la participante pidió sugerencias más personales) y lo confirma el autor. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) apartado 4.3.
 - **v0.11 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
 - **v0.11 (29 sept. 2026)** — RF-41 (experiencias por categoría: opciones cerradas "qué me ayuda" y la nota de RF-11 como experiencia privada), Should, Ciclo 2. Confirmado por el autor en el plan del Ciclo 2.
+- **v0.12 (3 oct. 2026)** — RF-42 (situaciones que lo ponen difícil, con puntuación baja; filtran las ideas) y RF-43 (lo que funciona a otros, anónimo y agregado, con puntuación alta). Confirmados por el autor: la puntuación decide qué pregunta cerrada se hace; el texto libre sigue siendo privado.

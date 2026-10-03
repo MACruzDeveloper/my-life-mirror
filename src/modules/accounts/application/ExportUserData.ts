@@ -2,6 +2,7 @@ import { type Result, ok } from "../../../shared/domain/Result.js";
 import type { Clock } from "../../../shared/domain/Clock.js";
 import type { AssessmentRepository } from "../../assessments/domain/AssessmentRepository.js";
 import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import type { PersonalizedIdeaRepository } from "../../recommendations/domain/PersonalizedIdea.js";
 import type { RecommendationRepository } from "../../recommendations/domain/RecommendationRepository.js";
 import type { ConsentRepository } from "../../consent/domain/ConsentRepository.js";
 import type { ProfileRepository } from "../domain/ProfileRepository.js";
@@ -15,6 +16,9 @@ export interface UserDataExport {
   consents: { category: string; policyVersion: string; grantedAt: string }[];
   assessments: { category: string; score: number; note?: string; recordedAt: string }[];
   recommendations: { category: string; templateKey: string; status: string; createdAt: string }[];
+  /** RF-40: si activó las ideas con IA y cuándo, y las ideas que se le personalizaron. */
+  aiIdeas: { enabled: boolean; enabledAt?: string };
+  personalizedIdeas: { category: string; locale: string; templateKey: string; text: string; model: string; createdAt: string }[];
 }
 
 interface Dependencies {
@@ -23,6 +27,7 @@ interface Dependencies {
   consentRepository: ConsentRepository;
   assessmentRepository: AssessmentRepository;
   recommendationRepository: RecommendationRepository;
+  personalizedIdeaRepository: PersonalizedIdeaRepository;
   clock: Clock;
 }
 
@@ -34,14 +39,15 @@ interface Dependencies {
  * que `ActivateCategory` con el consentimiento.
  * Ver docs/user-stories/RF-05-exportar-eliminar-datos.md.
  */
-export function createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, clock }: Dependencies) {
+export function createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, clock }: Dependencies) {
   return async function exportUserData(user: { id: string; email: string }): Promise<Result<UserDataExport, never>> {
-    const [profile, categories, consents, assessments, recommendations] = await Promise.all([
+    const [profile, categories, consents, assessments, recommendations, personalizedIdeas] = await Promise.all([
       profileRepository.findByUserId(user.id),
       categoryRepository.findByUserId(user.id),
       consentRepository.findByUser(user.id),
       assessmentRepository.findByUserId(user.id),
       recommendationRepository.findByUserId(user.id),
+      personalizedIdeaRepository.findByUserId(user.id),
     ]);
     const names = new Map(categories.map((c) => [c.id, c.name]));
 
@@ -60,6 +66,11 @@ export function createExportUserData({ profileRepository, categoryRepository, co
       categories: categories.map((c) => ({ name: c.name, description: c.description, type: c.type, status: c.status, isSensitiveData: c.isSensitiveData, experienceTags: [...(c.experienceTags ?? [])] })),
       consents: consents.map((c) => ({ category: names.get(c.categoryId) ?? "", policyVersion: c.policyVersion, grantedAt: c.grantedAt.toISOString() })),
       recommendations: recommendations.map((r) => ({ category: names.get(r.categoryId) ?? "", templateKey: r.templateKey, status: r.status, createdAt: r.createdAt.toISOString() })),
+      aiIdeas: { enabled: profile?.aiIdeasEnabled === true, ...(profile?.aiIdeasEnabledAt ? { enabledAt: profile.aiIdeasEnabledAt } : {}) },
+      personalizedIdeas: personalizedIdeas.map((idea) => {
+        const categoryId = recommendations.find((r) => r.id === idea.recommendationId)?.categoryId;
+        return { category: (categoryId && names.get(categoryId)) || "", locale: idea.locale, templateKey: idea.templateKey, text: idea.text, model: idea.model, createdAt: idea.createdAt.toISOString() };
+      }),
       assessments: [...assessments]
         .sort((a, b) => a.recordedAt.getTime() - b.recordedAt.getTime())
         .map((a) => ({ category: names.get(a.categoryId) ?? "", score: a.score, ...(a.note ? { note: a.note } : {}), recordedAt: a.recordedAt.toISOString() })),

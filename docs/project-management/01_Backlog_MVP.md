@@ -11,13 +11,15 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **RF-41** experiencias por categoría (desde el 29 sept.; [historia](../user-stories/RF-41-experiencias-categoria.md)): en cada pregunta de la entrevista, opciones para marcar "¿Qué te ayuda en esta área?" (las únicas que puede usar la IA, si el usuario lo activa) y la nota pasa a "Tu experiencia (privada)", que nunca sale hacia la IA ni se comparte. PR 2.
+- [ ] **RF-40a** ideas personalizadas con IA, contra un *Fake* (desde el 2 oct.; [historia](../user-stories/RF-40-ideas-personalizadas-ia.md), Nivel 3). Construida; pendiente de revisar las 27 ideas nuevas del catálogo y de los E2E con Docker: activación voluntaria en Privacidad y datos, la IA reescribe una idea del catálogo (ampliado a ~5 por categoría, revisado por el autor) la primera vez que se abre, con filtro de palabras y segunda revisión, y caída al texto curado; sin categorías sensibles ni texto libre ([ADR-05](../architecture-decisions/05_Fundamentos_IA.md), apartado 4.3). PR 3.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
-- [ ] **RF-40a** ideas personalizadas con IA, contra un *Fake*: activación voluntaria en Privacidad y datos, la IA reescribe una idea del catálogo (ampliado a ~5 por categoría, revisado por el autor) la primera vez que se abre, con filtro de palabras y segunda revisión, y caída al texto curado; sin categorías sensibles ni texto libre ([ADR-05](../architecture-decisions/05_Fundamentos_IA.md), apartado 4.3). PR 3.
+- [ ] **UX-05** respuesta inmediata en la entrevista: tu última experiencia guardada (privada) bajo su pregunta y en el historial, y tras guardar una puntuación baja, su idea en el propio mensaje de "Cambios guardados" (personalizada si RF-40 está activado). Petición del autor (3 oct.): "si no, el usuario no sabe qué ha pasado".
+- [ ] **RF-42** situaciones que lo ponen difícil (nuevo, Should): con puntuación baja, la entrevista pregunta "¿Qué te lo pone difícil?" con una lista cerrada de situaciones (no rasgos ni salud); las ideas que choquen no se proponen, tampoco por IA. Sustituye la idea aplazada del 29 sept.
+- [ ] **RF-43** lo que funciona a otros (nuevo, Could): con puntuación alta, agregado anónimo de las opciones de RF-41 de quienes van bien en esa categoría, con tamaño mínimo de grupo y posibilidad de excluirse. Primer paso, ligero y sin texto libre, hacia RF-32/RF-33.
 - [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
 - [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
 - [ ] **Demo final** — al terminar el proyecto, para la revisión de los profesores (no antes: solo revisan el proyecto terminado). [Guion](../validation/04_Guion_Demo_Cierre.md) ya preparado; se actualiza entonces con lo que haya del Ciclo 2.
@@ -36,11 +38,13 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 - **Campos JSON de la API en español** (`autenticado`, `sesionIniciada`, `rol`, `creadoEn`, `ultimoAcceso`, `suspendido`, `mensaje`): lo único del código que sigue en español sin ser dato guardado. Cambiarlos exige tocar servidor, cliente y tests a la vez; se hará en una PR aparte si compensa.
 - **Validación ética con el tutor** (pendiente, sin fecha): comentar el enfoque de RF-29/RES-09 (sugerir apoyo profesional sin detección algorítmica de riesgo), por si el máster exige alguna revisión ética adicional al tratarse de bienestar emocional. Pesa más ahora con RF-40 (IA). Venía de los "Próximos pasos" de los requisitos.
 - **`requestId` en los logs** (idea): un id por petición para seguirla entre funciones distintas en los logs de Vercel. Venía del "Próximo paso" de ADR-08.
+- **Contenido editable desde `/admin`** (idea, ADM-04; después de RF-40a, decidido el 29 sept.): el catálogo de ideas (con traducciones y etiquetas de situación), las opciones de "¿Qué te ayuda?" y las situaciones a evitar pasan a la base de datos, editables como las categorías de ADM-02 (retirar, nunca borrar: los usuarios guardan sus claves). Es lo que ya pedía RD-09 ("catálogo gestionable sin tocar código").
 - **Volver a ejecutar los E2E con `api/` en todas las PRs** (a final de octubre): quitar `branches: [main]` en `.github/workflows/e2e-api.yml`. Hasta entonces solo en las PRs a `main`, a petición del autor (tardaban en cada PR).
 - **Política de privacidad**: borrador de TFM, no revisado legalmente ([PrivacyPolicyPage](../../src/pages/PrivacyPolicyPage.tsx)).
 
 ## Hecho
 
+- [x] **RF-41** experiencias por categoría: "¿Qué te ayuda?" (opciones cerradas, guardado al momento) y la nota como "Tu experiencia (privada)" — [historia](../user-stories/RF-41-experiencias-categoria.md).
 - [x] **UX-04** historial de cambios plegado, con línea de tiempo por meses — [historia](../user-stories/UX-04-historial-plegable.md).
 - [x] **Primera entrega a producción** (29 sept.): v1.0.0 y v1.0.1 en https://my-life-mirror.vercel.app, con el *smoke* de producción tras cada despliegue.
 - [x] **Métricas DORA y Flow** (primera revisión, 29 sept.): 11 PRs, 1 fallo que llegó a `develop` (5 más parados antes de fusionar), *flow time* mediano de 0 días y dos reglas de flujo nuevas — [resultados](02_Metricas_DORA_y_Flujo.md) apartado 7.
@@ -53,7 +57,7 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 - [x] **Validación** (26-27 sept.): sesión con el [guion corto](../validation/03_Short_Test_Script_EN.md), [resultados](../validation/02_Resultados_Test_Usabilidad.md); RN-04 se cumple según lo declarado; problemas corregidos con UX-01 y UX-02.
 - [x] **UX-02** destacar las propuestas (gravedad 2 de la validación): banda en texto junto a la puntuación en cada tarjeta del panel y resumen "Ideas para ti" arriba del panel con un botón por idea. Frases inspiradoras e ideas con IA quedan fuera (pendientes de decidir) — [historia](../user-stories/UX-02-destacar-propuestas.md).
 - [x] **UX-01** guía de primer uso (gravedad 3 de la validación): "Cómo funciona" en tres pasos en la portada y en la bienvenida de Inicio, pasos de la pantalla en la primera entrevista, y "Cómo leer esta página" en el panel (se cierra con "Entendido", se recuerda en el dispositivo y se puede reabrir) — [historia](../user-stories/UX-01-guia-primer-uso.md).
-- [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow diario de GitHub Actions contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) apartado 6.1). Requiere dos secretos y la rama por defecto en `develop`.
+- [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow de GitHub Actions cada 5 días contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) apartado 6.1). Requiere dos secretos y la rama por defecto en `develop`.
 
 Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHANGELOG.md); aquí solo el resumen.
 
@@ -129,3 +133,6 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.32 (29 sept. 2026)** — limpieza: código en inglés (con excepciones anotadas), módulos vacíos o duplicados fuera, E2E solo en PRs a `main` hasta final de octubre.
 - **v2.33 (29 sept. 2026)** — plan del Ciclo 2 en "Listo": UX-04, RF-41, RF-40a, RF-40b, RF-30, y la demo al final. Primera entrega a producción, hecha.
 - **v2.34 (29 sept. 2026)** — UX-04 hecha; RF-41 en curso.
+- **v2.35 (2 oct. 2026)** — RF-41 hecha; RF-40a en curso (construida contra el *Fake*).
+- **v2.36 (3 oct. 2026)** — nuevas en "Listo", detrás de RF-40a: UX-05, RF-42 y RF-43 (confirmadas por el autor). La idea de "situaciones a evitar" pasa a ser RF-42.
+- **v2.36 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).

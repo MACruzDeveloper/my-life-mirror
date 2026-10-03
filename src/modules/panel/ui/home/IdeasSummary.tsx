@@ -17,7 +17,7 @@ export interface IdeaSummaryItem {
  * misma ventana que el de la tarjeta (con el aviso de RES-05); nada se abre
  * solo (RES-07). Sin recomendaciones no se muestra.
  */
-export function IdeasSummary({ ideas }: { ideas: IdeaSummaryItem[] }) {
+export function IdeasSummary({ ideas, personalize = false }: { ideas: IdeaSummaryItem[]; personalize?: boolean }) {
   const { t } = useTranslation();
   const headingId = useId();
 
@@ -34,6 +34,8 @@ export function IdeasSummary({ ideas }: { ideas: IdeaSummaryItem[] }) {
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
         {ideas.map((idea) => (
           <RecommendationButton
+            recommendationId={idea.id}
+            personalize={personalize}
             key={idea.id}
             templateKey={idea.templateKey}
             categoryName={idea.categoryName}

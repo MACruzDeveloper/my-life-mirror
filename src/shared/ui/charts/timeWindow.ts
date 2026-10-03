@@ -3,7 +3,8 @@
  * exactamente el mismo periodo (pequeños múltiplos comparables).
  */
 
-export type Period = "6m" | "12m" | "all";
+export const PERIODS = ["6m", "12m", "all"] as const;
+export type Period = (typeof PERIODS)[number];
 
 export interface TimeWindow {
   start: Date;

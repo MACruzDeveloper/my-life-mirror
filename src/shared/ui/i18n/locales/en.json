@@ -101,7 +101,9 @@
     "tusDerechosTitulo": "Your rights",
     "tusDerechosTexto": "You can access, correct, or delete your data at any time from your profile. Turning a category off does not delete its history — use data export/deletion if you want to erase everything.",
     "contactoTitulo": "Contact",
-    "contactoTexto": "This is an academic project (master's thesis) — for any question about your data, contact the project's developer directly."
+    "contactoTexto": "This is an academic project (master's thesis) — for any question about your data, contact the project's developer directly.",
+    "iaTitulo": "AI-personalised ideas",
+    "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive area, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\" and the app's ideas for that category. Your name, your email, your private experience and sensitive categories are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted."
   },
   "entrevista": {
     "titulo": "Your interview",
@@ -329,7 +331,13 @@
     "eliminando": "Deleting…",
     "cancelar": "Cancel",
     "errorEliminar": "The account could not be deleted",
-    "errorUltimoAdmin": "You are the only administrator and there must always be one: you can't delete your account until you create another administrator (by granting the role to another account)."
+    "errorUltimoAdmin": "You are the only administrator and there must always be one: you can't delete your account until you create another administrator (by granting the role to another account).",
+    "iaTitulo": "AI-personalised ideas",
+    "iaActivar": "AI-personalised ideas",
+    "iaQueSeEnvia": "If you turn this on, when you open an idea for an area, an AI service (Anthropic) is asked to pick and rewrite one of the app's ideas based on your score, whether it's going up or down, and the options you ticked in \"What helps you?\".",
+    "iaQueNunca": "Your name, your email, your private experience and sensitive categories are never sent.",
+    "iaRevocable": "It's off by default. You can turn it off at any time: personalised ideas are deleted and you see the usual ideas again.",
+    "iaError": "The change could not be saved"
   },
   "recomendaciones": {
     "titulo": "An idea for you",
@@ -337,39 +345,66 @@
     "plantillas": {
       "economia": {
         "1": "If you feel like it, note down where your money goes for a week, without judging yourself: just looking already helps.",
-        "2": "Try setting aside a small amount as soon as you're paid, even a symbolic one. The habit is what matters."
+        "2": "Try setting aside a small amount as soon as you're paid, even a symbolic one. The habit is what matters.",
+        "3": "Pick a small, recurring expense that doesn't give you much and try a week without it, just to see how it feels.",
+        "4": "Write down a concrete, near savings goal, like a small treat, and how much is left to reach it.",
+        "5": "If talking about money helps you, share what worries you with someone you trust; putting it into words already clears things up."
       },
       "vidaSocial": {
         "1": "Write today to someone you haven't spoken to in a while: a short message is enough to reconnect.",
-        "2": "Suggest a simple plan this week, like a coffee or a walk with someone you feel good around."
+        "2": "Suggest a simple plan this week, like a coffee or a walk with someone you feel good around.",
+        "3": "Bring back something you used to enjoy doing with other people, even just once this month.",
+        "4": "Calmly reply to that message you've been putting off; sometimes the first step is already taken.",
+        "5": "If you feel like it, look for a small, relaxed group activity around something you enjoy."
       },
       "pareja": {
         "1": "Set aside a screen-free moment this week to be together, even if it's only twenty minutes.",
-        "2": "Tell your partner something you've appreciated about them lately; small details add up."
+        "2": "Tell your partner something you've appreciated about them lately; small details add up.",
+        "3": "Ask your partner how they really are and listen without hurrying or looking for solutions.",
+        "4": "Try something new together this week, even something small: a recipe, a different walk, a game.",
+        "5": "Keep some time for yourself too: looking after your own space often does the relationship good."
       },
       "sexo": {
         "1": "Talking calmly about what you like or feel uncomfortable with often helps; pick a moment with no rush and no pressure.",
-        "2": "Take some time to look after yourself and find out what feels good, with no goals or expectations."
+        "2": "Take some time to look after yourself and find out what feels good, with no goals or expectations.",
+        "3": "Notice which moments of the day leave you calmer and with more energy; wellbeing often starts there.",
+        "4": "If you feel like it, read up from reliable sources on something you're curious about, at your own pace.",
+        "5": "Remember there's no right way to live it: what matters is feeling good and respected."
       },
       "deporte": {
         "1": "Go for a twenty-minute walk today: starting small beats not starting.",
-        "2": "Pick an activity you enjoy and put it in your calendar twice this week."
+        "2": "Pick an activity you enjoy and put it in your calendar twice this week.",
+        "3": "Put on a song you like and move while it plays; it counts as a good start.",
+        "4": "Find a way of moving that fits into your day, like walking somewhere you usually drive to.",
+        "5": "If you like being outdoors, plan an easy walk outside this weekend."
       },
       "aventura": {
         "1": "Change one small routine this week: a different route, a new dish, a place you don't know.",
-        "2": "Write down a plan you're excited about, even a small one, and give it a date."
+        "2": "Write down a plan you're excited about, even a small one, and give it a date.",
+        "3": "Learn something small you've always been curious about, from a video or a book, with no pressure.",
+        "4": "Visit a corner of your own town you don't know, as if you were travelling.",
+        "5": "Set yourself a small, reachable challenge for this month and celebrate when you get there."
       },
       "espiritualidad": {
         "1": "Give yourself five minutes of silence a day, phone away, to be with yourself.",
-        "2": "Write down what gives you meaning lately and what you'd like to nurture more."
+        "2": "Write down what gives you meaning lately and what you'd like to nurture more.",
+        "3": "Before going to sleep, think of one thing from the day you feel grateful for.",
+        "4": "Read a few pages of something that inspires or calms you, even for a short while.",
+        "5": "Spend some time in a place that feels peaceful to you, like a park or a quiet spot."
       },
       "familia": {
         "1": "Call someone in your family this week just to ask how they are.",
-        "2": "Suggest a meal or some time together: sometimes a small initiative is enough."
+        "2": "Suggest a meal or some time together: sometimes a small initiative is enough.",
+        "3": "Bring back a small family tradition you enjoy, or come up with a new one.",
+        "4": "Offer to help someone in your family with something specific; simple gestures bring you closer.",
+        "5": "Share something good that happened to you this week with someone in your family."
       },
       "inversiones": {
         "1": "Spend half an hour reviewing where your money is and what each part is for.",
-        "2": "Read up from reliable sources on one basic idea, like diversification, before deciding anything."
+        "2": "Read up from reliable sources on one basic idea, like diversification, before deciding anything.",
+        "3": "Write down what you want your money for in the long run; a clear goal helps you decide calmly.",
+        "4": "Before any important decision, give yourself a few days to think it over and don't let urgency carry you away.",
+        "5": "If you have doubts, consider talking to an independent professional before deciding anything."
       },
       "general": {
         "1": "Pick one small action related to {{categoria}} that you can do this week and write it down.",
@@ -381,7 +416,11 @@
     "cerrar": "Close",
     "resumenTitulo": "Ideas for you",
     "resumenTexto": "For the areas with the lowest scores. You decide whether they help.",
-    "ideaPara": "Idea for {{categoria}}"
+    "ideaPara": "Idea for {{categoria}}",
+    "personalizando": "Personalising your idea…",
+    "personalizadaConIa": "Personalised with AI",
+    "verOriginal": "See the original idea",
+    "ocultarOriginal": "Hide the original"
   },
   "evolucion": {
     "titulo": "Your evolution",

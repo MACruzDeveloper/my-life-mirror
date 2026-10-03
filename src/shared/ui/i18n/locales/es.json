@@ -101,7 +101,9 @@
     "tusDerechosTitulo": "Tus derechos",
     "tusDerechosTexto": "Puedes acceder, corregir o eliminar tus datos en cualquier momento desde tu perfil. Desactivar una categoría no borra tu historial — usa la exportación/eliminación de datos si quieres borrarlo todo.",
     "contactoTitulo": "Contacto",
-    "contactoTexto": "Este es un proyecto académico (TFM) — para cualquier duda sobre tus datos, contacta directamente con quien desarrolla el proyecto."
+    "contactoTexto": "Este es un proyecto académico (TFM) — para cualquier duda sobre tus datos, contacta directamente con quien desarrolla el proyecto.",
+    "iaTitulo": "Ideas personalizadas con IA",
+    "iaTexto": "Es opcional y está desactivado por defecto. Si lo activas en Privacidad y datos, al abrir una idea para un área no sensible se envían a Anthropic, que actúa como encargado del tratamiento: la categoría, tu última puntuación y si va a mejor o a peor, las opciones que hayas marcado en \"¿Qué te ayuda?\" y las ideas de la app para esa categoría. Nunca se envían tu nombre, tu email, tu experiencia privada ni las categorías sensibles. La idea resultante se guarda en tu cuenta para no volver a pedirla. Puedes desactivarlo cuando quieras y se borran las ideas personalizadas."
   },
   "entrevista": {
     "titulo": "Tu entrevista",
@@ -329,7 +331,13 @@
     "eliminando": "Eliminando…",
     "cancelar": "Cancelar",
     "errorEliminar": "No se pudo eliminar la cuenta",
-    "errorUltimoAdmin": "Eres el único administrador y siempre debe existir uno: no puedes eliminar tu cuenta hasta que crees otro administrador (concediendo el rol a otra cuenta)."
+    "errorUltimoAdmin": "Eres el único administrador y siempre debe existir uno: no puedes eliminar tu cuenta hasta que crees otro administrador (concediendo el rol a otra cuenta).",
+    "iaTitulo": "Ideas personalizadas con IA",
+    "iaActivar": "Ideas personalizadas con IA",
+    "iaQueSeEnvia": "Si lo activas, cuando abras una idea para un área se pide a un servicio de IA (Anthropic) que elija y reescriba una de las ideas de la app teniendo en cuenta tu puntuación, si va a mejor o a peor y las opciones que hayas marcado en \"¿Qué te ayuda?\".",
+    "iaQueNunca": "Nunca se envían tu nombre, tu email, tu experiencia privada ni las categorías sensibles.",
+    "iaRevocable": "Está desactivado por defecto. Puedes desactivarlo cuando quieras: se borran las ideas personalizadas y vuelves a ver las ideas de siempre.",
+    "iaError": "No se pudo guardar el cambio"
   },
   "recomendaciones": {
     "titulo": "Una idea para ti",
@@ -337,39 +345,66 @@
     "plantillas": {
       "economia": {
         "1": "Si te apetece, anota durante una semana en qué se va tu dinero, sin juzgarte: solo mirarlo ya ayuda.",
-        "2": "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica. Lo importante es el hábito."
+        "2": "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica. Lo importante es el hábito.",
+        "3": "Elige un gasto pequeño y repetido que no te aporte mucho y prueba una semana sin él, a ver cómo te sientes.",
+        "4": "Pon por escrito un objetivo de ahorro concreto y cercano, como un pequeño capricho, y cuánto te falta.",
+        "5": "Si hablar de dinero te ayuda, comenta con alguien de confianza qué te preocupa; ponerlo en palabras ya aclara."
       },
       "vidaSocial": {
         "1": "Escribe hoy a alguien con quien hace tiempo que no hablas: un mensaje corto basta para reconectar.",
-        "2": "Propón un plan sencillo esta semana, como un café o un paseo con alguien con quien te sientas a gusto."
+        "2": "Propón un plan sencillo esta semana, como un café o un paseo con alguien con quien te sientas a gusto.",
+        "3": "Recupera algo que te gustaba hacer con otras personas, aunque sea una vez este mes.",
+        "4": "Responde con calma a ese mensaje que tienes pendiente; a veces el primer paso ya está dado.",
+        "5": "Si te apetece, busca una actividad en grupo pequeña y tranquila relacionada con algo que te guste."
       },
       "pareja": {
         "1": "Reserva un rato sin pantallas esta semana para estar juntos, aunque sean veinte minutos.",
-        "2": "Cuéntale a tu pareja algo que hayas agradecido de ella últimamente; los detalles pequeños suman."
+        "2": "Cuéntale a tu pareja algo que hayas agradecido de ella últimamente; los detalles pequeños suman.",
+        "3": "Pregúntale a tu pareja cómo está de verdad y escucha sin prisa, sin buscar soluciones.",
+        "4": "Probad algo nuevo juntos esta semana, aunque sea pequeño: una receta, un paseo distinto, un juego.",
+        "5": "Reserva también un rato para ti: cuidar tu espacio propio suele hacer bien a la relación."
       },
       "sexo": {
         "1": "Hablar con calma sobre lo que os apetece o os incomoda suele ayudar; elige un momento sin prisas y sin presión.",
-        "2": "Dedica un rato a cuidarte y a conocer qué te sienta bien, sin objetivos ni expectativas."
+        "2": "Dedica un rato a cuidarte y a conocer qué te sienta bien, sin objetivos ni expectativas.",
+        "3": "Fíjate qué momentos del día te dejan más tranquilidad y energía; el bienestar empieza por ahí.",
+        "4": "Si te apetece, infórmate en fuentes fiables sobre algo que te genere curiosidad, a tu ritmo.",
+        "5": "Recuerda que no hay una forma correcta de vivirlo: lo importante es que te sientas bien y con respeto."
       },
       "deporte": {
         "1": "Sal a caminar veinte minutos hoy: empezar en pequeño es mejor que no empezar.",
-        "2": "Elige una actividad que te resulte agradable y ponla en el calendario dos veces esta semana."
+        "2": "Elige una actividad que te resulte agradable y ponla en el calendario dos veces esta semana.",
+        "3": "Pon una canción que te guste y muévete mientras suena; cuenta como un buen comienzo.",
+        "4": "Busca una forma de moverte que encaje en tu día, como ir andando a algún sitio que sueles hacer en coche.",
+        "5": "Si te gusta la naturaleza, planea un paseo tranquilo al aire libre este fin de semana."
       },
       "aventura": {
         "1": "Cambia una pequeña rutina esta semana: un camino distinto, un plato nuevo, un sitio que no conozcas.",
-        "2": "Apunta un plan que te haga ilusión, aunque sea pequeño, y ponle una fecha."
+        "2": "Apunta un plan que te haga ilusión, aunque sea pequeño, y ponle una fecha.",
+        "3": "Aprende algo pequeño que siempre te haya dado curiosidad, con un vídeo o un libro, sin presión.",
+        "4": "Visita un rincón de tu propia ciudad que no conozcas, como si fueras de viaje.",
+        "5": "Ponte un reto pequeño y alcanzable para este mes y celebra cuando lo cumplas."
       },
       "espiritualidad": {
         "1": "Regálate cinco minutos de silencio al día, sin móvil, para estar contigo.",
-        "2": "Escribe qué te da sentido últimamente y qué te gustaría cuidar más."
+        "2": "Escribe qué te da sentido últimamente y qué te gustaría cuidar más.",
+        "3": "Antes de dormir, piensa en una cosa del día por la que sientas agradecimiento.",
+        "4": "Lee unas páginas de algo que te inspire o te dé calma, aunque sea un rato corto.",
+        "5": "Pasa un rato en un lugar que te transmita paz, como un parque o un sitio tranquilo."
       },
       "familia": {
         "1": "Llama a alguien de tu familia esta semana solo para preguntarle cómo está.",
-        "2": "Propón una comida o un rato compartido: a veces basta con una pequeña iniciativa."
+        "2": "Propón una comida o un rato compartido: a veces basta con una pequeña iniciativa.",
+        "3": "Recupera una pequeña tradición familiar que os guste, o inventad una nueva.",
+        "4": "Ofrece tu ayuda en algo concreto a alguien de tu familia; los gestos sencillos acercan.",
+        "5": "Comparte con alguien de tu familia algo bueno que te haya pasado esta semana."
       },
       "inversiones": {
         "1": "Dedica media hora a revisar dónde está tu dinero y qué objetivo tiene cada parte.",
-        "2": "Infórmate en fuentes fiables sobre una idea básica, como diversificar, antes de decidir nada."
+        "2": "Infórmate en fuentes fiables sobre una idea básica, como diversificar, antes de decidir nada.",
+        "3": "Escribe para qué quieres tu dinero a largo plazo; tener claro el objetivo ayuda a decidir con calma.",
+        "4": "Antes de cualquier decisión importante, date unos días para pensarla y no te dejes llevar por las prisas.",
+        "5": "Si tienes dudas, considera hablar con un profesional independiente antes de decidir nada."
       },
       "general": {
         "1": "Elige una acción pequeña relacionada con {{categoria}} que puedas hacer esta semana y anótala.",
@@ -381,7 +416,11 @@
     "cerrar": "Cerrar",
     "resumenTitulo": "Ideas para ti",
     "resumenTexto": "Para las áreas con la puntuación más baja. Tú decides si te sirven.",
-    "ideaPara": "Idea para {{categoria}}"
+    "ideaPara": "Idea para {{categoria}}",
+    "personalizando": "Personalizando tu idea…",
+    "personalizadaConIa": "Personalizada con IA",
+    "verOriginal": "Ver la idea original",
+    "ocultarOriginal": "Ocultar la original"
   },
   "evolucion": {
     "titulo": "Tu evolución",

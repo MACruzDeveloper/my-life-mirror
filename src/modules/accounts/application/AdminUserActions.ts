@@ -7,7 +7,7 @@ import { Email } from "../domain/Email.js";
 import type { AdminAuditEntry } from "../domain/AdminAuditEntry.js";
 import type { AdminAuditRepository } from "../domain/AdminAuditRepository.js";
 import type { AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
-import { VALID_ROLES, type UserRole } from "../domain/UserRole.js";
+import { USER_ROLES, type UserRole } from "../domain/UserRole.js";
 import { type EraseUserDependencies, createEraseUser } from "./EraseUser.js";
 import type { createRegisterUser } from "./RegisterUser.js";
 import type { createUpdateProfile } from "./UpdateProfile.js";
@@ -80,7 +80,7 @@ export function createAdminUserActions(dependencies: Dependencies) {
     async changeRole(input: { actor: AuthenticatedUser; userId: string; rol: UserRole; password: string }): Promise<Result<void, AdminError>> {
       const permission = requireAdmin(input.actor);
       if (!permission.ok) return permission;
-      if (!(VALID_ROLES as readonly string[]).includes(input.rol)) return err(new ValidationError("Invalid role"));
+      if (!(USER_ROLES as readonly string[]).includes(input.rol)) return err(new ValidationError("Invalid role"));
       const confirmed = await confirmPassword(input.actor, input.password);
       if (!confirmed.ok) return confirmed;
 

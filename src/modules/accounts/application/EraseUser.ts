@@ -1,5 +1,6 @@
 import type { AssessmentRepository } from "../../assessments/domain/AssessmentRepository.js";
 import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import type { PersonalizedIdeaRepository } from "../../recommendations/domain/PersonalizedIdea.js";
 import type { RecommendationRepository } from "../../recommendations/domain/RecommendationRepository.js";
 import type { ConsentRepository } from "../../consent/domain/ConsentRepository.js";
 import type { AuthProvider } from "../domain/AuthProvider.js";
@@ -12,6 +13,8 @@ export interface EraseUserDependencies {
   consentRepository: ConsentRepository;
   assessmentRepository: AssessmentRepository;
   recommendationRepository: RecommendationRepository;
+  /** RF-40: las ideas personalizadas (en la base también caen en cascada; aquí se borran explícitamente, como el resto). */
+  personalizedIdeaRepository: PersonalizedIdeaRepository;
 }
 
 /**
@@ -22,12 +25,13 @@ export interface EraseUserDependencies {
  * camino se puede repetir (todos los pasos son repetibles) y nunca quedan
  * datos huérfanos sin una cuenta que pueda pedir su borrado.
  */
-export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository: consentimientoRepository, assessmentRepository, recommendationRepository }: EraseUserDependencies) {
+export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository }: EraseUserDependencies) {
   return async function eraseUser(userId: string): Promise<void> {
+    await personalizedIdeaRepository.deleteByUserId(userId);
     await recommendationRepository.deleteByUserId(userId);
     await assessmentRepository.deleteByUserId(userId);
     await categoryRepository.deleteByUserId(userId);
-    await consentimientoRepository.deleteByUser(userId);
+    await consentRepository.deleteByUser(userId);
     await profileRepository.deleteByUserId(userId);
     await authProvider.deleteUser(userId);
   };
