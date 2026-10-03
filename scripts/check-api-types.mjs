@@ -7,7 +7,7 @@
 // al arrancar. Por eso api/tsconfig.json declara `nodenext`: lo mismo que ejecuta Node. `tsc -b` usa tsconfig.api.json directamente y no ve ese
 // problema, así que un despliegue podía fallar con todo verde en local.
 // Ver docs/architecture-decisions/03_Arquitectura_Software.md (v2.2).
-import { mkdtempSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -59,7 +59,10 @@ const failures = [];
 try {
   const emitResult = ts.createProgram(apiFiles, { ...options, noEmit: false, outDir: outDir, rootDir: rootDir }).emit();
   if (emitResult.emitSkipped) throw new Error("No se pudo compilar api/ a JavaScript");
-  writeFileSync(join(outDir, "package.json"), JSON.stringify({ type: "module" }));
+  // Mismo "type" e "imports" que el package.json del proyecto: Node resuelve los imports
+  // `#shared/…` y `#modules/…` con ese mapeo, igual que hará en Vercel.
+  const { type, imports } = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
+  writeFileSync(join(outDir, "package.json"), JSON.stringify({ type, imports }));
   symlinkSync(join(rootDir, "node_modules"), join(outDir, "node_modules"), "dir");
 
   for (const file of apiFiles) {

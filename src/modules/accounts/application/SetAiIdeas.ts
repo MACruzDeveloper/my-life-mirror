@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { NotFoundError } from "../../../shared/domain/DomainError.js";
-import type { Clock } from "../../../shared/domain/Clock.js";
-import type { PersonalizedIdeaRepository } from "../../recommendations/domain/PersonalizedIdea.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { NotFoundError } from "#shared/domain/DomainError.js";
+import type { Clock } from "#shared/domain/Clock.js";
+import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import type { Profile } from "../domain/Profile.js";
 import type { ProfileRepository } from "../domain/ProfileRepository.js";
 

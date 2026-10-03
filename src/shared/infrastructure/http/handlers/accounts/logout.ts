@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { clearedSessionCookie } from "../../../cookies.js";
+import { clearedSessionCookie } from "#shared/infrastructure/cookies.js";
 
 /** Borra la cookie de sesión — no hace falta invalidar el token en Supabase para el Ciclo 1. */
 export default function handler(req: IncomingMessage, res: ServerResponse) {

@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { type Actor, requireAdmin } from "../../../shared/domain/Actor.js";
-import { ConflictError, type ForbiddenError, ValidationError } from "../../../shared/domain/DomainError.js";
-import { type Locale, SUPPORTED_LOCALES } from "../../../shared/domain/locales.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { type Actor, requireAdmin } from "#shared/domain/Actor.js";
+import { ConflictError, type ForbiddenError, ValidationError } from "#shared/domain/DomainError.js";
+import { type Locale, SUPPORTED_LOCALES } from "#shared/domain/locales.js";
 import type { CatalogCategory, CategoryText } from "../domain/CatalogCategory.js";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 

@@ -1,7 +1,7 @@
-import { type Result } from "../../../shared/domain/Result.js";
-import { ok } from "../../../shared/domain/Result.js";
-import { type Actor, requireAdmin } from "../../../shared/domain/Actor.js";
-import type { ForbiddenError } from "../../../shared/domain/DomainError.js";
+import { type Result } from "#shared/domain/Result.js";
+import { ok } from "#shared/domain/Result.js";
+import { type Actor, requireAdmin } from "#shared/domain/Actor.js";
+import type { ForbiddenError } from "#shared/domain/DomainError.js";
 import type { CatalogCategory } from "../domain/CatalogCategory.js";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 

@@ -1,4 +1,4 @@
-import type { Locale } from "../../../shared/domain/locales.js";
+import type { Locale } from "#shared/domain/locales.js";
 
 /** RF-40: versión personalizada de una recomendación, en un idioma. Se escribe una vez y se reutiliza. */
 export interface PersonalizedIdea {
