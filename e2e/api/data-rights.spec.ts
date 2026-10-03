@@ -13,7 +13,7 @@ test.describe("RF-05: exportar y eliminar mis datos", () => {
     await interview.open();
     await interview.activate("Economía");
     await interview.score("Economía", 4);
-    await interview.save();
+    await interview.save("Economía");
 
     const privacy = new DataPrivacyPage(page);
     await privacy.open();

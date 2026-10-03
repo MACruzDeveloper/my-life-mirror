@@ -5,6 +5,22 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (UX-05, respuesta inmediata en la entrevista)
+
+- Cada categoría de la entrevista tiene su propio botón "Guardar", junto a su puntuación y su experiencia, y guarda solo esa categoría. Desaparece el botón único "Guardar cambios" del final, que con varias categorías abiertas quedaba fuera de la vista.
+- Al guardar: "Guardado ahora" en la propia categoría; si el guardado abre una idea nueva (puntuación baja), una ventana "Cambios guardados" con la idea (personalizada si RF-40 está activado), el aviso y los enlaces a Resultados e Inicio. Si falla, el error sale en la categoría.
+- Bajo cada pregunta, la última actualización ("Última actualización: 18 de septiembre de 2026 · 6 → 4") y tu última experiencia (privada).
+- El historial de cambios pasa de la entrevista a Resultados, agrupado por día (con el cambio del día por categoría y sus experiencias).
+- El "Guardar" de cada categoría va a la derecha de su puntuación (debajo en móvil si no cabe).
+- La ventana de ideas es un carrusel con las 5 ideas de la categoría (primero la recomendada, "Idea 2 de 5"), en la entrevista, Inicio y Resultados.
+- Las categorías con una idea abierta enseñan "Ideas para Economía" en su pregunta.
+- En escritorio, la columna derecha de la entrevista muestra el progreso: cuántas categorías están respondidas y el estado de cada una (sin responder, sin guardar, guardada hoy o el día X); tocar una lleva a su pregunta.
+- RF-40 v1.1: la IA reescribe la idea que se ve en el carrusel (ya no elige entre las 5), y una idea personalizada se reescribe si cambian las opciones de "¿Qué te ayuda?" de su categoría. **Migración 0012** (`personalized_ideas` por recomendación, idea e idioma, con las opciones usadas): ejecutarla antes de desplegar.
+
+### Corregido (E2E)
+
+- Los E2E con `api/` fallaban de vez en cuando (1 de cada 4-5 ejecuciones): tras `supabase db reset`, la API local tarda un instante en volver a ver las tablas ("Could not find the table … in the schema cache"). El script espera a que responda por ellas antes de empezar. Seis ejecuciones seguidas sin fallos.
+
 ### Cambiado (imports)
 
 - Imports del código del servidor con `#shared/…` y `#modules/…` (imports nativos de Node, sección `imports` de `package.json`) en lugar de rutas relativas largas (`../../../shared/domain/locales.js` → `#shared/domain/locales.js`): 265 imports en 72 archivos. Dentro del mismo módulo siguen relativos; los componentes de `ui/` siguen con `@`.
