@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { AuthProvider, LoggedInSession, AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
 import { DEFAULT_ROLE, type UserRole } from "../domain/UserRole.js";
-import { AuthenticationError, ConflictError } from "../../../shared/domain/DomainError.js";
+import { AuthenticationError, ConflictError } from "#shared/domain/DomainError.js";
 
 interface StoredUser {
   id: string;

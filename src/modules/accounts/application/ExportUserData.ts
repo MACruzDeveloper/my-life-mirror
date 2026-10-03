@@ -1,10 +1,10 @@
-import { type Result, ok } from "../../../shared/domain/Result.js";
-import type { Clock } from "../../../shared/domain/Clock.js";
-import type { AssessmentRepository } from "../../assessments/domain/AssessmentRepository.js";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
-import type { PersonalizedIdeaRepository } from "../../recommendations/domain/PersonalizedIdea.js";
-import type { RecommendationRepository } from "../../recommendations/domain/RecommendationRepository.js";
-import type { ConsentRepository } from "../../consent/domain/ConsentRepository.js";
+import { type Result, ok } from "#shared/domain/Result.js";
+import type { Clock } from "#shared/domain/Clock.js";
+import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
+import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
+import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
+import type { RecommendationRepository } from "#modules/recommendations/domain/RecommendationRepository.js";
+import type { ConsentRepository } from "#modules/consent/domain/ConsentRepository.js";
 import type { ProfileRepository } from "../domain/ProfileRepository.js";
 
 export interface UserDataExport {

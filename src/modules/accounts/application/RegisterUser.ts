@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { type ConflictError, DomainError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { type ConflictError, DomainError, ValidationError } from "#shared/domain/DomainError.js";
 import { Email } from "../domain/Email.js";
 import { Password } from "../domain/Password.js";
 import type { User } from "../domain/User.js";

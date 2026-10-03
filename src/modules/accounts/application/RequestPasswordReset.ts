@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import type { ValidationError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import type { ValidationError } from "#shared/domain/DomainError.js";
 import { Email } from "../domain/Email.js";
 import type { AuthProvider } from "../domain/AuthProvider.js";
 

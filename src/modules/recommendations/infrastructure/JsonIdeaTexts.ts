@@ -1,9 +1,9 @@
-import es from "../../../shared/ui/i18n/locales/es.json" with { type: "json" };
-import en from "../../../shared/ui/i18n/locales/en.json" with { type: "json" };
-import type { Locale } from "../../../shared/domain/locales.js";
+import es from "#shared/ui/i18n/locales/es.json" with { type: "json" };
+import en from "#shared/ui/i18n/locales/en.json" with { type: "json" };
+import type { Locale } from "#shared/domain/locales.js";
 import type { IdeaCandidate } from "../domain/IdeaWriter.js";
 import type { IdeaTexts } from "../domain/IdeaTexts.js";
-import { templateKeysFor } from "../domain/recommendationCatalog.js";
+import { templateKeysFor } from "#modules/recommendations/domain/recommendationCatalog.js";
 
 type Tree = { [key: string]: string | Tree };
 const RESOURCES: Record<Locale, Tree> = { es: es as unknown as Tree, en: en as unknown as Tree };

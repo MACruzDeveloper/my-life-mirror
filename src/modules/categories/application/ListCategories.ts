@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { ValidationError } from "../../../shared/domain/DomainError.js";
-import { DEFAULT_LOCALE } from "../../../shared/domain/locales.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { ValidationError } from "#shared/domain/DomainError.js";
+import { DEFAULT_LOCALE } from "#shared/domain/locales.js";
 import type { Category } from "../domain/Category.js";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 import type { CategoryRepository } from "../domain/CategoryRepository.js";

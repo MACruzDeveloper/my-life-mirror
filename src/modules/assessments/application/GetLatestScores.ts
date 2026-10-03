@@ -1,6 +1,6 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { ValidationError } from "../../../shared/domain/DomainError.js";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { ValidationError } from "#shared/domain/DomainError.js";
+import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
 
 export interface LatestScore {

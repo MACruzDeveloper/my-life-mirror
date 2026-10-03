@@ -1,4 +1,4 @@
-import type { Locale } from "../../../shared/domain/locales.js";
+import type { Locale } from "#shared/domain/locales.js";
 
 /**
  * RF-40. Contratos de la personalización de ideas (ver la historia RF-40, Nivel 3).

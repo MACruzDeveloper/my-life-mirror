@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { type AuthenticationError, DomainError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { type AuthenticationError, DomainError, ValidationError } from "#shared/domain/DomainError.js";
 import { Password } from "../domain/Password.js";
 import type { AuthProvider } from "../domain/AuthProvider.js";
 

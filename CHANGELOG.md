@@ -5,6 +5,11 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (imports)
+
+- Imports del código del servidor con `#shared/…` y `#modules/…` (imports nativos de Node, sección `imports` de `package.json`) en lugar de rutas relativas largas (`../../../shared/domain/locales.js` → `#shared/domain/locales.js`): 265 imports en 72 archivos. Dentro del mismo módulo siguen relativos; los componentes de `ui/` siguen con `@`.
+- `check:api` copia el mapeo `imports` a su `package.json` temporal (sin él, cada función daba una falsa alarma al cargar). Antes de convertir nada se comprobó con un `vercel build` real: las 11 funciones cargan desde su salida.
+
 ### Cambiado (código)
 
 - Los términos del filtro de ideas con IA pasan a `ideaSafetyTerms.json` (por idioma y tipo, con `*` para "y lo que siga"), fuera del código y solo en el servidor.

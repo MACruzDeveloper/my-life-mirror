@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { getAppContext } from "../../../container.js";
-import { logger } from "../../../logger.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { logger } from "#shared/infrastructure/logger.js";
 
 type RequestWithBody = IncomingMessage & { body: unknown };
 

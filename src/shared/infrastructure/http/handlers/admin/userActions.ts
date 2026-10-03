@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { USER_ROLES } from "../../../../../modules/accounts/domain/UserRole.js";
+import { USER_ROLES } from "#modules/accounts/domain/UserRole.js";
 import { adminHandler } from "./adminHandler.js";
 
 const userId = z.string().min(1);

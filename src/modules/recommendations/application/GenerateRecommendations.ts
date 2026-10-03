@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { type Result, ok } from "../../../shared/domain/Result.js";
-import type { Clock } from "../../../shared/domain/Clock.js";
-import type { Assessment } from "../../assessments/domain/Assessment.js";
-import type { CategoryCatalogRepository } from "../../categories/domain/CategoryCatalogRepository.js";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import { type Result, ok } from "#shared/domain/Result.js";
+import type { Clock } from "#shared/domain/Clock.js";
+import type { Assessment } from "#modules/assessments/domain/Assessment.js";
+import type { CategoryCatalogRepository } from "#modules/categories/domain/CategoryCatalogRepository.js";
+import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import { type Recommendation, isOpen } from "../domain/Recommendation.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 import { templateKeysFor } from "../domain/recommendationCatalog.js";

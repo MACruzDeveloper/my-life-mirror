@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { getAppContext } from "../../../container.js";
-import { clearedSessionCookie, readCookie } from "../../../cookies.js";
-import { logger } from "../../../logger.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { clearedSessionCookie, readCookie } from "#shared/infrastructure/cookies.js";
+import { logger } from "#shared/infrastructure/logger.js";
 
 const DeleteAccountSchema = z.object({ password: z.string() });
 
