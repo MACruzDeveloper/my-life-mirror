@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { ValidationError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { ValidationError } from "#shared/domain/DomainError.js";
 import type { Profile } from "../domain/Profile.js";
 import type { ProfileRepository } from "../domain/ProfileRepository.js";
 

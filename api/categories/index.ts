@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getAppContext } from "../../src/shared/infrastructure/container.js";
-import { readCookie } from "../../src/shared/infrastructure/cookies.js";
-import { logger } from "../../src/shared/infrastructure/logger.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { readCookie } from "#shared/infrastructure/cookies.js";
+import { logger } from "#shared/infrastructure/logger.js";
 
 /**
  * Controlador HTTP — RF-06. Devuelve la lista de categorías del usuario,

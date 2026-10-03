@@ -1,6 +1,6 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { type Actor, requireAdmin } from "../../../shared/domain/Actor.js";
-import { type ForbiddenError, NotFoundError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { type Actor, requireAdmin } from "#shared/domain/Actor.js";
+import { type ForbiddenError, NotFoundError } from "#shared/domain/DomainError.js";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 import type { CategoryRepository } from "../domain/CategoryRepository.js";
 

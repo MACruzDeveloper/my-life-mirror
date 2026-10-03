@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Locale } from "../../../shared/domain/locales.js";
+import type { Locale } from "#shared/domain/locales.js";
 import type { PersonalizedIdea, PersonalizedIdeaRepository } from "../domain/PersonalizedIdea.js";
 
 interface PersonalizedIdeaRow {

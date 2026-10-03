@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { ValidationError } from "../../../shared/domain/DomainError.js";
-import type { Clock } from "../../../shared/domain/Clock.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { ValidationError } from "#shared/domain/DomainError.js";
+import type { Clock } from "#shared/domain/Clock.js";
 import type { Consent } from "../domain/Consent.js";
 import type { ConsentRepository } from "../domain/ConsentRepository.js";
 

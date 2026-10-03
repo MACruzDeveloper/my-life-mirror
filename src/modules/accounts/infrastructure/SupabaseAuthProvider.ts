@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { AuthProvider, LoggedInSession, AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
 import { DEFAULT_ROLE, readRoleFromMetadata, type UserRole } from "../domain/UserRole.js";
-import { AuthenticationError, ConflictError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { AuthenticationError, ConflictError, ValidationError } from "#shared/domain/DomainError.js";
 
 function isSuspended(bannedUntil?: string): boolean {
   return !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();

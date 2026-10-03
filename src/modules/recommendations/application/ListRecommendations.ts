@@ -1,7 +1,7 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { ValidationError } from "../../../shared/domain/DomainError.js";
-import type { AssessmentRepository } from "../../assessments/domain/AssessmentRepository.js";
-import type { CategoryRepository } from "../../categories/domain/CategoryRepository.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { ValidationError } from "#shared/domain/DomainError.js";
+import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
+import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import { type Recommendation, isOpen } from "../domain/Recommendation.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 

@@ -1,5 +1,5 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { type AuthenticationError, DomainError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { type AuthenticationError, DomainError, ValidationError } from "#shared/domain/DomainError.js";
 import type { AuthProvider, AuthenticatedUser } from "../domain/AuthProvider.js";
 
 /** Caso de uso — comprueba la cookie de sesión (ADR-06, RF-39 nota "spec viva"). */
