@@ -8,29 +8,34 @@ test.describe("RF-04: consentimiento de las categorías sensibles", () => {
     await new AccountPages(page).register(newUser());
     const interview = new InterviewPage(page);
     await interview.open();
+    await interview.startIfFirstTime();
 
-    await interview.category("Deporte").click();
+    // UX-07: en la primera entrevista, las categorías se eligen en el paso 2, con botones.
+    await interview.categoryOption("Deporte").click();
     const dialog = interview.consentDialog();
     await expect(dialog).toContainText(/datos sensibles/i);
     await expect(dialog.getByRole("link", { name: /política de privacidad/i })).toBeVisible();
     await dialog.getByRole("button", { name: "Aceptar y activar" }).click();
 
-    await expect(interview.category("Deporte")).toBeChecked();
+    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "true");
     // Persistido en el servidor, no solo en pantalla.
     await page.reload();
-    await expect(interview.category("Deporte")).toBeChecked();
+    await interview.startIfFirstTime();
+    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "true");
   });
 
   test("cancelar deja la categoría sin activar", async ({ page }) => {
     await new AccountPages(page).register(newUser());
     const interview = new InterviewPage(page);
     await interview.open();
+    await interview.startIfFirstTime();
 
-    await interview.category("Deporte").click();
+    await interview.categoryOption("Deporte").click();
     await interview.consentDialog().getByRole("button", { name: "Cancelar" }).click();
 
-    await expect(interview.category("Deporte")).not.toBeChecked();
+    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "false");
     await page.reload();
-    await expect(interview.category("Deporte")).not.toBeChecked();
+    await interview.startIfFirstTime();
+    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "false");
   });
 });

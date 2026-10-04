@@ -27,7 +27,7 @@ function readStatus() {
  */
 function keepRunningWithDocker() {
   try {
-    const ids = execFileSync("docker", ["ps", "-aq", "--filter", "name=_my-sims"], { encoding: "utf8" }).split("\n").filter(Boolean);
+    const ids = execFileSync("docker", ["ps", "-aq", "--filter", "name=_my-life-mirror"], { encoding: "utf8" }).split("\n").filter(Boolean);
     if (ids.length > 0) execFileSync("docker", ["update", "--restart", "unless-stopped", ...ids], { stdio: "ignore" });
   } catch {
     // Sin consecuencias para la app ni los tests.

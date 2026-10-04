@@ -7,6 +7,7 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import ToggleButton from "@mui/material/ToggleButton";
 import Typography from "@mui/material/Typography";
+import { keyframes } from "@mui/material/styles";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useTranslation } from "react-i18next";
@@ -24,6 +25,12 @@ import { ExperienceNote } from "./ExperienceNote";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+/** Entrada de una pregunta recién añadida: de la derecha, solo con transform y opacity (las baratas de animar). */
+const slideIn = keyframes`
+  from { opacity: 0; transform: translateX(48px); }
+  to { opacity: 1; transform: none; }
+`;
+
 export type CategorySaveStatus = { kind: "saving" } | { kind: "saved" } | { kind: "error"; message: string };
 
 export interface LastUpdate {
@@ -39,6 +46,8 @@ export interface LastExperience {
 
 interface CategoryQuestionProps {
   category: CategoryDto;
+  /** Añadida en esta visita (UX-06): entra con una animación breve. */
+  justAdded?: boolean;
   label: CategoryLabel;
   /** Puntuación que se ve: la cambiada en esta pantalla o, si no, la guardada. */
   score?: number;
@@ -65,7 +74,7 @@ interface CategoryQuestionProps {
  * experiencia, la experiencia nueva y su propio "Guardar" (UX-05). El texto de
  * la experiencia vive aquí: escribir solo vuelve a pintar esta pregunta.
  */
-export function CategoryQuestion({ category, label, score, scoreChanged, lastUpdate, lastExperience, saveStatus, recommendation, personalizeIdeas, onScore, onToggleTag, onSave, onNoteStateChange }: CategoryQuestionProps) {
+export function CategoryQuestion({ category, justAdded = false, label, score, scoreChanged, lastUpdate, lastExperience, saveStatus, recommendation, personalizeIdeas, onScore, onToggleTag, onSave, onNoteStateChange }: CategoryQuestionProps) {
   const { t, i18n } = useTranslation();
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [helpsOpen, setHelpsOpen] = useState(false);
@@ -108,11 +117,15 @@ export function CategoryQuestion({ category, label, score, scoreChanged, lastUpd
   return (
     <Box
       id={`pregunta-${category.id}`}
+      data-just-added={justAdded || undefined}
       sx={{
+        ...(justAdded && { animation: `${slideIn} 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both` }),
+        "@media (prefers-reduced-motion: reduce)": { animation: "none" },
         display: "flex",
         flexDirection: "column",
         gap: 1.5,
-        scrollMarginTop: 16,
+        // Al saltar a una pregunta, que no quede bajo la cabecera fija (48 px compacta).
+        scrollMarginTop: 72,
         pl: 1.5,
         // Mismo ancho de borde siempre, para que contestar no desplace nada.
         borderLeft: "3px solid",
