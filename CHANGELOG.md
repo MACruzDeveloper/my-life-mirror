@@ -5,6 +5,26 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.1.0] - 2026-10-04
+
+### Cambiado (proyecto)
+
+- El repositorio pasa a llamarse `my-life-mirror` (antes `my-sims`), igual que el paquete y el Supabase local (`project_id`). En una copia ya clonada: `git remote set-url origin https://github.com/MACruzDeveloper/my-life-mirror.git`, y parar el Supabase local antiguo (`npx supabase stop --project-id my-sims`) antes de arrancar el nuevo, que empieza vacío.
+
+### Cambiado (UX-07, primera entrevista por pasos)
+
+- La primera entrevista va por pasos, con un indicador arriba: 1) introducción y escala, con "Empezar"; 2) "¿De qué quieres hablar?", con cada categoría como un botón grande (nombre y descripción) que se marca al tocarlo, "Elegir todas" y las sensibles aparte con su consentimiento; 3) las preguntas, con las categorías en su acordeón y la introducción plegada. Así se ve qué preguntas se añaden, y en el móvil se gana pantalla. Quien ya tiene respuestas entra directamente a actualizar.
+
+### Cambiado (UX-06, distribución de la entrevista y menú plegable)
+
+- Al actualizar la entrevista, "Tus categorías" y "Requieren tu consentimiento" van en dos acordeones plegados con cuántas hay activas ("2 de 6 activas"): en escritorio, en la columna derecha encima del progreso; en móvil, encima de las preguntas. La primera entrevista sigue con las dos columnas abiertas (sus pasos llegarán con UX-07).
+- El menú de Mi perfil es un `Drawer` de Material UI con iconos: en escritorio se puede plegar a solo iconos (se recuerda en el navegador); en móvil se abre con un botón que muestra la sección actual ("☰ Entrevista"), para no confundirlo con el menú de la cabecera.
+- La introducción y las preguntas de la entrevista van en dos bloques con fondo distinto (las preguntas, con su título "¿Cómo te sientes en cada una?").
+- La columna derecha de la entrevista (categorías y progreso) se queda fija entera al desplazarse; el progreso también es un acordeón (abierto por defecto, con el resumen visible al plegarlo).
+- Cabecera oscura y fija arriba; al bajar se compacta (menos altura y letra más pequeña) con una transición breve.
+- Una categoría recién añadida sale la primera y entra con una animación breve de derecha a izquierda (solo `transform`/`opacity`; ninguna con "reducir movimiento").
+- *Breadcrumbs* a la izquierda en las pantallas protegidas; la entrevista sin margen superior.
+
 ### Cambiado (UX-05, respuesta inmediata en la entrevista)
 
 - Cada categoría de la entrevista tiene su propio botón "Guardar", junto a su puntuación y su experiencia, y guarda solo esa categoría. Desaparece el botón único "Guardar cambios" del final, que con varias categorías abiertas quedaba fuera de la vista.
@@ -16,6 +36,21 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 - Las categorías con una idea abierta enseñan "Ideas para Economía" en su pregunta.
 - En escritorio, la columna derecha de la entrevista muestra el progreso: cuántas categorías están respondidas y el estado de cada una (sin responder, sin guardar, guardada hoy o el día X); tocar una lleva a su pregunta.
 - RF-40 v1.1: la IA reescribe la idea que se ve en el carrusel (ya no elige entre las 5), y una idea personalizada se reescribe si cambian las opciones de "¿Qué te ayuda?" de su categoría. **Migración 0012** (`personalized_ideas` por recomendación, idea e idioma, con las opciones usadas): ejecutarla antes de desplegar.
+
+### Cambiado (PERF-01, menos llamadas al guardar)
+
+- El `POST /api/assessments` devuelve también las últimas puntuaciones y las recomendaciones abiertas; la entrevista las pone en la caché y solo vuelve a pedir el historial. De 4 llamadas a 2 por guardado, y el modal de la idea sale en la mitad de tiempo (medido en local). Un E2E lo vigila.
+- La barra de desplazamiento de la columna derecha, fina y semitransparente; sus acordeones, sin bordes ni sombras.
+
+### Corregido (UX-06)
+
+- Con `npm run dev:local` abierto, lanzar los E2E rompía la app ("Invalid hook call", "Cannot read properties of null (reading 'useContext')", dos copias de `@emotion/react`): los dos servidores de Vite compartían la caché de dependencias (`node_modules/.vite`) y, al re-empaquetarla uno, el navegador del otro mezclaba versiones. Cada servidor tiene ahora la suya (`VITE_CACHE_DIR`): `.vite` (`npm run dev`), `.vite-local` (`dev:local`), `.vite-e2e` y `.vite-e2e-api` (los tests).
+- Las consultas pasan a `fetch` la señal de cancelación de TanStack Query (`AbortController`): una carga cancelada u obsoleta aborta su petición en lugar de solo ignorar la respuesta.
+- Al abrir una idea personalizada en Inicio se hacían dos peticiones iguales (una sin las opciones de "¿Qué te ayuda?", porque las categorías aún no habían llegado, y otra con ellas). Ahora espera a tener las categorías.
+
+- El menú lateral de Mi perfil quedaba por encima de la cabecera fija al desplazarse.
+- Si se abría una idea justo después de marcar una opción de "¿Qué te ayuda?", podía escribirse con las opciones de antes (el guardado aún no había llegado al servidor) y quedarse así en la caché. Ahora, cuando el servidor confirma la opción, se cancela lo que estuviera en curso y las ideas personalizadas se vuelven a pedir (invalidar sin cancelar no repetía una primera carga en curso). Lo destapó un E2E que fallaba 1 de cada 4 veces.
+- Al reactivar una categoría con puntuaciones guardadas, su pregunta salía "sin responder" y un segundo después saltaba a la puntuación guardada. Ahora aparece ya con ella.
 
 ### Corregido (E2E)
 

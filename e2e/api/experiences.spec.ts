@@ -28,6 +28,7 @@ test.describe("RF-41: experiencias por categoría", () => {
     const interview = new InterviewPage(page);
     await interview.open();
     await interview.activate("Familia");
+    await interview.goToQuestions();
 
     await page.getByRole("button", { name: /tu experiencia \(privada\)/i }).click();
     await expect(page.getByText("Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.")).toBeVisible();

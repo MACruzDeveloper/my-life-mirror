@@ -10,3 +10,16 @@ export const theme = createTheme({
     mode: "light",
   },
 });
+
+/**
+ * Tema oscuro de la cabecera (UX-06): fondo oscuro con texto claro. Sus botones,
+ * textos secundarios y el menú de móvil (que se abre fuera de la cabecera pero
+ * hereda este tema) toman los colores de aquí, sin estilos sueltos por componente.
+ */
+export const headerTheme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: { main: "#9ED9C9" },
+    background: { default: "#1E2B30", paper: "#24343A" },
+  },
+});

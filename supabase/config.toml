@@ -4,7 +4,7 @@
 # working directory name when running `supabase init`.
 # Supabase local (Docker) para los tests E2E contra api/ — ver docs/requirements-analysis/04_Plan_Verificacion_Validacion.md apartado 1.1.
 # Nunca se conecta al proyecto real: `supabase start` levanta una copia vacía y aplica supabase/migrations.
-project_id = "my-sims"
+project_id = "my-life-mirror"
 
 [api]
 enabled = true
