@@ -164,9 +164,12 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, categoryN
   const { t, i18n } = useTranslation();
   const [showOriginal, setShowOriginal] = useState(false);
   // Las opciones de "¿Qué te ayuda?" salen de la caché de categorías (la entrevista la actualiza al marcarlas).
-  const categories = useCategories().data;
+  // Se espera a tenerlas: si no, se pedía con "sin opciones" y otra vez al llegar (dos peticiones).
+  const categoriesQuery = useCategories();
+  const categories = categoriesQuery.data;
+  const categoriesReady = !categoryId || categories !== undefined || categoriesQuery.isError;
   const experienceTags = (Array.isArray(categories) ? categories.find((category) => category.id === categoryId)?.experienceTags : undefined) ?? [];
-  const { data, isPending } = usePersonalizedIdea(recommendationId, templateKey, i18n.language, experienceTags, true);
+  const { data, isPending } = usePersonalizedIdea(recommendationId, templateKey, i18n.language, experienceTags, categoriesReady);
 
   if (isPending) {
     return (

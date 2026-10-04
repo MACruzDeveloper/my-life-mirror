@@ -178,6 +178,30 @@ describe("RecommendationButton (RF-18)", () => {
       await waitFor(() => expect(personalizeBodies(fetchMock).map((body) => body.templateKey)).toEqual(["economia.1", "economia.2"]));
     });
 
+    it("espera a tener las categorías antes de pedirla: una sola petición, ya con sus opciones", async () => {
+      // Sin esperar, se pedía con "sin opciones" y otra vez al llegar las categorías (dos peticiones).
+      let deliverCategories: () => void = () => {};
+      const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<unknown>>((url) => {
+        if (url === "/api/categories") {
+          return new Promise((resolve) => {
+            deliverCategories = () => resolve({ ok: true, json: async () => [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"] }] });
+          });
+        }
+        if (url === "/api/recommendations/personalize") return Promise.resolve({ ok: true, json: async () => ({ source: "catalog", templateKey: "economia.1" }) });
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      renderPersonalized();
+
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      await waitFor(() => expect(fetchMock.mock.calls.some(([url]) => url === "/api/categories")).toBe(true));
+      expect(personalizeBodies(fetchMock)).toHaveLength(0);
+      deliverCategories();
+
+      await within(screen.getByRole("dialog")).findByText(/en qué se va tu dinero/i);
+      expect(personalizeBodies(fetchMock)).toHaveLength(1);
+    });
+
     it("si cambian las opciones de '¿Qué te ayuda?' de la categoría, la idea se vuelve a pedir (RF-40 v1.1)", async () => {
       const fetchMock = stubPersonalize(async () => ({ ok: true, json: async () => ({ source: "ai", templateKey: "economia.1", text: "Una idea personalizada con la longitud suficiente para pasar." }) }));
       const client = createTestClient();

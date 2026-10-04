@@ -16,7 +16,7 @@ export const PROFILE_KEY = ["profile"] as const;
 
 /** Perfil del usuario (RF-03); `null` si todavía no tiene (react-query no admite `undefined` como dato). */
 export function useProfile(enabled = true) {
-  return useQuery({ queryKey: PROFILE_KEY, enabled, queryFn: () => getJson<ProfileResponse | null>("/api/accounts/profile") });
+  return useQuery({ queryKey: PROFILE_KEY, enabled, queryFn: ({ signal }) => getJson<ProfileResponse | null>("/api/accounts/profile", signal) });
 }
 
 /** RF-40: hay que pedir ideas personalizadas solo si la función existe en este despliegue y el usuario la activó. */

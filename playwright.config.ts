@@ -29,6 +29,8 @@ export default defineConfig({
     // `vercel dev` (npm run dev:full); este primer test no necesita `api/`.
     command: "npx vite",
     url: "http://localhost:5173",
+    // Caché de Vite propia, para no pisar la de `npm run dev` si está abierto (ver vite.config.ts).
+    env: { VITE_CACHE_DIR: "node_modules/.vite-e2e" },
     reuseExistingServer: !process.env.CI,
   },
 });

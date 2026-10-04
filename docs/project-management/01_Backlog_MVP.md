@@ -11,8 +11,10 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **UX-05** respuesta inmediata en la entrevista (desde el 3 oct.; [historia](../user-stories/UX-05-respuesta-inmediata-entrevista.md)): un "Guardar" por categoría, a la derecha de la puntuación; "Guardado ahora" en la categoría o, si el guardado abre una idea nueva, una ventana con ella; carrusel con las 5 ideas de la categoría y "Ideas para X" en la pregunta (con RF-40, se reescriben al cambiar "¿Qué te ayuda?", RF-40 v1.1); la última actualización y la última experiencia bajo cada pregunta; panel de progreso en la columna derecha; el historial pasa a Resultados, agrupado por día. Petición del autor (3 oct.): "si no, el usuario no sabe qué ha pasado".
-- [ ] **UX-06** distribución de la entrevista (detrás de UX-05, propuesta el 3 oct.): la selección de categorías en la columna derecha, bajo el progreso (que se adelantó a UX-05), y el menú lateral de Mi perfil, plegable.
+- [ ] **UX-06** distribución de la entrevista y menú plegable (desde el 4 oct.; [historia](../user-stories/UX-06-distribucion-entrevista-menu.md)): al actualizar, "Tus categorías" y "Requieren tu consentimiento" en acordeones (columna derecha en escritorio, encima de las preguntas en móvil), y el menú de Mi perfil como `Drawer` plegable a iconos.
+
+- [ ] **PERF-01** menos llamadas al guardar en la entrevista (desde el 4 oct.; [historia](../user-stories/PERF-01-menos-llamadas-guardar.md)): el `POST /api/assessments` devuelve las últimas puntuaciones y las recomendaciones; de 4 llamadas a 2 por guardado y el modal de la idea en la mitad de tiempo (medido en local). GraphQL descartado.
+- [ ] **UX-07** primera entrevista por pasos (desde el 4 oct.; [historia](../user-stories/UX-07-primera-entrevista-pasos.md)): introducción → categorías con botones (sensibles aparte, con consentimiento) → preguntas, con indicador de pasos. Solo la primera vez.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
@@ -44,6 +46,7 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
 ## Hecho
 
+- [x] **UX-05** respuesta inmediata en la entrevista ([historia](../user-stories/UX-05-respuesta-inmediata-entrevista.md)): un "Guardar" por categoría, a la derecha de la puntuación; "Guardado ahora" en la categoría o, si el guardado abre una idea nueva, una ventana con ella; carrusel con las 5 ideas de la categoría y "Ideas para X" en la pregunta (con RF-40, se reescriben al cambiar "¿Qué te ayuda?", RF-40 v1.1); la última actualización y la última experiencia bajo cada pregunta; panel de progreso en la columna derecha; el historial pasa a Resultados, agrupado por día. Petición del autor (3 oct.): "si no, el usuario no sabe qué ha pasado".
 - [x] **RF-40a** ideas personalizadas con IA contra un *Fake*: interruptor voluntario, la IA reescribe una idea del catálogo (ampliado a 5 por categoría) con filtro y caída al texto curado — [historia](../user-stories/RF-40-ideas-personalizadas-ia.md) (Nivel 3). Las 27 ideas nuevas, pendientes de una revisión a fondo del autor.
 - [x] **Imports `#shared`/`#modules`** en el código del servidor, probados con un `vercel build` real antes de convertir 265 imports.
 - [x] **RF-41** experiencias por categoría: "¿Qué te ayuda?" (opciones cerradas, guardado al momento) y la nota como "Tu experiencia (privada)" — [historia](../user-stories/RF-41-experiencias-categoria.md).
@@ -141,3 +144,6 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.36 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).
 - **v2.38 (3 oct. 2026)** — UX-05 rediseñada tras probarla (guardar por categoría, ventana solo con idea nueva, historial a Resultados); UX-06 añadida detrás.
 - **v2.39 (3 oct. 2026)** — UX-05 crece (decisión del autor): carrusel de ideas, ideas que cambian con "¿Qué te ayuda?" (RF-40 v1.1) y el panel de progreso, adelantado de UX-06.
+- **v2.40 (4 oct. 2026)** — UX-05 hecha; UX-06 en curso (categorías en acordeón y menú `Drawer`); PERF-01 y UX-07 añadidas a "Listo" (confirmadas por el autor).
+- **v2.41 (4 oct. 2026)** — PERF-01 en curso y hecha en la rama (junto con UX-06; irán en la misma PR que el renombrado y UX-07, decisión del autor).
+- **v2.42 (4 oct. 2026)** — UX-07 hecha en la rama (con UX-06 y PERF-01, para la misma PR que el renombrado).

@@ -19,7 +19,8 @@ const RecordAssessmentsSchema = z.object({
  * puntuaciones, todo o nada — ver RecordAssessments); GET devuelve la última
  * puntuación de cada categoría activa (pantalla "Resultados"). El `userId`
  * sale siempre de la cookie, nunca del cuerpo. El historial completo llega
- * con el panel (RF-14).
+ * con el panel (RF-14). PERF-01: el POST responde también con las últimas
+ * puntuaciones y las recomendaciones abiertas.
  */
 export default async function handler(req: IncomingMessage & { body: unknown }, res: ServerResponse) {
   try {
@@ -30,7 +31,7 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
     }
 
     const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession, recordAssessments, getLatestScores } = getAppContext();
+    const { verifySession, recordAssessments, getLatestScores, listRecommendations } = getAppContext();
     const session = await verifySession(token);
 
     if (!session.ok) {
@@ -66,8 +67,17 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
+    // PERF-01: lo que cambia al guardar va en la respuesta (las mismas formas que GET /api/assessments
+    // y GET /api/recommendations), así la pantalla no tiene que volver a pedirlo: de 4 llamadas a 2.
+    const [latest, recommendations] = await Promise.all([getLatestScores(session.value.id), listRecommendations(session.value.id)]);
     res.writeHead(201, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ recorded: result.value.length }));
+    res.end(
+      JSON.stringify({
+        recorded: result.value.length,
+        ...(latest.ok ? { latest: latest.value } : {}),
+        ...(recommendations.ok ? { recommendations: recommendations.value } : {}),
+      }),
+    );
   } catch (error) {
     logger.error("Error inesperado en /api/assessments", error, { route: "/api/assessments" });
     res.writeHead(500, { "Content-Type": "application/json" });

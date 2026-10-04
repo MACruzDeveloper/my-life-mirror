@@ -19,7 +19,7 @@ export interface RecommendationDto {
 export const RECOMMENDATIONS_KEY = ["assessments", "recommendations"] as const;
 
 export function useRecommendations() {
-  return useQuery({ queryKey: RECOMMENDATIONS_KEY, queryFn: () => getJson<RecommendationDto[]>("/api/recommendations") });
+  return useQuery({ queryKey: RECOMMENDATIONS_KEY, queryFn: ({ signal }) => getJson<RecommendationDto[]>("/api/recommendations", signal) });
 }
 
 export type PersonalizedIdeaDto = { source: "ai"; templateKey: string; text: string } | { source: "catalog"; templateKey: string };
@@ -39,11 +39,13 @@ export function usePersonalizedIdea(recommendationId: string, templateKey: strin
   return useQuery({
     queryKey: [...PERSONALIZED_IDEAS_KEY, recommendationId, templateKey, locale, [...experienceTags].sort().join("|")],
     enabled,
-    queryFn: async () => {
+    // Con la señal de la carga: si se cancela (p. ej. al cambiar "¿Qué te ayuda?"), la petición se aborta.
+    queryFn: async ({ signal }) => {
       const response = await fetch("/api/recommendations/personalize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ recommendationId, templateKey, locale }),
+        signal,
       });
       if (!response.ok) throw new Error("personalize failed");
       return (await response.json()) as PersonalizedIdeaDto;
