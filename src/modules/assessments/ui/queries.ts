@@ -23,9 +23,9 @@ export const HISTORY_KEY = ["assessments", "history"] as const;
 
 /** Última puntuación por categoría activa (Entrevista, Resultados e Inicio comparten esta caché). */
 export function useLatestScores() {
-  return useQuery({ queryKey: LATEST_SCORES_KEY, queryFn: () => getJson<LatestScoreDto[]>("/api/assessments") });
+  return useQuery({ queryKey: LATEST_SCORES_KEY, queryFn: ({ signal }) => getJson<LatestScoreDto[]>("/api/assessments", signal) });
 }
 
 export function useAssessmentHistory() {
-  return useQuery({ queryKey: HISTORY_KEY, queryFn: () => getJson<HistorySessionDto[]>("/api/assessments/history") });
+  return useQuery({ queryKey: HISTORY_KEY, queryFn: ({ signal }) => getJson<HistorySessionDto[]>("/api/assessments/history", signal) });
 }

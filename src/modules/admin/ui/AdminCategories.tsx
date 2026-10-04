@@ -68,7 +68,7 @@ const postJson = (body: unknown) => ({
 export function AdminCategories() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const catalog = useQuery({ queryKey: ADMIN_CATALOG_KEY, queryFn: () => getJson<CatalogDto[]>("/api/admin/categories") });
+  const catalog = useQuery({ queryKey: ADMIN_CATALOG_KEY, queryFn: ({ signal }) => getJson<CatalogDto[]>("/api/admin/categories", signal) });
   const [form, setForm] = useState<NewCategoryForm>(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actionError, setActionError] = useState<string | undefined>();

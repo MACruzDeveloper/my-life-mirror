@@ -137,7 +137,7 @@
     "sinResponder": "Sin responder",
     "pasosTitulo": "Qué vamos a hacer",
     "pasosPrimeraVez": [
-      "Marca abajo las categorías de las que quieres hablar.",
+      "En el siguiente paso, elige las categorías de las que quieres hablar.",
       "En cada una, toca un número del 1 al 10. Puedes dejar alguna para otro día.",
       "Al terminar cada una, pulsa «{{boton}}» junto a ella."
     ],
@@ -163,7 +163,22 @@
     "progresoResumen": "{{respondidas}} de {{total}} respondidas",
     "estadoSinGuardar": "Sin guardar",
     "estadoGuardadaHoy": "Guardada hoy",
-    "estadoGuardada": "Guardada el {{fecha}}"
+    "estadoGuardada": "Guardada el {{fecha}}",
+    "activasResumen": "{{activas}} de {{total}} activas",
+    "preguntasTitulo": "¿Cómo te sientes en cada una?",
+    "pasoIntro": "Introducción",
+    "pasoCategorias": "Categorías",
+    "pasoPreguntas": "Preguntas",
+    "pasosAria": "Pasos de la entrevista",
+    "empezar": "Empezar",
+    "irAPreguntas": "Ir a las preguntas",
+    "atras": "Atrás",
+    "queHablarTitulo": "¿De qué quieres hablar?",
+    "queHablarTexto": "Elige las áreas de tu vida que quieres revisar. Podrás cambiarlas cuando quieras.",
+    "elegirTodas": "Elegir todas",
+    "quitarTodas": "Quitar todas",
+    "eligeUna": "Elige al menos una para seguir.",
+    "releerIntro": "Releer la introducción"
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -183,7 +198,9 @@
     "perfil": "Perfil",
     "entrevista": "Entrevista",
     "resultados": "Resultados",
-    "datos": "Privacidad y datos"
+    "datos": "Privacidad y datos",
+    "plegarMenu": "Plegar menú",
+    "desplegarMenu": "Desplegar menú"
   },
   "ejemplos": {
     "economia": [

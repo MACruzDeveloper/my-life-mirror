@@ -1,8 +1,12 @@
 import { useId } from "react";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTranslation } from "react-i18next";
 import { PENDING_COLORS } from "./pendingColors";
 
@@ -20,7 +24,7 @@ const STATUS_COLORS: Record<ProgressStatus["kind"], string> = { unanswered: PEND
 /**
  * UX-05: progreso de la entrevista en la columna derecha (escritorio): cuántas
  * categorías activas tienen respuesta y el estado de cada una. Tocar una lleva
- * a su pregunta. La página lo deja fijo al desplazarse y lo oculta en móvil (la
+ * a su pregunta. Acordeón como los de las categorías, abierto por defecto. La página lo deja fijo al desplazarse y lo oculta en móvil (la
  * página enseña los accesos directos de arriba).
  */
 export function InterviewProgress({ items, onSelect }: { items: ProgressItem[]; onSelect: (categoryId: string) => void }) {
@@ -36,14 +40,19 @@ export function InterviewProgress({ items, onSelect }: { items: ProgressItem[]; 
   };
 
   return (
-    <Box component="aside" aria-labelledby={titleId} sx={{ bgcolor: "#FFFFFF", border: "1px solid #E4EAE8", borderRadius: 3, p: 2 }}>
-      <Typography id={titleId} variant="subtitle1" component="h2">
-        {t("entrevista.progresoTitulo")}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-        {t("entrevista.progresoResumen", { respondidas: answered, total: items.length })}
-      </Typography>
-      <LinearProgress variant="determinate" value={items.length === 0 ? 0 : (answered / items.length) * 100} aria-hidden sx={{ height: 6, borderRadius: 3, mb: 1.5 }} />
+    <Box component="aside" aria-labelledby={titleId}>
+    <Accordion defaultExpanded disableGutters elevation={0} sx={{ bgcolor: "#F5F7F6", borderRadius: 3, "&::before": { display: "none" }, overflow: "hidden" }}>
+      {/* El resumen (cuántas respondidas y la barra) va en la cabecera: se ve también plegado. */}
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ "& .MuiAccordionSummary-content": { flexDirection: "column", mr: 1 } }}>
+        <Typography id={titleId} variant="subtitle1" component="span">
+          {t("entrevista.progresoTitulo")}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" component="span" sx={{ mb: 1 }}>
+          {t("entrevista.progresoResumen", { respondidas: answered, total: items.length })}
+        </Typography>
+        <LinearProgress variant="determinate" value={items.length === 0 ? 0 : (answered / items.length) * 100} aria-hidden sx={{ height: 6, borderRadius: 3 }} />
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0 }}>
       <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 0.5 }}>
         {items.map((item) => (
           <Box component="li" key={item.categoryId}>
@@ -64,6 +73,8 @@ export function InterviewProgress({ items, onSelect }: { items: ProgressItem[]; 
           </Box>
         ))}
       </Box>
+      </AccordionDetails>
+    </Accordion>
     </Box>
   );
 }

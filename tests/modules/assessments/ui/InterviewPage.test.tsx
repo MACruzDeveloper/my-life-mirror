@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { InterviewPage } from "@modules/assessments/ui/InterviewPage";
+import { SessionProvider } from "@shared/ui/context/SessionContext";
 import i18n from "@shared/ui/i18n";
 import { createTestClient, withClient } from "../../../helpers/queryClient";
 import type { QueryClient } from "@tanstack/react-query";
@@ -30,7 +31,7 @@ interface StubOptions {
   latest?: unknown;
   history?: unknown;
   recommendations?: unknown;
-  /** Lo que devuelve /api/recommendations después de guardar (por defecto, lo mismo que antes). */
+  /** Recomendaciones abiertas después de guardar (las devuelve el POST, PERF-01; por defecto, las mismas que antes). */
   recommendationsAfterSave?: unknown;
   saveResponse?: () => Promise<unknown>;
 }
@@ -45,7 +46,7 @@ function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], r
       return Promise.resolve({ ok: true, json: async () => (saved && recommendationsAfterSave !== undefined ? recommendationsAfterSave : recommendations) });
     }
     if (url === "/api/assessments" && (!init || !init.method || init.method === "GET")) {
-      return Promise.resolve({ ok: true, json: async () => latest });
+      return Promise.resolve({ ok: true, json: async () => (typeof latest === "function" ? latest() : latest) });
     }
     if (url === "/api/categories/activate") {
       const { categoryId } = JSON.parse(init?.body as string);
@@ -65,7 +66,17 @@ function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], r
       const category = CATEGORIES.find((category) => category.id === categoryId);
       return Promise.resolve({ ok: true, json: async () => ({ ...category, status: "inactive" }) });
     }
-    if (url === "/api/assessments") return saveResponse ? saveResponse() : Promise.resolve({ ok: true, json: async () => ({ recorded: 1 }) });
+    if (url === "/api/assessments") {
+      if (saveResponse) return saveResponse();
+      // Como el servidor (PERF-01): las últimas puntuaciones con lo guardado ya aplicado, y las recomendaciones abiertas.
+      const { entries } = JSON.parse(init?.body as string) as { entries: { categoryId: string; score: number }[] };
+      const current = (typeof latest === "function" ? latest() : latest) as { categoryId: string; score?: number }[];
+      const updated = current.map((latestScore) => {
+        const saved = entries.find((entry) => entry.categoryId === latestScore.categoryId);
+        return saved ? { ...latestScore, score: saved.score, recordedAt: "2026-10-04T10:00:00.000Z" } : latestScore;
+      });
+      return Promise.resolve({ ok: true, json: async () => ({ recorded: entries.length, latest: updated, recommendations: recommendationsAfterSave ?? recommendations }) });
+    }
     return Promise.resolve({ ok: true, json: async () => ({}) });
   });
   vi.stubGlobal("fetch", fetchMock);
@@ -83,7 +94,21 @@ function renderPage(client: QueryClient = createTestClient()) {
   );
 }
 
+/**
+ * UX-06: al actualizar, las categorías van en acordeones plegados; se abren para poder marcarlas.
+ * Por texto y no por rol: `queryByRole` calcula el nombre accesible de todos los botones de la
+ * entrevista (más de 40) y, llamado en cada test, triplicaba la duración del archivo.
+ */
+function openCategoryAccordions() {
+  for (const title of ["Tus categorías", "Your categories", "Requieren tu consentimiento", "Require your consent"]) {
+    const summary = screen.queryByText(title)?.closest("[aria-expanded]");
+    if (summary?.getAttribute("aria-expanded") === "false") fireEvent.click(summary);
+  }
+}
+
 async function waitUntilLoaded() {
+  await screen.findByRole("heading", { level: 1 });
+  openCategoryAccordions();
   await waitFor(() => expect(screen.getByRole("checkbox", { name: /economía/i })).toBeInTheDocument());
 }
 
@@ -113,6 +138,131 @@ function postCalls(fetchMock: ReturnType<typeof vi.fn>, url: string) {
 describe("InterviewPage (RF-10)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+  });
+
+  describe("categorías en acordeón al actualizar (UX-06)", () => {
+    it("con respuestas guardadas, las dos listas van plegadas, cada una con cuántas tiene activas", async () => {
+      stubFetch();
+      renderPage();
+      await screen.findByRole("heading", { level: 1, name: /actualiza tus respuestas/i });
+
+      const regular = screen.getByRole("button", { name: /^tus categorías/i });
+      const sensitive = screen.getByRole("button", { name: /^requieren tu consentimiento/i });
+      expect(regular).toHaveAttribute("aria-expanded", "false");
+      expect(regular).toHaveTextContent("1 de 2 activas");
+      expect(sensitive).toHaveAttribute("aria-expanded", "false");
+      expect(sensitive).toHaveTextContent("1 de 2 activas");
+      expect(screen.queryByRole("checkbox", { name: /pareja/i })).not.toBeInTheDocument();
+      expect(screen.getByText("¿Cómo te sientes con Economía?")).toBeInTheDocument();
+
+      fireEvent.click(regular);
+      expect(await screen.findByRole("checkbox", { name: /pareja/i })).not.toBeChecked();
+    });
+
+  });
+
+  describe("primera entrevista por pasos (UX-07)", () => {
+    // Sin respuestas guardadas: Economía y Deporte activas pero sin puntuar.
+    const FIRST_TIME = [
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" },
+      { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte" },
+    ];
+
+    function categoryButton(name: string) {
+      return screen.getByRole("button", { name: new RegExp(`^${name}`, "i") });
+    }
+
+    async function openFirstTime() {
+      const fetchMock = stubFetch({ latest: FIRST_TIME, history: [] });
+      renderPage();
+      await screen.findByRole("heading", { level: 1, name: /tu entrevista/i });
+      return fetchMock;
+    }
+
+    function currentStep() {
+      return document.querySelector('[aria-current="step"]');
+    }
+
+    it("paso 1: la introducción con la escala y 'Empezar'; ni categorías ni preguntas todavía", async () => {
+      await openFirstTime();
+
+      expect(currentStep()).toHaveTextContent("Introducción");
+      expect(screen.getByText(/1 = muy mal/)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Empezar" })).toBeInTheDocument();
+      expect(screen.queryByRole("checkbox", { name: /pareja/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /^pareja/i })).not.toBeInTheDocument();
+      expect(screen.queryByText("¿Cómo te sientes con Economía?")).not.toBeInTheDocument();
+    });
+
+    it("paso 2: cada categoría es un botón que se marca al tocarlo y la activa al momento", async () => {
+      const fetchMock = await openFirstTime();
+      fireEvent.click(screen.getByRole("button", { name: "Empezar" }));
+
+      expect(screen.getByRole("heading", { name: "¿De qué quieres hablar?" })).toBeInTheDocument();
+      expect(currentStep()).toHaveTextContent("Categorías");
+      expect(categoryButton("economía")).toHaveAttribute("aria-pressed", "true");
+      expect(categoryButton("pareja")).toHaveAttribute("aria-pressed", "false");
+
+      fireEvent.click(categoryButton("pareja"));
+
+      expect(categoryButton("pareja")).toHaveAttribute("aria-pressed", "true");
+      await waitFor(() => expect(postCalls(fetchMock, "/api/categories/activate")).toHaveLength(1));
+      expect(screen.queryByText("¿Cómo te sientes con Pareja?")).not.toBeInTheDocument();
+    });
+
+    it("paso 2: sin ninguna categoría elegida no se puede seguir", async () => {
+      await openFirstTime();
+      fireEvent.click(screen.getByRole("button", { name: "Empezar" }));
+
+      fireEvent.click(categoryButton("economía"));
+      fireEvent.click(categoryButton("deporte"));
+
+      await waitFor(() => expect(screen.getByRole("button", { name: "Ir a las preguntas" })).toBeDisabled());
+    });
+
+    it("paso 2: una categoría sensible pide consentimiento antes de activarse", async () => {
+      await openFirstTime();
+      fireEvent.click(screen.getByRole("button", { name: "Empezar" }));
+
+      fireEvent.click(categoryButton("sexo"));
+
+      expect(await screen.findByText(/se necesita tu consentimiento/i)).toBeInTheDocument();
+    });
+
+    it("paso 3: las preguntas, las categorías elegidas en su acordeón y la introducción plegada", async () => {
+      await openFirstTime();
+      fireEvent.click(screen.getByRole("button", { name: "Empezar" }));
+      fireEvent.click(screen.getByRole("button", { name: "Ir a las preguntas" }));
+
+      expect(currentStep()).toHaveTextContent("Preguntas");
+      expect(screen.getByText("¿Cómo te sientes con Economía?")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /^tus categorías/i })).toHaveAttribute("aria-expanded", "false");
+      expect(screen.getByText("Releer la introducción").closest("[aria-expanded]")).toHaveAttribute("aria-expanded", "false");
+      expect(screen.queryByRole("button", { name: "Empezar" })).not.toBeInTheDocument();
+    });
+
+    it("paso 3: guardar la primera categoría no cambia la pantalla", async () => {
+      await openFirstTime();
+      fireEvent.click(screen.getByRole("button", { name: "Empezar" }));
+      fireEvent.click(screen.getByRole("button", { name: "Ir a las preguntas" }));
+
+      chooseScore("economía", 7);
+      fireEvent.click(saveButton("Economía"));
+
+      expect(await within(question("c1")).findByRole("status")).toHaveTextContent(/guardado ahora/i);
+      expect(screen.getByRole("heading", { level: 1, name: /tu entrevista/i })).toBeInTheDocument();
+      expect(currentStep()).toHaveTextContent("Preguntas");
+      expect(screen.queryByRole("button", { name: "Empezar" })).not.toBeInTheDocument();
+    });
+
+    it("con respuestas guardadas no hay pasos", async () => {
+      stubFetch();
+      renderPage();
+      await screen.findByRole("heading", { level: 1, name: /actualiza tus respuestas/i });
+
+      expect(currentStep()).toBeNull();
+      expect(screen.queryByRole("button", { name: "Empezar" })).not.toBeInTheDocument();
+    });
   });
 
   it("lista todas las categorías; las activas salen marcadas y con su pregunta", async () => {
@@ -252,6 +402,25 @@ describe("InterviewPage (RF-10)", () => {
       expect(within(screen.getByRole("group", { name: /puntuación de economía/i })).getByRole("button", { name: "4" })).toHaveAttribute("aria-pressed", "true");
     });
 
+    it("tras guardar usa lo que devuelve el servidor: no vuelve a pedir las puntuaciones ni las recomendaciones (PERF-01)", async () => {
+      const fetchMock = stubFetch({ recommendations: [], recommendationsAfterSave: [LOW_ECONOMY_IDEA] });
+      renderPage();
+      await waitUntilLoaded();
+      const gets = (url: string) => fetchMock.mock.calls.filter(([urlCalled, init]) => urlCalled === url && !init?.method).length;
+      const before = { latest: gets("/api/assessments"), recommendations: gets("/api/recommendations"), history: gets("/api/assessments/history") };
+
+      chooseScore("economía", 2);
+      fireEvent.click(saveButton("Economía"));
+
+      expect(await screen.findByRole("dialog", { name: /cambios guardados/i })).toBeInTheDocument();
+      await waitFor(() => expect(gets("/api/assessments/history")).toBe(before.history + 1));
+      expect(gets("/api/assessments")).toBe(before.latest);
+      expect(gets("/api/recommendations")).toBe(before.recommendations);
+      // Con el modal abierto, el resto de la página está oculto a la accesibilidad: `hidden` para mirar debajo.
+      const group = screen.getByRole("group", { name: /puntuación de economía/i, hidden: true });
+      expect(within(group).getByRole("button", { name: "2", hidden: true })).toHaveAttribute("aria-pressed", "true");
+    });
+
     it("guardar vuelve a pedir el historial, del que sale la última actualización", async () => {
       const fetchMock = stubFetch();
       renderPage();
@@ -316,6 +485,19 @@ describe("InterviewPage (RF-10)", () => {
         await waitFor(() => expect(progressItem("economía")).toHaveTextContent(/guardada hoy/i));
       });
 
+      it("es un acordeón, abierto por defecto, que conserva el resumen al plegarlo (UX-06)", async () => {
+        stubFetch();
+        renderPage();
+        await waitUntilLoaded();
+
+        const summary = within(progressPanel()).getByText("Tu progreso").closest("[aria-expanded]") as HTMLElement;
+        expect(summary).toHaveAttribute("aria-expanded", "true");
+        fireEvent.click(summary);
+
+        expect(summary).toHaveAttribute("aria-expanded", "false");
+        expect(summary).toHaveTextContent("1 de 2 respondidas");
+      });
+
       it("tocar una categoría lleva a su pregunta", async () => {
         const scrollIntoView = vi.fn();
         Element.prototype.scrollIntoView = scrollIntoView;
@@ -373,6 +555,60 @@ describe("InterviewPage (RF-10)", () => {
       expect(saveButton("Economía")).toBeDisabled();
     });
 
+    it("cuando el servidor confirma la opción, las ideas personalizadas se vuelven a pedir (RF-40 v1.1)", async () => {
+      // Si una idea se pidió mientras se guardaba la opción, se escribió con las opciones de antes.
+      stubFetch();
+      const client = createTestClient();
+      client.setQueryData(["personalized-ideas", "r1", "economia.1", "es", "economia.apps|economia.presupuesto"], { source: "ai", templateKey: "economia.1", text: "Escrita antes de guardar la opción." });
+      renderPage(client);
+      await waitUntilLoaded();
+
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
+
+      await waitFor(() => expect(client.getQueryState(["personalized-ideas", "r1", "economia.1", "es", "economia.apps|economia.presupuesto"])?.isInvalidated).toBe(true));
+    });
+
+    it("una idea que se estaba pidiendo por primera vez mientras se guardaba la opción se vuelve a pedir al confirmarse (RF-40 v1.1)", async () => {
+      // TanStack Query no repite una primera carga en curso al invalidarla: se engancha a ella (y esa lleva las opciones de antes).
+      const fetchMock = stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      let confirmExperience: () => void = () => {};
+      fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ ok: true, json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable: true }) });
+        if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiIdeasEnabled: true }) });
+        if (url === "/api/recommendations/personalize") return new Promise(() => {}); // la primera carga se queda en curso
+        if (url === "/api/categories/experience") {
+          return new Promise((resolve) => {
+            confirmExperience = () => resolve({ ok: true, json: async () => ({}) });
+          });
+        }
+        return defaultImplementation(url, init);
+      });
+      render(
+        withClient(
+          <MemoryRouter>
+            <SessionProvider>
+              <InterviewPage />
+            </SessionProvider>
+          </MemoryRouter>,
+        ),
+      );
+      await waitUntilLoaded();
+      const personalizeCalls = () => fetchMock.mock.calls.filter(([urlCalled]) => urlCalled === "/api/recommendations/personalize").length;
+
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía" }));
+      await waitFor(() => expect(personalizeCalls()).toBe(1));
+      confirmExperience();
+
+      await waitFor(() => expect(personalizeCalls()).toBe(2));
+      // La petición de antes no solo se ignora: se aborta (AbortController de TanStack Query).
+      const firstCall = fetchMock.mock.calls.find(([urlCalled]) => urlCalled === "/api/recommendations/personalize");
+      expect((firstCall?.[1] as RequestInit).signal?.aborted).toBe(true);
+    });
+
     it("si el servidor lo rechaza, la marca se deshace y se avisa", async () => {
       const fetchMock = stubFetch();
       const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
@@ -410,6 +646,64 @@ describe("InterviewPage (RF-10)", () => {
     await waitFor(() => expect(screen.getByRole("checkbox", { name: /pareja/i })).toBeChecked());
     expect(postCalls(fetchMock, "/api/categories/activate")).toHaveLength(1);
     expect(screen.getByRole("group", { name: /pareja/i })).toBeInTheDocument();
+  });
+
+  it("una categoría recién añadida sale la primera, con su animación de entrada; las de antes, sin ella", async () => {
+    stubFetch();
+    renderPage();
+    await waitUntilLoaded();
+
+    toggleCategory("pareja");
+
+    await waitFor(() => expect(document.querySelectorAll('[id^="pregunta-"]')[0]).toHaveAttribute("id", "pregunta-c3"));
+    expect(question("c3")).toHaveAttribute("data-just-added", "true");
+    expect(question("c1")).not.toHaveAttribute("data-just-added");
+    expect(within(screen.getByRole("navigation", { name: /ir a una categoría/i })).getAllByRole("link")[0]).toHaveTextContent(/pareja/i);
+  });
+
+  it("las preguntas van en su propio bloque, separado de la introducción, con su título", async () => {
+    stubFetch();
+    renderPage();
+    await waitUntilLoaded();
+
+    expect(screen.getByRole("heading", { level: 2, name: "¿Cómo te sientes en cada una?" })).toBeInTheDocument();
+  });
+
+  describe("reactivar una categoría con puntuaciones guardadas (UX-06)", () => {
+    it("vuelve al instante con su última puntuación, sin pasar por 'sin responder'", async () => {
+      // Como el servidor: las últimas puntuaciones solo traen las categorías activas.
+      let economyActive = true;
+      const fetchMock = stubFetch({ latest: () => (economyActive ? LATEST : LATEST.filter((latestScore) => latestScore.categoryId !== "c1")) });
+      renderPage();
+      await waitUntilLoaded();
+      const latestCalls = () => fetchMock.mock.calls.filter(([urlCalled, init]) => urlCalled === "/api/assessments" && !init?.method).length;
+      const callsBefore = latestCalls();
+
+      economyActive = false;
+      toggleCategory("economía");
+      await waitFor(() => expect(latestCalls()).toBeGreaterThan(callsBefore));
+      await waitFor(() => expect(screen.queryByRole("group", { name: /puntuación de economía/i })).not.toBeInTheDocument());
+      economyActive = true;
+      toggleCategory("economía");
+
+      const group = screen.getByRole("group", { name: /puntuación de economía/i });
+      expect(within(group).getByRole("button", { name: "6" })).toHaveAttribute("aria-pressed", "true");
+      expect(within(question("c1")).queryByText(/sin responder/i)).not.toBeInTheDocument();
+    });
+
+    it("una categoría que ya venía desactivada recupera al instante la puntuación de su historial", async () => {
+      stubFetch({
+        history: [...HISTORY, { recordedAt: "2026-08-01T10:00:00.000Z", entries: [{ categoryId: "c3", catalogId: "k-pareja", categoryName: "Pareja", score: 7 }] }],
+      });
+      renderPage();
+      await waitUntilLoaded();
+      await waitFor(() => expect(screen.getAllByText(/última actualización/i).length).toBeGreaterThan(0));
+
+      toggleCategory("pareja");
+
+      const group = screen.getByRole("group", { name: /puntuación de pareja/i });
+      expect(within(group).getByRole("button", { name: "7" })).toHaveAttribute("aria-pressed", "true");
+    });
   });
 
   it("desmarcar una categoría activa la desactiva y quita su pregunta", async () => {
@@ -578,7 +872,8 @@ describe("InterviewPage (RF-10)", () => {
 
     renderPage(client);
 
-    expect(screen.getByRole("checkbox", { name: /economía/i })).toBeInTheDocument();
+    // Sin esperar: la pantalla sale ya pintada con lo de la caché, sin el indicador de carga.
+    expect(screen.getByRole("heading", { level: 1, name: /actualiza tus respuestas/i })).toBeInTheDocument();
     expect(fetchMock.mock.calls.filter(([urlCalled]) => urlCalled === "/api/categories")).toHaveLength(1);
     expect(fetchMock.mock.calls.filter(([urlCalled, i]) => urlCalled === "/api/assessments" && !i?.method)).toHaveLength(1);
   });
@@ -650,6 +945,8 @@ describe("InterviewPage (RF-10)", () => {
       stubFetch();
       renderPage();
 
+      await screen.findByRole("heading", { level: 1 });
+      openCategoryAccordions();
       expect(await screen.findByRole("checkbox", { name: /finances/i })).toBeInTheDocument();
       expect(screen.getByText("How are you feeling about Finances?")).toBeInTheDocument();
       expect(screen.getByRole("group", { name: "Score for Finances" })).toBeInTheDocument();

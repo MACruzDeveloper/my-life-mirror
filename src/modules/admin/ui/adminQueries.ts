@@ -24,11 +24,11 @@ export const ADMIN_USERS_KEY = ["admin", "users"] as const;
 export const ADMIN_AUDIT_KEY = ["admin", "audit"] as const;
 
 export function useAdminUsers() {
-  return useQuery({ queryKey: ADMIN_USERS_KEY, queryFn: () => getJson<AdminUserDto[]>("/api/admin/users") });
+  return useQuery({ queryKey: ADMIN_USERS_KEY, queryFn: ({ signal }) => getJson<AdminUserDto[]>("/api/admin/users", signal) });
 }
 
 export function useAdminAudit() {
-  return useQuery({ queryKey: ADMIN_AUDIT_KEY, queryFn: () => getJson<AuditEntryDto[]>("/api/admin/audit") });
+  return useQuery({ queryKey: ADMIN_AUDIT_KEY, queryFn: ({ signal }) => getJson<AuditEntryDto[]>("/api/admin/audit", signal) });
 }
 
 /** POST de una acción de administración; devuelve el estado y el cuerpo para que la pantalla explique el error. */

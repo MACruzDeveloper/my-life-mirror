@@ -27,6 +27,8 @@ export default defineConfig({
   webServer: {
     command: "npx vite --config vite.local.config.ts",
     url: "http://localhost:5174",
+    // Caché de Vite propia: si no, re-empaquetar aquí rompe un `npm run dev:local` abierto (ver vite.config.ts).
+    env: { VITE_CACHE_DIR: "node_modules/.vite-e2e-api" },
     // Nunca reutilizar un servidor ya abierto: podría no estar apuntando al Supabase local.
     reuseExistingServer: false,
   },

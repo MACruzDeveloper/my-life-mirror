@@ -36,7 +36,7 @@ describe("Caché de datos compartida entre pantallas", () => {
     start.unmount();
 
     render(withClient(<MemoryRouter><InterviewPage /></MemoryRouter>, client));
-    await screen.findByRole("checkbox", { name: /economía/i });
+    await screen.findByRole("heading", { level: 1, name: /actualiza tus respuestas/i });
 
     const countCalls = (url: string) => fetchMock.mock.calls.filter(([u]) => u === url).length;
     expect(countCalls("/api/assessments/history")).toBe(1);

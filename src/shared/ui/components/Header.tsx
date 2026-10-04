@@ -10,9 +10,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
+import useScrollTrigger from "@mui/material/useScrollTrigger";
+import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
+import { headerTheme } from "../theme";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export interface HeaderProps {
@@ -30,7 +32,8 @@ export interface HeaderProps {
  * dentro, en el menú lateral de AccountPage), usuario con sesión activa,
  * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 apartado 6,
  * UX-03): en móvil, logo + idioma + un menú con la navegación, el nombre y
- * cerrar sesión; desde `sm`, todo en línea.
+ * cerrar sesión; desde `sm`, todo en línea. UX-06: oscura y fija arriba; al
+ * bajar se compacta (menos altura y letra más pequeña) con una transición breve.
  */
 export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
   const { t } = useTranslation();
@@ -38,11 +41,24 @@ export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"), { noSsr: true });
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const closeMenu = () => setMenuAnchor(null);
+  const isCompact = useScrollTrigger({ disableHysteresis: true, threshold: 16 });
 
   return (
-    <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}>
-      <Toolbar sx={{ justifyContent: "space-between", gap: 1 }}>
-        <Typography variant="h6" component="span" sx={{ fontWeight: 700 }}>
+    <ThemeProvider theme={headerTheme}>
+    <AppBar
+      position="sticky"
+      elevation={isCompact ? 4 : 0}
+      data-compact={isCompact}
+      sx={{
+        bgcolor: "background.default",
+        color: "text.primary",
+        transition: "box-shadow 200ms",
+        // Letra de los botones: más pequeña en compacto (el logo cambia aparte).
+        "& .MuiButton-root": { fontSize: isCompact ? "0.75rem" : "0.8125rem", transition: "font-size 200ms" },
+      }}
+    >
+      <Toolbar sx={{ justifyContent: "space-between", gap: 1, minHeight: { xs: isCompact ? 48 : 56, sm: isCompact ? 48 : 64 }, transition: "min-height 200ms ease" }}>
+        <Typography variant="h6" component="span" sx={{ fontWeight: 700, fontSize: isCompact ? "1.05rem" : "1.25rem", transition: "font-size 200ms ease" }}>
           MyLifeMirror
         </Typography>
         {isMobile ? (
@@ -111,5 +127,6 @@ export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
         )}
       </Toolbar>
     </AppBar>
+    </ThemeProvider>
   );
 }
