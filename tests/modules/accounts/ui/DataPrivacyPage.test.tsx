@@ -165,7 +165,7 @@ describe("DataPrivacyPage (RF-05)", () => {
 
       const toggle = await screen.findByRole("switch", { name: /ideas personalizadas con ia/i });
       expect(toggle).not.toBeChecked();
-      expect(screen.getByText(/nunca se envían tu nombre, tu email, tu experiencia privada ni las categorías sensibles/i)).toBeInTheDocument();
+      expect(screen.getByText(/nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles/i)).toBeInTheDocument();
     });
 
     it("activarla y desactivarla lo guarda en el servidor", async () => {
@@ -188,6 +188,68 @@ describe("DataPrivacyPage (RF-05)", () => {
       await screen.findByRole("button", { name: /descargar mis datos/i });
       await new Promise((resolve) => setTimeout(resolve, 50));
       expect(screen.queryByRole("switch", { name: /ideas personalizadas con ia/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("sugerencias de la IA a partir de tus experiencias (RF-45)", () => {
+    function stubSuggestions({ available, enabled }: { available: boolean; enabled: boolean }) {
+      const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ ok: true, json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable: available }) });
+        if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiSuggestionsEnabled: enabled }) });
+        if (url === "/api/accounts/ai-suggestions") {
+          const { enabled: next } = JSON.parse(init?.body as string);
+          return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiSuggestionsEnabled: next }) });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      return fetchMock;
+    }
+
+    function renderWithSession() {
+      return render(
+        withClient(
+          <MemoryRouter initialEntries={["/perfil/datos"]}>
+            <SessionProvider>
+              <DataPrivacyPage />
+            </SessionProvider>
+          </MemoryRouter>,
+        ),
+      );
+    }
+
+    it("se ofrece desactivada, aparte de la de ideas, y explica qué se envía, qué se quita y qué nunca", async () => {
+      stubSuggestions({ available: true, enabled: false });
+      renderWithSession();
+
+      const toggle = await screen.findByRole("switch", { name: /sugerencias de la ia a partir de tus experiencias/i });
+      expect(toggle).not.toBeChecked();
+      expect(screen.getByText(/solo la experiencia que tú le pidas analizar/i)).toBeInTheDocument();
+      expect(screen.getByText(/quitamos emails, teléfonos, enlaces y números largos/i)).toBeInTheDocument();
+      expect(screen.getByText(/nunca se envían las categorías sensibles/i)).toBeInTheDocument();
+    });
+
+    it("activarla y desactivarla lo guarda en el servidor", async () => {
+      const fetchMock = stubSuggestions({ available: true, enabled: false });
+      renderWithSession();
+      const name = /sugerencias de la ia a partir de tus experiencias/i;
+
+      fireEvent.click(await screen.findByRole("switch", { name }));
+      await waitFor(() => expect(screen.getByRole("switch", { name })).toBeChecked());
+      fireEvent.click(screen.getByRole("switch", { name }));
+      await waitFor(() => expect(screen.getByRole("switch", { name })).not.toBeChecked());
+
+      const bodies = fetchMock.mock.calls.filter(([url]) => url === "/api/accounts/ai-suggestions").map(([, init]) => JSON.parse(init?.body as string));
+      expect(bodies).toEqual([{ enabled: true }, { enabled: false }]);
+    });
+
+    it("sin la función disponible no se ofrece", async () => {
+      stubSuggestions({ available: false, enabled: false });
+      renderWithSession();
+
+      await screen.findByRole("button", { name: /descargar mis datos/i });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(screen.queryByRole("switch", { name: /sugerencias de la ia/i })).not.toBeInTheDocument();
     });
   });
 });

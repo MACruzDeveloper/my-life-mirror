@@ -5,6 +5,29 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-45, sugerencias de la IA a partir de una experiencia)
+
+- Consentimiento propio en *Privacidad y datos*, "Sugerencias de la IA a partir de tus experiencias" (desactivado por defecto, aparte del de RF-40), con qué se envía, qué se quita y qué nunca. Con él, cada experiencia del diario de una categoría no sensible ofrece "Sugerir opciones con IA".
+- La IA solo traduce esa experiencia a las listas cerradas ("¿Qué te ayuda?", "¿Qué te lo pone difícil?"): se ven como propuestas "Sugerido por IA" que el usuario marca o descarta; aceptar una la marca como si la tocara él (con su "✓" y el pulso en las ideas). Nunca se enseña ni se guarda texto de la IA.
+- Salvaguardas: salida validada (solo claves posibles de esa categoría), datos personales quitados antes de enviar (emails, enlaces, teléfonos, números largos; los nombres no, y se avisa), nunca categorías sensibles, ids ni puntuaciones, y caída a "sin sugerencias" si algo falla o tarda más de 8 s. Proveedor *Fake* (palabras clave) en local y E2E; el modelo real, con RF-40b.
+- **Migración 0015** (`profiles.ai_suggestions_enabled` y su fecha): ejecutarla antes de desplegar. Acciones `/api/accounts/ai-suggestions` y `/api/recommendations/suggest-options` (sin funciones nuevas: 11/12). La elección entra en la exportación (RF-05).
+- **Pareja queda fuera de la IA** (ni ideas personalizadas ni sugerencias) sin volverse sensible: marca `aiExcluded` en el catálogo, **migración 0016** (ejecutarla antes de desplegar). No pide consentimiento para activarla; las sensibles siguen fuera siempre.
+- Aviso al pulsar "Sugerir opciones con IA" si la experiencia lleva insultos o palabras ofensivas (lista curada `offensiveTerms.json`): el usuario puede enviarla igualmente o cancelar. El diario no se valida, y cómo se siente la persona ("estoy fatal", "no puedo más") nunca avisa.
+- Si la función existe pero no está activada, el diario dice dónde activarla ("Actívalas en Privacidad y datos"); antes no había forma de descubrirla desde la entrevista.
+- El *Fake* reconoce otras formas de la misma palabra ("viajé" → "Viajar", "comida nueva" → "Probar comidas nuevas"), para poder probarlo con frases naturales.
+- La política de privacidad tiene su apartado, y los textos de RF-40 ("nunca se envían tus experiencias privadas") pasan a decir "para estas ideas", porque ya no es cierto en general.
+
+### Añadido (RF-44, diario de experiencias)
+
+- "Tus experiencias (privadas)" en cada pregunta: varias por categoría, con su propio "Añadir" (no hace falta puntuar), "✓ Guardada" en la línea del título, la lista de las 3 más recientes con su fecha y "Ver todas", y borrar cada una con confirmación. Siguen siendo privadas: nunca van a la IA.
+- **Migración 0014** (tabla `experiences`): copia a ella las notas que ya había en las evaluaciones, con su fecha; ejecutarla antes de desplegar. La nota original se conserva en su evaluación (inmutable, RF-12), pero la interfaz ya solo enseña las experiencias: en la entrevista, en el historial de Resultados (en su día, también los días sin puntuaciones) y no en las tarjetas. Acción `/api/categories/diary` (sin función nueva: 11/12). Entran en la exportación y el borrado de datos (RF-05).
+- "Guardar" vuelve a ser solo para la puntuación (antes también se activaba al escribir la nota).
+
+### Cambiado (CAT-01, contenido curado como datos)
+
+- Las ideas del catálogo, las situaciones de RF-42 con sus choques, las opciones de "¿Qué te ayuda?" y los términos del filtro de IA pasan de constantes en el código a JSON en `domain/catalog/` de su módulo (`ideas.json`, `situations.json`, `safetyTerms.json`, `helpOptions.json`), con la forma de las futuras tablas de ADM-04. Sin cambios de comportamiento: los tests de siempre pasan sin tocarlos.
+- Tests de integridad del catálogo: claves únicas, choques que apuntan a ideas que existen, opciones de categorías estándar, siempre alguna idea general sin choques y texto en español e inglés para todo.
+
 ### Añadido (RF-42, situaciones que lo ponen difícil)
 
 - "¿Qué te lo pone difícil?" en cada pregunta con una puntuación baja (o una idea abierta): situaciones de una lista cerrada (salir de casa, sitios con mucha gente, dar el primer paso…), nunca rasgos ni salud, solo las que afectan a las ideas de esa categoría. Se guardan al momento.
@@ -50,6 +73,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 - El `POST /api/assessments` devuelve también las últimas puntuaciones y las recomendaciones abiertas; la entrevista las pone en la caché y solo vuelve a pedir el historial. De 4 llamadas a 2 por guardado, y el modal de la idea sale en la mitad de tiempo (medido en local). Un E2E lo vigila.
 - La barra de desplazamiento de la columna derecha, fina y semitransparente; sus acordeones, sin bordes ni sombras.
+
+### Corregido (entrevista)
+
+- Si las categorías o las puntuaciones no cargaban, el aviso se quedaba hasta volver a entrar: ahora tiene "Reintentar". Sigue sin haber reintentos automáticos (un fallo se enseña, no se esconde).
 
 ### Corregido (UX-06)
 

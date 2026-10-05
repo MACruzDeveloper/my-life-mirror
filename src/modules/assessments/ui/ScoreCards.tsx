@@ -48,7 +48,6 @@ export function ScoreCards({ latestScores, renderCardExtra }: { latestScores: La
                       {t(BAND_LABEL_KEYS[band])}
                     </Typography>
                   </Box>
-                  {latestScore.note && <Typography variant="body2">{latestScore.note}</Typography>}
                   {latestScore.recordedAt && (
                     <Typography variant="caption" color="text.secondary">
                       {t("resultados.ultima", { fecha: new Date(latestScore.recordedAt).toLocaleDateString(i18n.language) })}

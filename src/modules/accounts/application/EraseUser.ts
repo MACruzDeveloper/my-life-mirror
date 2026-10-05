@@ -1,6 +1,7 @@
 import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
+import type { ExperienceRepository } from "#modules/assessments/domain/Experience.js";
 import type { RecommendationRepository } from "#modules/recommendations/domain/RecommendationRepository.js";
 import type { ConsentRepository } from "#modules/consent/domain/ConsentRepository.js";
 import type { AuthProvider } from "../domain/AuthProvider.js";
@@ -15,6 +16,7 @@ export interface EraseUserDependencies {
   recommendationRepository: RecommendationRepository;
   /** RF-40: las ideas personalizadas (en la base también caen en cascada; aquí se borran explícitamente, como el resto). */
   personalizedIdeaRepository: PersonalizedIdeaRepository;
+  experienceRepository: ExperienceRepository;
 }
 
 /**
@@ -25,9 +27,10 @@ export interface EraseUserDependencies {
  * camino se puede repetir (todos los pasos son repetibles) y nunca quedan
  * datos huérfanos sin una cuenta que pueda pedir su borrado.
  */
-export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository }: EraseUserDependencies) {
+export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }: EraseUserDependencies) {
   return async function eraseUser(userId: string): Promise<void> {
     await personalizedIdeaRepository.deleteByUserId(userId);
+    await experienceRepository.deleteByUserId(userId);
     await recommendationRepository.deleteByUserId(userId);
     await assessmentRepository.deleteByUserId(userId);
     await categoryRepository.deleteByUserId(userId);

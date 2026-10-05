@@ -1,4 +1,4 @@
-import terms from "./ideaSafetyTerms.json" with { type: "json" };
+import terms from "./catalog/safetyTerms.json" with { type: "json" };
 import type { IdeaDraft, IdeaRequest } from "./IdeaWriter.js";
 
 export const IDEA_SAFETY_REASONS = ["templateKey", "length", "blocked"] as const;
@@ -14,7 +14,7 @@ function normalize(text: string): string {
 }
 
 /**
- * Convierte un término de `ideaSafetyTerms.json` en su patrón: sin tildes ni
+ * Convierte un término de `catalog/safetyTerms.json` en su patrón: sin tildes ni
  * mayúsculas, palabras separadas por cualquier espacio, palabra entera salvo
  * que acabe en `*` (entonces admite lo que siga: `fracas*` → fracasado).
  */

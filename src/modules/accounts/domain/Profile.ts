@@ -21,4 +21,8 @@ export interface Profile {
   readonly aiIdeasEnabled?: boolean;
   /** Cuándo las activó (ISO), como constancia del consentimiento; sin valor si están desactivadas. */
   readonly aiIdeasEnabledAt?: string;
+  /** RF-45: sugerencias de opciones a partir de una experiencia, activadas por el propio usuario (desactivadas por defecto). */
+  readonly aiSuggestionsEnabled?: boolean;
+  /** Cuándo las activó (ISO), como constancia del consentimiento. */
+  readonly aiSuggestionsEnabledAt?: string;
 }
