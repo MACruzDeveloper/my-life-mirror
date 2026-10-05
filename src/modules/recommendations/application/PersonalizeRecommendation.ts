@@ -11,6 +11,7 @@ import type { IdeaTexts } from "../domain/IdeaTexts.js";
 import { checkIdeaSafety } from "../domain/ideaSafety.js";
 import type { PersonalizedIdeaRepository } from "../domain/PersonalizedIdea.js";
 import { isOpen } from "../domain/Recommendation.js";
+import { allowedTemplateKeys } from "../domain/ideaSituations.js";
 import { templateKeysFor } from "../domain/recommendationCatalog.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
@@ -84,6 +85,10 @@ export function createPersonalizeRecommendation(deps: Dependencies) {
     const templateKey = input.templateKey ?? recommendation.templateKey;
     if (templateKey !== recommendation.templateKey && !templateKeysFor(categoryKey).includes(templateKey)) {
       return err(new ValidationError("Template does not belong to this category"));
+    }
+    // RF-42: una idea que choca con lo que se le pone difícil no se propone, tampoco personalizada.
+    if (!allowedTemplateKeys(categoryKey, category?.difficultyTags ?? []).includes(templateKey)) {
+      return err(new ValidationError("Template clashes with a difficult situation"));
     }
     const curated: PersonalizedResult = { source: "catalog", templateKey };
 

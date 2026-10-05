@@ -6,7 +6,8 @@
     "errorServidor": "No se pudo contactar con el servidor",
     "reintentar": "Reintentar",
     "idioma": "Idioma",
-    "abrirMenu": "Abrir menú"
+    "abrirMenu": "Abrir menú",
+    "cargando": "Cargando…"
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -144,8 +145,8 @@
     "verHistorial": "Ver mi historial ({{count}})",
     "ocultarHistorial": "Ocultar historial",
     "verMasHistorial": "Ver más",
-    "queTeAyuda": "¿Qué te ayuda en esta área?",
-    "queTeAyudaMarcadas": "¿Qué te ayuda en esta área? ({{count}})",
+    "queTeAyuda": "¿Qué te ayuda?",
+    "queTeAyudaMarcadas": "¿Qué te ayuda? ({{count}})",
     "queTeAyudaTexto": "Opcional. Sirve para que las ideas de la app encajen contigo.",
     "notaPrivada": "Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.",
     "errorExperiencia": "No se pudo guardar tu elección",
@@ -158,7 +159,7 @@
     "gracias": "Gracias por mirarte con honestidad.",
     "irInicio": "Ir a Inicio",
     "seguirAqui": "Seguir aquí",
-    "ideasPara": "Ideas para {{categoria}}",
+    "ideasPara": "Ideas para {{categoria}} ({{count}})",
     "progresoTitulo": "Tu progreso",
     "progresoResumen": "{{respondidas}} de {{total}} respondidas",
     "estadoSinGuardar": "Sin guardar",
@@ -178,7 +179,15 @@
     "elegirTodas": "Elegir todas",
     "quitarTodas": "Quitar todas",
     "eligeUna": "Elige al menos una para seguir.",
-    "releerIntro": "Releer la introducción"
+    "releerIntro": "Releer la introducción",
+    "queTeLoPoneDificil": "¿Qué te lo pone difícil?",
+    "queTeLoPoneDificilMarcadas": "¿Qué te lo pone difícil? ({{count}})",
+    "queTeLoPoneDificilTexto": "Opcional. No te propondremos ideas que choquen con lo que marques.",
+    "guardadoSolo": "Guardado",
+    "guardadoProximasIdeas": "Para tus próximas ideas",
+    "guardadoIdeasActualizadas": "Ideas actualizadas",
+    "guardadoIdeasEnCuenta": "Lo tendrán en cuenta",
+    "borrarYCerrar": "Borrar y cerrar"
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -578,5 +587,18 @@
       "pocoAPoco": "Aportar poco a poco",
       "revisarDeVezEnCuando": "Revisar de vez en cuando"
     }
+  },
+  "situaciones": {
+    "salirDeCasa": "Salir de casa",
+    "sitiosConGente": "Sitios con mucha gente",
+    "darElPrimerPaso": "Dar el primer paso con otras personas",
+    "actividadesEnGrupo": "Actividades en grupo",
+    "hablarDeLoQueSiento": "Hablar de lo que siento o me preocupa",
+    "llamarPorTelefono": "Llamar por teléfono",
+    "contactoConFamilia": "Estar en contacto con mi familia",
+    "apuntarYRegistrar": "Apuntar cosas o llevar registros",
+    "mirarMisCuentas": "Mirar mis cuentas",
+    "cambiosDeRutina": "Cambiar mi rutina",
+    "pocoTiempoLibre": "Tener poco tiempo libre"
   }
 }

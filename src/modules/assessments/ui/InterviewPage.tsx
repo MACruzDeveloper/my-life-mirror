@@ -103,6 +103,9 @@ export function InterviewPage() {
   const [pageError, setPageError] = useState<string | null>(null);
   // Categorías añadidas en esta visita, la más reciente primero (sus preguntas van arriba, con animación).
   const [justAddedIds, setJustAddedIds] = useState<string[]>([]);
+  // RF-41/RF-42: la reacción al marcar una opción (se borra sola) y cuántas veces han cambiado las ideas de cada categoría.
+  const [tagFeedback, setTagFeedback] = useState<Record<string, { kind: "helps" | "difficulties"; token: number }>>({});
+  const [ideasPulses, setIdeasPulses] = useState<Record<string, number>>({});
   // UX-07: ¿primera entrevista (sin respuestas al abrirla)? Se fija al cargar; y en qué paso va.
   const [firstInterview, setFirstInterview] = useState<boolean | null>(null);
   const [step, setStep] = useState<InterviewStep>("intro");
@@ -167,6 +170,21 @@ export function InterviewPage() {
     queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, status } : category)));
   }
 
+  const hasOpenIdea = (categoryId: string) => recommendations.some((recommendation) => recommendation.categoryId === categoryId && isOpenRecommendation(recommendation));
+
+  /** Tras confirmarlo el servidor: "✓ Guardado" con lo que cambia (unos segundos) y, con una idea abierta, un pulso en "Ideas para…". */
+  function reactToSavedTag(categoryId: string, kind: "helps" | "difficulties") {
+    const token = Date.now() + Math.random();
+    setTagFeedback((current) => ({ ...current, [categoryId]: { kind, token } }));
+    window.setTimeout(() => setTagFeedback((current) => (current[categoryId]?.token === token ? omitKey(current, categoryId) : current)), 4000);
+    // El mismo pulso para las dos listas (el texto ya dice si de verdad cambian, sin prometer de más).
+    if (hasOpenIdea(categoryId)) setIdeasPulses((current) => ({ ...current, [categoryId]: (current[categoryId] ?? 0) + 1 }));
+  }
+
+  function setCategoryDifficultyTags(id: string, difficultyTags: string[]) {
+    queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, difficultyTags } : category)));
+  }
+
   function setCategoryExperienceTags(id: string, experienceTags: string[]) {
     queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, experienceTags } : category)));
   }
@@ -193,8 +211,32 @@ export function InterviewPage() {
       // se engancha a ella (lo destapó un E2E que fallaba 1 de cada 4 veces).
       await queryClient.cancelQueries({ queryKey: PERSONALIZED_IDEAS_KEY });
       void queryClient.invalidateQueries({ queryKey: PERSONALIZED_IDEAS_KEY });
+      reactToSavedTag(category.id, "helps");
     } catch {
       setCategoryExperienceTags(category.id, previous);
+      setPageError(t("entrevista.errorExperiencia"));
+    }
+  }
+
+  /**
+   * RF-42: marcar o desmarcar una situación se guarda al momento (optimista, se
+   * deshace si el servidor falla). El carrusel de ideas la tiene en cuenta en
+   * cuanto cambia la caché de categorías.
+   */
+  async function toggleDifficultyTag(category: CategoryDto, situation: string) {
+    const previous = category.difficultyTags ?? [];
+    const next = previous.includes(situation) ? previous.filter((current) => current !== situation) : [...previous, situation];
+    setCategoryDifficultyTags(category.id, next);
+    try {
+      const response = await fetch("/api/categories/difficulties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categoryId: category.id, tags: next }),
+      });
+      if (!response.ok) throw new Error("rejected");
+      reactToSavedTag(category.id, "difficulties");
+    } catch {
+      setCategoryDifficultyTags(category.id, previous);
       setPageError(t("entrevista.errorExperiencia"));
     }
   }
@@ -588,6 +630,9 @@ export function InterviewPage() {
           onNoteStateChange={handleNoteStateChange}
           onScore={(categoryId, score) => setDraftScores((current) => ({ ...current, [categoryId]: score }))}
           onToggleTag={(target, tag) => void toggleExperienceTag(target, tag)}
+          onToggleDifficulty={(target, situation) => void toggleDifficultyTag(target, situation)}
+          tagFeedback={tagFeedback[category.id]?.kind}
+          ideasPulse={ideasPulses[category.id]}
           onSave={saveCategory}
         />
       ))}

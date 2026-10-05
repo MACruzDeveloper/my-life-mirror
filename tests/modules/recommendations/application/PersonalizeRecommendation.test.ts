@@ -150,6 +150,18 @@ describe("PersonalizeRecommendation (RF-40)", () => {
     if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
   });
 
+  it("una idea que choca con lo que se lo pone difícil se rechaza, tampoco se personaliza (RF-42)", async () => {
+    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Una idea que no debería llegar a escribirse nunca, ni personalizada." }));
+    const { personalize, categoryRepository, finances } = await setup({ writer });
+    await categoryRepository.save({ ...(await categoryRepository.findById("u1", finances.id))!, difficultyTags: ["apuntarYRegistrar"] });
+
+    const result = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.4", locale: "es" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+    expect(writer.calls).toHaveLength(0);
+  });
+
   it("sin IA, la idea pedida del carrusel se devuelve como curada", async () => {
     const { personalize } = await setup({ aiIdeasEnabled: false });
 

@@ -6,7 +6,7 @@ import type { CategoryCatalogRepository } from "#modules/categories/domain/Categ
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import { type Recommendation, isOpen } from "../domain/Recommendation.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
-import { templateKeysFor } from "../domain/recommendationCatalog.js";
+import { allowedTemplateKeys } from "../domain/ideaSituations.js";
 
 interface Dependencies {
   recommendationRepository: RecommendationRepository;
@@ -23,7 +23,8 @@ interface Dependencies {
  * categoría activa con puntuación por debajo del umbral, propone una acción
  * concreta del catálogo curado. Reglas: como mucho una recomendación abierta
  * por categoría (no acumular avisos, RES-07) y rotación de plantillas (una que
- * el usuario aún no haya recibido; si las agotó, se repite desde la primera).
+ * el usuario aún no haya recibido; si las agotó, se repite desde la primera),
+ * solo entre las que no chocan con sus situaciones difíciles (RF-42).
  * Se invoca como oyente de `RecordAssessments`, después de persistir.
  * Ver docs/user-stories/RF-18-recomendaciones.md.
  */
@@ -42,7 +43,9 @@ export function createGenerateRecommendations({ recommendationRepository, catego
       const forCategory = [...existentes, ...created].filter((r) => r.categoryId === category.id);
       if (forCategory.some(isOpen)) continue;
 
-      const keys = templateKeysFor(category.catalogId ? keysByCatalogId.get(category.catalogId) : undefined);
+      // RF-42: solo las ideas que no chocan con lo que se le pone difícil en esa categoría.
+      const keys = allowedTemplateKeys(category.catalogId ? keysByCatalogId.get(category.catalogId) : undefined, category.difficultyTags ?? []);
+      if (keys.length === 0) continue;
       const used = new Set(forCategory.map((r) => r.templateKey));
       const templateKey = keys.find((c) => !used.has(c)) ?? keys[0];
 
