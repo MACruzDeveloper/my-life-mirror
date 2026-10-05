@@ -99,6 +99,47 @@ describe("RecommendationButton (RF-18)", () => {
     });
   });
 
+  describe("pulso cuando cambian las ideas (RF-42)", () => {
+    it("cada cambio da un pulso al botón, sin cerrar la ventana si estaba abierta", () => {
+      const view = render(<RecommendationButton templateKey="economia.1" categoryName="Economía" pulseKey={0} />);
+      expect(screen.getByRole("button", { name: /una idea para ti/i })).not.toHaveAttribute("data-pulse");
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+
+      view.rerender(<RecommendationButton templateKey="economia.1" categoryName="Economía" pulseKey={1} />);
+
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /una idea para ti/i, hidden: true })).toHaveAttribute("data-pulse", "true");
+    });
+  });
+
+  describe("situaciones que lo ponen difícil (RF-42)", () => {
+    function renderWithDifficulties(difficultyTags: string[]) {
+      const client = createTestClient();
+      client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false, difficultyTags }]);
+      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      return screen.getByRole("dialog");
+    }
+
+    it("el carrusel no enseña las ideas que chocan, tampoco la recomendada", () => {
+      const dialog = renderWithDifficulties(["apuntarYRegistrar"]);
+
+      expect(within(dialog).getByText("Idea 1 de 3")).toBeInTheDocument();
+      expect(within(dialog).getByText(/apartar una cantidad pequeña/i)).toBeInTheDocument();
+      for (let step = 0; step < 3; step += 1) {
+        expect(within(dialog).queryByText(/en qué se va tu dinero|objetivo de ahorro concreto/i)).not.toBeInTheDocument();
+        fireEvent.click(within(dialog).getByRole("button", { name: "Idea siguiente" }));
+      }
+    });
+
+    it("sin nada marcado, las cinco", () => {
+      const dialog = renderWithDifficulties([]);
+
+      expect(within(dialog).getByText("Idea 1 de 5")).toBeInTheDocument();
+      expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+    });
+  });
+
   describe("ideas personalizadas (RF-40)", () => {
     afterEach(() => vi.unstubAllGlobals());
 

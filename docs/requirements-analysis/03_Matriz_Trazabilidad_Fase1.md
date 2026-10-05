@@ -11,7 +11,7 @@
 | RN | RF relacionados | RNF relacionados | RES relacionados | RD relacionados | Cobertura |
 |---|---|---|---|---|---|
 | RN-01 | RF-06, RF-07, RF-09, RF-10 | RNF-01 | — | RD-01, RD-02, RD-03 | ✅ |
-| RN-02 | RF-18, RF-19, RF-20, RF-21, RF-34, RF-35, RF-40, RF-41, RF-42, RF-43 | — | — | RD-04, RD-09 | ✅ |
+| RN-02 | RF-18, RF-19, RF-20, RF-21, RF-34, RF-35, RF-40, RF-41, RF-42, RF-43, RF-44, RF-45 | — | — | RD-04, RD-09 | ✅ |
 | RN-03 | RF-12, RF-16, RF-36 | — | — | RD-07 | ✅ |
 | RN-04 | RF-19, RF-21 | — | RES-07, RES-09 | — | ✅ |
 | RN-05 | RF-07, RF-08 | — | — | RD-02 | ✅ |
@@ -65,3 +65,4 @@ La cobertura parcial de RN-11 es esperada: ya documentamos en RN-11/RD-10 que la
 - **v1.5 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
 - **v1.5 (29 sept. 2026)** — RF-41 en la fila de RN-02.
 - **v1.6 (3 oct. 2026)** — RF-42 y RF-43 en la fila de RN-02.
+- **v1.7 (5 oct. 2026)** — RF-44 y RF-45 en la fila de RN-02.

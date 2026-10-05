@@ -91,7 +91,8 @@ describe("ResultsPage", () => {
     expect(within(economyCard).queryByRole("button", { name: /una idea para ti/i })).not.toBeInTheDocument();
     fireEvent.click(ideaButton);
     const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByText(/sal a caminar/i)).toBeInTheDocument();
+    // RF-42: el carrusel espera a tener las categorías (para quitar las ideas que chocan).
+    expect(await within(dialog).findByText(/sal a caminar/i)).toBeInTheDocument();
     expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
   });
 

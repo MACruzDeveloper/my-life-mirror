@@ -15,9 +15,10 @@ import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
+import { keyframes } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { useCategories } from "@modules/categories/ui/queries";
-import { templateKeysFor } from "../domain/recommendationCatalog";
+import { allowedTemplateKeys } from "../domain/ideaSituations";
 import { usePersonalizedIdea } from "./queries";
 
 /** Tono "idea" amarillo suave: destaca sin sonar a aviso ni a error (RN-04, RES-07). */
@@ -35,7 +36,18 @@ interface RecommendationButtonProps {
   categoryId?: string;
   /** RF-40: la función está disponible y el usuario la activó (lo decide la página con `useAiIdeasActive`). */
   personalize?: boolean;
+  /**
+   * RF-42: cuántas veces han cambiado las ideas; cada cambio, un pulso suave del botón. Se reinicia solo
+   * el botón (su `key`), no la ventana: una `key` en todo el componente la cerraba si estaba abierta.
+   */
+  pulseKey?: number;
 }
+
+/** Un pulso suave del botón (solo `transform`), dos veces; nada con "reducir movimiento". */
+const ideasPulse = keyframes`
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+`;
 
 /**
  * Recomendación de una categoría (RF-18): en la tarjeta solo se ve un botón
@@ -47,7 +59,7 @@ interface RecommendationButtonProps {
  * muestra con su etiqueta y la idea original a un clic. Ante cualquier
  * respuesta que no sea una idea de IA, se ve el texto curado de siempre.
  */
-export function RecommendationButton({ templateKey, categoryName, label, recommendationId, categoryId, personalize = false }: RecommendationButtonProps) {
+export function RecommendationButton({ templateKey, categoryName, label, recommendationId, categoryId, personalize = false, pulseKey = 0 }: RecommendationButtonProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const titleId = useId();
@@ -55,12 +67,16 @@ export function RecommendationButton({ templateKey, categoryName, label, recomme
   return (
     <>
       <Button
+        key={pulseKey}
         size="small"
         startIcon={<LightbulbOutlinedIcon fontSize="small" />}
         aria-haspopup="dialog"
         data-highlighted="true"
+        data-pulse={pulseKey > 0 || undefined}
         onClick={() => setOpen(true)}
         sx={{
+          ...(pulseKey > 0 && { animation: `${ideasPulse} 450ms ease-in-out 2` }),
+          "@media (prefers-reduced-motion: reduce)": { animation: "none" },
           alignSelf: "flex-start",
           mt: 0.5,
           px: 1.5,
@@ -98,11 +114,14 @@ interface IdeaContentProps {
   personalize?: boolean;
 }
 
-/** Las ideas del catálogo de la categoría de una plantilla, empezando por ella ("economia.3" → 3, 1, 2, 4, 5). */
-function carouselKeys(templateKey: string): string[] {
+/**
+ * Las ideas del carrusel: las del catálogo de la categoría de la plantilla que no chocan con lo que
+ * se le pone difícil (RF-42), empezando por la recomendada si se puede ("economia.3" → 3, 1, 2, 4, 5).
+ */
+function carouselKeys(templateKey: string, difficultyTags: readonly string[]): string[] {
   const prefix = templateKey.split(".")[0];
-  const keys = templateKeysFor(prefix === "general" ? undefined : prefix);
-  return [templateKey, ...keys.filter((key) => key !== templateKey)];
+  const allowed = allowedTemplateKeys(prefix === "general" ? undefined : prefix, difficultyTags);
+  return allowed.includes(templateKey) ? [templateKey, ...allowed.filter((key) => key !== templateKey)] : allowed;
 }
 
 /**
@@ -111,13 +130,38 @@ function carouselKeys(templateKey: string): string[] {
  * personalizada si RF-40 está activo; el aviso de RES-05 se ve siempre. Lo
  * comparten esta ventana y la de "Cambios guardados" de la entrevista.
  */
-export function IdeaContent({ templateKey, categoryName, recommendationId, categoryId, personalize = false }: IdeaContentProps) {
+export function IdeaContent(props: IdeaContentProps) {
+  return props.categoryId ? <IdeaCarouselForCategory {...props} categoryId={props.categoryId} /> : <IdeaCarousel {...props} difficultyTags={[]} />;
+}
+
+/** RF-42: con su categoría, el carrusel quita las ideas que chocan; espera a tener las categorías para no enseñarlas ni un momento. */
+function IdeaCarouselForCategory(props: IdeaContentProps & { categoryId: string }) {
   const { t } = useTranslation();
-  const keys = carouselKeys(templateKey);
-  const [index, setIndex] = useState(0);
+  const categoriesQuery = useCategories();
+  if (categoriesQuery.data === undefined && !categoriesQuery.isError) {
+    return (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+        <CircularProgress size={18} />
+        <Typography variant="body2" color="text.secondary">
+          {t("comun.cargando")}
+        </Typography>
+      </Box>
+    );
+  }
+  const categories = categoriesQuery.data;
+  const difficultyTags = (Array.isArray(categories) ? categories.find((category) => category.id === props.categoryId)?.difficultyTags : undefined) ?? [];
+  return <IdeaCarousel {...props} difficultyTags={difficultyTags} />;
+}
+
+function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId, personalize = false, difficultyTags }: IdeaContentProps & { difficultyTags: readonly string[] }) {
+  const { t } = useTranslation();
+  const keys = carouselKeys(templateKey, difficultyTags);
+  const [rawIndex, setIndex] = useState(0);
+  // Si la lista se acorta con la ventana abierta (se marcó una situación), el índice no se sale.
+  const index = Math.min(rawIndex, Math.max(keys.length - 1, 0));
   const currentKey = keys[index];
   const curatedText = t(`recomendaciones.plantillas.${currentKey}`, { categoria: categoryName });
-  const move = (step: number) => setIndex((current) => (current + step + keys.length) % keys.length);
+  const move = (step: number) => setIndex((index + step + keys.length) % keys.length);
 
   return (
     <>

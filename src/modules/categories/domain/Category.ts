@@ -30,4 +30,9 @@ export interface Category {
    * (claves de `experienceOptions`). Ausente o vacío = ninguna.
    */
   readonly experienceTags?: readonly string[];
+  /**
+   * RF-42: situaciones que se lo ponen difícil en esta categoría (claves de
+   * `recommendations/domain/ideaSituations`). Las ideas que chocan no se le proponen.
+   */
+  readonly difficultyTags?: readonly string[];
 }
