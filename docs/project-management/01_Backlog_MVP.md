@@ -11,13 +11,12 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **RF-42** situaciones que lo ponen difícil (desde el 5 oct.; [historia](../user-stories/RF-42-situaciones-dificiles.md)): con puntuación baja, "¿Qué te lo pone difícil?" con una lista cerrada de situaciones; las ideas que chocan no se proponen (carrusel, recomendaciones nuevas, IA). Lista y choques pendientes de revisión del autor.
+- [ ] **CAT-01** contenido curado como datos (desde el 5 oct.; [historia](../user-stories/CAT-01-contenido-curado-json.md)): las ideas, las situaciones de RF-42, sus choques, las opciones de "¿Qué te ayuda?" y los términos del filtro de IA pasan de constantes en el código a archivos JSON en una carpeta `catalog/` de su módulo, con la forma de las futuras tablas de ADM-04. Para localizarlos y revisarlos sin leer TypeScript, y que migrar a la base de datos sea casi copiar. Sin archivo global de constantes (acoplaría módulos, AGENTS.md).
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
-- [ ] **CAT-01** contenido curado como datos (confirmada el 5 oct., detrás de RF-42): las ideas, las situaciones de RF-42, sus choques, las opciones de "¿Qué te ayuda?" y los términos del filtro de IA pasan de constantes en el código a archivos JSON en una carpeta `catalog/` de su módulo, con la forma de las futuras tablas de ADM-04. Para localizarlos y revisarlos sin leer TypeScript, y que migrar a la base de datos sea casi copiar. Sin archivo global de constantes (acoplaría módulos, AGENTS.md).
 - [ ] **RF-44** diario de experiencias (confirmada el 5 oct., detrás de CAT-01; [historia](../user-stories/RF-44-diario-experiencias.md)): varias experiencias por categoría, "Añadir" sin necesidad de puntuar, lista con fechas y eliminar; tabla propia (las notas de las evaluaciones se copian); enlace a las líneas de ayuda junto al diario.
 - [ ] **RF-45** la IA propone opciones a partir de una experiencia (confirmada el 5 oct., detrás de RF-44, Could; [historia](../user-stories/RF-45-sugerencias-ia-experiencias.md), Nivel 3): voluntario y por experiencia, solo claves de las listas cerradas, datos personales quitados antes de enviar, sin categorías sensibles. Primero con un *Fake*; el modelo real con RF-40b.
 
@@ -46,6 +45,7 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
 ## Hecho
 
+- [x] **RF-42** situaciones que lo ponen difícil ([historia](../user-stories/RF-42-situaciones-dificiles.md)): con puntuación baja, "¿Qué te lo pone difícil?" con una lista cerrada de situaciones; las ideas que chocan no se proponen (carrusel, recomendaciones nuevas, IA). Lista y choques pendientes de revisión del autor.
 - [x] **UX-07** primera entrevista por pasos ([historia](../user-stories/UX-07-primera-entrevista-pasos.md)): introducción → categorías con botones (sensibles aparte, con consentimiento) → preguntas, con indicador de pasos. Solo la primera vez.
 - [x] **PERF-01** menos llamadas al guardar en la entrevista ([historia](../user-stories/PERF-01-menos-llamadas-guardar.md)): el `POST /api/assessments` devuelve las últimas puntuaciones y las recomendaciones; de 4 llamadas a 2 por guardado y el modal de la idea en la mitad de tiempo (medido en local). GraphQL descartado.
 - [x] **UX-06** distribución de la entrevista y menú plegable ([historia](../user-stories/UX-06-distribucion-entrevista-menu.md)): al actualizar, "Tus categorías" y "Requieren tu consentimiento" en acordeones (columna derecha en escritorio, encima de las preguntas en móvil), y el menú de Mi perfil como `Drawer` plegable a iconos.
@@ -153,3 +153,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.43 (5 oct. 2026)** — v1.1.0 en producción (UX-05, UX-06, UX-07, PERF-01): pasan a "Hecho"; RF-42 en curso.
 - **v2.44 (5 oct. 2026)** — CAT-01 añadida detrás de RF-42 (contenido curado en JSON por módulo); ADM-04 sigue como idea, a decidir según el tiempo.
 - **v2.45 (5 oct. 2026)** — RF-44 y RF-45 añadidas detrás de CAT-01; el dilema de RF-45 se suma a la validación ética con el tutor.
+- **v2.46 (5 oct. 2026)** — RF-42 hecha (PR #25); CAT-01 en curso.

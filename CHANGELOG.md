@@ -5,6 +5,11 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (CAT-01, contenido curado como datos)
+
+- Las ideas del catálogo, las situaciones de RF-42 con sus choques, las opciones de "¿Qué te ayuda?" y los términos del filtro de IA pasan de constantes en el código a JSON en `domain/catalog/` de su módulo (`ideas.json`, `situations.json`, `safetyTerms.json`, `helpOptions.json`), con la forma de las futuras tablas de ADM-04. Sin cambios de comportamiento: los tests de siempre pasan sin tocarlos.
+- Tests de integridad del catálogo: claves únicas, choques que apuntan a ideas que existen, opciones de categorías estándar, siempre alguna idea general sin choques y texto en español e inglés para todo.
+
 ### Añadido (RF-42, situaciones que lo ponen difícil)
 
 - "¿Qué te lo pone difícil?" en cada pregunta con una puntuación baja (o una idea abierta): situaciones de una lista cerrada (salir de casa, sitios con mucha gente, dar el primer paso…), nunca rasgos ni salud, solo las que afectan a las ideas de esa categoría. Se guardan al momento.
