@@ -6,7 +6,8 @@
     "errorServidor": "Could not reach the server",
     "reintentar": "Retry",
     "idioma": "Language",
-    "abrirMenu": "Open menu"
+    "abrirMenu": "Open menu",
+    "cargando": "Loading…"
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -144,8 +145,8 @@
     "verHistorial": "See my history ({{count}})",
     "ocultarHistorial": "Hide history",
     "verMasHistorial": "Show more",
-    "queTeAyuda": "What helps you in this area?",
-    "queTeAyudaMarcadas": "What helps you in this area? ({{count}})",
+    "queTeAyuda": "What helps you?",
+    "queTeAyudaMarcadas": "What helps you? ({{count}})",
     "queTeAyudaTexto": "Optional. It helps the app's ideas fit you.",
     "notaPrivada": "Only you can see it. It's never sent to the AI or shared with anyone.",
     "errorExperiencia": "Your choice could not be saved",
@@ -158,7 +159,7 @@
     "gracias": "Thanks for looking at yourself honestly.",
     "irInicio": "Go to Home",
     "seguirAqui": "Stay here",
-    "ideasPara": "Ideas for {{categoria}}",
+    "ideasPara": "Ideas for {{categoria}} ({{count}})",
     "progresoTitulo": "Your progress",
     "progresoResumen": "{{respondidas}} of {{total}} answered",
     "estadoSinGuardar": "Not saved",
@@ -178,7 +179,15 @@
     "elegirTodas": "Choose all",
     "quitarTodas": "Remove all",
     "eligeUna": "Choose at least one to continue.",
-    "releerIntro": "Read the introduction again"
+    "releerIntro": "Read the introduction again",
+    "queTeLoPoneDificil": "What makes it hard?",
+    "queTeLoPoneDificilMarcadas": "What makes it hard? ({{count}})",
+    "queTeLoPoneDificilTexto": "Optional. We won't suggest ideas that clash with what you mark.",
+    "guardadoSolo": "Saved",
+    "guardadoProximasIdeas": "For your next ideas",
+    "guardadoIdeasActualizadas": "Ideas updated",
+    "guardadoIdeasEnCuenta": "They'll take it into account",
+    "borrarYCerrar": "Clear and close"
   },
   "resultados": {
     "titulo": "Your results",
@@ -578,5 +587,18 @@
       "pocoAPoco": "Investing little by little",
       "revisarDeVezEnCuando": "Checking now and then"
     }
+  },
+  "situaciones": {
+    "salirDeCasa": "Going out",
+    "sitiosConGente": "Crowded places",
+    "darElPrimerPaso": "Making the first move with other people",
+    "actividadesEnGrupo": "Group activities",
+    "hablarDeLoQueSiento": "Talking about how I feel or what worries me",
+    "llamarPorTelefono": "Phone calls",
+    "contactoConFamilia": "Being in touch with my family",
+    "apuntarYRegistrar": "Writing things down or keeping records",
+    "mirarMisCuentas": "Looking at my finances",
+    "cambiosDeRutina": "Changing my routine",
+    "pocoTiempoLibre": "Having little free time"
   }
 }

@@ -44,7 +44,7 @@ test.describe("RF-40: ideas personalizadas con IA", () => {
     const moreHelps = await interview.openHelps("Economía");
     await moreHelps.getByRole("button", { name: "Apps de finanzas" }).click();
     await expect(moreHelps.getByRole("button", { name: "Apps de finanzas", pressed: true })).toBeVisible();
-    await interview.question("Economía").getByRole("button", { name: "Ideas para Economía" }).click();
+    await interview.question("Economía").getByRole("button", { name: /^Ideas para Economía/ }).click();
     await expect(page.getByRole("dialog")).toContainText("apps de finanzas");
     await page.getByRole("dialog").getByRole("button", { name: /cerrar/i }).click();
 

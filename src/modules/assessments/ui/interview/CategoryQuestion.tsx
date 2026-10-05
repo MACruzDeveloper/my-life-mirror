@@ -7,8 +7,11 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import ToggleButton from "@mui/material/ToggleButton";
 import Typography from "@mui/material/Typography";
-import { keyframes } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { keyframes, useTheme } from "@mui/material/styles";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
+import TerrainOutlinedIcon from "@mui/icons-material/TerrainOutlined";
+import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useTranslation } from "react-i18next";
 import interviewerAvatar from "../../../../assets/avatars/interviewer.svg";
@@ -16,14 +19,23 @@ import userAvatar from "../../../../assets/avatars/user.svg";
 import type { CategoryLabel } from "@modules/categories/ui/categoryLabels";
 import type { CategoryDto } from "@modules/categories/ui/queries";
 import { experienceOptionsFor } from "@modules/categories/domain/experienceOptions";
+import { allowedTemplateKeys, situationOptionsFor } from "@modules/recommendations/domain/ideaSituations";
+import { DEFAULT_THRESHOLD } from "@modules/recommendations/domain/recommendationCatalog";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import type { RecommendationDto } from "@modules/recommendations/ui/queries";
 import { scoreBand } from "../scoreBand";
 import { Bubble, PendingBadge } from "./Bubble";
 import { PENDING_COLORS } from "./pendingColors";
+import { ExpandToggle } from "./ExpandToggle";
 import { ExperienceNote } from "./ExperienceNote";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+/** Oculto a la vista pero leído por el lector de pantalla. */
+const VISUALLY_HIDDEN = { position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" } as const;
+
+/** Fila de un título desplegable y, a su derecha, su "✓ …": nunca se parte, así que al irse el mensaje no salta nada. */
+const TOGGLE_ROW = { display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 } as const;
 
 /** Entrada de una pregunta recién añadida: de la derecha, solo con transform y opacity (las baratas de animar). */
 const slideIn = keyframes`
@@ -62,6 +74,12 @@ interface CategoryQuestionProps {
   personalizeIdeas: boolean;
   onScore: (categoryId: string, score: number) => void;
   onToggleTag: (category: CategoryDto, tag: string) => void;
+  /** RF-41/RF-42: el servidor acaba de confirmar una opción marcada (para decir qué cambia). */
+  tagFeedback?: "helps" | "difficulties";
+  /** Cuántas veces han cambiado sus ideas en esta visita: cada cambio, un pulso en "Ideas para…". */
+  ideasPulse?: number;
+  /** RF-42: marcar o desmarcar una situación que se lo pone difícil. */
+  onToggleDifficulty: (category: CategoryDto, situation: string) => void;
   /** Guarda esta categoría; `true` si se guardó (la experiencia escrita vuelve a empezar vacía). */
   onSave: (categoryId: string, note: string | undefined) => Promise<boolean>;
   /** Solo cuando pasa de vacía a con texto o al revés (para el progreso); escribir no repinta la página. */
@@ -70,14 +88,17 @@ interface CategoryQuestionProps {
 
 /**
  * Una categoría de la entrevista (RF-10): la pregunta con sus ejemplos, la
- * puntuación, "¿Qué te ayuda?" (RF-41), la última actualización y la última
+ * puntuación, "¿Qué te ayuda?" (RF-41), "¿Qué te lo pone difícil?" con una
+ * puntuación baja (RF-42), la última actualización y la última
  * experiencia, la experiencia nueva y su propio "Guardar" (UX-05). El texto de
  * la experiencia vive aquí: escribir solo vuelve a pintar esta pregunta.
  */
-export function CategoryQuestion({ category, justAdded = false, label, score, scoreChanged, lastUpdate, lastExperience, saveStatus, recommendation, personalizeIdeas, onScore, onToggleTag, onSave, onNoteStateChange }: CategoryQuestionProps) {
+export function CategoryQuestion({ category, justAdded = false, label, score, scoreChanged, lastUpdate, lastExperience, saveStatus, recommendation, personalizeIdeas, tagFeedback, ideasPulse = 0, onScore, onToggleTag, onToggleDifficulty, onSave, onNoteStateChange }: CategoryQuestionProps) {
   const { t, i18n } = useTranslation();
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [helpsOpen, setHelpsOpen] = useState(false);
+  const [difficultiesOpen, setDifficultiesOpen] = useState(false);
+  const isWide = useMediaQuery(useTheme().breakpoints.up("sm"), { noSsr: true });
   const noteRef = useRef("");
   const [hasNote, setHasNote] = useState(false);
   const hasNoteRef = useRef(false);
@@ -89,6 +110,34 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
   const hasChanges = !isUnanswered && (scoreChanged || hasNote);
   const experienceOptions = experienceOptionsFor(label.key);
   const experienceTags = category.experienceTags ?? [];
+  // RF-42: solo con una puntuación baja (el umbral por defecto de RF-18) o una idea abierta.
+  const difficultyOptions = situationOptionsFor(label.key);
+  const difficultyTags = category.difficultyTags ?? [];
+  const asksDifficulties = difficultyOptions.length > 0 && ((score !== undefined && score < DEFAULT_THRESHOLD) || recommendation !== undefined);
+  // RF-42: qué cambia de verdad al marcar una opción (sin prometer lo que no pasa: "¿Qué te ayuda?" sin IA no cambia nada visible).
+  // A la derecha del título de su lista, en la misma fila: al irse no hace saltar nada.
+  // En pantallas anchas, visible a la derecha; en móvil no cabe y la confirmación se ve dentro del título
+  // (`savedTagInline`), pero el aviso para el lector de pantalla es siempre este, fuera del botón.
+  const savedTagStatus = (
+    <Typography role="status" variant="body2" sx={isWide ? { display: "flex", alignItems: "center", gap: 0.5, minWidth: 0, color: "success.dark" } : VISUALLY_HIDDEN}>
+      {isWide && <CheckCircleOutlineIcon fontSize="small" sx={{ flexShrink: 0 }} />}
+      <Box component="span" sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {feedbackText()}
+      </Box>
+    </Typography>
+  );
+  const savedTagInline = (
+    <Box component="span" aria-hidden sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, color: "success.dark" }}>
+      <CheckCircleOutlineIcon fontSize="small" />
+      {feedbackText()}
+    </Box>
+  );
+  function feedbackText() {
+    if (!tagFeedback) return null;
+    if (tagFeedback === "helps" && !personalizeIdeas) return t("entrevista.guardadoSolo");
+    if (!recommendation) return t("entrevista.guardadoProximasIdeas");
+    return tagFeedback === "difficulties" ? t("entrevista.guardadoIdeasActualizadas") : t("entrevista.guardadoIdeasEnCuenta");
+  }
   const formatDate = (isoDate: string) => new Date(isoDate).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" });
 
   const handleNoteChange = useCallback(
@@ -201,9 +250,12 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
         </Box>
         {experienceOptions.length > 0 && (
           <Box sx={{ mt: 1 }}>
-            <Button size="small" aria-expanded={helpsOpen} onClick={() => setHelpsOpen((open) => !open)}>
-              {experienceTags.length > 0 ? t("entrevista.queTeAyudaMarcadas", { count: experienceTags.length }) : t("entrevista.queTeAyuda")}
-            </Button>
+            <Box sx={TOGGLE_ROW}>
+              <ExpandToggle icon={<VolunteerActivismOutlinedIcon />} open={helpsOpen} onToggle={() => setHelpsOpen((open) => !open)} status={!isWide && tagFeedback === "helps" ? savedTagInline : undefined}>
+                {experienceTags.length > 0 ? t("entrevista.queTeAyudaMarcadas", { count: experienceTags.length }) : t("entrevista.queTeAyuda")}
+              </ExpandToggle>
+              {tagFeedback === "helps" && savedTagStatus}
+            </Box>
             <Collapse in={helpsOpen} unmountOnExit>
               <Typography variant="caption" color="text.secondary" component="p">
                 {t("entrevista.queTeAyudaTexto")}
@@ -228,20 +280,53 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
             </Collapse>
           </Box>
         )}
-        {/* UX-05: con una idea abierta, las ideas están a un toque (y cambian con "¿Qué te ayuda?" si RF-40 está activo). */}
-        {recommendation && (
+        {asksDifficulties && (
           <Box sx={{ mt: 0.5 }}>
+            <Box sx={TOGGLE_ROW}>
+              <ExpandToggle icon={<TerrainOutlinedIcon />} open={difficultiesOpen} onToggle={() => setDifficultiesOpen((open) => !open)} status={!isWide && tagFeedback === "difficulties" ? savedTagInline : undefined}>
+                {difficultyTags.length > 0 ? t("entrevista.queTeLoPoneDificilMarcadas", { count: difficultyTags.length }) : t("entrevista.queTeLoPoneDificil")}
+              </ExpandToggle>
+              {tagFeedback === "difficulties" && savedTagStatus}
+            </Box>
+            <Collapse in={difficultiesOpen} unmountOnExit>
+              <Typography variant="caption" color="text.secondary" component="p">
+                {t("entrevista.queTeLoPoneDificilTexto")}
+              </Typography>
+              <Box role="group" aria-label={`${t("entrevista.queTeLoPoneDificil")} ${label.name}`} sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mt: 0.75 }}>
+                {difficultyOptions.map((situation) => {
+                  const selected = difficultyTags.includes(situation);
+                  return (
+                    <Chip
+                      key={situation}
+                      label={t(`situaciones.${situation}`)}
+                      clickable
+                      size="small"
+                      color={selected ? "secondary" : "default"}
+                      variant={selected ? "filled" : "outlined"}
+                      aria-pressed={selected}
+                      onClick={() => onToggleDifficulty(category, situation)}
+                    />
+                  );
+                })}
+              </Box>
+            </Collapse>
+          </Box>
+        )}
+        <ExperienceNote key={noteVersion} categoryId={category.id} onChange={handleNoteChange} />
+        {/* UX-05: con una idea abierta, las ideas están a un toque; debajo de las tres opciones de la pregunta (y cambian con "¿Qué te ayuda?" si RF-40 está activo). */}
+        {recommendation && (
+          <Box sx={{ mt: 1.5 }}>
             <RecommendationButton
+              pulseKey={ideasPulse}
               recommendationId={recommendation.id}
               categoryId={category.id}
               personalize={personalizeIdeas}
               templateKey={recommendation.templateKey}
               categoryName={label.name}
-              label={t("entrevista.ideasPara", { categoria: label.name })}
+              label={t("entrevista.ideasPara", { categoria: label.name, count: allowedTemplateKeys(label.key, difficultyTags).length })}
             />
           </Box>
         )}
-        <ExperienceNote key={noteVersion} categoryId={category.id} onChange={handleNoteChange} />
         {saveStatus?.kind === "error" && (
           <Alert severity="error" sx={{ mt: 1 }}>
             {saveStatus.message}

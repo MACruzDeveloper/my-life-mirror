@@ -5,6 +5,15 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-42, situaciones que lo ponen difícil)
+
+- "¿Qué te lo pone difícil?" en cada pregunta con una puntuación baja (o una idea abierta): situaciones de una lista cerrada (salir de casa, sitios con mucha gente, dar el primer paso…), nunca rasgos ni salud, solo las que afectan a las ideas de esa categoría. Se guardan al momento.
+- Las ideas que chocan con lo marcado no se proponen: ni en el carrusel, ni al crear una recomendación nueva, ni personalizadas por IA (el servidor lo rechaza). Las situaciones no se envían a la IA. Si chocan todas las de una categoría, se usan las generales.
+- **Migración 0013** (`categories.difficulty_tags`): ejecutarla antes de desplegar. Acción `/api/categories/difficulties` (sin función nueva: 11/12). Entran en la exportación de datos (RF-05).
+- La lista de situaciones y qué idea choca con cuál, pendientes de revisión del autor (en la historia RF-42).
+- Reacción al marcar una opción (aquí y en "¿Qué te ayuda?"): un "✓" con lo que cambia ("Ideas actualizadas", "Lo tendrán en cuenta", "Para tus próximas ideas" o "Guardado"), en la línea de su título para que al irse no salte nada (en móvil, dentro del título un momento); y "Ideas para Economía (4)" dice cuántas quedan y da un pulso suave (sin pulso con "reducir movimiento"). "Guardar" no se activa: crearía una evaluación sin cambio de puntuación.
+- Los tres títulos de cada pregunta llevan icono y flecha para que se vea que se despliegan; "¿Qué te ayuda en esta área?" pasa a "¿Qué te ayuda?". "Tu experiencia (privada)" se cierra con su título o con una X que borra lo escrito. "Ideas para…" va debajo de las tres, como su resultado.
+
 ## [1.1.0] - 2026-10-04
 
 ### Cambiado (proyecto)
@@ -17,7 +26,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ### Cambiado (UX-06, distribución de la entrevista y menú plegable)
 
-- Al actualizar la entrevista, "Tus categorías" y "Requieren tu consentimiento" van en dos acordeones plegados con cuántas hay activas ("2 de 6 activas"): en escritorio, en la columna derecha encima del progreso; en móvil, encima de las preguntas. La primera entrevista sigue con las dos columnas abiertas (sus pasos llegarán con UX-07).
+- Al actualizar la entrevista, "Tus categorías" y "Requieren tu consentimiento" van en dos acordeones plegados con cuántas hay activas ("2 de 6 activas"): en escritorio, en la columna derecha encima del progreso; en móvil, encima de las preguntas. En la primera entrevista se eligen en su paso (UX-07).
 - El menú de Mi perfil es un `Drawer` de Material UI con iconos: en escritorio se puede plegar a solo iconos (se recuerda en el navegador); en móvil se abre con un botón que muestra la sección actual ("☰ Entrevista"), para no confundirlo con el menú de la cabecera.
 - La introducción y las preguntas de la entrevista van en dos bloques con fondo distinto (las preguntas, con su título "¿Cómo te sientes en cada una?").
 - La columna derecha de la entrevista (categorías y progreso) se queda fija entera al desplazarse; el progreso también es un acordeón (abierto por defecto, con el resumen visible al plegarlo).

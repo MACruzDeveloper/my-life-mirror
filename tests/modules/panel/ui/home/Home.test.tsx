@@ -80,7 +80,8 @@ describe("Home (RF-39 / RF-14)", () => {
     expect(screen.queryByText(/en qué se va tu dinero/i)).not.toBeInTheDocument();
     fireEvent.click(ideaButton);
     const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+    // RF-42: el carrusel espera a tener las categorías (para quitar las ideas que chocan).
+    expect(await within(dialog).findByText(/en qué se va tu dinero/i)).toBeInTheDocument();
     expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
   });
 
@@ -194,7 +195,7 @@ describe("Home (RF-39 / RF-14)", () => {
       expect(within(summary).queryByRole("button", { name: /familia/i })).not.toBeInTheDocument();
       fireEvent.click(button);
       const dialog = screen.getByRole("dialog");
-      expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+      expect(await within(dialog).findByText(/en qué se va tu dinero/i)).toBeInTheDocument();
       expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
     });
 
