@@ -165,7 +165,7 @@ describe("DataPrivacyPage (RF-05)", () => {
 
       const toggle = await screen.findByRole("switch", { name: /ideas personalizadas con ia/i });
       expect(toggle).not.toBeChecked();
-      expect(screen.getByText(/nunca se envían tu nombre, tu email, tu experiencia privada ni las categorías sensibles/i)).toBeInTheDocument();
+      expect(screen.getByText(/nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles/i)).toBeInTheDocument();
     });
 
     it("activarla y desactivarla lo guarda en el servidor", async () => {

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -28,10 +28,10 @@ import { PENDING_COLORS } from "./interview/pendingColors";
 import { CategoryPicker } from "./interview/CategoryPicker";
 import { CategorySelection } from "./interview/CategorySelection";
 import { InterviewSteps, type InterviewStep } from "./interview/InterviewSteps";
-import { CategoryQuestion, type CategorySaveStatus, type LastExperience, type LastUpdate } from "./interview/CategoryQuestion";
+import { CategoryQuestion, type CategorySaveStatus, type LastUpdate, type TagFeedback } from "./interview/CategoryQuestion";
 import { InterviewProgress, type ProgressStatus } from "./interview/InterviewProgress";
 import { SavedIdeaDialog } from "./interview/SavedIdeaDialog";
-import { ASSESSMENTS_KEY, HISTORY_KEY, LATEST_SCORES_KEY, useAssessmentHistory, useLatestScores } from "./queries";
+import { ASSESSMENTS_KEY, EXPERIENCES_KEY, HISTORY_KEY, LATEST_SCORES_KEY, useAssessmentHistory, useExperiences, useLatestScores, type ExperienceDto } from "./queries";
 import type { LatestScoreDto } from "./ScoreCards";
 
 /** Lleva a la pregunta de una categoría; sin animación si el usuario prefiere menos movimiento. */
@@ -104,7 +104,9 @@ export function InterviewPage() {
   // Categorías añadidas en esta visita, la más reciente primero (sus preguntas van arriba, con animación).
   const [justAddedIds, setJustAddedIds] = useState<string[]>([]);
   // RF-41/RF-42: la reacción al marcar una opción (se borra sola) y cuántas veces han cambiado las ideas de cada categoría.
-  const [tagFeedback, setTagFeedback] = useState<Record<string, { kind: "helps" | "difficulties"; token: number }>>({});
+  const [tagFeedback, setTagFeedback] = useState<Record<string, { kind: TagFeedback; token: number }>>({});
+  // RF-44: la experiencia recién añadida, que entra con una animación breve.
+  const [justAddedExperienceId, setJustAddedExperienceId] = useState<string | undefined>(undefined);
   const [ideasPulses, setIdeasPulses] = useState<Record<string, number>>({});
   // UX-07: ¿primera entrevista (sin respuestas al abrirla)? Se fija al cargar; y en qué paso va.
   const [firstInterview, setFirstInterview] = useState<boolean | null>(null);
@@ -116,8 +118,7 @@ export function InterviewPage() {
   const [newIdea, setNewIdea] = useState<RecommendationDto | null>(null);
   const historyQuery = useAssessmentHistory();
   const recommendations = useRecommendations().data ?? [];
-  // Categorías con experiencia escrita sin guardar (para el progreso); el texto vive en cada pregunta.
-  const [notedCategoryIds, setNotedCategoryIds] = useState<ReadonlySet<string>>(new Set());
+  const experiences = useExperiences().data ?? [];
   const personalizeIdeas = useAiIdeasActive();
 
   const savedScores: Record<string, number> = {};
@@ -136,27 +137,16 @@ export function InterviewPage() {
 
   // El historial llega del más reciente al más antiguo: lo primero que se encuentra de cada categoría es lo último.
   const lastUpdateByCategory = new Map<string, LastUpdate>();
-  const lastExperienceByCategory = new Map<string, LastExperience>();
   for (const session of historyQuery.data ?? []) {
     for (const entry of session.entries) {
       if (!lastUpdateByCategory.has(entry.categoryId)) lastUpdateByCategory.set(entry.categoryId, { recordedAt: session.recordedAt, score: entry.score, previousScore: entry.previousScore });
-      if (entry.note && !lastExperienceByCategory.has(entry.categoryId)) lastExperienceByCategory.set(entry.categoryId, { note: entry.note, recordedAt: session.recordedAt });
     }
   }
-
-  const handleNoteStateChange = useCallback((categoryId: string, hasNote: boolean) => {
-    setNotedCategoryIds((current) => {
-      const next = new Set(current);
-      if (hasNote) next.add(categoryId);
-      else next.delete(categoryId);
-      return next;
-    });
-  }, []);
 
   const today = new Date().toDateString();
   function progressStatus(categoryId: string): ProgressStatus {
     if (scores[categoryId] === undefined) return { kind: "unanswered" };
-    if (scores[categoryId] !== savedScores[categoryId] || notedCategoryIds.has(categoryId)) return { kind: "unsaved" };
+    if (scores[categoryId] !== savedScores[categoryId]) return { kind: "unsaved" };
     const lastUpdate = lastUpdateByCategory.get(categoryId);
     if (saveStatuses[categoryId]?.kind === "saved" || (lastUpdate && new Date(lastUpdate.recordedAt).toDateString() === today)) return { kind: "savedToday" };
     return lastUpdate ? { kind: "saved", recordedAt: lastUpdate.recordedAt } : { kind: "savedToday" };
@@ -173,12 +163,43 @@ export function InterviewPage() {
   const hasOpenIdea = (categoryId: string) => recommendations.some((recommendation) => recommendation.categoryId === categoryId && isOpenRecommendation(recommendation));
 
   /** Tras confirmarlo el servidor: "✓ Guardado" con lo que cambia (unos segundos) y, con una idea abierta, un pulso en "Ideas para…". */
-  function reactToSavedTag(categoryId: string, kind: "helps" | "difficulties") {
+  function reactToSavedTag(categoryId: string, kind: TagFeedback) {
     const token = Date.now() + Math.random();
     setTagFeedback((current) => ({ ...current, [categoryId]: { kind, token } }));
     window.setTimeout(() => setTagFeedback((current) => (current[categoryId]?.token === token ? omitKey(current, categoryId) : current)), 4000);
-    // El mismo pulso para las dos listas (el texto ya dice si de verdad cambian, sin prometer de más).
-    if (hasOpenIdea(categoryId)) setIdeasPulses((current) => ({ ...current, [categoryId]: (current[categoryId] ?? 0) + 1 }));
+    // El mismo pulso para las dos listas de opciones (el texto ya dice si de verdad cambian, sin prometer de más).
+    // Una experiencia (RF-44) no cambia las ideas: nunca va a la IA, así que no hay pulso.
+    if ((kind === "helps" || kind === "difficulties") && hasOpenIdea(categoryId)) setIdeasPulses((current) => ({ ...current, [categoryId]: (current[categoryId] ?? 0) + 1 }));
+  }
+
+  /** RF-44: añade una experiencia al diario (sin puntuar); al confirmarlo el servidor, entra arriba de la lista. */
+  async function addExperience(categoryId: string, text: string): Promise<boolean> {
+    try {
+      const response = await fetch("/api/categories/diary", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ categoryId, text }) });
+      if (!response.ok) throw new Error("rejected");
+      const added = (await response.json()) as ExperienceDto;
+      queryClient.setQueryData<ExperienceDto[]>(EXPERIENCES_KEY, (current) => [added, ...(current ?? [])]);
+      setJustAddedExperienceId(added.id);
+      reactToSavedTag(categoryId, "experienceAdded");
+      return true;
+    } catch {
+      setPageError(t("entrevista.errorExperienciaGuardar"));
+      return false;
+    }
+  }
+
+  /** RF-44: borra una experiencia (ya confirmado en su diálogo); se quita al momento y vuelve si el servidor falla. */
+  async function deleteExperience(experience: ExperienceDto) {
+    const previous = queryClient.getQueryData<ExperienceDto[]>(EXPERIENCES_KEY);
+    queryClient.setQueryData<ExperienceDto[]>(EXPERIENCES_KEY, (current) => current?.filter((candidate) => candidate.id !== experience.id));
+    try {
+      const response = await fetch(`/api/categories/diary?id=${encodeURIComponent(experience.id)}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("rejected");
+      reactToSavedTag(experience.categoryId, "experienceDeleted");
+    } catch {
+      queryClient.setQueryData(EXPERIENCES_KEY, previous);
+      setPageError(t("entrevista.errorExperienciaBorrar"));
+    }
   }
 
   function setCategoryDifficultyTags(id: string, difficultyTags: string[]) {
@@ -345,7 +366,6 @@ export function InterviewPage() {
     markJustAdded(category.id, false);
     // Lo que estaba a medias de esa categoría se descarta; las evaluaciones ya guardadas se conservan.
     setDraftScores((current) => omitKey(current, category.id));
-    handleNoteStateChange(category.id, false);
 
     try {
       const response = await fetch("/api/categories/deactivate", categoryRequest(category.id));
@@ -407,7 +427,7 @@ export function InterviewPage() {
    * que no estaba, la enseña en "Cambios guardados"; si no, la categoría dice
    * "Guardado ahora".
    */
-  async function saveCategory(categoryId: string, note: string | undefined): Promise<boolean> {
+  async function saveCategory(categoryId: string): Promise<boolean> {
     const score = scores[categoryId];
     setSaveStatus(categoryId, { kind: "saving" });
     const openBefore = new Set((queryClient.getQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY) ?? []).filter(isOpenRecommendation).map((recommendation) => recommendation.id));
@@ -416,7 +436,7 @@ export function InterviewPage() {
       const response = await fetch("/api/assessments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ entries: [{ categoryId, score, ...(note ? { note } : {}) }] }),
+        body: JSON.stringify({ entries: [{ categoryId, score }] }),
       });
       const data = await response.json();
 
@@ -623,11 +643,13 @@ export function InterviewPage() {
           score={scores[category.id]}
           scoreChanged={scores[category.id] !== savedScores[category.id]}
           lastUpdate={lastUpdateByCategory.get(category.id)}
-          lastExperience={lastExperienceByCategory.get(category.id)}
           saveStatus={saveStatuses[category.id]}
           recommendation={recommendations.find((recommendation) => recommendation.categoryId === category.id && isOpenRecommendation(recommendation))}
           personalizeIdeas={personalizeIdeas}
-          onNoteStateChange={handleNoteStateChange}
+          experiences={experiences.filter((experience) => experience.categoryId === category.id)}
+          justAddedExperienceId={justAddedExperienceId}
+          onAddExperience={addExperience}
+          onDeleteExperience={(experience) => void deleteExperience(experience)}
           onScore={(categoryId, score) => setDraftScores((current) => ({ ...current, [categoryId]: score }))}
           onToggleTag={(target, tag) => void toggleExperienceTag(target, tag)}
           onToggleDifficulty={(target, situation) => void toggleDifficultyTag(target, situation)}
