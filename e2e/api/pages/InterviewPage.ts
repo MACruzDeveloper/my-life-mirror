@@ -46,6 +46,13 @@ export class InterviewPage {
     if (await next.isVisible()) await next.click();
   }
 
+  /** RF-42: abre "¿Qué te lo pone difícil?" de una categoría (con puntuación baja) y devuelve su grupo de situaciones. */
+  async openDifficulties(name: string) {
+    await this.goToQuestions();
+    await this.question(name).getByRole("button", { name: /qué te lo pone difícil/i }).click();
+    return this.page.getByRole("group", { name: new RegExp(`qué te lo pone difícil\\? ${name}`, "i") });
+  }
+
   /** UX-06: al actualizar, las categorías van en acordeones plegados; los abre si hace falta. */
   async openCategories() {
     for (const title of [/^tus categorías/i, /^requieren tu consentimiento/i]) {
@@ -84,8 +91,8 @@ export class InterviewPage {
   /** RF-41: abre "¿Qué te ayuda en esta área?" de una categoría y devuelve su grupo de opciones. */
   async openHelps(name: string) {
     await this.goToQuestions();
-    await this.question(name).getByRole("button", { name: /qué te ayuda en esta área/i }).click();
-    return this.page.getByRole("group", { name: new RegExp(`qué te ayuda en esta área\\? ${name}`, "i") });
+    await this.question(name).getByRole("button", { name: /qué te ayuda/i }).click();
+    return this.page.getByRole("group", { name: new RegExp(`qué te ayuda\\? ${name}`, "i") });
   }
 
   /** UX-05: "Cambios guardados", que se abre solo si el guardado abre una idea nueva. */
@@ -96,6 +103,7 @@ export class InterviewPage {
   /** UX-05: guarda una categoría con su botón; termina con "Guardado ahora" o con la ventana de la idea. */
   async save(name: string) {
     await this.page.getByRole("button", { name: `Guardar ${name}`, exact: true }).click();
-    await expect(this.question(name).getByRole("status").or(this.savedIdeaDialog())).toBeVisible();
+    // "Guardado ahora" en concreto: tras marcar una opción puede haber otro estado ("✓ Guardado · …", RF-42).
+    await expect(this.question(name).getByRole("status").filter({ hasText: /guardado ahora/i }).or(this.savedIdeaDialog())).toBeVisible();
   }
 }

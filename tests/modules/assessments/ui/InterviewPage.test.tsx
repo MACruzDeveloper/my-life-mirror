@@ -440,7 +440,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía" }));
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía (5)" }));
 
       const dialog = screen.getByRole("dialog");
       expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
@@ -531,7 +531,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      const toggle = screen.getByRole("button", { name: "¿Qué te ayuda en esta área? (1)" });
+      const toggle = screen.getByRole("button", { name: "¿Qué te ayuda? (1)" });
       expect(toggle).toHaveAttribute("aria-expanded", "false");
       fireEvent.click(toggle);
 
@@ -546,7 +546,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
 
       expect(await within(helpsGroup("economía")).findByRole("button", { name: "Apps de finanzas", pressed: true })).toBeInTheDocument();
@@ -563,7 +563,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage(client);
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
 
       await waitFor(() => expect(client.getQueryState(["personalized-ideas", "r1", "economia.1", "es", "economia.apps|economia.presupuesto"])?.isInvalidated).toBe(true));
@@ -597,9 +597,9 @@ describe("InterviewPage (RF-10)", () => {
       await waitUntilLoaded();
       const personalizeCalls = () => fetchMock.mock.calls.filter(([urlCalled]) => urlCalled === "/api/recommendations/personalize").length;
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
-      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía" }));
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: /^Ideas para Economía/ }));
       await waitFor(() => expect(personalizeCalls()).toBe(1));
       confirmExperience();
 
@@ -618,11 +618,37 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
 
       await waitFor(() => expect(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeInTheDocument());
       expect(screen.getByText(/no se pudo guardar tu elección/i)).toBeInTheDocument();
+    });
+
+    it("las tres opciones de cada pregunta son desplegables y lo indican (aria-expanded)", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+      chooseScore("economía", 3);
+
+      for (const name of [/qué te ayuda/i, /qué te lo pone difícil/i, /tu experiencia \(privada\)/i]) {
+        expect(within(question("c1")).getByRole("button", { name })).toHaveAttribute("aria-expanded", "false");
+      }
+    });
+
+    it("'Tu experiencia' se puede cerrar con la X: borra lo escrito y vuelve al estado inicial", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+      fireEvent.click(within(question("c1")).getByRole("button", { name: /tu experiencia \(privada\)/i }));
+      fireEvent.change(within(question("c1")).getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "algo" } });
+      expect(saveButton("Economía")).toBeEnabled();
+
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Borrar y cerrar" }));
+
+      expect(within(question("c1")).queryByLabelText(/tu experiencia \(privada\)/i)).not.toBeInTheDocument();
+      expect(within(question("c1")).getByRole("button", { name: /tu experiencia \(privada\)/i })).toHaveAttribute("aria-expanded", "false");
+      expect(saveButton("Economía")).toBeDisabled();
     });
 
     it("'Tu experiencia (privada)' avisa de que solo la ve el usuario y nunca va a la IA", async () => {
@@ -633,6 +659,145 @@ describe("InterviewPage (RF-10)", () => {
       fireEvent.click(screen.getAllByRole("button", { name: /tu experiencia \(privada\)/i })[0]);
 
       expect(screen.getByText("Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.")).toBeInTheDocument();
+    });
+  });
+
+  describe("¿Qué te lo pone difícil? (RF-42)", () => {
+    function difficultiesToggle(categoryId: string) {
+      return within(question(categoryId)).queryByRole("button", { name: /qué te lo pone difícil/i });
+    }
+
+    it("con una puntuación alta y sin idea abierta no se pregunta", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(difficultiesToggle("c1")).not.toBeInTheDocument();
+    });
+
+    it("con una puntuación baja aparece, plegado, con las situaciones de esa categoría", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("economía", 3);
+      const toggle = difficultiesToggle("c1")!;
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+      fireEvent.click(toggle);
+
+      const group = within(question("c1")).getByRole("group", { name: /qué te lo pone difícil/i });
+      expect(within(group).getAllByRole("button").map((button) => button.textContent)).toEqual(["Hablar de lo que siento o me preocupa", "Apuntar cosas o llevar registros", "Mirar mis cuentas"]);
+    });
+
+    it("con una idea abierta también aparece, aunque la puntuación ya no sea baja", async () => {
+      stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByRole("button", { name: /qué te lo pone difícil/i })).toBeInTheDocument();
+    });
+
+    it("marcar una situación se ve al momento y se guarda", async () => {
+      const fetchMock = stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+      chooseScore("economía", 3);
+      fireEvent.click(difficultiesToggle("c1")!);
+
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+      expect(await within(question("c1")).findByRole("button", { name: "Mirar mis cuentas", pressed: true })).toBeInTheDocument();
+      await waitFor(() => expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(1));
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/difficulties")[0][1].body as string)).toEqual({ categoryId: "c1", tags: ["mirarMisCuentas"] });
+    });
+
+    describe("reacción al marcar", () => {
+      it("con idea abierta: 'Ideas actualizadas', y el botón de ideas dice cuántas quedan y da un pulso", async () => {
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        const ideasButton = await within(question("c1")).findByRole("button", { name: "Ideas para Economía (5)" });
+        expect(ideasButton).not.toHaveAttribute("data-pulse");
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Ideas actualizadas");
+        expect(within(question("c1")).getByRole("button", { name: "Ideas para Economía (4)" })).toHaveAttribute("data-pulse", "true");
+      });
+
+      it("sin idea abierta: 'Para tus próximas ideas'", async () => {
+        stubFetch();
+        renderPage();
+        await waitUntilLoaded();
+        chooseScore("economía", 3);
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Para tus próximas ideas");
+      });
+
+      it("'¿Qué te ayuda?' sin IA: el mismo pulso en las ideas, pero el texto solo dice 'Guardado' (no promete un cambio)", async () => {
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        await within(question("c1")).findByRole("button", { name: /^Ideas para Economía/ });
+        fireEvent.click(within(question("c1")).getByRole("button", { name: /qué te ayuda/i }));
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Apps de finanzas" }));
+
+        const status = await within(question("c1")).findByRole("status");
+        expect(status.textContent?.trim()).toBe("Guardado");
+        expect(within(question("c1")).getByRole("button", { name: /^Ideas para Economía/ })).toHaveAttribute("data-pulse", "true");
+      });
+
+      it("en pantallas anchas, el mensaje sale a la derecha del título de su lista, en la misma línea (no hace saltar nada al irse)", async () => {
+        // jsdom no evalúa media queries: se simula una pantalla ancha.
+        vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("min-width"), media: query, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, onchange: null, dispatchEvent: () => false }));
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        const status = await within(question("c1")).findByRole("status");
+        expect(status).toBeVisible();
+        expect(status.parentElement).toBe(difficultiesToggle("c1")!.parentElement);
+        vi.unstubAllGlobals();
+      });
+
+      it("en móvil (no cabe al lado), el título enseña la confirmación un momento y conserva su nombre", async () => {
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Ideas actualizadas");
+        const toggle = difficultiesToggle("c1")!;
+        expect(toggle).toHaveAccessibleName(/qué te lo pone difícil/i);
+        expect(within(toggle).getByText("Ideas actualizadas")).toBeInTheDocument();
+      });
+    });
+
+    it("si el servidor lo rechaza, la marca se deshace y se avisa", async () => {
+      const fetchMock = stubFetch();
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+        url === "/api/categories/difficulties" ? Promise.resolve({ ok: false, json: async () => ({ error: "Unknown situation" }) }) : defaultImplementation(url, init),
+      );
+      renderPage();
+      await waitUntilLoaded();
+      chooseScore("economía", 3);
+      fireEvent.click(difficultiesToggle("c1")!);
+
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+      expect(await screen.findByText(/no se pudo guardar tu elección/i)).toBeInTheDocument();
+      expect(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas", pressed: false })).toBeInTheDocument();
     });
   });
 

@@ -40,7 +40,7 @@ async function setup() {
   const categoriesLuis = (await listCategories(luis.id)).ok ? await categoryRepository.findByUserId(luis.id) : [];
   const financesAna = categoriesAna.find((c) => c.name === "Economía")!;
   const sexAna = categoriesAna.find((c) => c.name === "Sexo")!;
-  await categoryRepository.save({ ...financesAna, status: "active", experienceTags: ["economia.presupuesto"] });
+  await categoryRepository.save({ ...financesAna, status: "active", experienceTags: ["economia.presupuesto"], difficultyTags: ["mirarMisCuentas"] });
   await categoryRepository.save({ ...sexAna, status: "active" });
   await categoryRepository.save({ ...categoriesLuis[0], status: "active" });
   await recordAssessments({ userId: ana.id, entries: [{ categoryId: financesAna.id, score: 6, note: "mes justo" }, { categoryId: sexAna.id, score: 8 }] });
@@ -75,7 +75,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     expect(data.exportedAt).toBe("2026-09-20T10:00:00.000Z");
     expect(data.account).toEqual({ id: ana.id, email: "ana@ejemplo.com" });
     expect(data.profile).toEqual({ name: "Ana", birthDate: "1996-05-20", timeZone: "Europe/Madrid" });
-    expect(data.categories.find((c) => c.name === "Economía")).toMatchObject({ status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"] });
+    expect(data.categories.find((c) => c.name === "Economía")).toMatchObject({ status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"], difficultyTags: ["mirarMisCuentas"] });
     expect(data.assessments).toEqual(
       expect.arrayContaining([
         { category: "Economía", score: 6, note: "mes justo", recordedAt: "2026-09-20T10:00:00.000Z" },

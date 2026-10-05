@@ -93,6 +93,16 @@ describe("GenerateRecommendations (RF-18)", () => {
     void generate;
   });
 
+  it("elige entre las ideas que no chocan con lo que se lo pone difícil (RF-42)", async () => {
+    const { record, recommendationRepository, categoryRepository, economia } = await setup();
+    await categoryRepository.save({ ...(await categoryRepository.findById("u1", economia.id))!, difficultyTags: ["apuntarYRegistrar", "mirarMisCuentas", "hablarDeLoQueSiento"] });
+
+    await record({ userId: "u1", entries: [{ categoryId: economia.id, score: 2 }] });
+
+    const [saved] = await recommendationRepository.findByUserId("u1");
+    expect(["economia.2", "economia.3"]).toContain(saved.templateKey);
+  });
+
   it("una categoría sin plantillas propias usa las generales", async () => {
     const { generate, recommendationRepository, categoryRepository } = await setup();
     await categoryRepository.save({ id: "custom", userId: "u1", name: "Creatividad", description: "d", type: "standard", status: "active", isSensitiveData: false });
