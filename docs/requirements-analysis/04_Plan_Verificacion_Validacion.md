@@ -47,6 +47,9 @@ Decisión que apartado 1.1 dejaba pendiente: **cómo automatizar los flujos que 
 
 - **Lección de la primera ejecución en CI (28 sept.):** un test falló solo en móvil y solo en la máquina de GitHub, más lenta. El Page Object elegía entre el menú móvil y el botón de escritorio con `isVisible()`, que mira una vez sin esperar; justo después del registro la cabecera aún no estaba pintada. Ahora se decide por el ancho de pantalla (el mismo punto de corte que la cabecera) y se deja que Playwright espere. Regla para los Page Objects: nunca bifurcar con `isVisible()`; decidir con datos fijos (dispositivo, estado conocido) y dejar esperar a las acciones. En esa misma ejecución Docker Hub/ECR respondió varias veces `toomanyrequests` al descargar imágenes; la CLI de Supabase reintentó y siguió, pero es un riesgo conocido de la primera descarga en cada ejecución.
 
+- **Segunda lección (3 oct.):** fallos intermitentes (1 de cada 4-5) que no venían del código: tras vaciar la base (`db reset`), la API de Supabase tarda un instante en volver a leer qué tablas hay, y si los tests empiezan en ese momento sus primeras peticiones fallan. La solución no fue reintentar los tests, sino esperar a que la base esté lista de verdad (`waitForSchema` en `scripts/local-supabase.mjs`). Regla: un test intermitente se investiga hasta encontrar la causa; reintentar solo la esconde.
+- **Tercera lección (4 oct.):** otro fallo intermitente (1 de cada 4) en el E2E de ideas con IA destapó **un fallo real de la app**: al abrir una idea justo después de marcar una opción de "¿Qué te ayuda?", la idea se pedía antes de que la opción estuviera guardada y salía con las opciones antiguas. Primero se invalidó la caché al confirmarse la opción, pero no bastaba: TanStack Query no repite una primera carga en curso al invalidarla, se engancha a ella. Se encontró registrando las peticiones del test mientras se repetía 10 veces en paralelo para provocarlo, y se arregló cancelando antes de invalidar. Ese mismo día, el E2E nuevo de PERF-01 falló por otra razón, esta vez del test: `waitForLoadState("networkidle")` solo espera la primera vez que la página llega a ese estado, así que no sirve para esperar las peticiones de una acción posterior. Se cambió por esperas a las respuestas concretas.
+
 #### 1.2.1 Cómo ver que funciona
 
 Requisito: Docker Desktop abierto. La primera vez, `supabase start` descarga las imágenes (unos minutos).
@@ -57,7 +60,7 @@ Requisito: Docker Desktop abierto. La primera vez, `supabase start` descarga las
 | En directo | `npm run test:e2e:api -- --headed` | Los navegadores (móvil y escritorio) se abren y la app se usa sola, paso a paso. |
 | Modo interactivo | `npm run test:e2e:api -- --ui` | La ventana de Playwright: se elige un test, se ejecuta y se recorre cada acción hacia atrás con su captura ("viaje en el tiempo"). La mejor opción para la demo. Mientras está abierta ocupa el puerto 5174. |
 | Informe | `npm run test:e2e:api -- --reporter=html` y después `npx playwright show-report` | Una página con cada test, su resultado y su duración (y la traza si alguno falla). Útil como captura para la memoria. |
-| Solo un test | `npm run test:e2e:api -- -g "consentimiento"` | Ejecuta solo los tests cuyo nombre contiene el texto. |
+| Solo un test | `npm run test:e2e:api -- -g "consent"` | Ejecuta solo los tests cuyo nombre contiene el texto. |
 | Solo un dispositivo | `npm run test:e2e:api -- --project=mobile` | `mobile` (Pixel 7) o `desktop`. |
 | Los datos que crean | Supabase Studio local: http://127.0.0.1:54323 | *Authentication → Users* (cuentas `e2e-…@example.com`), *Table Editor* (`assessments`, `recommendations`…). La siguiente ejecución los borra. |
 | En GitHub | Pestaña *Actions* → `E2E con api`, o el apartado de *checks* del PR | El resultado en cada PR; el informe HTML se descarga desde el artefacto `informe-playwright`. |
@@ -121,13 +124,6 @@ Dado el alcance real (RES-01, RES-02):
 Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras funcionalidades: priorizar la demostración rigurosa del concepto y del método sobre la cobertura exhaustiva, dado el marco temporal del TFM.
 
 ---
-
-## 5. Próximo paso
-
-Con este plan aprobado, seguimos con el archivo 3: **justificación del ciclo de vida** (por qué un modelo espiral ligero encaja con este proyecto, y cómo se estructuran los ciclos desde el MVP).
-
----
-
 ## Historial de cambios
 
 - **v1.0 (5 sept. 2026)** — versión inicial: técnicas de verificación (peer review, tests unitarios/integración, UAT Given/When/Then, criterios ejecutables opcionales) y validación (demos, usability testing 5 personas, piloto 5-10 personas, métricas, A/B documental).
@@ -140,3 +136,6 @@ Con este plan aprobado, seguimos con el archivo 3: **justificación del ciclo de
 - **v1.3 (26 sept. 2026)** — apartado 4 corregido: decía "usability test de 5 personas", contradiciendo el ajuste a n = 1 de apartado 2. Enlaces al guion y a la hoja de resultados del test del MVP.
 - **v1.4 (27 sept. 2026)** — nueva apartado 1.2: E2E con `api/` contra Supabase local en Docker, con un servidor propio en Vite (no `vercel dev`, que carga siempre la base real) y aislamiento entre funciones que mantiene cubierto el fallo de apartado 1.1. Primera batería de 9 tests × 2 dispositivos.
 - **v1.5 (28 sept. 2026)** — apartado 1.2: workflow de GitHub Actions en cada PR y nuevo apartado 1.2.1 "Cómo ver que funciona" (modos `--headed`, `--ui`, informe HTML, Studio local, `npm run dev:local`). Los apartados "1bis/1ter" pasan a numeración decimal (1.1, 1.2), igual que en el resto de documentos.
+- **v1.6 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v1.6 (3 oct. 2026)** — apartado 1.2: segunda lección de los E2E (carrera tras `db reset`, resuelta esperando a que la API vea las tablas).
+- **v1.7 (4 oct. 2026)** — apartado 1.2: tercera lección (una intermitencia que era un fallo real de la caché, y `networkidle`, que no espera a las acciones posteriores).

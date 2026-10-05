@@ -3,11 +3,11 @@ import { createQueryClient } from "@shared/ui/api/queryClient";
 
 describe("createQueryClient", () => {
   it("guarda los datos para siempre: solo se vuelve a pedir si una acción los invalida (o al recargar)", () => {
-    const opciones = createQueryClient().getDefaultOptions().queries;
+    const options = createQueryClient().getDefaultOptions().queries;
 
-    expect(opciones?.staleTime).toBe(Infinity);
-    expect(opciones?.gcTime).toBe(Infinity);
-    expect(opciones?.refetchOnWindowFocus).toBe(false);
-    expect(opciones?.retry).toBe(false);
+    expect(options?.staleTime).toBe(Infinity);
+    expect(options?.gcTime).toBe(Infinity);
+    expect(options?.refetchOnWindowFocus).toBe(false);
+    expect(options?.retry).toBe(false);
   });
 });

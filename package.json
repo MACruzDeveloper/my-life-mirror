@@ -1,8 +1,12 @@
 {
-  "name": "my-sims",
+  "name": "my-life-mirror",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.1.0",
   "type": "module",
+  "imports": {
+    "#shared/*": "./src/shared/*",
+    "#modules/*": "./src/modules/*"
+  },
   "scripts": {
     "dev": "vite --open",
     "dev:full": "(sleep 2 && open http://localhost:3000) & npx -y vercel dev",

@@ -8,11 +8,15 @@ export class HttpError extends Error {
   }
 }
 
-/** GET que devuelve JSON y lanza `HttpError` si la respuesta no es 2xx (para que la caché lo trate como error). */
-export async function getJson<T>(url: string): Promise<T> {
-  const respuesta = await fetch(url);
-  if (!respuesta.ok) {
-    throw new HttpError(respuesta.status, url);
+/**
+ * GET que devuelve JSON y lanza `HttpError` si la respuesta no es 2xx (para que la caché lo trate como error).
+ * `signal`: la que TanStack Query da a cada carga (`queryFn: ({ signal }) => …`); al cancelarla
+ * (`cancelQueries`, desmontar…) el navegador aborta la petición en vez de solo ignorar su respuesta.
+ */
+export async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(url, ...(signal ? [{ signal }] : []));
+  if (!response.ok) {
+    throw new HttpError(response.status, url);
   }
-  return (await respuesta.json()) as T;
+  return (await response.json()) as T;
 }

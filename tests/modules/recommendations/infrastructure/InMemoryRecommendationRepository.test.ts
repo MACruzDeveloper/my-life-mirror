@@ -12,10 +12,10 @@ describe("InMemoryRecommendationRepository", () => {
     await repo.saveMany([rec({ id: "a" }), rec({ id: "b", userId: "u2" })]);
     await repo.saveMany([rec({ id: "a", status: "done" })]);
 
-    const delUsuario = await repo.findByUserId("u1");
+    const ofUser = await repo.findByUserId("u1");
 
-    expect(delUsuario).toHaveLength(1);
-    expect(delUsuario[0].status).toBe("done");
+    expect(ofUser).toHaveLength(1);
+    expect(ofUser[0].status).toBe("done");
   });
 
   it("deleteByUserId borra las de ese usuario y no las de los demás (RF-05)", async () => {

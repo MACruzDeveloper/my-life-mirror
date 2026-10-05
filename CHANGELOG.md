@@ -5,6 +5,119 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.1.0] - 2026-10-04
+
+### Cambiado (proyecto)
+
+- El repositorio pasa a llamarse `my-life-mirror` (antes `my-sims`), igual que el paquete y el Supabase local (`project_id`). En una copia ya clonada: `git remote set-url origin https://github.com/MACruzDeveloper/my-life-mirror.git`, y parar el Supabase local antiguo (`npx supabase stop --project-id my-sims`) antes de arrancar el nuevo, que empieza vacío.
+
+### Cambiado (UX-07, primera entrevista por pasos)
+
+- La primera entrevista va por pasos, con un indicador arriba: 1) introducción y escala, con "Empezar"; 2) "¿De qué quieres hablar?", con cada categoría como un botón grande (nombre y descripción) que se marca al tocarlo, "Elegir todas" y las sensibles aparte con su consentimiento; 3) las preguntas, con las categorías en su acordeón y la introducción plegada. Así se ve qué preguntas se añaden, y en el móvil se gana pantalla. Quien ya tiene respuestas entra directamente a actualizar.
+
+### Cambiado (UX-06, distribución de la entrevista y menú plegable)
+
+- Al actualizar la entrevista, "Tus categorías" y "Requieren tu consentimiento" van en dos acordeones plegados con cuántas hay activas ("2 de 6 activas"): en escritorio, en la columna derecha encima del progreso; en móvil, encima de las preguntas. La primera entrevista sigue con las dos columnas abiertas (sus pasos llegarán con UX-07).
+- El menú de Mi perfil es un `Drawer` de Material UI con iconos: en escritorio se puede plegar a solo iconos (se recuerda en el navegador); en móvil se abre con un botón que muestra la sección actual ("☰ Entrevista"), para no confundirlo con el menú de la cabecera.
+- La introducción y las preguntas de la entrevista van en dos bloques con fondo distinto (las preguntas, con su título "¿Cómo te sientes en cada una?").
+- La columna derecha de la entrevista (categorías y progreso) se queda fija entera al desplazarse; el progreso también es un acordeón (abierto por defecto, con el resumen visible al plegarlo).
+- Cabecera oscura y fija arriba; al bajar se compacta (menos altura y letra más pequeña) con una transición breve.
+- Una categoría recién añadida sale la primera y entra con una animación breve de derecha a izquierda (solo `transform`/`opacity`; ninguna con "reducir movimiento").
+- *Breadcrumbs* a la izquierda en las pantallas protegidas; la entrevista sin margen superior.
+
+### Cambiado (UX-05, respuesta inmediata en la entrevista)
+
+- Cada categoría de la entrevista tiene su propio botón "Guardar", junto a su puntuación y su experiencia, y guarda solo esa categoría. Desaparece el botón único "Guardar cambios" del final, que con varias categorías abiertas quedaba fuera de la vista.
+- Al guardar: "Guardado ahora" en la propia categoría; si el guardado abre una idea nueva (puntuación baja), una ventana "Cambios guardados" con la idea (personalizada si RF-40 está activado), el aviso y los enlaces a Resultados e Inicio. Si falla, el error sale en la categoría.
+- Bajo cada pregunta, la última actualización ("Última actualización: 18 de septiembre de 2026 · 6 → 4") y tu última experiencia (privada).
+- El historial de cambios pasa de la entrevista a Resultados, agrupado por día (con el cambio del día por categoría y sus experiencias).
+- El "Guardar" de cada categoría va a la derecha de su puntuación (debajo en móvil si no cabe).
+- La ventana de ideas es un carrusel con las 5 ideas de la categoría (primero la recomendada, "Idea 2 de 5"), en la entrevista, Inicio y Resultados.
+- Las categorías con una idea abierta enseñan "Ideas para Economía" en su pregunta.
+- En escritorio, la columna derecha de la entrevista muestra el progreso: cuántas categorías están respondidas y el estado de cada una (sin responder, sin guardar, guardada hoy o el día X); tocar una lleva a su pregunta.
+- RF-40 v1.1: la IA reescribe la idea que se ve en el carrusel (ya no elige entre las 5), y una idea personalizada se reescribe si cambian las opciones de "¿Qué te ayuda?" de su categoría. **Migración 0012** (`personalized_ideas` por recomendación, idea e idioma, con las opciones usadas): ejecutarla antes de desplegar.
+
+### Cambiado (PERF-01, menos llamadas al guardar)
+
+- El `POST /api/assessments` devuelve también las últimas puntuaciones y las recomendaciones abiertas; la entrevista las pone en la caché y solo vuelve a pedir el historial. De 4 llamadas a 2 por guardado, y el modal de la idea sale en la mitad de tiempo (medido en local). Un E2E lo vigila.
+- La barra de desplazamiento de la columna derecha, fina y semitransparente; sus acordeones, sin bordes ni sombras.
+
+### Corregido (UX-06)
+
+- Con `npm run dev:local` abierto, lanzar los E2E rompía la app ("Invalid hook call", "Cannot read properties of null (reading 'useContext')", dos copias de `@emotion/react`): los dos servidores de Vite compartían la caché de dependencias (`node_modules/.vite`) y, al re-empaquetarla uno, el navegador del otro mezclaba versiones. Cada servidor tiene ahora la suya (`VITE_CACHE_DIR`): `.vite` (`npm run dev`), `.vite-local` (`dev:local`), `.vite-e2e` y `.vite-e2e-api` (los tests).
+- Las consultas pasan a `fetch` la señal de cancelación de TanStack Query (`AbortController`): una carga cancelada u obsoleta aborta su petición en lugar de solo ignorar la respuesta.
+- Al abrir una idea personalizada en Inicio se hacían dos peticiones iguales (una sin las opciones de "¿Qué te ayuda?", porque las categorías aún no habían llegado, y otra con ellas). Ahora espera a tener las categorías.
+
+- El menú lateral de Mi perfil quedaba por encima de la cabecera fija al desplazarse.
+- Si se abría una idea justo después de marcar una opción de "¿Qué te ayuda?", podía escribirse con las opciones de antes (el guardado aún no había llegado al servidor) y quedarse así en la caché. Ahora, cuando el servidor confirma la opción, se cancela lo que estuviera en curso y las ideas personalizadas se vuelven a pedir (invalidar sin cancelar no repetía una primera carga en curso). Lo destapó un E2E que fallaba 1 de cada 4 veces.
+- Al reactivar una categoría con puntuaciones guardadas, su pregunta salía "sin responder" y un segundo después saltaba a la puntuación guardada. Ahora aparece ya con ella.
+
+### Corregido (E2E)
+
+- Los E2E con `api/` fallaban de vez en cuando (1 de cada 4-5 ejecuciones): tras `supabase db reset`, la API local tarda un instante en volver a ver las tablas ("Could not find the table … in the schema cache"). El script espera a que responda por ellas antes de empezar. Seis ejecuciones seguidas sin fallos.
+
+### Cambiado (imports)
+
+- Imports del código del servidor con `#shared/…` y `#modules/…` (imports nativos de Node, sección `imports` de `package.json`) en lugar de rutas relativas largas (`../../../shared/domain/locales.js` → `#shared/domain/locales.js`): 265 imports en 72 archivos. Dentro del mismo módulo siguen relativos; los componentes de `ui/` siguen con `@`.
+- `check:api` copia el mapeo `imports` a su `package.json` temporal (sin él, cada función daba una falsa alarma al cargar). Antes de convertir nada se comprobó con un `vercel build` real: las 11 funciones cargan desde su salida.
+
+### Cambiado (código)
+
+- Los términos del filtro de ideas con IA pasan a `ideaSafetyTerms.json` (por idioma y tipo, con `*` para "y lo que siga"), fuera del código y solo en el servidor.
+- Listas de valores en un solo sitio (`as const` con el tipo derivado): roles (estaban copiados en 4 sitios), género (en 3), estados de categoría y de recomendación, tendencias, bandas, periodos, entornos. Las validaciones de la API (`z.enum`) y la interfaz las importan.
+
+### Cambiado (infraestructura)
+
+- *Keep-alive* de Supabase cada 5 días en lugar de a diario (la pausa llega a los 7; el hueco más largo entre ejecuciones es de 5 días).
+- El Supabase local vuelve a arrancar solo al abrir Docker Desktop: `scripts/local-supabase.mjs` marca sus contenedores "reiniciar salvo que se paren" (sin docker-compose). `npx supabase stop` lo apaga.
+
+### Añadido (RF-40a, ideas personalizadas con IA contra un *Fake*)
+
+- Interruptor "Ideas personalizadas con IA" en *Privacidad y datos* (desactivado por defecto, solo si el despliegue tiene proveedor), con qué se envía y qué nunca. Desactivarlo borra las ideas personalizadas.
+- Al abrir una idea, si está activado: la IA elige una de las ideas curadas de esa categoría y la reescribe con lo que le ayuda al usuario (RF-41) y su tendencia; se ve con la etiqueta "Personalizada con IA" y la original a un clic, siempre con el aviso de RES-05. Se guarda y no se vuelve a pedir.
+- Caída segura al texto curado en cualquier duda: sin activar, sin proveedor, categoría sensible, error, tiempo agotado, filtro (`checkIdeaSafety`, con un conjunto de evaluación de 22 casos) o revisión.
+- Catálogo de ideas de 2 a 5 por categoría (es/en), redactadas con ayuda de IA y **pendientes de revisión del autor**.
+- Migración `0011_personalized_ideas.sql`; `api/recommendations/[action].ts` con `personalize` (11/12 funciones) y la acción `/api/accounts/ai-ideas`; la sesión dice si la función está disponible. Variable `AI_IDEAS_PROVIDER` (`fake` en local y E2E; sin valor en producción hasta RF-40b).
+- Política de privacidad: apartado de ideas con IA. Exportación y borrado de datos (RF-05) incluyen la elección y las ideas.
+
+### Corregido
+
+- Escribir en "Tu experiencia (privada)" iba lento (~1 s por palabra en un móvil medio): cada tecla volvía a pintar la entrevista entera. El campo guarda su texto en su propio componente (`ExperienceNote`) y la entrevista solo se entera de si tiene texto o no: de 169 ms a 24 ms por tecla con la CPU 6 veces más lenta.
+- `UpdateProfile` reconstruía el perfil campo a campo: guardar el nombre habría desactivado sin avisar la elección de RF-40. Ahora parte del perfil existente.
+- El test "todas las plantillas tienen texto en es/en" pasaba nombres de categoría en vez de claves y solo comprobaba las generales; ahora comprueba las 45 de categoría y las 3 generales.
+
+### Añadido (RF-41, experiencias por categoría)
+
+- "¿Qué te ayuda en esta área?" en cada pregunta de la entrevista: 5-7 opciones propias de cada categoría estándar, que se guardan al momento (optimista, se deshace si el servidor falla). Son lo único que podrá usar la IA de RF-40, y solo si el usuario lo activa.
+- La nota pasa a "Tu experiencia (privada)", con el aviso de que solo la ve el usuario y nunca se envía a la IA ni se comparte.
+- Migración `0010_category_experience.sql` (`categories.experience_tags`), caso de uso `SetCategoryExperience` (solo acepta opciones de esa categoría), acción `/api/categories/experience` (sin función nueva: 10/12). Las opciones entran en la exportación de datos (RF-05). E2E: se guarda y sigue marcada al recargar.
+
+### Cambiado (limpieza)
+
+- Últimos restos en español del pase anterior: nombres locales en las desestructuraciones de los handlers (`verifySession: verificarSesion`), el método `registrar` de `AuthProvider` (→ `register`) y los nombres de las funciones internas de seis casos de uso.
+
+### Cambiado (UX-04)
+
+- El historial de cambios de la entrevista empieza plegado ("Ver mi historial (N)"); al abrirlo, una línea de tiempo por meses con los 5 guardados más recientes y "Ver más". Mismos datos y caché: abrir y cerrar no repite llamadas.
+
+### Cambiado
+
+- Código en inglés en un pase completo: módulos `cuentas` → `accounts`, `consentimiento` → `consent`, `bienestar` → `wellbeing`, `notificaciones` → `notifications`; ~60 archivos renombrados (`IniciarSesion` → `LogIn`, `OtorgarConsentimiento` → `GrantConsent`, `RolUsuario` → `UserRole`…) y ~750 identificadores (`obtenerAppContext` → `getAppContext`…). Hecho con el servicio de lenguaje de TypeScript, que cambia cada referencia y rechaza un nombre que choque con otro ya visible. Sin cambios de comportamiento: 419 tests, E2E con base de datos local y `check:api` en verde.
+- Se quedan en español a propósito: columnas de la base de datos, claves de categoría, claves y variables de i18n, la cookie `sesion` y los campos JSON de la API (ver AGENTS.md).
+- Los campos del log estructurado pasan a inglés: `level`, `message`, `route`, `userId`.
+- E2E con `api/` en GitHub Actions solo en las PRs a `main` (entregas a producción) hasta final de octubre; a mano desde la pestaña *Actions* cuando se quiera.
+
+### Añadido (documentación)
+
+- `docs/README.md`: mapa de toda la documentación (una línea por documento), recorrido de 20 minutos y reglas para que no crezca sin control.
+- Aviso al principio de los 5 diagramas de análisis: son el modelo conceptual de septiembre, no el diseño actual, con la equivalencia de nombres.
+
+### Eliminado
+
+- `src/modules/recomendaciones/`: carpeta vacía, duplicada de `recommendations/`.
+- Esqueletos vacíos de módulo (`notifications/`, capas vacías de `panel/` y `wellbeing/`) y los `.gitkeep` de carpetas que ya tienen código.
+- Los apartados "Próximo paso" de 15 documentos (eran notas de la conversación de trabajo; lo pendiente vive en el tablero). Los dos con contenido propio pasan al tablero: la validación ética con el tutor (RF-29/RES-09) y la idea de `requestId` en los logs. El de ADR-02 era una regla de uso y pasa a llamarse "Mantenimiento".
+
 ## [1.0.1] - 2026-09-29
 
 ### Corregido

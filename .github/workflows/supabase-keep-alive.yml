@@ -1,5 +1,5 @@
 # Mantiene activo el proyecto de Supabase (plan Free): Supabase pausa los
-# proyectos sin actividad durante ~7 días. Una vez al día hace una consulta
+# proyectos sin actividad durante ~7 días. Cada 5 días hace una consulta
 # mínima de solo lectura. Ver docs/architecture-decisions/03_Arquitectura_Software.md apartado 6.1.
 #
 # - Usa SOLO la clave pública "anon" (la misma que podría ir en un navegador),
@@ -13,7 +13,10 @@ name: Supabase keep-alive
 
 on:
   schedule:
-    - cron: "17 7 * * *" # todos los días a las 07:17 UTC (fuera de la hora en punto, que GitHub satura)
+    # Cada 5 días (los días 1, 6, 11, 16, 21, 26 y 31 de cada mes, a las 07:17 UTC, fuera de la
+    # hora en punto, que GitHub satura). Supabase pausa tras 7 días sin actividad: el hueco más
+    # largo, contando los cambios de mes, es de 5 días, así que queda margen si GitHub se salta una.
+    - cron: "17 7 */5 * *"
   workflow_dispatch: # permite lanzarlo a mano desde la pestaña Actions
 
 permissions: {} # no necesita ningún permiso sobre el repositorio

@@ -57,7 +57,7 @@ Para tener un registro honesto de mi vida, sin juicios y a mi ritmo
 
 7. Given un usuario que ya puntuó antes
    When vuelve a la pantalla
-   Then ve sus categorías marcadas y su última puntuación precargada; "Guardar cambios" está deshabilitado hasta que cambie una puntuación, y al guardar solo se envían las cambiadas (nuevos registros; los anteriores se conservan)
+   Then ve sus categorías marcadas y su última puntuación precargada; el "Guardar" de cada categoría está deshabilitado hasta que la cambie, y al guardar solo se envía esa (UX-05; antes, un "Guardar cambios" único que enviaba las cambiadas) (nuevos registros; los anteriores se conservan)
 
 8. Given la casilla de una categoría
    When el usuario la desmarca (o marca)
@@ -98,3 +98,4 @@ Para tener un registro honesto de mi vida, sin juicios y a mi ritmo
 - **v1.3 (19 sept. 2026)** — la entrevista pasa a ser editable: estado actual precargado, cambios como registros nuevos, marcar/desmarcar activa/desactiva categorías. Ya no hay que "hacer una entrevista nueva".
 - **v1.4 (19 sept. 2026)** — categorías en dos columnas (sensibles aparte, con explicación) y aside con el historial de cambios.
 - **v1.5 (26 sept. 2026)** — marca "Sin responder" y accesos directos por categoría; "Tu entrevista" solo la primera vez, luego "Actualiza tus respuestas"; colores planos en vez de degradados.
+- **v1.6 (3 oct. 2026)** — UX-05: un "Guardar" por categoría en lugar del botón único, y el historial de cambios pasa a Resultados ([UX-05](UX-05-respuesta-inmediata-entrevista.md)).

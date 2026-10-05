@@ -24,19 +24,19 @@ export const ADMIN_USERS_KEY = ["admin", "users"] as const;
 export const ADMIN_AUDIT_KEY = ["admin", "audit"] as const;
 
 export function useAdminUsers() {
-  return useQuery({ queryKey: ADMIN_USERS_KEY, queryFn: () => getJson<AdminUserDto[]>("/api/admin/users") });
+  return useQuery({ queryKey: ADMIN_USERS_KEY, queryFn: ({ signal }) => getJson<AdminUserDto[]>("/api/admin/users", signal) });
 }
 
 export function useAdminAudit() {
-  return useQuery({ queryKey: ADMIN_AUDIT_KEY, queryFn: () => getJson<AuditEntryDto[]>("/api/admin/audit") });
+  return useQuery({ queryKey: ADMIN_AUDIT_KEY, queryFn: ({ signal }) => getJson<AuditEntryDto[]>("/api/admin/audit", signal) });
 }
 
 /** POST de una acción de administración; devuelve el estado y el cuerpo para que la pantalla explique el error. */
 export async function postAdmin<T = unknown>(action: string, body: unknown): Promise<{ ok: boolean; status: number; data: T }> {
-  const respuesta = await fetch(`/api/admin/${action}`, {
+  const response = await fetch(`/api/admin/${action}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  return { ok: respuesta.ok, status: respuesta.status, data: (await respuesta.json()) as T };
+  return { ok: response.ok, status: response.status, data: (await response.json()) as T };
 }

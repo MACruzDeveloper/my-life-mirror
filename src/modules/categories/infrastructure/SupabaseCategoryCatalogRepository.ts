@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { DEFAULT_LOCALE, isSupportedLocale, type Locale } from "../../../shared/domain/locales.js";
+import { DEFAULT_LOCALE, isSupportedLocale, type Locale } from "#shared/domain/locales.js";
 import type { CatalogCategory, CategoryText } from "../domain/CatalogCategory.js";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 

@@ -1,43 +1,38 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
 import Alert from "@mui/material/Alert";
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
 import CircularProgress from "@mui/material/CircularProgress";
-import Collapse from "@mui/material/Collapse";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
-import ToggleButton from "@mui/material/ToggleButton";
 import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import { Link as RouterLink } from "react-router";
 import interviewerAvatar from "../../../assets/avatars/interviewer.svg";
-import userAvatar from "../../../assets/avatars/user.svg";
-import { BandBackground } from "./BandBackground";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
-import { InterviewHistory } from "./InterviewHistory";
-import { ASSESSMENTS_KEY, LATEST_SCORES_KEY, useLatestScores } from "./queries";
+import { useAiIdeasActive } from "@modules/accounts/ui/queries";
+import { PERSONALIZED_IDEAS_KEY, RECOMMENDATIONS_KEY, useRecommendations, type RecommendationDto } from "@modules/recommendations/ui/queries";
+import { Bubble } from "./interview/Bubble";
+import { PENDING_COLORS } from "./interview/pendingColors";
+import { CategoryPicker } from "./interview/CategoryPicker";
+import { CategorySelection } from "./interview/CategorySelection";
+import { InterviewSteps, type InterviewStep } from "./interview/InterviewSteps";
+import { CategoryQuestion, type CategorySaveStatus, type LastExperience, type LastUpdate } from "./interview/CategoryQuestion";
+import { InterviewProgress, type ProgressStatus } from "./interview/InterviewProgress";
+import { SavedIdeaDialog } from "./interview/SavedIdeaDialog";
+import { ASSESSMENTS_KEY, HISTORY_KEY, LATEST_SCORES_KEY, useAssessmentHistory, useLatestScores } from "./queries";
 import type { LatestScoreDto } from "./ScoreCards";
-import { scoreBand, type ScoreBand } from "./scoreBand";
-
-const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-/**
- * Categorías activas todavía sin respuesta: un tono lila suave, para recordar
- * sin alarmar (RN-04) — ni rojo ni icono de aviso. Colores planos.
- */
-const PENDING_COLORS = { bg: "#EEEAFB", fg: "#4B3F8F", border: "#C9BDF2" };
 
 /** Lleva a la pregunta de una categoría; sin animación si el usuario prefiere menos movimiento. */
 function scrollToQuestion(categoryId: string) {
@@ -45,65 +40,32 @@ function scrollToQuestion(categoryId: string) {
   document.getElementById(`pregunta-${categoryId}`)?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
 }
 
-/** Etiqueta pequeña "Sin responder". */
-function PendingBadge({ label }: { label: string }) {
-  return (
-    <Box
-      component="span"
-      sx={{ px: 1, py: 0.25, borderRadius: 999, fontSize: "0.75rem", fontWeight: 600, bgcolor: PENDING_COLORS.bg, color: PENDING_COLORS.fg, whiteSpace: "nowrap" }}
-    >
-      {label}
-    </Box>
-  );
-}
-
-
-type SaveState =
-  | { kind: "idle" }
-  | { kind: "saving" }
-  | { kind: "saved" }
-  | { kind: "error"; message: string };
-
-/** Icono "i" en círculo (Material) inline — evita añadir la dependencia @mui/icons-material solo para uno. */
 function omitKey<T>(record: Record<string, T>, key: string): Record<string, T> {
   const { [key]: _omitted, ...rest } = record;
   void _omitted;
   return rest;
 }
 
+/** Barra de desplazamiento discreta: fina y semitransparente, más visible al pasar el ratón. */
+const SOFT_SCROLLBAR = {
+  scrollbarWidth: "thin",
+  scrollbarColor: "rgba(0, 0, 0, 0.18) transparent",
+  "&::-webkit-scrollbar": { width: 6 },
+  "&::-webkit-scrollbar-track": { background: "transparent" },
+  "&::-webkit-scrollbar-thumb": { backgroundColor: "rgba(0, 0, 0, 0.18)", borderRadius: 3 },
+  "&::-webkit-scrollbar-thumb:hover": { backgroundColor: "rgba(0, 0, 0, 0.32)" },
+} as const;
+
+/** Cada bloque de la columna principal (introducción, preguntas): mismo marco, distinto fondo. */
+const MODULE_STYLES = { p: { xs: 2, sm: 4 }, borderRadius: 4, display: "flex", flexDirection: "column", gap: 3 } as const;
+
+const isOpenRecommendation = (recommendation: RecommendationDto) => recommendation.status === "pending" || recommendation.status === "postponed";
+
 const categoryRequest = (categoryId: string) => ({
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ categoryId }),
 });
-
-/** Burbuja de conversación — el entrevistador a la izquierda, el usuario a la derecha. */
-function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNode; side: "left" | "right"; avatar: string; alt: string; band?: ScoreBand }) {
-  const isLeft = side === "left";
-  return (
-    <Box sx={{ display: "flex", flexDirection: isLeft ? "row" : "row-reverse", alignItems: "flex-start", gap: 1.5 }}>
-      <Avatar src={avatar} alt={alt} sx={{ width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, flexShrink: 0 }} />
-      <Box
-        data-band={band}
-        sx={{
-          position: "relative",
-          overflow: "hidden",
-          bgcolor: isLeft ? "#FFFFFF" : "#F3EFFB",
-          border: "1px solid",
-          borderColor: isLeft ? "#D9ECE8" : "#E2DAF3",
-          borderRadius: isLeft ? "4px 20px 20px 20px" : "20px 4px 20px 20px",
-          px: 2,
-          py: 1.5,
-          minWidth: 0,
-          flex: isLeft ? "0 1 auto" : 1,
-        }}
-      >
-        <BandBackground band={band} />
-        <Box sx={{ position: "relative" }}>{children}</Box>
-      </Box>
-    </Box>
-  );
-}
 
 /**
  * Vista de RF-10 — la "entrevista personal", siempre editable. Mobile-first
@@ -119,41 +81,150 @@ function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNo
  * consentimiento para las sensibles, RF-04). Puntuar es opcional por
  * categoría. Diez botones en vez de un slider: un slider siempre tiene un
  * valor por defecto (un 5 preseleccionado sesgaría los datos).
- * Ver docs/user-stories/RF-10-entrevista.md.
+ * UX-05: cada categoría se guarda con su propio botón; si el guardado abre una
+ * idea nueva, se enseña en una ventana. Cada pregunta es un `CategoryQuestion`.
+ * Ver docs/user-stories/RF-10-entrevista.md y UX-05-respuesta-inmediata-entrevista.md.
  */
 export function InterviewPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
+  const isDesktop = useMediaQuery(useTheme().breakpoints.up("lg"), { noSsr: true });
   const categoriesQuery = useCategories();
   const latestScoresQuery = useLatestScores();
   const categories = categoriesQuery.data ?? [];
   // Solo lo que el usuario ha cambiado en esta pantalla; el resto sale de la última puntuación guardada.
   const [draftScores, setDraftScores] = useState<Record<string, number>>({});
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
-  const [openExamples, setOpenExamples] = useState<Record<string, boolean>>({});
   const [categoryAwaitingConsent, setCategoryAwaitingConsent] = useState<CategoryDto | null>(null);
   const [isSendingConsent, setIsSendingConsent] = useState(false);
   // Categorías con una petición en curso: evita dobles clics contradictorios y enseña un indicador en las sensibles.
   const [pendingCategoryIds, setPendingCategoryIds] = useState<Set<string>>(new Set());
-  const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" });
+  // Errores de activar/desactivar categorías o de "¿Qué te ayuda?"; los del guardado salen en su categoría.
+  const [pageError, setPageError] = useState<string | null>(null);
+  // Categorías añadidas en esta visita, la más reciente primero (sus preguntas van arriba, con animación).
+  const [justAddedIds, setJustAddedIds] = useState<string[]>([]);
+  // UX-07: ¿primera entrevista (sin respuestas al abrirla)? Se fija al cargar; y en qué paso va.
+  const [firstInterview, setFirstInterview] = useState<boolean | null>(null);
+  const [step, setStep] = useState<InterviewStep>("intro");
+  // Última puntuación de las categorías desactivadas en esta visita, para devolverla al reactivarlas.
+  const deactivatedScoresRef = useRef(new Map<string, LatestScoreDto>());
+  const [saveStatuses, setSaveStatuses] = useState<Record<string, CategorySaveStatus>>({});
+  // UX-05: la idea nueva que ha abierto el último guardado (abre "Cambios guardados").
+  const [newIdea, setNewIdea] = useState<RecommendationDto | null>(null);
+  const historyQuery = useAssessmentHistory();
+  const recommendations = useRecommendations().data ?? [];
+  // Categorías con experiencia escrita sin guardar (para el progreso); el texto vive en cada pregunta.
+  const [notedCategoryIds, setNotedCategoryIds] = useState<ReadonlySet<string>>(new Set());
+  const personalizeIdeas = useAiIdeasActive();
 
   const savedScores: Record<string, number> = {};
   for (const latestScore of latestScoresQuery.data ?? []) if (latestScore.score !== undefined) savedScores[latestScore.categoryId] = latestScore.score;
   const scores: Record<string, number> = { ...savedScores, ...draftScores };
   const hasSavedAnswers = Object.keys(savedScores).length > 0;
 
-  const activeCategories = categories.filter((category) => category.status === "active");
+  // Las añadidas en esta visita van primero (la más reciente arriba): así el usuario ve la pregunta que ha añadido.
+  const unorderedActive = categories.filter((category) => category.status === "active");
+  const activeCategories = [
+    ...justAddedIds.flatMap((id) => unorderedActive.filter((category) => category.id === id)),
+    ...unorderedActive.filter((category) => !justAddedIds.includes(category.id)),
+  ];
   const regularCategories = categories.filter((category) => !category.isSensitiveData);
-  const sensitiveCategories = categories.filter((category) => category.isSensitiveData);
   const allRegularActive = regularCategories.length > 0 && regularCategories.every((category) => category.status === "active");
-  const anyActive = activeCategories.length > 0;
-  const anyRegularActive = regularCategories.some((category) => category.status === "active");
-  const changedCategories = activeCategories.filter((category) => scores[category.id] !== undefined && (scores[category.id] !== savedScores[category.id] || notes[category.id]?.trim()));
+
+  // El historial llega del más reciente al más antiguo: lo primero que se encuentra de cada categoría es lo último.
+  const lastUpdateByCategory = new Map<string, LastUpdate>();
+  const lastExperienceByCategory = new Map<string, LastExperience>();
+  for (const session of historyQuery.data ?? []) {
+    for (const entry of session.entries) {
+      if (!lastUpdateByCategory.has(entry.categoryId)) lastUpdateByCategory.set(entry.categoryId, { recordedAt: session.recordedAt, score: entry.score, previousScore: entry.previousScore });
+      if (entry.note && !lastExperienceByCategory.has(entry.categoryId)) lastExperienceByCategory.set(entry.categoryId, { note: entry.note, recordedAt: session.recordedAt });
+    }
+  }
+
+  const handleNoteStateChange = useCallback((categoryId: string, hasNote: boolean) => {
+    setNotedCategoryIds((current) => {
+      const next = new Set(current);
+      if (hasNote) next.add(categoryId);
+      else next.delete(categoryId);
+      return next;
+    });
+  }, []);
+
+  const today = new Date().toDateString();
+  function progressStatus(categoryId: string): ProgressStatus {
+    if (scores[categoryId] === undefined) return { kind: "unanswered" };
+    if (scores[categoryId] !== savedScores[categoryId] || notedCategoryIds.has(categoryId)) return { kind: "unsaved" };
+    const lastUpdate = lastUpdateByCategory.get(categoryId);
+    if (saveStatuses[categoryId]?.kind === "saved" || (lastUpdate && new Date(lastUpdate.recordedAt).toDateString() === today)) return { kind: "savedToday" };
+    return lastUpdate ? { kind: "saved", recordedAt: lastUpdate.recordedAt } : { kind: "savedToday" };
+  }
+
+  function setSaveStatus(categoryId: string, status: CategorySaveStatus) {
+    setSaveStatuses((current) => ({ ...current, [categoryId]: status }));
+  }
 
   function setCategoryStatus(id: string, status: "active" | "inactive") {
     queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, status } : category)));
+  }
+
+  function setCategoryExperienceTags(id: string, experienceTags: string[]) {
+    queryClient.setQueryData<CategoryDto[]>(CATEGORIES_KEY, (current) => current?.map((category) => (category.id === id ? { ...category, experienceTags } : category)));
+  }
+
+  /**
+   * RF-41: marcar o desmarcar "qué te ayuda" se guarda al momento, como marcar
+   * una categoría (optimista, se deshace si el servidor falla); no espera al
+   * "Guardar" de la categoría, que es para la puntuación y la experiencia.
+   */
+  async function toggleExperienceTag(category: CategoryDto, tag: string) {
+    const previous = category.experienceTags ?? [];
+    const next = previous.includes(tag) ? previous.filter((current) => current !== tag) : [...previous, tag];
+    setCategoryExperienceTags(category.id, next);
+    try {
+      const response = await fetch("/api/categories/experience", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categoryId: category.id, tags: next }),
+      });
+      if (!response.ok) throw new Error("rejected");
+      // Una idea pedida mientras se guardaba se escribió con las opciones de antes (y quedó en
+      // la caché con la clave de las nuevas): con lo ya guardado, se vuelve a pedir (RF-40 v1.1).
+      // Primero se cancela lo que esté en curso: invalidar una primera carga en curso no la repite,
+      // se engancha a ella (lo destapó un E2E que fallaba 1 de cada 4 veces).
+      await queryClient.cancelQueries({ queryKey: PERSONALIZED_IDEAS_KEY });
+      void queryClient.invalidateQueries({ queryKey: PERSONALIZED_IDEAS_KEY });
+    } catch {
+      setCategoryExperienceTags(category.id, previous);
+      setPageError(t("entrevista.errorExperiencia"));
+    }
+  }
+
+  /**
+   * Al activar una categoría, su última puntuación vuelve a la caché al momento. El
+   * servidor solo devuelve las de las categorías activas, así que al desactivarla
+   * desaparece; sin esto, la pregunta salía "sin responder" y un segundo después
+   * saltaba a la puntuación guardada. Se usa la que se veía al desactivarla en esta
+   * visita o, si ya venía desactivada, la última del historial (que guarda todas):
+   * es justo lo que devolverá el servidor.
+   */
+  function restoreLatestScore(category: CategoryDto) {
+    const remembered = deactivatedScoresRef.current.get(category.id);
+    if (remembered) {
+      queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (current) => current && [...current.filter((latestScore) => latestScore.categoryId !== category.id), remembered]);
+      return;
+    }
+    const latestEntry = (historyQuery.data ?? []).flatMap((session) => session.entries.filter((entry) => entry.categoryId === category.id).map((entry) => ({ entry, recordedAt: session.recordedAt })))[0];
+    queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (current) => {
+      if (!current) return current;
+      const existing = current.find((latestScore) => latestScore.categoryId === category.id);
+      if (existing?.score !== undefined || !latestEntry) return existing ? current : [...current, { categoryId: category.id, catalogId: category.catalogId, categoryName: category.name }];
+      const restored: LatestScoreDto = { categoryId: category.id, catalogId: category.catalogId, categoryName: category.name, score: latestEntry.entry.score, note: latestEntry.entry.note, recordedAt: latestEntry.recordedAt };
+      return existing ? current.map((latestScore) => (latestScore.categoryId === category.id ? restored : latestScore)) : [...current, restored];
+    });
+  }
+
+  function markJustAdded(id: string, added: boolean) {
+    setJustAddedIds((current) => (added ? [id, ...current.filter((other) => other !== id)] : current.filter((other) => other !== id)));
   }
 
   function markPending(id: string, isPending: boolean) {
@@ -181,28 +252,42 @@ export function InterviewPage() {
     if (pendingCategoryIds.has(category.id)) return;
     markPending(category.id, true);
     const isOptimistic = !category.isSensitiveData;
-    if (isOptimistic) setCategoryStatus(category.id, "active");
+    if (isOptimistic) {
+      restoreLatestScore(category);
+      setCategoryStatus(category.id, "active");
+      markJustAdded(category.id, true);
+    }
 
     try {
       const response = await fetch("/api/categories/activate", categoryRequest(category.id));
       const data = await response.json();
 
       if (!response.ok) {
-        if (isOptimistic) setCategoryStatus(category.id, "inactive");
+        if (isOptimistic) {
+          setCategoryStatus(category.id, "inactive");
+          markJustAdded(category.id, false);
+        }
         if (data.code === "CONSENT_REQUIRED") {
           setCategoryAwaitingConsent(category);
         } else {
-          setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorActivar") });
+          setPageError(data.error ?? t("entrevista.errorActivar"));
         }
         return false;
       }
 
+      if (!isOptimistic) {
+        restoreLatestScore(category);
+        markJustAdded(category.id, true);
+      }
       setCategoryStatus(category.id, "active");
       refreshResults();
       return true;
     } catch {
-      if (isOptimistic) setCategoryStatus(category.id, "inactive");
-      setSaveState({ kind: "error", message: t("comun.errorServidor") });
+      if (isOptimistic) {
+        setCategoryStatus(category.id, "inactive");
+        markJustAdded(category.id, false);
+      }
+      setPageError(t("comun.errorServidor"));
       return false;
     } finally {
       markPending(category.id, false);
@@ -212,23 +297,26 @@ export function InterviewPage() {
   async function deactivateCategory(category: CategoryDto) {
     if (pendingCategoryIds.has(category.id)) return;
     markPending(category.id, true);
+    const shownScore = queryClient.getQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY)?.find((latestScore) => latestScore.categoryId === category.id);
+    if (shownScore?.score !== undefined) deactivatedScoresRef.current.set(category.id, shownScore);
     setCategoryStatus(category.id, "inactive");
+    markJustAdded(category.id, false);
     // Lo que estaba a medias de esa categoría se descarta; las evaluaciones ya guardadas se conservan.
     setDraftScores((current) => omitKey(current, category.id));
-    setNotes((current) => omitKey(current, category.id));
+    handleNoteStateChange(category.id, false);
 
     try {
       const response = await fetch("/api/categories/deactivate", categoryRequest(category.id));
       if (!response.ok) {
         const data = await response.json();
         setCategoryStatus(category.id, "active");
-        setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorActivar") });
+        setPageError(data.error ?? t("entrevista.errorActivar"));
         return;
       }
       refreshResults();
     } catch {
       setCategoryStatus(category.id, "active");
-      setSaveState({ kind: "error", message: t("comun.errorServidor") });
+      setPageError(t("comun.errorServidor"));
     } finally {
       markPending(category.id, false);
     }
@@ -248,7 +336,7 @@ export function InterviewPage() {
       const response = await fetch("/api/consent/grant", categoryRequest(category.id));
       if (!response.ok) {
         const data = await response.json();
-        setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorActivar") });
+        setPageError(data.error ?? t("entrevista.errorActivar"));
         return;
       }
       await activateCategory(category);
@@ -271,64 +359,58 @@ export function InterviewPage() {
     await Promise.all(regularCategories.filter((category) => category.status === "inactive").map(activateCategory));
   }
 
-  async function saveChanges(event: React.FormEvent) {
-    event.preventDefault();
-    setSaveState({ kind: "saving" });
+  /**
+   * UX-05: guarda una sola categoría (el mismo POST, con una entrada). Con las
+   * recomendaciones que devuelve (PERF-01): si el guardado ha abierto una idea
+   * que no estaba, la enseña en "Cambios guardados"; si no, la categoría dice
+   * "Guardado ahora".
+   */
+  async function saveCategory(categoryId: string, note: string | undefined): Promise<boolean> {
+    const score = scores[categoryId];
+    setSaveStatus(categoryId, { kind: "saving" });
+    const openBefore = new Set((queryClient.getQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY) ?? []).filter(isOpenRecommendation).map((recommendation) => recommendation.id));
 
     try {
       const response = await fetch("/api/assessments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          entries: changedCategories.map((category) => ({
-            categoryId: category.id,
-            score: scores[category.id],
-            ...(notes[category.id]?.trim() ? { note: notes[category.id].trim() } : {}),
-          })),
-        }),
+        body: JSON.stringify({ entries: [{ categoryId, score, ...(note ? { note } : {}) }] }),
       });
       const data = await response.json();
 
       if (!response.ok) {
-        setSaveState({ kind: "error", message: data.error ?? t("entrevista.errorGenerico") });
-        return;
+        setSaveStatus(categoryId, { kind: "error", message: data.error ?? t("entrevista.errorGenerico") });
+        return false;
       }
 
-      // La caché se actualiza al momento con lo guardado (Resultados/Inicio ya lo ven) y se confirma en segundo plano.
-      queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (current) =>
-        current?.map((latestScore) => (draftScores[latestScore.categoryId] !== undefined && changedCategories.some((category) => category.id === latestScore.categoryId) ? { ...latestScore, score: draftScores[latestScore.categoryId] } : latestScore)),
+      // PERF-01: el servidor devuelve las últimas puntuaciones y las recomendaciones; van directas a la
+      // caché y solo se vuelve a pedir el historial. Sin ellas (un servidor anterior), como antes.
+      const latest = Array.isArray(data.latest) ? (data.latest as LatestScoreDto[]) : undefined;
+      const updatedRecommendations = Array.isArray(data.recommendations) ? (data.recommendations as RecommendationDto[]) : undefined;
+      if (latest) queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, latest);
+      else queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (current) => current?.map((latestScore) => (latestScore.categoryId === categoryId ? { ...latestScore, score } : latestScore)));
+      setDraftScores((current) => omitKey(current, categoryId));
+      setSaveStatus(categoryId, { kind: "saved" });
+
+      if (updatedRecommendations) {
+        queryClient.setQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY, updatedRecommendations);
+        void queryClient.invalidateQueries({ queryKey: HISTORY_KEY });
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
+      }
+      const idea = (queryClient.getQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY) ?? []).find(
+        (recommendation) => recommendation.categoryId === categoryId && isOpenRecommendation(recommendation) && !openBefore.has(recommendation.id),
       );
-      setDraftScores({});
-      setNotes({});
-      setOpenNotes({});
-      void queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
-      setSaveState({ kind: "saved" });
+      if (idea) setNewIdea(idea);
+      return true;
     } catch {
-      setSaveState({ kind: "error", message: t("comun.errorServidor") });
+      setSaveStatus(categoryId, { kind: "error", message: t("comun.errorServidor") });
+      return false;
     }
   }
 
-  const renderCategoryRow = (category: CategoryDto) => (
-    <Box key={category.id} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-    <FormControlLabel
-      control={<Checkbox checked={category.status === "active"} onChange={() => toggleCategory(category)} />}
-      label={
-        <Box>
-          <Typography variant="body1" component="span">
-            {categoryLabel(category.catalogId).name}
-          </Typography>
-          {categoryLabel(category.catalogId).description && (
-            <Typography variant="caption" color="text.secondary" component="span" sx={{ display: "block" }}>
-              {categoryLabel(category.catalogId).description}
-            </Typography>
-          )}
-        </Box>
-      }
-    />
-  {pendingCategoryIds.has(category.id) && category.isSensitiveData && (
-      <CircularProgress size={16} aria-label={categoryLabel(category.catalogId).name} />
-    )}
-    </Box>
+  const categorySelection = (
+    <CategorySelection categories={categories} categoryLabel={categoryLabel} pendingCategoryIds={pendingCategoryIds} onToggle={toggleCategory} onToggleAllRegular={() => void toggleAllRegular()} />
   );
 
   if (categoriesQuery.isPending || latestScoresQuery.isPending || labelsPending) {
@@ -339,77 +421,118 @@ export function InterviewPage() {
     );
   }
 
-  return (
-    <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) 300px" }, alignItems: "start", mt: { xs: 1, sm: 3 } }}>
-    <Box
-      component="form"
-      onSubmit={saveChanges}
-      sx={{
-        p: { xs: 2, sm: 4 },
-        borderRadius: 4,
-        bgcolor: "#F5F7F6",
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-      }}
-    >
-      {/* La entrevista es la primera vez; con respuestas guardadas, la misma pantalla se presenta como "actualizarlas". */}
-      <Typography variant="h5" component="h1">
-        {hasSavedAnswers ? t("entrevista.tituloActualizar") : t("entrevista.titulo")}
-      </Typography>
+  // UX-07: se decide una vez, al cargar (estado ajustado durante el render, como recomienda React para
+  // recordar algo de renders anteriores). Guardar la primera categoría no saca al usuario de sus pasos.
+  if (firstInterview === null) setFirstInterview(!hasSavedAnswers);
+  const isFirstInterview = firstInterview ?? !hasSavedAnswers;
+  const showQuestions = !isFirstInterview || step === "questions";
+  // UX-06: las categorías, en la columna derecha en escritorio y encima de las preguntas en móvil (un solo ejemplar).
+  const selectionInAside = showQuestions && isDesktop;
 
-      <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
-        <Typography variant="body1">{hasSavedAnswers ? t("entrevista.descripcionActualizar") : t("entrevista.descripcion")}</Typography>
-        {/* UX-01: la primera vez, los pasos concretos de esta pantalla; al actualizar ya se conocen. */}
-        {!hasSavedAnswers && (
-          <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ my: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
-            {(t("entrevista.pasosPrimeraVez", { returnObjects: true, boton: t("entrevista.guardar") }) as string[]).map((step) => (
-              <Typography component="li" variant="body2" key={step}>
-                {step}
-              </Typography>
-            ))}
-          </Box>
-        )}
-        <Typography variant="caption" color="text.secondary">
-          {t("entrevista.escala")}
-        </Typography>
-      </Bubble>
+  function goToStep(next: InterviewStep) {
+    setStep(next);
+    document.getElementById("entrevista-titulo")?.scrollIntoView?.({ block: "start" });
+  }
+
+  const introBubble = (
+    <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
+      <Typography variant="body1">{isFirstInterview ? t("entrevista.descripcion") : t("entrevista.descripcionActualizar")}</Typography>
+      {/* UX-01: la primera vez, los pasos concretos de esta pantalla; al actualizar ya se conocen. */}
+      {isFirstInterview && (
+        <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ my: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+          {(t("entrevista.pasosPrimeraVez", { returnObjects: true, boton: t("entrevista.guardar") }) as string[]).map((text) => (
+            <Typography component="li" variant="body2" key={text}>
+              {text}
+            </Typography>
+          ))}
+        </Box>
+      )}
+      <Typography variant="caption" color="text.secondary">
+        {t("entrevista.escala")}
+      </Typography>
+    </Bubble>
+  );
+
+  return (
+    <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", lg: showQuestions ? "minmax(0, 1fr) 280px" : "minmax(0, 1fr)" }, alignItems: "start" }}>
+    {/* Dos bloques con fondo distinto (UX-06): la introducción y, debajo, las preguntas. */}
+    <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 2, sm: 3 }, minWidth: 0 }}>
+    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: "#E6F2EE", scrollMarginTop: 72 }}>
+      {/* La entrevista es la primera vez; con respuestas guardadas, la misma pantalla se presenta como "actualizarlas". */}
+      <Typography id="entrevista-titulo" variant="h5" component="h1">
+        {isFirstInterview ? t("entrevista.titulo") : t("entrevista.tituloActualizar")}
+      </Typography>
+      {isFirstInterview && <InterviewSteps active={step} />}
 
       {(categoriesQuery.isError || latestScoresQuery.isError) && <Alert severity="error">{t("entrevista.errorCarga")}</Alert>}
-      {saveState.kind === "error" && <Alert severity="error">{saveState.message}</Alert>}
-      {saveState.kind === "saved" && (
-        <Alert severity="success">
-          {t("entrevista.exito")}{" "}
-          <Link component={RouterLink} to="/perfil/resultados">
-            {t("entrevista.verResultados")}
-          </Link>
-        </Alert>
+      {pageError && <Alert severity="error">{pageError}</Alert>}
+
+      {isFirstInterview && step === "intro" && (
+        <>
+          {introBubble}
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button variant="contained" size="large" onClick={() => goToStep("categories")}>
+              {t("entrevista.empezar")}
+            </Button>
+          </Box>
+        </>
       )}
 
-      <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, alignItems: "start" }}>
-        <Box role="group" aria-labelledby="columna-libres" sx={{ bgcolor: "#FFFFFF", borderRadius: 3, border: "1px solid #E4EAE8", p: 2 }}>
-          <Typography id="columna-libres" variant="subtitle1" sx={{ mb: 1 }}>
-            {t("entrevista.elegirTitulo")}
-          </Typography>
-          <FormControlLabel
-            control={<Checkbox checked={allRegularActive} indeterminate={anyRegularActive && !allRegularActive} onChange={() => void toggleAllRegular()} />}
-            label={t("entrevista.seleccionarTodas")}
-          />
-          <Box sx={{ display: "flex", flexDirection: "column", pl: 3 }}>{regularCategories.map(renderCategoryRow)}</Box>
-        </Box>
-        <Box role="group" aria-labelledby="columna-sensibles" sx={{ bgcolor: "#FBF8FF", borderRadius: 3, border: "1px solid #E2DAF3", p: 2 }}>
-          <Typography id="columna-sensibles" variant="subtitle1" sx={{ mb: 0.5 }}>
-            {t("entrevista.sensiblesTitulo")}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-            {t("entrevista.sensiblesExplicacion")}
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>{sensitiveCategories.map(renderCategoryRow)}</Box>
-        </Box>
-      </Box>
+      {isFirstInterview && step === "categories" && (
+        <>
+          <Box>
+            <Typography variant="h6" component="h2">
+              {t("entrevista.queHablarTitulo")}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t("entrevista.queHablarTexto")}
+            </Typography>
+          </Box>
+          <CategoryPicker categories={categories} categoryLabel={categoryLabel} pendingCategoryIds={pendingCategoryIds} onToggle={toggleCategory} onToggleAllRegular={() => void toggleAllRegular()} />
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1 }}>
+            <Button onClick={() => goToStep("intro")}>{t("entrevista.atras")}</Button>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              {activeCategories.length === 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  {t("entrevista.eligeUna")}
+                </Typography>
+              )}
+              <Button variant="contained" size="large" disabled={activeCategories.length === 0} onClick={() => goToStep("questions")}>
+                {t("entrevista.irAPreguntas")}
+              </Button>
+            </Box>
+          </Box>
+        </>
+      )}
+
+      {showQuestions &&
+        (isFirstInterview ? (
+          // En la primera entrevista ya se leyó en el paso 1: queda plegada, por si se quiere releer.
+          <Accordion disableGutters elevation={0} sx={{ bgcolor: "rgba(255, 255, 255, 0.6)", borderRadius: 3, "&::before": { display: "none" } }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle1" component="span">
+                {t("entrevista.releerIntro")}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>{introBubble}</AccordionDetails>
+          </Accordion>
+        ) : (
+          introBubble
+        ))}
+      {showQuestions && !selectionInAside && categorySelection}
+    </Box>
+
+    {showQuestions && (
+    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "#F5F7F6" }}>
+      {activeCategories.length > 0 && (
+        <Typography id="entrevista-preguntas" variant="h6" component="h2">
+          {t("entrevista.preguntasTitulo")}
+        </Typography>
+      )}
 
       {activeCategories.length > 0 && (
-        <Box component="nav" aria-label={t("entrevista.irA")} sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        // En escritorio, el panel de progreso de la derecha hace de accesos directos.
+        <Box component="nav" aria-label={t("entrevista.irA")} sx={{ display: { xs: "flex", lg: "none" }, flexWrap: "wrap", gap: 1 }}>
           {activeCategories.map((category) => {
             const isUnanswered = scores[category.id] === undefined;
             return (
@@ -450,112 +573,67 @@ export function InterviewPage() {
       )}
 
       {activeCategories.map((category) => (
-        <Box
+        <CategoryQuestion
           key={category.id}
-          id={`pregunta-${category.id}`}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 1.5,
-            scrollMarginTop: 16,
-            pl: 1.5,
-            // Mismo ancho de borde siempre, para que contestar no desplace nada.
-            borderLeft: "3px solid",
-            borderColor: scores[category.id] === undefined ? PENDING_COLORS.border : "transparent",
-          }}
-        >
-          <Bubble side="left" avatar={interviewerAvatar} alt={t("entrevista.entrevistador")}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
-              <Typography variant="body1">{t("entrevista.pregunta", { categoria: categoryLabel(category.catalogId).name })}</Typography>
-              {scores[category.id] === undefined && <PendingBadge label={t("entrevista.sinResponder")} />}
-              {categoryLabel(category.catalogId).key && (
-                <IconButton
-                  size="small"
-                  aria-label={t("entrevista.verEjemplos", { categoria: categoryLabel(category.catalogId).name })}
-                  aria-expanded={openExamples[category.id] === true}
-                  onClick={() => setOpenExamples((current) => ({ ...current, [category.id]: !current[category.id] }))}
-                >
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-              )}
-            </Box>
-            {categoryLabel(category.catalogId).key && (
-              <Collapse in={openExamples[category.id] === true}>
-                <Typography variant="caption" color="text.secondary">
-                  {t("entrevista.ejemplosTitulo")}
-                </Typography>
-                <Box component="ul" sx={{ m: 0, pl: 2.5, mt: 0.5 }}>
-                  {(t(`ejemplos.${categoryLabel(category.catalogId).key}`, { returnObjects: true }) as string[]).map((example) => (
-                    <Typography key={example} component="li" variant="body2">
-                      {example}
-                    </Typography>
-                  ))}
-                </Box>
-              </Collapse>
-            )}
-          </Bubble>
-          <Bubble side="right" avatar={userAvatar} alt={t("entrevista.tu")} band={scores[category.id] !== undefined ? scoreBand(scores[category.id]) : undefined}>
-            <Box role="group" aria-label={t("entrevista.puntuacionDe", { categoria: categoryLabel(category.catalogId).name })} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {SCORES.map((score) => {
-                return (
-                  <ToggleButton
-                    key={score}
-                    value={score}
-                    size="small"
-                    selected={scores[category.id] === score}
-                    onChange={() => setDraftScores((current) => ({ ...current, [category.id]: score }))}
-                    sx={{ minWidth: 40, "&.Mui-selected": { fontWeight: 700 } }}
-                  >
-                    {score}
-                  </ToggleButton>
-                );
-              })}
-            </Box>
-            {openNotes[category.id] ? (
-              <TextField
-                label={t("entrevista.nota")}
-                value={notes[category.id] ?? ""}
-                onChange={(event) => setNotes((current) => ({ ...current, [category.id]: event.target.value }))}
-                slotProps={{ htmlInput: { maxLength: 500 } }}
-                size="small"
-                fullWidth
-                sx={{ mt: 1.5 }}
-              />
-            ) : (
-              <Button size="small" onClick={() => setOpenNotes((current) => ({ ...current, [category.id]: true }))} sx={{ mt: 0.5 }}>
-                {t("entrevista.anadirNota")}
-              </Button>
-            )}
-          </Bubble>
-        </Box>
+          category={category}
+          justAdded={justAddedIds.includes(category.id)}
+          label={categoryLabel(category.catalogId)}
+          score={scores[category.id]}
+          scoreChanged={scores[category.id] !== savedScores[category.id]}
+          lastUpdate={lastUpdateByCategory.get(category.id)}
+          lastExperience={lastExperienceByCategory.get(category.id)}
+          saveStatus={saveStatuses[category.id]}
+          recommendation={recommendations.find((recommendation) => recommendation.categoryId === category.id && isOpenRecommendation(recommendation))}
+          personalizeIdeas={personalizeIdeas}
+          onNoteStateChange={handleNoteStateChange}
+          onScore={(categoryId, score) => setDraftScores((current) => ({ ...current, [categoryId]: score }))}
+          onToggleTag={(target, tag) => void toggleExperienceTag(target, tag)}
+          onSave={saveCategory}
+        />
       ))}
 
-      {changedCategories.length === 0 && (
+      {activeCategories.length === 0 && (
         <Typography variant="caption" color="text.secondary">
-          {anyActive ? t("entrevista.sinCambios") : t("entrevista.elegirAlgo")}
+          {t("entrevista.elegirAlgo")}
         </Typography>
       )}
-      <Button type="submit" variant="contained" size="large" fullWidth disabled={changedCategories.length === 0 || saveState.kind === "saving"}>
-        {saveState.kind === "saving" ? t("entrevista.guardando") : t("entrevista.guardar")}
-      </Button>
 
-      <Dialog open={categoryAwaitingConsent !== null} onClose={() => setCategoryAwaitingConsent(null)}>
-        <DialogTitle>{t("categorias.modalTitulo")}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{t("categorias.modalTexto", { categoria: categoryAwaitingConsent ? categoryLabel(categoryAwaitingConsent.catalogId).name : "" })}</DialogContentText>
-          <Link href="/politica-privacidad" target="_blank" rel="noopener noreferrer">
-            {t("categorias.leerPolitica")}
-          </Link>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCategoryAwaitingConsent(null)}>{t("categorias.modalCancelar")}</Button>
-          <Button onClick={confirmConsent} variant="contained" disabled={isSendingConsent}>
-            {t("categorias.modalAceptar")}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
-    <InterviewHistory />
+    )}
+
+    <SavedIdeaDialog recommendation={newIdea} categoryName={newIdea ? categoryLabel(newIdea.catalogId).name : ""} personalize={personalizeIdeas} onClose={() => setNewIdea(null)} />
+
+    <Dialog open={categoryAwaitingConsent !== null} onClose={() => setCategoryAwaitingConsent(null)}>
+      <DialogTitle>{t("categorias.modalTitulo")}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{t("categorias.modalTexto", { categoria: categoryAwaitingConsent ? categoryLabel(categoryAwaitingConsent.catalogId).name : "" })}</DialogContentText>
+        <Link href="/politica-privacidad" target="_blank" rel="noopener noreferrer">
+          {t("categorias.leerPolitica")}
+        </Link>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setCategoryAwaitingConsent(null)}>{t("categorias.modalCancelar")}</Button>
+        <Button onClick={confirmConsent} variant="contained" disabled={isSendingConsent}>
+          {t("categorias.modalAceptar")}
+        </Button>
+      </DialogActions>
+    </Dialog>
+    </Box>
+    {/* Columna derecha (escritorio): categorías al actualizar y, debajo, el progreso. Fija entera al
+        desplazarse, bajo la cabecera compacta (48 px); si no cabe en la pantalla, se desplaza por dentro. */}
+    {showQuestions && (
+    <Box sx={{ display: { xs: "none", lg: "block" }, alignSelf: "stretch" }}>
+      <Box sx={{ position: "sticky", top: 64, maxHeight: "calc(100vh - 80px)", overflowY: "auto", display: "flex", flexDirection: "column", gap: 2, ...SOFT_SCROLLBAR }}>
+        {selectionInAside && categorySelection}
+        {activeCategories.length > 0 && (
+          <InterviewProgress
+            items={activeCategories.map((category) => ({ categoryId: category.id, name: categoryLabel(category.catalogId).name, status: progressStatus(category.id) }))}
+            onSelect={scrollToQuestion}
+          />
+        )}
+      </Box>
+    </Box>
+    )}
     </Box>
   );
 }

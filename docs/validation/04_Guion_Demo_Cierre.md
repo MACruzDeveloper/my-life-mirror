@@ -46,7 +46,7 @@
 | Portada | "Cómo funciona" en tres pasos; botón **EN** | La guía salió de la validación (UX-01). Inglés desde antes de tener cuenta. |
 | Registro | Crear cuenta con el email nuevo | Entra directamente, sin volver a iniciar sesión. |
 | Bienvenida | "Empezar mi entrevista" + los tres pasos | En vez de un panel vacío. |
-| Entrevista | Marcar 3-4 áreas, **Deporte** (pide consentimiento, con enlace a la política), puntuar, "Guardar cambios" | Las categorías sensibles piden consentimiento explícito y versionado (RF-04). Se puede puntuar solo una parte. |
+| Entrevista | Marcar 3-4 áreas, **Deporte** (pide consentimiento, con enlace a la política), puntuar y "Guardar" en cada una (una puntuación baja abre la ventana con su idea) | Las categorías sensibles piden consentimiento explícito y versionado (RF-04). Se puede puntuar solo una parte. |
 | Inicio (cuenta con historia) | "Cómo leer esta página", **Tu equilibrio** (radar), **Tu evolución** (12 meses), la banda en texto de cada tarjeta | Colores suaves y siempre con número y texto; el color nunca es la única señal. |
 | Ideas para ti | Abrir una idea | Salen de un catálogo curado, con aviso de que no sustituyen el consejo profesional (RES-05). |
 | Móvil | Modo móvil del navegador: cabecera con menú, gráficos compactos | Diseñada primero para móvil (RNF-06). |
@@ -87,7 +87,7 @@
 | ¿Cómo sabéis que funciona en producción y no solo en local? | `check:api` carga las funciones como Vercel, y los E2E con base de datos real (local) corren en cada PR. Lección aprendida con un fallo real. | Métricas, apartado 7.2 |
 | ¿Por qué una sola participante? | Era la persona disponible; está documentado como limitación y se buscaron problemas graves, no medir. | Resultados del test, apartado 6 |
 | ¿Por qué no Sentry u otro servicio de errores? | A esta escala basta el logger estructurado y los logs de Vercel (RES-03, YAGNI). | ADR-08 |
-| ¿Límites del plan gratuito? | 12 funciones en Vercel Hobby (una por capacidad) y pausa de Supabase tras 7 días (workflow diario). | ADR-03, apartado 6.1 |
+| ¿Límites del plan gratuito? | 12 funciones en Vercel Hobby (una por capacidad) y pausa de Supabase tras 7 días (workflow cada 5 días). | ADR-03, apartado 6.1 |
 
 ## 4. Después de la demo
 
@@ -101,3 +101,5 @@
 
 - **v1.0 (29 sept. 2026)** — versión inicial: preparación (incluida la primera entrega a producción), guion de 25 minutos, preguntas probables y qué hacer después.
 - **v1.1 (29 sept. 2026)** — la demo pasa al final del proyecto; la lista de la primera entrega a producción (apartado 1.1) se usa ya.
+- **v1.2 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).
+- **v1.3 (3 oct. 2026)** — la entrevista se guarda categoría a categoría (UX-05).

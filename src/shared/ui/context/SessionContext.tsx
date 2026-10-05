@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 
-export interface EstadoSesion {
+export interface SessionState {
   loading: boolean;
   authenticated: boolean;
   email?: string;
@@ -8,9 +8,11 @@ export interface EstadoSesion {
   name?: string;
   /** Rol de la sesión. Solo sirve para adaptar la interfaz: la autorización real la hace el servidor (ADM-01). */
   rol?: "usuario" | "premium" | "admin";
+  /** RF-40: si este despliegue tiene un proveedor de IA (sin él, la opción ni se ofrece). */
+  aiIdeasAvailable?: boolean;
 }
 
-export interface SessionContextValue extends EstadoSesion {
+export interface SessionContextValue extends SessionState {
   /**
    * Vuelve a consultar /api/accounts/session. Necesario porque el estado de sesión se
    * carga una vez al montar — sin esto, guardar el perfil (RF-03) no se
@@ -29,26 +31,26 @@ const SessionContext = createContext<SessionContextValue | undefined>(undefined)
  * comparten una sola llamada a /api/accounts/session y pueden invalidarla entre sí.
  */
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [estado, setEstado] = useState<EstadoSesion>({ loading: true, authenticated: false });
-  const montado = useRef(true);
+  const [formState, setFormState] = useState<SessionState>({ loading: true, authenticated: false });
+  const mounted = useRef(true);
 
   useEffect(() => {
-    montado.current = true;
+    mounted.current = true;
     return () => {
-      montado.current = false;
+      mounted.current = false;
     };
   }, []);
 
   const refresh = useCallback(() => {
     fetch("/api/accounts/session")
-      .then((respuesta) => respuesta.json())
-      .then((datos) => {
-        if (montado.current) {
-          setEstado({ loading: false, authenticated: !!datos.autenticado, email: datos.email, name: datos.name, rol: datos.autenticado ? (datos.rol ?? "usuario") : undefined });
+      .then((response) => response.json())
+      .then((data) => {
+        if (mounted.current) {
+          setFormState({ loading: false, authenticated: !!data.autenticado, email: data.email, name: data.name, rol: data.autenticado ? (data.rol ?? "usuario") : undefined, aiIdeasAvailable: data.aiIdeasAvailable === true });
         }
       })
       .catch(() => {
-        if (montado.current) setEstado({ loading: false, authenticated: false });
+        if (mounted.current) setFormState({ loading: false, authenticated: false });
       });
   }, []);
 
@@ -56,17 +58,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     refresh();
   }, [refresh]);
 
-  return <SessionContext.Provider value={{ ...estado, refresh }}>{children}</SessionContext.Provider>;
+  return <SessionContext.Provider value={{ ...formState, refresh }}>{children}</SessionContext.Provider>;
 }
 
 /** Debe usarse dentro de <SessionProvider> — lo instala ProtectedRoute. */
 // eslint-disable-next-line react-refresh/only-export-components -- hook de contexto, convención habitual junto a su Provider.
 export function useSession(): SessionContextValue {
-  const contexto = useContext(SessionContext);
-  if (!contexto) {
+  const context = useContext(SessionContext);
+  if (!context) {
     throw new Error("useSession debe usarse dentro de <SessionProvider> (ver ProtectedRoute)");
   }
-  return contexto;
+  return context;
 }
 
 /** Como `useSession` pero sin lanzar fuera de un `SessionProvider` (pantallas que solo la usan para pulir la interfaz). */

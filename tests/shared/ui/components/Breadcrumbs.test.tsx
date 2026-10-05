@@ -11,9 +11,9 @@ describe("Breadcrumbs", () => {
       <MemoryRouter>
         <Breadcrumbs
           items={[
-            { etiqueta: "Inicio", ruta: "/" },
-            { etiqueta: "Iniciar sesión", ruta: "/login" },
-            { etiqueta: "Recuperar contraseña" },
+            { label: "Inicio", path: "/" },
+            { label: "Iniciar sesión", path: "/login" },
+            { label: "Recuperar contraseña" },
           ]}
         />
       </MemoryRouter>,

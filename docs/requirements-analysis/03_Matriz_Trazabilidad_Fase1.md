@@ -11,7 +11,7 @@
 | RN | RF relacionados | RNF relacionados | RES relacionados | RD relacionados | Cobertura |
 |---|---|---|---|---|---|
 | RN-01 | RF-06, RF-07, RF-09, RF-10 | RNF-01 | — | RD-01, RD-02, RD-03 | ✅ |
-| RN-02 | RF-18, RF-19, RF-20, RF-21, RF-34, RF-35, RF-40 | — | — | RD-04, RD-09 | ✅ |
+| RN-02 | RF-18, RF-19, RF-20, RF-21, RF-34, RF-35, RF-40, RF-41, RF-42, RF-43 | — | — | RD-04, RD-09 | ✅ |
 | RN-03 | RF-12, RF-16, RF-36 | — | — | RD-07 | ✅ |
 | RN-04 | RF-19, RF-21 | — | RES-07, RES-09 | — | ✅ |
 | RN-05 | RF-07, RF-08 | — | — | RD-02 | ✅ |
@@ -55,13 +55,6 @@ En sentido inverso, hay RF/RNF que no cuelgan de ningún RN concreto — esto **
 La cobertura parcial de RN-11 es esperada: ya documentamos en RN-11/RD-10 que las ventajas concretas del plan premium se definirán más adelante. No es un gap que haya que resolver ahora — se resolverá cuando decidáis el contenido del plan premium.
 
 ---
-
-## 5. Próximo paso
-
-Con los dos hallazgos cerrados, seguimos con el **Plan de Verificación y Validación** (archivo 4) y la **justificación del ciclo de vida** (archivo 1).
-
----
-
 ## Historial de cambios
 
 - **v1.0 (5 sept. 2026)** — versión inicial, hallazgos 1 y 2 identificados y luego cerrados (ver apartado 2).
@@ -69,3 +62,6 @@ Con los dos hallazgos cerrados, seguimos con el **Plan de Verificación y Valida
 - **v1.2 (10 sept. 2026)** — se añaden RF-35 (RN-02), RF-36 (RN-03) y RF-37 (RN-08), la nueva sección 2.11 de funcionalidades asistidas por IA. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md).
 - **v1.3 (14 sept. 2026)** — se añaden RF-38 y RF-39 como infraestructura de cuenta transversal (apartado 3).
 - **v1.4 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA) en la fila de RN-02.
+- **v1.5 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v1.5 (29 sept. 2026)** — RF-41 en la fila de RN-02.
+- **v1.6 (3 oct. 2026)** — RF-42 y RF-43 en la fila de RN-02.

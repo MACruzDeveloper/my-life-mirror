@@ -11,30 +11,47 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **Primera entrega a producción** (desde el 29 sept.) — **v1.0.0 desplegada** en https://my-life-mirror.vercel.app (funciones en Dublín, variables en Production y Preview, etiqueta `v1.0.0`, rama por defecto `main`). Tenía un fallo: recargar una ruta de la app daba 404 → **v1.0.1** lo corrige y añade `npm run smoke:prod` y su workflow. Pendiente: URLs de Supabase (*Authentication → URL Configuration*), limpiar cuentas de prueba y confirmar la cuenta de administrador.
+- [ ] **UX-06** distribución de la entrevista y menú plegable (desde el 4 oct.; [historia](../user-stories/UX-06-distribucion-entrevista-menu.md)): al actualizar, "Tus categorías" y "Requieren tu consentimiento" en acordeones (columna derecha en escritorio, encima de las preguntas en móvil), y el menú de Mi perfil como `Drawer` plegable a iconos.
+
+- [ ] **PERF-01** menos llamadas al guardar en la entrevista (desde el 4 oct.; [historia](../user-stories/PERF-01-menos-llamadas-guardar.md)): el `POST /api/assessments` devuelve las últimas puntuaciones y las recomendaciones; de 4 llamadas a 2 por guardado y el modal de la idea en la mitad de tiempo (medido en local). GraphQL descartado.
+- [ ] **UX-07** primera entrevista por pasos (desde el 4 oct.; [historia](../user-stories/UX-07-primera-entrevista-pasos.md)): introducción → categorías con botones (sensibles aparte, con consentimiento) → preguntas, con indicador de pasos. Solo la primera vez.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
+Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
+
+- [ ] **RF-42** situaciones que lo ponen difícil (nuevo, Should): con puntuación baja, la entrevista pregunta "¿Qué te lo pone difícil?" con una lista cerrada de situaciones (no rasgos ni salud); las ideas que choquen no se proponen, tampoco por IA. Sustituye la idea aplazada del 29 sept.
+- [ ] **RF-43** lo que funciona a otros (nuevo, Could): con puntuación alta, agregado anónimo de las opciones de RF-41 de quienes van bien en esa categoría, con tamaño mínimo de grupo y posibilidad de excluirse. Primer paso, ligero y sin texto libre, hacia RF-32/RF-33.
+- [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
+- [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
 - [ ] **Demo final** — al terminar el proyecto, para la revisión de los profesores (no antes: solo revisan el proyecto terminado). [Guion](../validation/04_Guion_Demo_Cierre.md) ya preparado; se actualiza entonces con lo que haya del Ciclo 2.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
 
 - [ ] **RF-23** — Caso de uso `ConfigurarNotificaciones`. Ningún otro RF del Ciclo 1 depende de él.
-- [ ] Primeras historias del Ciclo 2. Ideas **importantes** que salen de la validación (27 sept.), pendientes de convertirse en RF con su prioridad:
+- [ ] Más ideas del Ciclo 2 que salen de la validación (27 sept.), pendientes de convertirse en RF (la pregunta por categoría ya es RF-41 y las sugerencias, RF-40):
   - **Perfil ampliado** tras el registro: aficiones, estado civil, hijos (y sus edades o necesidades especiales), ubicación, peso/altura, salud, religión… Hoy RF-03 solo tiene nombre, fecha de nacimiento, género y zona horaria. **Salud y religión son datos de categoría especial (RGPD art. 9):** solo con consentimiento explícito (como las categorías sensibles), cada campo opcional y ligado a un uso concreto (minimización). Su uso con IA sigue sujeto a RD-09 y RES-09.
-  - **Pregunta abierta por categoría** en la entrevista (p. ej. "¿Cuál es la mejor aventura que has vivido?"). Las notas actuales no se entendieron: sustituirlas o integrarlas, y dejar claro para qué sirven y quién las ve (solo el usuario).
-  - **Sugerencias personalizadas → RF-40** (decidido el 27 sept., Should): la IA reescribe ideas del catálogo con verificación automática y caída al texto curado, sin moderación humana ([05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) apartado 4.3). Se empieza contra un *Fake*; el adaptador real de Anthropic cuando haya crédito de API. Primera versión sin notas ni categorías sensibles; el perfil ampliado y la pregunta abierta la enriquecerán después.
 
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
 - **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
 - **RF-17** (puntuación global ponderada, Could): sin planificar; decidir según el tiempo que quede tras la validación. (RF-15 ya está hecho.)
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
-- **Renombrado a inglés** del código anterior al 14 sept.: solo cuando se toque por otro motivo (AGENTS.md).
+- **Campos JSON de la API en español** (`autenticado`, `sesionIniciada`, `rol`, `creadoEn`, `ultimoAcceso`, `suspendido`, `mensaje`): lo único del código que sigue en español sin ser dato guardado. Cambiarlos exige tocar servidor, cliente y tests a la vez; se hará en una PR aparte si compensa.
+- **Validación ética con el tutor** (pendiente, sin fecha): comentar el enfoque de RF-29/RES-09 (sugerir apoyo profesional sin detección algorítmica de riesgo), por si el máster exige alguna revisión ética adicional al tratarse de bienestar emocional. Pesa más ahora con RF-40 (IA). Venía de los "Próximos pasos" de los requisitos.
+- **`requestId` en los logs** (idea): un id por petición para seguirla entre funciones distintas en los logs de Vercel. Venía del "Próximo paso" de ADR-08.
+- **Contenido editable desde `/admin`** (idea, ADM-04; después de RF-40a, decidido el 29 sept.): el catálogo de ideas (con traducciones y etiquetas de situación), las opciones de "¿Qué te ayuda?" y las situaciones a evitar pasan a la base de datos, editables como las categorías de ADM-02 (retirar, nunca borrar: los usuarios guardan sus claves). Es lo que ya pedía RD-09 ("catálogo gestionable sin tocar código").
+- **Volver a ejecutar los E2E con `api/` en todas las PRs** (a final de octubre): quitar `branches: [main]` en `.github/workflows/e2e-api.yml`. Hasta entonces solo en las PRs a `main`, a petición del autor (tardaban en cada PR).
 - **Política de privacidad**: borrador de TFM, no revisado legalmente ([PrivacyPolicyPage](../../src/pages/PrivacyPolicyPage.tsx)).
 
 ## Hecho
 
+- [x] **UX-05** respuesta inmediata en la entrevista ([historia](../user-stories/UX-05-respuesta-inmediata-entrevista.md)): un "Guardar" por categoría, a la derecha de la puntuación; "Guardado ahora" en la categoría o, si el guardado abre una idea nueva, una ventana con ella; carrusel con las 5 ideas de la categoría y "Ideas para X" en la pregunta (con RF-40, se reescriben al cambiar "¿Qué te ayuda?", RF-40 v1.1); la última actualización y la última experiencia bajo cada pregunta; panel de progreso en la columna derecha; el historial pasa a Resultados, agrupado por día. Petición del autor (3 oct.): "si no, el usuario no sabe qué ha pasado".
+- [x] **RF-40a** ideas personalizadas con IA contra un *Fake*: interruptor voluntario, la IA reescribe una idea del catálogo (ampliado a 5 por categoría) con filtro y caída al texto curado — [historia](../user-stories/RF-40-ideas-personalizadas-ia.md) (Nivel 3). Las 27 ideas nuevas, pendientes de una revisión a fondo del autor.
+- [x] **Imports `#shared`/`#modules`** en el código del servidor, probados con un `vercel build` real antes de convertir 265 imports.
+- [x] **RF-41** experiencias por categoría: "¿Qué te ayuda?" (opciones cerradas, guardado al momento) y la nota como "Tu experiencia (privada)" — [historia](../user-stories/RF-41-experiencias-categoria.md).
+- [x] **UX-04** historial de cambios plegado, con línea de tiempo por meses — [historia](../user-stories/UX-04-historial-plegable.md).
+- [x] **Primera entrega a producción** (29 sept.): v1.0.0 y v1.0.1 en https://my-life-mirror.vercel.app, con el *smoke* de producción tras cada despliegue.
 - [x] **Métricas DORA y Flow** (primera revisión, 29 sept.): 11 PRs, 1 fallo que llegó a `develop` (5 más parados antes de fusionar), *flow time* mediano de 0 días y dos reglas de flujo nuevas — [resultados](02_Metricas_DORA_y_Flujo.md) apartado 7.
 - [x] **E2E con `api/` en GitHub Actions** (`E2E con api`, en cada PR, sin secretos) y **`npm run dev:local`** para probar la app completa contra el Supabase local; README reescrito para quien quiera probarla.
 - [x] **Playwright contra `api/`**: Supabase local en Docker, servidor propio en Vite con salvaguarda (nunca la base real) y aislamiento entre funciones; 9 tests × móvil/escritorio sobre RF-01, RF-04, RF-05, RF-10, RF-14, RF-15, RF-18, RF-39, UX-01 y UX-02 (`npm run test:e2e:api`, [plan de V&V](../requirements-analysis/04_Plan_Verificacion_Validacion.md) apartado 1.2).
@@ -45,7 +62,7 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 - [x] **Validación** (26-27 sept.): sesión con el [guion corto](../validation/03_Short_Test_Script_EN.md), [resultados](../validation/02_Resultados_Test_Usabilidad.md); RN-04 se cumple según lo declarado; problemas corregidos con UX-01 y UX-02.
 - [x] **UX-02** destacar las propuestas (gravedad 2 de la validación): banda en texto junto a la puntuación en cada tarjeta del panel y resumen "Ideas para ti" arriba del panel con un botón por idea. Frases inspiradoras e ideas con IA quedan fuera (pendientes de decidir) — [historia](../user-stories/UX-02-destacar-propuestas.md).
 - [x] **UX-01** guía de primer uso (gravedad 3 de la validación): "Cómo funciona" en tres pasos en la portada y en la bienvenida de Inicio, pasos de la pantalla en la primera entrevista, y "Cómo leer esta página" en el panel (se cierra con "Entendido", se recuerda en el dispositivo y se puede reabrir) — [historia](../user-stories/UX-01-guia-primer-uso.md).
-- [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow diario de GitHub Actions contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) apartado 6.1). Requiere dos secretos y la rama por defecto en `develop`.
+- [x] **Keep-alive de Supabase** (transversal, desbloquea la evaluación del TFM): workflow de GitHub Actions cada 5 días contra la pausa por inactividad del plan Free ([03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md) apartado 6.1). Requiere dos secretos y la rama por defecto en `develop`.
 
 Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHANGELOG.md); aquí solo el resumen.
 
@@ -118,3 +135,15 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.29 (29 sept. 2026)** — la demo de cierre pasa a "En curso", con su guion y la lista de la primera entrega a producción.
 - **v2.30 (29 sept. 2026)** — la demo se aplaza al final del proyecto (los profesores solo revisan el proyecto terminado); la primera entrega a producción (v1.0.0) se hace ya, para encontrar ahora los problemas que solo aparecen en producción.
 - **v2.31 (29 sept. 2026)** — v1.0.0 en producción; fallo de rutas detectado a los ~10 minutos y corregido en la v1.0.1, con un control nuevo (*smoke* de producción).
+- **v2.32 (29 sept. 2026)** — limpieza: código en inglés (con excepciones anotadas), módulos vacíos o duplicados fuera, E2E solo en PRs a `main` hasta final de octubre.
+- **v2.33 (29 sept. 2026)** — plan del Ciclo 2 en "Listo": UX-04, RF-41, RF-40a, RF-40b, RF-30, y la demo al final. Primera entrega a producción, hecha.
+- **v2.34 (29 sept. 2026)** — UX-04 hecha; RF-41 en curso.
+- **v2.35 (2 oct. 2026)** — RF-41 hecha; RF-40a en curso (construida contra el *Fake*).
+- **v2.36 (3 oct. 2026)** — nuevas en "Listo", detrás de RF-40a: UX-05, RF-42 y RF-43 (confirmadas por el autor). La idea de "situaciones a evitar" pasa a ser RF-42.
+- **v2.37 (3 oct. 2026)** — RF-40a e imports `#` hechos; UX-05 en curso.
+- **v2.36 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).
+- **v2.38 (3 oct. 2026)** — UX-05 rediseñada tras probarla (guardar por categoría, ventana solo con idea nueva, historial a Resultados); UX-06 añadida detrás.
+- **v2.39 (3 oct. 2026)** — UX-05 crece (decisión del autor): carrusel de ideas, ideas que cambian con "¿Qué te ayuda?" (RF-40 v1.1) y el panel de progreso, adelantado de UX-06.
+- **v2.40 (4 oct. 2026)** — UX-05 hecha; UX-06 en curso (categorías en acordeón y menú `Drawer`); PERF-01 y UX-07 añadidas a "Listo" (confirmadas por el autor).
+- **v2.41 (4 oct. 2026)** — PERF-01 en curso y hecha en la rama (junto con UX-06; irán en la misma PR que el renombrado y UX-07, decisión del autor).
+- **v2.42 (4 oct. 2026)** — UX-07 hecha en la rama (con UX-06 y PERF-01, para la misma PR que el renombrado).

@@ -1,11 +1,11 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 // Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
-import { obtenerAppContext } from "../../../container.js";
-import { cookieDeSesion } from "../../../cookies.js";
-import { logger } from "../../../logger.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { sessionCookie } from "#shared/infrastructure/cookies.js";
+import { logger } from "#shared/infrastructure/logger.js";
 
-type PeticionConCuerpo = IncomingMessage & { body: unknown };
+type RequestWithBody = IncomingMessage & { body: unknown };
 
 const LoginSchema = z.object({
   email: z.string(),
@@ -17,7 +17,7 @@ const LoginSchema = z.object({
  * guarda en una cookie httpOnly puesta aquí — nunca se devuelve en el
  * cuerpo de la respuesta ni se maneja en el cliente.
  */
-export default async function handler(req: PeticionConCuerpo, res: ServerResponse) {
+export default async function handler(req: RequestWithBody, res: ServerResponse) {
   try {
     if (req.method !== "POST") {
       res.writeHead(405, { "Content-Type": "application/json" });
@@ -25,27 +25,27 @@ export default async function handler(req: PeticionConCuerpo, res: ServerRespons
       return;
     }
 
-    const datos = LoginSchema.safeParse(req.body);
-    if (!datos.success) {
+    const data = LoginSchema.safeParse(req.body);
+    if (!data.success) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Petición mal formada" }));
       return;
     }
 
-    const { iniciarSesion } = obtenerAppContext();
-    const resultado = await iniciarSesion(datos.data);
+    const { logIn } = getAppContext();
+    const result = await logIn(data.data);
 
-    if (!resultado.ok) {
-      const status = resultado.error.code === "AUTHENTICATION_ERROR" ? 401 : 400;
+    if (!result.ok) {
+      const status = result.error.code === "AUTHENTICATION_ERROR" ? 401 : 400;
       res.writeHead(status, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: resultado.error.message }));
+      res.end(JSON.stringify({ error: result.error.message }));
       return;
     }
 
-    res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": cookieDeSesion(resultado.value.token) });
-    res.end(JSON.stringify({ id: resultado.value.id, email: resultado.value.email }));
+    res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": sessionCookie(result.value.token) });
+    res.end(JSON.stringify({ id: result.value.id, email: result.value.email }));
   } catch (error) {
-    logger.error("Error inesperado en /api/accounts/login", error, { ruta: "/api/accounts/login" });
+    logger.error("Error inesperado en /api/accounts/login", error, { route: "/api/accounts/login" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

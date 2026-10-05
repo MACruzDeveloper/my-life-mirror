@@ -5,8 +5,10 @@
  * `userId` vive directamente aquí. `type: "custom"` ya cubre RF-08 (Could,
  * fuera del MVP por ahora) sin cambios futuros al modelo.
  */
-export type CategoryType = "standard" | "custom";
-export type CategoryStatus = "active" | "inactive";
+export const CATEGORY_TYPES = ["standard", "custom"] as const;
+export type CategoryType = (typeof CATEGORY_TYPES)[number];
+export const CATEGORY_STATUSES = ["active", "inactive"] as const;
+export type CategoryStatus = (typeof CATEGORY_STATUSES)[number];
 
 export interface Category {
   readonly id: string;
@@ -23,4 +25,9 @@ export interface Category {
   readonly type: CategoryType;
   readonly status: CategoryStatus;
   readonly isSensitiveData: boolean;
+  /**
+   * RF-41: opciones de "¿Qué te ayuda en esta área?" marcadas por el usuario
+   * (claves de `experienceOptions`). Ausente o vacío = ninguna.
+   */
+  readonly experienceTags?: readonly string[];
 }

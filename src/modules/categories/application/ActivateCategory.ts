@@ -1,9 +1,9 @@
-import { type Result, err, ok } from "../../../shared/domain/Result.js";
-import { ConsentRequiredError, NotFoundError, ValidationError } from "../../../shared/domain/DomainError.js";
+import { type Result, err, ok } from "#shared/domain/Result.js";
+import { ConsentRequiredError, NotFoundError, ValidationError } from "#shared/domain/DomainError.js";
 import type { Category } from "../domain/Category.js";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
 import type { CategoryRepository } from "../domain/CategoryRepository.js";
-import type { crearVerificarConsentimiento } from "../../consentimiento/application/VerificarConsentimiento.js";
+import type { createCheckConsent } from "#modules/consent/application/CheckConsent.js";
 
 export interface ActivateCategoryInput {
   userId: string;
@@ -19,7 +19,7 @@ export interface ActivateCategoryInput {
  */
 export function createActivateCategory(
   categoryRepository: CategoryRepository,
-  verifyConsent: ReturnType<typeof crearVerificarConsentimiento>,
+  verifyConsent: ReturnType<typeof createCheckConsent>,
   catalog: CategoryCatalogRepository,
 ) {
   return async function activateCategory(
@@ -38,14 +38,14 @@ export function createActivateCategory(
 
     // Retirada por el admin (ADM-02): ya no se puede activar. Aquí, y no solo
     // en la lista, para que una llamada directa a la API tampoco pueda.
-    const entrada = (await catalog.findAll()).find((c) => c.id === category.catalogId);
-    if (!entrada || entrada.retiredAt) return err(new NotFoundError("Category not found"));
+    const entry = (await catalog.findAll()).find((c) => c.id === category.catalogId);
+    if (!entry || entry.retiredAt) return err(new NotFoundError("Category not found"));
 
     if (category.isSensitiveData) {
       const consentResult = await verifyConsent({
-        usuarioId: userId,
-        categoriaId: categoryId,
-        versionPolitica: policyVersion,
+        userId: userId,
+        categoryId: categoryId,
+        policyVersion: policyVersion,
       });
       if (!consentResult.ok) return err(consentResult.error);
       if (!consentResult.value) {

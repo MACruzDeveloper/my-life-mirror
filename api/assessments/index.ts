@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { obtenerAppContext } from "../../src/shared/infrastructure/container.js";
-import { leerCookie } from "../../src/shared/infrastructure/cookies.js";
-import { logger } from "../../src/shared/infrastructure/logger.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { readCookie } from "#shared/infrastructure/cookies.js";
+import { logger } from "#shared/infrastructure/logger.js";
 
 const RecordAssessmentsSchema = z.object({
   entries: z.array(
@@ -19,7 +19,8 @@ const RecordAssessmentsSchema = z.object({
  * puntuaciones, todo o nada — ver RecordAssessments); GET devuelve la última
  * puntuación de cada categoría activa (pantalla "Resultados"). El `userId`
  * sale siempre de la cookie, nunca del cuerpo. El historial completo llega
- * con el panel (RF-14).
+ * con el panel (RF-14). PERF-01: el POST responde también con las últimas
+ * puntuaciones y las recomendaciones abiertas.
  */
 export default async function handler(req: IncomingMessage & { body: unknown }, res: ServerResponse) {
   try {
@@ -29,47 +30,56 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
       return;
     }
 
-    const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, recordAssessments, getLatestScores } = obtenerAppContext();
-    const sesion = await verificarSesion(token);
+    const token = readCookie(req.headers.cookie, "sesion");
+    const { verifySession, recordAssessments, getLatestScores, listRecommendations } = getAppContext();
+    const session = await verifySession(token);
 
-    if (!sesion.ok) {
+    if (!session.ok) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "No autenticado" }));
       return;
     }
 
     if (req.method === "GET") {
-      const resultado = await getLatestScores(sesion.value.id);
-      if (!resultado.ok) {
+      const result = await getLatestScores(session.value.id);
+      if (!result.ok) {
         res.writeHead(400, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: resultado.error.message }));
+        res.end(JSON.stringify({ error: result.error.message }));
         return;
       }
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(resultado.value));
+      res.end(JSON.stringify(result.value));
       return;
     }
 
-    const datos = RecordAssessmentsSchema.safeParse(req.body);
-    if (!datos.success) {
+    const data = RecordAssessmentsSchema.safeParse(req.body);
+    if (!data.success) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Petición mal formada" }));
       return;
     }
 
-    const resultado = await recordAssessments({ userId: sesion.value.id, entries: datos.data.entries });
-    if (!resultado.ok) {
-      const status = resultado.error.code === "NOT_FOUND" ? 404 : resultado.error.code === "CONFLICT" ? 409 : 400;
+    const result = await recordAssessments({ userId: session.value.id, entries: data.data.entries });
+    if (!result.ok) {
+      const status = result.error.code === "NOT_FOUND" ? 404 : result.error.code === "CONFLICT" ? 409 : 400;
       res.writeHead(status, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: resultado.error.message, code: resultado.error.code }));
+      res.end(JSON.stringify({ error: result.error.message, code: result.error.code }));
       return;
     }
 
+    // PERF-01: lo que cambia al guardar va en la respuesta (las mismas formas que GET /api/assessments
+    // y GET /api/recommendations), así la pantalla no tiene que volver a pedirlo: de 4 llamadas a 2.
+    const [latest, recommendations] = await Promise.all([getLatestScores(session.value.id), listRecommendations(session.value.id)]);
     res.writeHead(201, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ recorded: resultado.value.length }));
+    res.end(
+      JSON.stringify({
+        recorded: result.value.length,
+        ...(latest.ok ? { latest: latest.value } : {}),
+        ...(recommendations.ok ? { recommendations: recommendations.value } : {}),
+      }),
+    );
   } catch (error) {
-    logger.error("Error inesperado en /api/assessments", error, { ruta: "/api/assessments" });
+    logger.error("Error inesperado en /api/assessments", error, { route: "/api/assessments" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

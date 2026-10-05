@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { obtenerAppContext } from "../../../container.js";
-import { leerCookie } from "../../../cookies.js";
-import { logger } from "../../../logger.js";
+import { getAppContext } from "#shared/infrastructure/container.js";
+import { readCookie } from "#shared/infrastructure/cookies.js";
+import { logger } from "#shared/infrastructure/logger.js";
 
 /**
  * RF-39 (nota "spec viva"): la cookie de sesión es httpOnly a propósito
@@ -12,11 +12,11 @@ import { logger } from "../../../logger.js";
  */
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
-    const token = leerCookie(req.headers.cookie, "sesion");
-    const { verificarSesion, getProfile } = obtenerAppContext();
-    const resultado = await verificarSesion(token);
+    const token = readCookie(req.headers.cookie, "sesion");
+    const { verifySession, getProfile, aiIdeasAvailable } = getAppContext();
+    const result = await verifySession(token);
 
-    if (!resultado.ok) {
+    if (!result.ok) {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ autenticado: false }));
       return;
@@ -29,18 +29,18 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     // nombre todavía", nunca a "no sé si hay sesión".
     let name: string | undefined;
     try {
-      const perfil = await getProfile(resultado.value.id);
-      name = perfil.ok ? perfil.value?.name : undefined;
+      const profile = await getProfile(result.value.id);
+      name = profile.ok ? profile.value?.name : undefined;
     } catch (error) {
       logger.error("No se pudo obtener el perfil en /api/accounts/session (se ignora, no es crítico)", error, {
-        ruta: "/api/accounts/session",
+        route: "/api/accounts/session",
       });
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ autenticado: true, email: resultado.value.email, name, rol: resultado.value.rol }));
+    res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, rol: result.value.rol, aiIdeasAvailable }));
   } catch (error) {
-    logger.error("Error inesperado en /api/accounts/session", error, { ruta: "/api/accounts/session" });
+    logger.error("Error inesperado en /api/accounts/session", error, { route: "/api/accounts/session" });
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }

@@ -11,6 +11,8 @@ export interface CategoryDto {
   description?: string;
   isSensitiveData?: boolean;
   status: "active" | "inactive";
+  /** RF-41: opciones marcadas de "¿Qué te ayuda?" (claves de `experienceOptions`). */
+  experienceTags?: string[];
 }
 
 export interface CatalogLabelDto {
@@ -25,10 +27,10 @@ export const CATEGORY_LABELS_KEY = ["categories", "labels"] as const;
 
 /** Categorías del usuario (RF-06), en caché compartida entre pantallas. */
 export function useCategories() {
-  return useQuery({ queryKey: CATEGORIES_KEY, queryFn: () => getJson<CategoryDto[]>("/api/categories") });
+  return useQuery({ queryKey: CATEGORIES_KEY, queryFn: ({ signal }) => getJson<CategoryDto[]>("/api/categories", signal) });
 }
 
 /** Textos de todas las categorías del catálogo en cada idioma (RNF-10). */
 export function useCategoryLabelsQuery() {
-  return useQuery({ queryKey: CATEGORY_LABELS_KEY, queryFn: () => getJson<CatalogLabelDto[]>("/api/categories/translations") });
+  return useQuery({ queryKey: CATEGORY_LABELS_KEY, queryFn: ({ signal }) => getJson<CatalogLabelDto[]>("/api/categories/translations", signal) });
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { Breadcrumbs, type MigaDePan } from "./Breadcrumbs";
+import { Breadcrumbs, type BreadcrumbItem } from "./Breadcrumbs";
 import { Header } from "./Header";
 import { useSession } from "../context/SessionContext";
 
@@ -10,7 +10,7 @@ export interface ProtectedLayoutProps {
    * Tipo `MigaDePan` (de Breadcrumbs.tsx) sin traducir todavía — pendiente,
    * ver AGENTS.md sobre nombres en inglés.
    */
-  breadcrumbs?: MigaDePan[];
+  breadcrumbs?: BreadcrumbItem[];
   children: ReactNode;
 }
 
@@ -36,7 +36,7 @@ export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps)
     <>
       {/* name (RF-03) tiene prioridad sobre el email en cuanto existe — ver api/sesion.ts. */}
       <Header displayName={name ?? email} onLogout={handleLogout} isAdmin={rol === "admin"} />
-      {breadcrumbs ? <Breadcrumbs items={breadcrumbs} /> : null}
+      {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" /> : null}
       {children}
     </>
   );

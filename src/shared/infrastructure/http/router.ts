@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-export type PeticionHttp = IncomingMessage & { body: unknown };
-export type ManejadorHttp = (req: PeticionHttp, res: ServerResponse) => Promise<void> | void;
+export type HttpRequest = IncomingMessage & { body: unknown };
+export type HttpHandler = (req: HttpRequest, res: ServerResponse) => Promise<void> | void;
 
 /**
  * Despacha por el último segmento de la URL a un handler de la tabla. El plan
@@ -11,11 +11,11 @@ export type ManejadorHttp = (req: PeticionHttp, res: ServerResponse) => Promise<
  * `api/<capacidad>/[action].ts` mantiene las URLs y reduce las funciones.
  * Regla del proyecto: una función por capacidad, no por acción.
  */
-export function createRouter(prefijo: string, rutas: Record<string, ManejadorHttp>): ManejadorHttp {
+export function createRouter(prefix: string, routes: Record<string, HttpHandler>): HttpHandler {
   return async (req, res) => {
     const ruta = (req.url ?? "").split("?")[0];
-    const accion = ruta.startsWith(prefijo) ? ruta.slice(prefijo.length).replace(/\/$/, "") : undefined;
-    const handler = accion && Object.hasOwn(rutas, accion) ? rutas[accion] : undefined;
+    const action = ruta.startsWith(prefix) ? ruta.slice(prefix.length).replace(/\/$/, "") : undefined;
+    const handler = action && Object.hasOwn(routes, action) ? routes[action] : undefined;
 
     if (!handler) {
       res.writeHead(404, { "Content-Type": "application/json" });

@@ -124,4 +124,24 @@ describe("Header", () => {
       expect(screen.queryByRole("button", { name: /abrir menú/i })).not.toBeInTheDocument();
     });
   });
+
+  describe("fijo y compacto al desplazarse (UX-06)", () => {
+    afterEach(() => {
+      Object.defineProperty(window, "pageYOffset", { value: 0, configurable: true });
+    });
+
+    it("empieza a tamaño normal y se compacta al bajar; vuelve al subir", () => {
+      renderHeader();
+      const header = screen.getByRole("banner");
+      expect(header).toHaveAttribute("data-compact", "false");
+
+      Object.defineProperty(window, "pageYOffset", { value: 120, configurable: true });
+      fireEvent.scroll(window);
+      expect(header).toHaveAttribute("data-compact", "true");
+
+      Object.defineProperty(window, "pageYOffset", { value: 0, configurable: true });
+      fireEvent.scroll(window);
+      expect(header).toHaveAttribute("data-compact", "false");
+    });
+  });
 });

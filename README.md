@@ -27,7 +27,7 @@ La primera vez descarga las imágenes de Supabase (unos minutos). Después se ab
 | http://127.0.0.1:54323 | Supabase Studio local: ver las tablas y los usuarios que vas creando. |
 | http://127.0.0.1:54324 | Buzón local: aquí llegan los correos de "¿Olvidaste tu contraseña?". |
 
-Los datos se conservan entre arranques. Para empezar de cero: `npx supabase db reset`. Para apagar la base local y liberar memoria: `npx supabase stop`.
+Los datos se conservan entre arranques. Una vez arrancado, el Supabase local **vuelve a arrancar solo al abrir Docker Desktop** (sus contenedores quedan marcados "reiniciar salvo que se paren"); para que deje de hacerlo y liberar memoria, `npx supabase stop`. Para empezar de cero: `npx supabase db reset`. Para apagar la base local y liberar memoria: `npx supabase stop`.
 
 ### Probar como administrador
 
@@ -87,6 +87,7 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 
 ## Documentación
 
+- [docs/README.md](docs/README.md) — **mapa de toda la documentación** y por dónde empezar.
 - [AGENTS.md](AGENTS.md) — convenciones del proyecto y comandos (punto de entrada).
 - [Requisitos](docs/requirements-analysis/) · [Decisiones de arquitectura (ADR)](docs/architecture-decisions/) · [Historias de usuario](docs/user-stories/) · [Tablero](docs/project-management/01_Backlog_MVP.md) · [Validación](docs/validation/)
 - [CHANGELOG.md](CHANGELOG.md) — cambios por versión.

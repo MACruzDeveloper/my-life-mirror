@@ -10,5 +10,7 @@ export default mergeConfig(
   defineConfig({
     plugins: [vercelApiRoutes(fileURLToPath(new URL('./api', import.meta.url)))],
     server: { port: 5174, strictPort: true },
+    // `npm run dev:local` (los E2E con api/ pasan la suya en VITE_CACHE_DIR): ver vite.config.ts.
+    cacheDir: process.env.VITE_CACHE_DIR ?? 'node_modules/.vite-local',
   }),
 )

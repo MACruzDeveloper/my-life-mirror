@@ -80,6 +80,9 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-11 | El sistema debe permitir añadir una nota o comentario libre asociado a cada puntuación. | Should |
 | RF-12 | El sistema debe guardar cada evaluación con marca de tiempo, de forma inmutable (no editable retroactivamente, salvo corrección en las siguientes 24h). | Should |
 | RF-13 | El sistema debe recordar al usuario (notificación) cuándo toca una nueva evaluación según la frecuencia configurada. | Should |
+| RF-41 | El usuario podrá indicar en cada categoría qué le ayuda, eligiendo entre opciones de una lista cerrada por categoría, y la nota de RF-11 se presentará como su experiencia privada. Solo las opciones elegidas pueden usarse para personalizar ideas (RF-40), y solo si el usuario lo activa; el texto libre nunca se envía a la IA ni se comparte. | Should |
+| RF-42 | Cuando la puntuación de una categoría esté por debajo del umbral de recomendación, el usuario podrá indicar qué se lo pone difícil eligiendo entre situaciones de una lista cerrada (p. ej. mucha gente, hablar en público, gastar dinero), nunca rasgos ni condiciones de salud. Las ideas que choquen con esas situaciones no se le proponen, tampoco las personalizadas por IA (RF-40). | Should |
+| RF-43 | Cuando la puntuación de una categoría sea alta (8 o más), el usuario podrá ver, de forma anónima y agregada, qué opciones de "¿Qué te ayuda?" (RF-41) marcan otras personas a las que esa categoría les va bien, solo si el grupo alcanza un tamaño mínimo que impida identificar a nadie. Sin texto libre. El usuario puede excluir sus datos del agregado. | Could |
 
 ### 2.4 Panel / Dashboard
 | ID | Descripción | Prioridad |
@@ -185,7 +188,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RD-02 | El sistema debe modelar una entidad `Categoría` con: nombre, descripción, tipo (estándar/personalizada), estado (activa/inactiva), es_dato_sensible (booleano). | Must |
 | RD-03 | El sistema debe modelar una entidad `Evaluación` (check-in) con: usuario, categoría, puntuación, fecha, nota opcional. | Must |
 | RD-04 | El sistema debe modelar una entidad `Recomendación` con: usuario destinatario, categoría asociada, texto, condición de disparo (umbral), estado (pendiente de respuesta / hecha / descartada / pospuesta). Cada recomendación queda registrada como propuesta a un usuario concreto, con el estado de su respuesta. | Must |
-| RD-05 | El sistema debe modelar un registro de `Consentimiento` por usuario y por categoría sensible, con fecha y versión de política aceptada. | Must |
+| RD-05 | El sistema debe modelar un registro de `Consent` por usuario y por categoría sensible, con fecha y versión de política aceptada. | Must |
 | RD-06 | Los datos de categorías sensibles (sexo, espiritualidad, salud) deben estar lógicamente separados/etiquetados para poder aplicarles cifrado y controles de acceso diferenciados. | Must |
 | RD-07 | El sistema debe conservar el histórico de evaluaciones sin sobrescritura, para permitir análisis de evolución temporal. | Should |
 | RD-08 | El sistema debe poder anonimizar o pseudonimizar datos de usuario en caso de eliminación de cuenta, si existen registros necesarios por obligación legal (p. ej. facturación). | Could |
@@ -194,20 +197,6 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RD-11 | El sistema debe modelar una entidad `Conexión` (usuario_a, usuario_b, estado: pendiente/aceptada/rechazada, fecha) para representar relaciones confirmadas mutuamente entre usuarios, necesarias para RF-32/RF-33. | Should |
 
 ---
-
-## 6. Próximos pasos (Fase 2 sugerida)
-
-Para la siguiente fase, propongo:
-
-1. **Verificación de consistencia**: matriz de trazabilidad RN → RF/RNF/RD, comprobando que cada RN de negocio esté cubierto por al menos un requisito funcional.
-2. **Revisión de ambigüedad**: pasar cada requisito por un checklist (¿es verificable? ¿es atómico? ¿tiene criterio de aceptación medible?).
-3. **Priorización validada**: revisar el MoSCoW con criterios objetivos (p. ej. método de puntuación ponderada, o técnica de priorización por valor/esfuerzo).
-4. **Prototipado/validación con usuarios**: mockups de las pantallas clave (onboarding, check-in, dashboard, recomendación) para validar RN-04 (tono no punitivo) antes de programar nada.
-5. **Casos de uso / historias de usuario**: derivar de cada RF al menos un caso de uso o user story con criterios de aceptación, para la fase de diseño.
-6. **Validación con tutor**: comentar específicamente el enfoque de RF-29/RES-09 (sugerencia de apoyo profesional sin detección algorítmica de riesgo) por si el programa del máster requiere alguna revisión ética adicional al tratarse de bienestar emocional. *(⏸️ en espera — sin fecha de interview con el tutor todavía; ver [02_Plan_Verificacion_Validacion.md](02_Plan_Verificacion_Validacion.md))*
-
----
-
 ## Historial de cambios
 
 - **v0.1 (baseline, sept. 2026)** — versión inicial: RN-01 a RN-10, RF-01 a RF-25, RNF-01 a RNF-12, RES-01 a RES-08, RD-01 a RD-09.
@@ -220,3 +209,6 @@ Para la siguiente fase, propongo:
 - **v0.8 (14 sept. 2026)** — RNF-13 (control de acceso por roles: estándar/premium/administrador), preparación de RN-11 y de un futuro rol de administrador para el equipo. Se corrige el campo "Versión" de este documento, desactualizado desde v0.3.
 - **v0.9 (14 sept. 2026)** — RNF-06 explicita mobile-first con adaptación real a tablet ([07_UI.md](../architecture-decisions/07_UI.md) apartado 6), no solo "responsive" en abstracto.
 - **v0.10 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA, ancladas al catálogo curado y con verificación automática), Should, Ciclo 2. Surge de la validación (la participante pidió sugerencias más personales) y lo confirma el autor. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md) apartado 4.3.
+- **v0.11 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v0.11 (29 sept. 2026)** — RF-41 (experiencias por categoría: opciones cerradas "qué me ayuda" y la nota de RF-11 como experiencia privada), Should, Ciclo 2. Confirmado por el autor en el plan del Ciclo 2.
+- **v0.12 (3 oct. 2026)** — RF-42 (situaciones que lo ponen difícil, con puntuación baja; filtran las ideas) y RF-43 (lo que funciona a otros, anónimo y agregado, con puntuación alta). Confirmados por el autor: la puntuación decide qué pregunta cerrada se hace; el texto libre sigue siendo privado.

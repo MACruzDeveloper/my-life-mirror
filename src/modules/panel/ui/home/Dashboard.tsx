@@ -13,6 +13,7 @@ import { RecommendationButton } from "@modules/recommendations/ui/Recommendation
 import { useRecommendations } from "@modules/recommendations/ui/queries";
 import { DashboardGuide } from "./DashboardGuide";
 import { IdeasSummary } from "./IdeasSummary";
+import { useAiIdeasActive } from "@modules/accounts/ui/queries";
 
 /**
  * Los gráficos (Apache ECharts) se cargan solo al llegar al panel: son la mayor
@@ -41,6 +42,7 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
   // Secundarios respecto a las puntuaciones: si tardan o fallan, el panel se ve igual.
   const recommendations = useRecommendations().data ?? [];
   const history = useAssessmentHistory();
+  const personalize = useAiIdeasActive();
   const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
   // Los gráficos reciben el nombre ya en el idioma de la interfaz: no saben nada de traducciones.
   const displayedScores = latestScores.map((latestScore) => ({ ...latestScore, categoryName: categoryLabel(latestScore.catalogId).name }));
@@ -59,8 +61,10 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
       </Box>
       <DashboardGuide />
       <IdeasSummary
+        personalize={personalize}
         ideas={recommendations.map((recommendation) => ({
           id: recommendation.id,
+          categoryId: recommendation.categoryId,
           templateKey: recommendation.templateKey,
           categoryName: categoryLabel(recommendation.catalogId).name,
         }))}
@@ -83,7 +87,9 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
           historyError={history.isError}
           renderCardExtra={(categoryId) => {
             const recommendation = recommendations.find((candidate) => candidate.categoryId === categoryId);
-            return recommendation ? <RecommendationButton templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} /> : null;
+            return recommendation ? (
+              <RecommendationButton recommendationId={recommendation.id} categoryId={recommendation.categoryId} personalize={personalize} templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} />
+            ) : null;
           }}
         />
       </Suspense>

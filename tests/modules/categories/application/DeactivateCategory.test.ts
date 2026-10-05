@@ -9,32 +9,32 @@ describe("DeactivateCategory (RF-07)", () => {
     const repo = new InMemoryCategoryRepository();
     const listCategories = createListCategories(repo, new InMemoryCategoryCatalogRepository());
     const deactivateCategory = createDeactivateCategory(repo);
-    const listado = await listCategories("u1");
-    if (!listado.ok) throw new Error("setup falló");
-    const sensible = listado.value.find((c) => c.isSensitiveData)!;
-    await repo.save({ ...sensible, status: "active" });
+    const listed = await listCategories("u1");
+    if (!listed.ok) throw new Error("setup falló");
+    const sensitive = listed.value.find((c) => c.isSensitiveData)!;
+    await repo.save({ ...sensitive, status: "active" });
 
-    const resultado = await deactivateCategory({ userId: "u1", categoryId: sensible.id });
+    const result = await deactivateCategory({ userId: "u1", categoryId: sensitive.id });
 
-    expect(resultado.ok).toBe(true);
-    if (resultado.ok) expect(resultado.value.status).toBe("inactive");
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.status).toBe("inactive");
   });
 
   it("rechaza una categoría que no existe", async () => {
     const deactivateCategory = createDeactivateCategory(new InMemoryCategoryRepository());
 
-    const resultado = await deactivateCategory({ userId: "u1", categoryId: "no-existe" });
+    const result = await deactivateCategory({ userId: "u1", categoryId: "no-existe" });
 
-    expect(resultado.ok).toBe(false);
-    if (!resultado.ok) expect(resultado.error.code).toBe("NOT_FOUND");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("NOT_FOUND");
   });
 
   it("rechaza entradas vacías", async () => {
     const deactivateCategory = createDeactivateCategory(new InMemoryCategoryRepository());
 
-    const resultado = await deactivateCategory({ userId: "", categoryId: "c1" });
+    const result = await deactivateCategory({ userId: "", categoryId: "c1" });
 
-    expect(resultado.ok).toBe(false);
-    if (!resultado.ok) expect(resultado.error.code).toBe("VALIDATION_ERROR");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
   });
 });

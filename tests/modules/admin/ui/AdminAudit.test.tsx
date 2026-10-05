@@ -5,8 +5,8 @@ import "@testing-library/jest-dom/vitest";
 import { AdminAudit } from "@modules/admin/ui/AdminAudit";
 import { withClient } from "../../../helpers/queryClient";
 
-function stub(audit: unknown, usuarios: unknown = [{ id: "u-admin", email: "admin@ejemplo.com", rol: "admin", suspendido: false, createdAt: "2026-09-01T10:00:00.000Z" }]) {
-  vi.stubGlobal("fetch", vi.fn((url: string) => Promise.resolve({ ok: true, status: 200, json: async () => (url === "/api/admin/audit" ? audit : usuarios) })));
+function stub(audit: unknown, users: unknown = [{ id: "u-admin", email: "admin@ejemplo.com", rol: "admin", suspendido: false, createdAt: "2026-09-01T10:00:00.000Z" }]) {
+  vi.stubGlobal("fetch", vi.fn((url: string) => Promise.resolve({ ok: true, status: 200, json: async () => (url === "/api/admin/audit" ? audit : users) })));
 }
 
 afterEach(() => vi.unstubAllGlobals());
@@ -19,11 +19,11 @@ describe("AdminAudit (ADM-03)", () => {
     ]);
     render(withClient(<AdminAudit />));
 
-    const filaEliminar = (await screen.findByText("Eliminación")).closest("tr")!;
-    expect(within(filaEliminar).getByText("admin@ejemplo.com")).toBeInTheDocument();
-    expect(within(filaEliminar).getByText("12345678")).toBeInTheDocument();
-    const filaRol = screen.getByText("Cambio de rol").closest("tr")!;
-    expect(within(filaRol).getByText("usuario->premium")).toBeInTheDocument();
+    const deleteRow = (await screen.findByText("Eliminación")).closest("tr")!;
+    expect(within(deleteRow).getByText("admin@ejemplo.com")).toBeInTheDocument();
+    expect(within(deleteRow).getByText("12345678")).toBeInTheDocument();
+    const roleRow = screen.getByText("Cambio de rol").closest("tr")!;
+    expect(within(roleRow).getByText("usuario->premium")).toBeInTheDocument();
   });
 
   it("sin acciones lo dice", async () => {

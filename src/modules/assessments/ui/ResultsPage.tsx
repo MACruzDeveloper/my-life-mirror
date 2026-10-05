@@ -7,20 +7,24 @@ import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
+import { useAiIdeasActive } from "@modules/accounts/ui/queries";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
+import { HistoryTimeline } from "./HistoryTimeline";
 import { ScoreCards } from "./ScoreCards";
 import { useLatestScores } from "./queries";
 
 /**
  * Resultados (dentro de Mi perfil): las tarjetas de detalle de cada categoría
  * activa — última puntuación, nota, fecha y banda — con el botón de la
- * recomendación si la hay. La vista gráfica (evolución) está en Inicio (RF-16).
+ * recomendación si la hay, y el historial de cambios por día (UX-05). La vista
+ * gráfica (evolución) está en Inicio (RF-16).
  */
 export function ResultsPage() {
   const { t } = useTranslation();
   const { data: latestScores, isPending, isError } = useLatestScores();
   // Secundarias: si fallan o tardan, los resultados se ven igual.
   const recommendations = useRecommendations().data ?? [];
+  const personalize = useAiIdeasActive();
   const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
 
   if (isPending || labelsPending) {
@@ -52,7 +56,9 @@ export function ResultsPage() {
           latestScores={latestScores}
           renderCardExtra={(categoryId) => {
             const recommendation = recommendations.find((candidate) => candidate.categoryId === categoryId);
-            return recommendation ? <RecommendationButton templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} /> : null;
+            return recommendation ? (
+              <RecommendationButton recommendationId={recommendation.id} categoryId={recommendation.categoryId} personalize={personalize} templateKey={recommendation.templateKey} categoryName={categoryLabel(recommendation.catalogId).name} />
+            ) : null;
           }}
         />
       )}
@@ -60,6 +66,8 @@ export function ResultsPage() {
         {/* La entrevista es la primera vez; después se actualizan las respuestas, no se "hace otra". */}
         {hasAnswers ? t("entrevista.actualizarRespuestas") : t("resultados.empezar")}
       </Link>
+      {/* UX-05: el historial de cambios vive aquí; en la entrevista queda la última actualización de cada categoría. */}
+      {hasAnswers && <HistoryTimeline />}
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import type { Locale } from "../../../shared/domain/locales.js";
+import type { Locale } from "#shared/domain/locales.js";
 import type { CategoryText } from "./CatalogCategory.js";
 
 /**

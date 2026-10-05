@@ -64,3 +64,4 @@ Para tener un primer paso pequeño, sin que la aplicación me juzgue ni me agobi
 
 - **v1.0 (20 sept. 2026)** — versión inicial.
 - **v1.1 (26 sept. 2026)** — la recomendación pasa de nota en la tarjeta a botón destacado que abre una ventana con la idea y el aviso de RES-05 (`RecommendationButton`).
+- **v1.2 (3 oct. 2026)** — la ventana de la idea es un carrusel con las demás ideas curadas de la categoría (UX-05). Sigue habiendo como mucho una recomendación abierta por categoría: el carrusel enseña alternativas, no crea recomendaciones.
