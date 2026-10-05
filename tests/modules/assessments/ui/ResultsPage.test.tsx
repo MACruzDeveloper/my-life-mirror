@@ -15,6 +15,8 @@ function stub(ok: boolean, body: unknown, recommendations: unknown = []) {
         ? Promise.resolve({ ok: true, json: async () => recommendations })
         : url === "/api/assessments/history"
           ? Promise.resolve({ ok: true, json: async () => HISTORY })
+          : url === "/api/categories/diary"
+            ? Promise.resolve({ ok: true, json: async () => [] })
         : url === "/api/categories/translations"
           ? Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() })
           : Promise.resolve({ ok, json: async () => body }),
@@ -49,7 +51,8 @@ describe("ResultsPage", () => {
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("Bueno", { selector: "[data-band]" })).toHaveAttribute("data-band", "high");
     expect(screen.getByText("Bajo", { selector: "[data-band]" })).toHaveAttribute("data-band", "low");
-    expect(screen.getByText("Poco")).toBeInTheDocument();
+    // RF-44: la nota antigua de la evaluación ya no se enseña (está en el diario de experiencias).
+    expect(screen.queryByText("Poco")).not.toBeInTheDocument();
   });
 
   it("indica las categorías sin puntuar", async () => {

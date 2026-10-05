@@ -21,6 +21,10 @@ import type { IdeaReviewer, IdeaWriter } from "#modules/recommendations/domain/I
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infrastructure/FakeIdeaWriter.js";
 import { InMemoryPersonalizedIdeaRepository } from "#modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository.js";
+import { InMemoryExperienceRepository } from "#modules/assessments/infrastructure/InMemoryExperienceRepository.js";
+import { SupabaseExperienceRepository } from "#modules/assessments/infrastructure/SupabaseExperienceRepository.js";
+import { type ExperienceRepository } from "#modules/assessments/domain/Experience.js";
+import { createAddExperience, createDeleteExperience, createListExperiences } from "#modules/assessments/application/Experiences.js";
 import { JsonIdeaTexts } from "#modules/recommendations/infrastructure/JsonIdeaTexts.js";
 import { SupabasePersonalizedIdeaRepository } from "#modules/recommendations/infrastructure/SupabasePersonalizedIdeaRepository.js";
 import { createSetAiIdeas } from "#modules/accounts/application/SetAiIdeas.js";
@@ -102,6 +106,14 @@ function createAuthProvider(environment: Environment): AuthProvider {
     throw new Error("Falta APP_URL — ver .env.example");
   }
   return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
+}
+
+function createExperienceRepository(environment: Environment): ExperienceRepository {
+  if (environment === "test") {
+    return new InMemoryExperienceRepository();
+  }
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseExperienceRepository(url, serviceRoleKey);
 }
 
 function createPersonalizedIdeaRepository(environment: Environment): PersonalizedIdeaRepository {
@@ -247,6 +259,9 @@ export interface AppContext {
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
   getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
+  addExperience: ReturnType<typeof createAddExperience>;
+  listExperiences: ReturnType<typeof createListExperiences>;
+  deleteExperience: ReturnType<typeof createDeleteExperience>;
   recommendationRepository: RecommendationRepository;
   listRecommendations: ReturnType<typeof createListRecommendations>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
@@ -268,6 +283,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const registerUser = createRegisterUser(authProvider, updateProfile);
   const recommendationRepository = createRecommendationRepository(environment);
   const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
+  const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider();
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
   const generateRecommendations = createGenerateRecommendations({
@@ -296,13 +312,14 @@ export function createAppContext(environment: Environment = detectEnvironment())
       assessmentRepository,
       recommendationRepository,
       personalizedIdeaRepository,
+      experienceRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -334,6 +351,10 @@ export function createAppContext(environment: Environment = detectEnvironment())
     }),
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
     getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
+    // RF-44: el diario de experiencias, separado de las evaluaciones.
+    addExperience: createAddExperience({ experienceRepository, categoryRepository, clock }),
+    listExperiences: createListExperiences(experienceRepository),
+    deleteExperience: createDeleteExperience(experienceRepository),
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
     aiIdeasAvailable: ideaProvider.writer !== undefined,

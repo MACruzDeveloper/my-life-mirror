@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -7,8 +7,7 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import ToggleButton from "@mui/material/ToggleButton";
 import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { keyframes, useTheme } from "@mui/material/styles";
+import { keyframes } from "@mui/material/styles";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import TerrainOutlinedIcon from "@mui/icons-material/TerrainOutlined";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
@@ -26,16 +25,11 @@ import type { RecommendationDto } from "@modules/recommendations/ui/queries";
 import { scoreBand } from "../scoreBand";
 import { Bubble, PendingBadge } from "./Bubble";
 import { PENDING_COLORS } from "./pendingColors";
-import { ExpandToggle } from "./ExpandToggle";
-import { ExperienceNote } from "./ExperienceNote";
+import type { ExperienceDto } from "../queries";
+import { ExperienceJournal } from "./ExperienceJournal";
+import { ToggleRow } from "./ToggleRow";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-/** Oculto a la vista pero leído por el lector de pantalla. */
-const VISUALLY_HIDDEN = { position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" } as const;
-
-/** Fila de un título desplegable y, a su derecha, su "✓ …": nunca se parte, así que al irse el mensaje no salta nada. */
-const TOGGLE_ROW = { display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 } as const;
 
 /** Entrada de una pregunta recién añadida: de la derecha, solo con transform y opacity (las baratas de animar). */
 const slideIn = keyframes`
@@ -51,11 +45,6 @@ export interface LastUpdate {
   previousScore?: number;
 }
 
-export interface LastExperience {
-  note: string;
-  recordedAt: string;
-}
-
 interface CategoryQuestionProps {
   category: CategoryDto;
   /** Añadida en esta visita (UX-06): entra con una animación breve. */
@@ -66,7 +55,6 @@ interface CategoryQuestionProps {
   /** La puntuación que se ve no es la guardada. */
   scoreChanged: boolean;
   lastUpdate?: LastUpdate;
-  lastExperience?: LastExperience;
   saveStatus?: CategorySaveStatus;
   /** Su idea abierta (RF-18), si la tiene: la pregunta ofrece "Ideas para…". */
   recommendation?: RecommendationDto;
@@ -74,40 +62,57 @@ interface CategoryQuestionProps {
   personalizeIdeas: boolean;
   onScore: (categoryId: string, score: number) => void;
   onToggleTag: (category: CategoryDto, tag: string) => void;
-  /** RF-41/RF-42: el servidor acaba de confirmar una opción marcada (para decir qué cambia). */
-  tagFeedback?: "helps" | "difficulties";
+  /** RF-41/RF-42/RF-44: el servidor acaba de confirmar algo de una de sus listas (para decir qué cambia). */
+  tagFeedback?: TagFeedback;
   /** Cuántas veces han cambiado sus ideas en esta visita: cada cambio, un pulso en "Ideas para…". */
   ideasPulse?: number;
   /** RF-42: marcar o desmarcar una situación que se lo pone difícil. */
   onToggleDifficulty: (category: CategoryDto, situation: string) => void;
-  /** Guarda esta categoría; `true` si se guardó (la experiencia escrita vuelve a empezar vacía). */
-  onSave: (categoryId: string, note: string | undefined) => Promise<boolean>;
-  /** Solo cuando pasa de vacía a con texto o al revés (para el progreso); escribir no repinta la página. */
-  onNoteStateChange: (categoryId: string, hasNote: boolean) => void;
+  /** Guarda la puntuación de esta categoría. */
+  onSave: (categoryId: string) => Promise<boolean>;
+  /** RF-44: su diario de experiencias (la más reciente primero) y la recién añadida, si la hay. */
+  experiences: ExperienceDto[];
+  justAddedExperienceId?: string;
+  onAddExperience: (categoryId: string, text: string) => Promise<boolean>;
+  onDeleteExperience: (experience: ExperienceDto) => void;
 }
+
+export type TagFeedback = "helps" | "difficulties" | "experienceAdded" | "experienceDeleted";
 
 /**
  * Una categoría de la entrevista (RF-10): la pregunta con sus ejemplos, la
- * puntuación, "¿Qué te ayuda?" (RF-41), "¿Qué te lo pone difícil?" con una
- * puntuación baja (RF-42), la última actualización y la última
- * experiencia, la experiencia nueva y su propio "Guardar" (UX-05). El texto de
- * la experiencia vive aquí: escribir solo vuelve a pintar esta pregunta.
+ * puntuación con su propio "Guardar" (UX-05), "¿Qué te ayuda?" (RF-41), "¿Qué
+ * te lo pone difícil?" con una puntuación baja (RF-42), el diario de experiencias
+ * (RF-44, con su propio "Añadir") y, debajo, "Ideas para…".
  */
-export function CategoryQuestion({ category, justAdded = false, label, score, scoreChanged, lastUpdate, lastExperience, saveStatus, recommendation, personalizeIdeas, tagFeedback, ideasPulse = 0, onScore, onToggleTag, onToggleDifficulty, onSave, onNoteStateChange }: CategoryQuestionProps) {
+export function CategoryQuestion({
+  category,
+  justAdded = false,
+  label,
+  score,
+  scoreChanged,
+  lastUpdate,
+  saveStatus,
+  recommendation,
+  personalizeIdeas,
+  tagFeedback,
+  ideasPulse = 0,
+  onScore,
+  onToggleTag,
+  onToggleDifficulty,
+  onSave,
+  experiences,
+  justAddedExperienceId,
+  onAddExperience,
+  onDeleteExperience,
+}: CategoryQuestionProps) {
   const { t, i18n } = useTranslation();
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [helpsOpen, setHelpsOpen] = useState(false);
   const [difficultiesOpen, setDifficultiesOpen] = useState(false);
-  const isWide = useMediaQuery(useTheme().breakpoints.up("sm"), { noSsr: true });
-  const noteRef = useRef("");
-  const [hasNote, setHasNote] = useState(false);
-  const hasNoteRef = useRef(false);
-  // Al guardar, el campo de experiencia vuelve a empezar vacío y cerrado.
-  const [noteVersion, setNoteVersion] = useState(0);
-
   const isUnanswered = score === undefined;
   const isSaving = saveStatus?.kind === "saving";
-  const hasChanges = !isUnanswered && (scoreChanged || hasNote);
+  const hasChanges = !isUnanswered && scoreChanged;
   const experienceOptions = experienceOptionsFor(label.key);
   const experienceTags = category.experienceTags ?? [];
   // RF-42: solo con una puntuación baja (el umbral por defecto de RF-18) o una idea abierta.
@@ -115,53 +120,15 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
   const difficultyTags = category.difficultyTags ?? [];
   const asksDifficulties = difficultyOptions.length > 0 && ((score !== undefined && score < DEFAULT_THRESHOLD) || recommendation !== undefined);
   // RF-42: qué cambia de verdad al marcar una opción (sin prometer lo que no pasa: "¿Qué te ayuda?" sin IA no cambia nada visible).
-  // A la derecha del título de su lista, en la misma fila: al irse no hace saltar nada.
-  // En pantallas anchas, visible a la derecha; en móvil no cabe y la confirmación se ve dentro del título
-  // (`savedTagInline`), pero el aviso para el lector de pantalla es siempre este, fuera del botón.
-  const savedTagStatus = (
-    <Typography role="status" variant="body2" sx={isWide ? { display: "flex", alignItems: "center", gap: 0.5, minWidth: 0, color: "success.dark" } : VISUALLY_HIDDEN}>
-      {isWide && <CheckCircleOutlineIcon fontSize="small" sx={{ flexShrink: 0 }} />}
-      <Box component="span" sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {feedbackText()}
-      </Box>
-    </Typography>
-  );
-  const savedTagInline = (
-    <Box component="span" aria-hidden sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, color: "success.dark" }}>
-      <CheckCircleOutlineIcon fontSize="small" />
-      {feedbackText()}
-    </Box>
-  );
-  function feedbackText() {
-    if (!tagFeedback) return null;
+  function feedbackText(kind: TagFeedback) {
+    if (tagFeedback !== kind) return null;
+    if (kind === "experienceAdded") return t("entrevista.experienciaGuardada");
+    if (kind === "experienceDeleted") return t("entrevista.experienciaBorrada");
     if (tagFeedback === "helps" && !personalizeIdeas) return t("entrevista.guardadoSolo");
     if (!recommendation) return t("entrevista.guardadoProximasIdeas");
-    return tagFeedback === "difficulties" ? t("entrevista.guardadoIdeasActualizadas") : t("entrevista.guardadoIdeasEnCuenta");
+    return kind === "difficulties" ? t("entrevista.guardadoIdeasActualizadas") : t("entrevista.guardadoIdeasEnCuenta");
   }
   const formatDate = (isoDate: string) => new Date(isoDate).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" });
-
-  const handleNoteChange = useCallback(
-    (categoryId: string, text: string) => {
-      noteRef.current = text;
-      const nowHasNote = text.trim().length > 0;
-      if (nowHasNote === hasNoteRef.current) return;
-      hasNoteRef.current = nowHasNote;
-      setHasNote(nowHasNote);
-      onNoteStateChange(categoryId, nowHasNote);
-    },
-    [onNoteStateChange],
-  );
-
-  async function save() {
-    const note = noteRef.current.trim();
-    const saved = await onSave(category.id, note || undefined);
-    if (!saved) return;
-    noteRef.current = "";
-    hasNoteRef.current = false;
-    setHasNote(false);
-    onNoteStateChange(category.id, false);
-    setNoteVersion((version) => version + 1);
-  }
 
   return (
     <Box
@@ -214,16 +181,6 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
                 cambio: lastUpdate.previousScore !== undefined ? `${lastUpdate.previousScore} → ${lastUpdate.score}` : String(lastUpdate.score),
               })}
             </Typography>
-            {lastExperience && (
-              <>
-                <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.5 }}>
-                  {t("entrevista.ultimaExperiencia", { fecha: formatDate(lastExperience.recordedAt) })}
-                </Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic", overflowWrap: "anywhere" }}>
-                  «{lastExperience.note}»
-                </Typography>
-              </>
-            )}
           </Box>
         )}
       </Bubble>
@@ -237,7 +194,7 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
               </ToggleButton>
             ))}
           </Box>
-          <Button variant="contained" size="small" aria-label={t("entrevista.guardarCategoria", { categoria: label.name })} disabled={!hasChanges || isSaving} onClick={() => void save()}>
+          <Button variant="contained" size="small" aria-label={t("entrevista.guardarCategoria", { categoria: label.name })} disabled={!hasChanges || isSaving} onClick={() => void onSave(category.id)}>
             {isSaving ? t("entrevista.guardando") : t("entrevista.guardar")}
           </Button>
           {/* Se quita en cuanto la categoría vuelve a tener cambios sin guardar. */}
@@ -250,12 +207,9 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
         </Box>
         {experienceOptions.length > 0 && (
           <Box sx={{ mt: 1 }}>
-            <Box sx={TOGGLE_ROW}>
-              <ExpandToggle icon={<VolunteerActivismOutlinedIcon />} open={helpsOpen} onToggle={() => setHelpsOpen((open) => !open)} status={!isWide && tagFeedback === "helps" ? savedTagInline : undefined}>
-                {experienceTags.length > 0 ? t("entrevista.queTeAyudaMarcadas", { count: experienceTags.length }) : t("entrevista.queTeAyuda")}
-              </ExpandToggle>
-              {tagFeedback === "helps" && savedTagStatus}
-            </Box>
+            <ToggleRow icon={<VolunteerActivismOutlinedIcon />} open={helpsOpen} onToggle={() => setHelpsOpen((open) => !open)} statusText={feedbackText("helps")}>
+              {experienceTags.length > 0 ? t("entrevista.queTeAyudaMarcadas", { count: experienceTags.length }) : t("entrevista.queTeAyuda")}
+            </ToggleRow>
             <Collapse in={helpsOpen} unmountOnExit>
               <Typography variant="caption" color="text.secondary" component="p">
                 {t("entrevista.queTeAyudaTexto")}
@@ -282,12 +236,9 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
         )}
         {asksDifficulties && (
           <Box sx={{ mt: 0.5 }}>
-            <Box sx={TOGGLE_ROW}>
-              <ExpandToggle icon={<TerrainOutlinedIcon />} open={difficultiesOpen} onToggle={() => setDifficultiesOpen((open) => !open)} status={!isWide && tagFeedback === "difficulties" ? savedTagInline : undefined}>
-                {difficultyTags.length > 0 ? t("entrevista.queTeLoPoneDificilMarcadas", { count: difficultyTags.length }) : t("entrevista.queTeLoPoneDificil")}
-              </ExpandToggle>
-              {tagFeedback === "difficulties" && savedTagStatus}
-            </Box>
+            <ToggleRow icon={<TerrainOutlinedIcon />} open={difficultiesOpen} onToggle={() => setDifficultiesOpen((open) => !open)} statusText={feedbackText("difficulties")}>
+              {difficultyTags.length > 0 ? t("entrevista.queTeLoPoneDificilMarcadas", { count: difficultyTags.length }) : t("entrevista.queTeLoPoneDificil")}
+            </ToggleRow>
             <Collapse in={difficultiesOpen} unmountOnExit>
               <Typography variant="caption" color="text.secondary" component="p">
                 {t("entrevista.queTeLoPoneDificilTexto")}
@@ -312,7 +263,13 @@ export function CategoryQuestion({ category, justAdded = false, label, score, sc
             </Collapse>
           </Box>
         )}
-        <ExperienceNote key={noteVersion} categoryId={category.id} onChange={handleNoteChange} />
+        <ExperienceJournal
+          experiences={experiences}
+          justAddedId={justAddedExperienceId}
+          statusText={feedbackText("experienceAdded") ?? feedbackText("experienceDeleted")}
+          onAdd={(text) => onAddExperience(category.id, text)}
+          onDelete={onDeleteExperience}
+        />
         {/* UX-05: con una idea abierta, las ideas están a un toque; debajo de las tres opciones de la pregunta (y cambian con "¿Qué te ayuda?" si RF-40 está activo). */}
         {recommendation && (
           <Box sx={{ mt: 1.5 }}>

@@ -12,17 +12,17 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 ## En curso (límite WIP: 2)
 
 - [ ] **CAT-01** contenido curado como datos (desde el 5 oct.; [historia](../user-stories/CAT-01-contenido-curado-json.md)): las ideas, las situaciones de RF-42, sus choques, las opciones de "¿Qué te ayuda?" y los términos del filtro de IA pasan de constantes en el código a archivos JSON en una carpeta `catalog/` de su módulo, con la forma de las futuras tablas de ADM-04. Para localizarlos y revisarlos sin leer TypeScript, y que migrar a la base de datos sea casi copiar. Sin archivo global de constantes (acoplaría módulos, AGENTS.md).
+- [ ] **RF-44** diario de experiencias (desde el 5 oct.; [historia](../user-stories/RF-44-diario-experiencias.md)): varias experiencias por categoría, "Añadir" sin necesidad de puntuar, lista con fechas y eliminar; tabla propia (las notas de las evaluaciones se copian); enlace a las líneas de ayuda junto al diario.
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
-- [ ] **RF-44** diario de experiencias (confirmada el 5 oct., detrás de CAT-01; [historia](../user-stories/RF-44-diario-experiencias.md)): varias experiencias por categoría, "Añadir" sin necesidad de puntuar, lista con fechas y eliminar; tabla propia (las notas de las evaluaciones se copian); enlace a las líneas de ayuda junto al diario.
 - [ ] **RF-45** la IA propone opciones a partir de una experiencia (confirmada el 5 oct., detrás de RF-44, Could; [historia](../user-stories/RF-45-sugerencias-ia-experiencias.md), Nivel 3): voluntario y por experiencia, solo claves de las listas cerradas, datos personales quitados antes de enviar, sin categorías sensibles. Primero con un *Fake*; el modelo real con RF-40b.
 
 - [ ] **RF-43** lo que funciona a otros (nuevo, Could): con puntuación alta, agregado anónimo de las opciones de RF-41 de quienes van bien en esa categoría, con tamaño mínimo de grupo y posibilidad de excluirse. Primer paso, ligero y sin texto libre, hacia RF-32/RF-33.
 - [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
-- [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
+- [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". También junto al diario de experiencias (RF-44) y a las sugerencias de RF-45. La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
 - [ ] **Demo final** — al terminar el proyecto, para la revisión de los profesores (no antes: solo revisan el proyecto terminado). [Guion](../validation/04_Guion_Demo_Cierre.md) ya preparado; se actualiza entonces con lo que haya del Ciclo 2.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
@@ -154,3 +154,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.44 (5 oct. 2026)** — CAT-01 añadida detrás de RF-42 (contenido curado en JSON por módulo); ADM-04 sigue como idea, a decidir según el tiempo.
 - **v2.45 (5 oct. 2026)** — RF-44 y RF-45 añadidas detrás de CAT-01; el dilema de RF-45 se suma a la validación ética con el tutor.
 - **v2.46 (5 oct. 2026)** — RF-42 hecha (PR #25); CAT-01 en curso.
+- **v2.47 (5 oct. 2026)** — RF-44 en curso, detrás de CAT-01 (en su rama, encima de la de CAT-01).

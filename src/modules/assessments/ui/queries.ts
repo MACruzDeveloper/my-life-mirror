@@ -29,3 +29,19 @@ export function useLatestScores() {
 export function useAssessmentHistory() {
   return useQuery({ queryKey: HISTORY_KEY, queryFn: ({ signal }) => getJson<HistorySessionDto[]>("/api/assessments/history", signal) });
 }
+
+/** RF-44: una experiencia del diario (privada). */
+export interface ExperienceDto {
+  id: string;
+  categoryId: string;
+  text: string;
+  createdAt: string;
+}
+
+/** Fuera de `["assessments"]`: guardar una puntuación no las cambia. Añadir o borrar las actualiza con `setQueryData`. */
+export const EXPERIENCES_KEY = ["experiences"] as const;
+
+/** Las del usuario, la más reciente primero. */
+export function useExperiences() {
+  return useQuery({ queryKey: EXPERIENCES_KEY, queryFn: ({ signal }) => getJson<ExperienceDto[]>("/api/categories/diary", signal) });
+}

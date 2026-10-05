@@ -5,6 +5,12 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-44, diario de experiencias)
+
+- "Tus experiencias (privadas)" en cada pregunta: varias por categoría, con su propio "Añadir" (no hace falta puntuar), "✓ Guardada" en la línea del título, la lista de las 3 más recientes con su fecha y "Ver todas", y borrar cada una con confirmación. Siguen siendo privadas: nunca van a la IA.
+- **Migración 0014** (tabla `experiences`): copia a ella las notas que ya había en las evaluaciones, con su fecha; ejecutarla antes de desplegar. La nota original se conserva en su evaluación (inmutable, RF-12), pero la interfaz ya solo enseña las experiencias: en la entrevista, en el historial de Resultados (en su día, también los días sin puntuaciones) y no en las tarjetas. Acción `/api/categories/diary` (sin función nueva: 11/12). Entran en la exportación y el borrado de datos (RF-05).
+- "Guardar" vuelve a ser solo para la puntuación (antes también se activaba al escribir la nota).
+
 ### Cambiado (CAT-01, contenido curado como datos)
 
 - Las ideas del catálogo, las situaciones de RF-42 con sus choques, las opciones de "¿Qué te ayuda?" y los términos del filtro de IA pasan de constantes en el código a JSON en `domain/catalog/` de su módulo (`ideas.json`, `situations.json`, `safetyTerms.json`, `helpOptions.json`), con la forma de las futuras tablas de ADM-04. Sin cambios de comportamiento: los tests de siempre pasan sin tocarlos.

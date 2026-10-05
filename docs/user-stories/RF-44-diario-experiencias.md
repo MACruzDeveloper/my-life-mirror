@@ -17,8 +17,10 @@ Hasta ahora, "Tu experiencia (privada)" era una nota que solo se guardaba junto 
 - **La lista** de experiencias de la categoría, la más reciente primero, con su fecha. Se ven las 3 últimas y "Ver todas (N)".
 - **Eliminar** cada una (con confirmación: no se puede deshacer).
 - **Siguen siendo privadas:** solo las ve el usuario; nunca se comparten ni van a la IA, salvo que el usuario lo pida expresamente para una experiencia concreta (RF-45). El aviso del campo se mantiene.
-- **Junto al diario, siempre, el enlace a las líneas de ayuda (RF-30):** ayuda ofrecida a todos, sin detectar nada (RES-09).
-- **Datos:** una tabla propia, `experiences` (usuario, categoría, texto, fecha), separada de las evaluaciones, que siguen siendo inmutables. Las notas que ya existen en las evaluaciones se copian a la tabla nueva (migración), y la evaluación deja de recibir nota. Entran en la exportación y se borran con la cuenta (RF-05). El historial de Resultados las enseña en su día.
+- **El enlace a las líneas de ayuda junto al diario** (ayuda ofrecida a todos, sin detectar nada, RES-09) llega con RF-30, que aún no tiene pantalla a la que enlazar.
+- **Datos:** una tabla propia, `experiences` (usuario, categoría, texto, fecha), separada de las evaluaciones, que siguen siendo inmutables. Las notas que ya existen en las evaluaciones se copian a la tabla nueva (migración, con la fecha de su evaluación), y la entrevista deja de enviar nota al guardar. La nota original se conserva en su evaluación como dato histórico (RF-12), pero la interfaz ya no la enseña: las experiencias se ven desde su tabla, para no verlas dos veces. Entran en la exportación y se borran con la cuenta (RF-05).
+- **Dónde se ven:** la lista en cada pregunta (sustituye a "Tu última experiencia") y el historial de Resultados, en su día.
+- **"Guardar" vuelve a ser solo para la puntuación:** escribir una experiencia ya no lo activa (tiene su propio "Añadir").
 - **API:** acciones `experiences` (listar, añadir y borrar) en un router existente, sin función nueva.
 - **Fuera de alcance:** editar una experiencia (se borra y se escribe otra), adjuntos, compartirlas y la IA (RF-45).
 
@@ -42,7 +44,7 @@ Hasta ahora, "Tu experiencia (privada)" era una nota que solo se guardaba junto 
 
 5. Given el diario de una categoría
    When lo mira
-   Then ve el aviso de privacidad y el enlace a las líneas de ayuda
+   Then ve el aviso de privacidad (el enlace a las líneas de ayuda llega con RF-30)
 
 6. Given experiencias guardadas
    When exporta o borra su cuenta (RF-05)
@@ -51,3 +53,4 @@ Hasta ahora, "Tu experiencia (privada)" era una nota que solo se guardaba junto 
 ## Historial de cambios
 
 - **v1.0 (5 oct. 2026)** — versión inicial. Petición del autor: "al añadir una experiencia no veo que afecte a la app… el usuario debe poder añadir más de una experiencia, y también eliminarlas".
+- **v1.1 (5 oct. 2026)** — antes de implementarla: el enlace a las líneas de ayuda pasa a RF-30 (no tiene pantalla todavía); la nota antigua se conserva en su evaluación pero solo se enseñan las experiencias; "Guardar" vuelve a ser solo para la puntuación.
