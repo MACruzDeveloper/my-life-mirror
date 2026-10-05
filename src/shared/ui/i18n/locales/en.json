@@ -104,7 +104,9 @@
     "contactoTitulo": "Contact",
     "contactoTexto": "This is an academic project (master's thesis) — for any question about your data, contact the project's developer directly.",
     "iaTitulo": "AI-personalised ideas",
-    "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive area, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\" and the app's ideas for that category. Your name, your email, your private experiences and sensitive categories are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted."
+    "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive area, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\" and the app's ideas for that category. For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted.",
+    "iaSugerenciasTitulo": "AI suggestions from your experiences",
+    "iaSugerenciasTexto": "This is also optional, separate from the above and off by default. If you turn it on in Privacy and data, each experience in your diary shows “Suggest options with AI”: pressing it sends to Anthropic, as data processor, only the experience you ask to analyse, together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you and doesn't assess how you are. Before sending it we remove emails, phone numbers, links and long numbers; names can't be removed reliably, so we ask you not to write other people's names if you don't want them sent. Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent. You can turn it off whenever you like; only the options you accept remain from the AI."
   },
   "entrevista": {
     "titulo": "Your interview",
@@ -199,7 +201,20 @@
     "borrar": "Delete",
     "cancelar": "Cancel",
     "errorExperienciaGuardar": "Your experience could not be saved",
-    "errorExperienciaBorrar": "Your experience could not be deleted"
+    "errorExperienciaBorrar": "Your experience could not be deleted",
+    "sugerirConIa": "Suggest options with AI",
+    "sugerirAviso": "Before sending it we remove emails, phone numbers, links and long numbers. Don't write other people's names if you don't want them sent.",
+    "iaSugiere": "The AI suggests:",
+    "sugeridoPorIa": "Suggested by AI",
+    "aceptarSugerencia": "Mark “{{opcion}}”",
+    "descartarSugerencia": "Dismiss “{{opcion}}”",
+    "sinSugerencias": "We didn't find any options in this experience.",
+    "sugiriendo": "Thinking of suggestions…",
+    "experienciasPrivadasConIa": "Only you can see them. They're never shared; only the one you ask to analyse goes to the AI.",
+    "sugerenciasPista": "Want the AI to suggest options from your experiences?",
+    "sugerenciasPistaEnlace": "Turn them on in Privacy and data",
+    "avisoOfensivo": "This experience has words we'd rather not send to the AI. You can delete it and write it another way, or send it anyway.",
+    "enviarIgualmente": "Send anyway"
   },
   "resultados": {
     "titulo": "Your results",
@@ -373,7 +388,7 @@
     "exportando": "Preparing…",
     "errorExportar": "Your data could not be exported",
     "eliminarTitulo": "Delete my account",
-    "eliminarTexto": "Deletes your account and everything linked to it: profile, categories, consents and scores. It's your right and free of charge, but it can't be undone.",
+    "eliminarTexto": "Deletes your account and everything linked to it: profile, categories, consents, scores and experiences. It's your right and free of charge, but it can't be undone.",
     "eliminar": "Delete my account",
     "dialogoTitulo": "Delete your account forever?",
     "dialogoTexto": "This can't be undone. Your profile, categories, consents, all your scores and your experiences will be erased, and you won't be able to sign in with this email again. If you want to keep anything, download your data first.",
@@ -385,10 +400,15 @@
     "errorUltimoAdmin": "You are the only administrator and there must always be one: you can't delete your account until you create another administrator (by granting the role to another account).",
     "iaTitulo": "AI-personalised ideas",
     "iaActivar": "AI-personalised ideas",
-    "iaQueSeEnvia": "If you turn this on, when you open an idea for an area, an AI service (Anthropic) is asked to pick and rewrite one of the app's ideas based on your score, whether it's going up or down, and the options you ticked in \"What helps you?\".",
-    "iaQueNunca": "Your name, your email, your private experiences and sensitive categories are never sent.",
+    "iaQueSeEnvia": "If you turn this on, when you open an idea for an area, an AI service (Anthropic) is asked to rewrite the app's idea you're looking at based on your score, whether it's going up or down, and the options you ticked in \"What helps you?\".",
+    "iaQueNunca": "For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent.",
     "iaRevocable": "It's off by default. You can turn it off at any time: personalised ideas are deleted and you see the usual ideas again.",
-    "iaError": "The change could not be saved"
+    "iaError": "The change could not be saved",
+    "sugerenciasTitulo": "AI suggestions from your experiences",
+    "sugerenciasQueSeEnvia": "If you turn it on, each experience in your diary shows “Suggest options with AI”. When you press it, only the experience you ask to analyse is sent to an AI service (Anthropic), together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you.",
+    "sugerenciasQueSeQuita": "Before sending it we remove emails, phone numbers, links and long numbers. Names can't be removed reliably: if you don't want them sent, don't write other people's names.",
+    "sugerenciasQueNunca": "Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent.",
+    "sugerenciasRevocable": "It's off by default and you can turn it off whenever you like. Only the options you accept remain from the AI."
   },
   "recomendaciones": {
     "ideaAnterior": "Previous idea",

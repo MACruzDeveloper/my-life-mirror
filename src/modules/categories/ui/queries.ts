@@ -20,6 +20,8 @@ export interface CategoryDto {
 export interface CatalogLabelDto {
   catalogId: string;
   key?: string;
+  /** RF-45: fuera de la IA. */
+  aiExcluded?: boolean;
   translations: Partial<Record<Locale, { name: string; description: string }>>;
 }
 

@@ -5,6 +5,8 @@ import type { CategoryCatalogRepository } from "../domain/CategoryCatalogReposit
 export interface CatalogLabel {
   catalogId: string;
   key?: string;
+  /** RF-45: fuera de la IA (la interfaz no ofrece sugerencias en ella). */
+  aiExcluded?: boolean;
   translations: Partial<Record<Locale, CategoryText>>;
 }
 
@@ -19,6 +21,7 @@ export function createListCatalogLabels(catalog: CategoryCatalogRepository) {
     return (await catalog.findAll()).map((entry) => ({
       catalogId: entry.id,
       ...(entry.key ? { key: entry.key } : {}),
+      ...(entry.aiExcluded ? { aiExcluded: true } : {}),
       translations: entry.translations,
     }));
   };

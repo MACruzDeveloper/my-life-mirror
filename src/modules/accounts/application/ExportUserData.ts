@@ -19,6 +19,8 @@ export interface UserDataExport {
   recommendations: { category: string; templateKey: string; status: string; createdAt: string }[];
   /** RF-40: si activó las ideas con IA y cuándo, y las ideas que se le personalizaron. */
   aiIdeas: { enabled: boolean; enabledAt?: string };
+  /** RF-45: si tiene activadas las sugerencias a partir de sus experiencias, y desde cuándo. */
+  aiSuggestions: { enabled: boolean; enabledAt?: string };
   personalizedIdeas: { category: string; locale: string; templateKey: string; text: string; model: string; createdAt: string }[];
   /** RF-44: el diario de experiencias, de la más antigua a la más reciente. */
   experiences: { category: string; text: string; createdAt: string }[];
@@ -72,6 +74,7 @@ export function createExportUserData({ profileRepository, categoryRepository, co
       consents: consents.map((c) => ({ category: names.get(c.categoryId) ?? "", policyVersion: c.policyVersion, grantedAt: c.grantedAt.toISOString() })),
       recommendations: recommendations.map((r) => ({ category: names.get(r.categoryId) ?? "", templateKey: r.templateKey, status: r.status, createdAt: r.createdAt.toISOString() })),
       aiIdeas: { enabled: profile?.aiIdeasEnabled === true, ...(profile?.aiIdeasEnabledAt ? { enabledAt: profile.aiIdeasEnabledAt } : {}) },
+      aiSuggestions: { enabled: profile?.aiSuggestionsEnabled === true, ...(profile?.aiSuggestionsEnabledAt ? { enabledAt: profile.aiSuggestionsEnabledAt } : {}) },
       personalizedIdeas: personalizedIdeas.map((idea) => {
         const categoryId = recommendations.find((r) => r.id === idea.recommendationId)?.categoryId;
         return { category: (categoryId && names.get(categoryId)) || "", locale: idea.locale, templateKey: idea.templateKey, text: idea.text, model: idea.model, createdAt: idea.createdAt.toISOString() };

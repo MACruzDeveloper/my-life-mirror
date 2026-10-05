@@ -104,7 +104,9 @@
     "contactoTitulo": "Contacto",
     "contactoTexto": "Este es un proyecto académico (TFM) — para cualquier duda sobre tus datos, contacta directamente con quien desarrolla el proyecto.",
     "iaTitulo": "Ideas personalizadas con IA",
-    "iaTexto": "Es opcional y está desactivado por defecto. Si lo activas en Privacidad y datos, al abrir una idea para un área no sensible se envían a Anthropic, que actúa como encargado del tratamiento: la categoría, tu última puntuación y si va a mejor o a peor, las opciones que hayas marcado en \"¿Qué te ayuda?\" y las ideas de la app para esa categoría. Nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles. La idea resultante se guarda en tu cuenta para no volver a pedirla. Puedes desactivarlo cuando quieras y se borran las ideas personalizadas."
+    "iaTexto": "Es opcional y está desactivado por defecto. Si lo activas en Privacidad y datos, al abrir una idea para un área no sensible se envían a Anthropic, que actúa como encargado del tratamiento: la categoría, tu última puntuación y si va a mejor o a peor, las opciones que hayas marcado en \"¿Qué te ayuda?\" y las ideas de la app para esa categoría. Para estas ideas, nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles, ni la de Pareja. La idea resultante se guarda en tu cuenta para no volver a pedirla. Puedes desactivarlo cuando quieras y se borran las ideas personalizadas.",
+    "iaSugerenciasTitulo": "Sugerencias de la IA a partir de tus experiencias",
+    "iaSugerenciasTexto": "También es opcional, aparte de lo anterior y desactivado por defecto. Si lo activas en Privacidad y datos, en cada experiencia de tu diario aparece «Sugerir opciones con IA»: al pulsarlo se envía a Anthropic, como encargado del tratamiento, solo la experiencia que tú le pidas analizar, junto con las opciones posibles de esa categoría, para que te proponga cuáles marcar en «¿Qué te ayuda?» o «¿Qué te lo pone difícil?». Tú aceptas o descartas cada propuesta; la IA no escribe nada sobre ti ni valora tu estado. Antes de enviarla quitamos emails, teléfonos, enlaces y números largos; los nombres no se pueden quitar con seguridad, así que te pedimos que no escribas nombres de otras personas si no quieres que se envíen. Nunca se envían tu nombre, tu email, tus puntuaciones ni las experiencias que no pidas analizar, y nunca se envían las categorías sensibles ni la de Pareja. Puedes desactivarlo cuando quieras; de la IA solo quedan las opciones que aceptes."
   },
   "entrevista": {
     "titulo": "Tu entrevista",
@@ -199,7 +201,20 @@
     "borrar": "Borrar",
     "cancelar": "Cancelar",
     "errorExperienciaGuardar": "No se pudo guardar tu experiencia",
-    "errorExperienciaBorrar": "No se pudo borrar tu experiencia"
+    "errorExperienciaBorrar": "No se pudo borrar tu experiencia",
+    "sugerirConIa": "Sugerir opciones con IA",
+    "sugerirAviso": "Antes de enviarla quitamos emails, teléfonos, enlaces y números largos. No escribas nombres de otras personas si no quieres que se envíen.",
+    "iaSugiere": "La IA sugiere:",
+    "sugeridoPorIa": "Sugerido por IA",
+    "aceptarSugerencia": "Marcar «{{opcion}}»",
+    "descartarSugerencia": "Descartar «{{opcion}}»",
+    "sinSugerencias": "No hemos encontrado opciones en esta experiencia.",
+    "sugiriendo": "Pensando sugerencias…",
+    "experienciasPrivadasConIa": "Solo las ves tú. Nunca se comparten; a la IA solo va la que tú le pidas analizar.",
+    "sugerenciasPista": "¿Quieres que la IA te sugiera opciones a partir de tus experiencias?",
+    "sugerenciasPistaEnlace": "Actívalas en Privacidad y datos",
+    "avisoOfensivo": "Esta experiencia tiene palabras que preferimos no enviar a la IA. Puedes borrarla y escribirla de otra forma, o enviarla igualmente.",
+    "enviarIgualmente": "Enviar igualmente"
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -373,7 +388,7 @@
     "exportando": "Preparando…",
     "errorExportar": "No se pudieron exportar tus datos",
     "eliminarTitulo": "Eliminar mi cuenta",
-    "eliminarTexto": "Borra tu cuenta y todo lo asociado: perfil, categorías, consentimientos y puntuaciones. Es tu derecho y no tiene coste, pero no se puede deshacer.",
+    "eliminarTexto": "Borra tu cuenta y todo lo asociado: perfil, categorías, consentimientos, puntuaciones y experiencias. Es tu derecho y no tiene coste, pero no se puede deshacer.",
     "eliminar": "Eliminar mi cuenta",
     "dialogoTitulo": "¿Eliminar tu cuenta para siempre?",
     "dialogoTexto": "Esto no se puede deshacer. Se borrarán tu perfil, tus categorías, tus consentimientos, todas tus puntuaciones y tus experiencias, y no podrás volver a entrar con este email. Si quieres conservar algo, descarga tus datos antes.",
@@ -385,10 +400,15 @@
     "errorUltimoAdmin": "Eres el único administrador y siempre debe existir uno: no puedes eliminar tu cuenta hasta que crees otro administrador (concediendo el rol a otra cuenta).",
     "iaTitulo": "Ideas personalizadas con IA",
     "iaActivar": "Ideas personalizadas con IA",
-    "iaQueSeEnvia": "Si lo activas, cuando abras una idea para un área se pide a un servicio de IA (Anthropic) que elija y reescriba una de las ideas de la app teniendo en cuenta tu puntuación, si va a mejor o a peor y las opciones que hayas marcado en \"¿Qué te ayuda?\".",
-    "iaQueNunca": "Nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles.",
+    "iaQueSeEnvia": "Si lo activas, cuando abras una idea para un área se pide a un servicio de IA (Anthropic) que reescriba la idea de la app que estés viendo teniendo en cuenta tu puntuación, si va a mejor o a peor y las opciones que hayas marcado en \"¿Qué te ayuda?\".",
+    "iaQueNunca": "Para estas ideas, nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles, ni la de Pareja.",
     "iaRevocable": "Está desactivado por defecto. Puedes desactivarlo cuando quieras: se borran las ideas personalizadas y vuelves a ver las ideas de siempre.",
-    "iaError": "No se pudo guardar el cambio"
+    "iaError": "No se pudo guardar el cambio",
+    "sugerenciasTitulo": "Sugerencias de la IA a partir de tus experiencias",
+    "sugerenciasQueSeEnvia": "Si lo activas, en cada experiencia de tu diario aparece «Sugerir opciones con IA». Al pulsarlo, se envía a un servicio de IA (Anthropic) solo la experiencia que tú le pidas analizar, junto con las opciones posibles de esa categoría, para que te proponga cuáles marcar en «¿Qué te ayuda?» o «¿Qué te lo pone difícil?». Tú aceptas o descartas cada propuesta; la IA no escribe nada sobre ti.",
+    "sugerenciasQueSeQuita": "Antes de enviarla quitamos emails, teléfonos, enlaces y números largos. Los nombres no se pueden quitar con seguridad: si no quieres que se envíen, no escribas nombres de otras personas.",
+    "sugerenciasQueNunca": "Nunca se envían tu nombre, tu email, tus puntuaciones ni las experiencias que no pidas analizar, y nunca se envían las categorías sensibles ni la de Pareja.",
+    "sugerenciasRevocable": "Está desactivado por defecto y puedes desactivarlo cuando quieras. De la IA solo quedan las opciones que aceptes."
   },
   "recomendaciones": {
     "ideaAnterior": "Idea anterior",

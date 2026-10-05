@@ -1,5 +1,10 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// La entrevista entera en jsdom (MUI, varias consultas, una pregunta por categoría) tarda ~1 s por test
+// solo; con toda la batería en paralelo puede multiplicarse y rozar los 5 s por defecto. Medido el 5 oct.:
+// no es una regresión (antes de RF-44 ya iba a ~0,64 s por test), así que se ajusta el límite solo aquí.
+vi.setConfig({ testTimeout: 15_000 });
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
@@ -46,7 +51,9 @@ interface StubOptions {
   experiences?: unknown;
 }
 
-function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = EXPERIENCES }: StubOptions = {}) {
+// Por defecto, el diario vacío: cada experiencia añade botones a la página y encarece todas las búsquedas por rol.
+
+function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [] }: StubOptions = {}) {
   const fetchMock: ReturnType<typeof vi.fn> = vi.fn((url: string, init?: RequestInit) => {
     if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => CATEGORIES });
     if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
@@ -279,6 +286,24 @@ describe("InterviewPage (RF-10)", () => {
       expect(currentStep()).toBeNull();
       expect(screen.queryByRole("button", { name: "Empezar" })).not.toBeInTheDocument();
     });
+  });
+
+  it("si la carga falla, lo dice y deja reintentar (sin reintentos automáticos)", async () => {
+    let categoriesCalls = 0;
+    const fetchMock = stubFetch();
+    const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+    fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+      if (url === "/api/categories" && (categoriesCalls += 1) === 1) return Promise.resolve({ ok: false, status: 500, json: async () => ({ error: "caído" }) });
+      return defaultImplementation(url, init);
+    });
+    renderPage();
+
+    const alert = await screen.findByText("No se pudieron cargar tus categorías");
+    fireEvent.click(within(alert.closest("[role=alert]") as HTMLElement).getByRole("button", { name: "Reintentar" }));
+
+    await waitUntilLoaded();
+    expect(screen.queryByText("No se pudieron cargar tus categorías")).not.toBeInTheDocument();
+    expect(categoriesCalls).toBe(2);
   });
 
   it("lista todas las categorías; las activas salen marcadas y con su pregunta", async () => {
@@ -659,7 +684,7 @@ describe("InterviewPage (RF-10)", () => {
     }
 
     it("enseña las 3 más recientes de cada categoría, con su fecha, y 'Ver todas (N)'", async () => {
-      stubFetch();
+      stubFetch({ experiences: EXPERIENCES });
       renderPage();
       await waitUntilLoaded();
 
@@ -675,7 +700,7 @@ describe("InterviewPage (RF-10)", () => {
     });
 
     it("'Añadir' guarda la experiencia al momento, sin puntuar: 'Guardada' y arriba de la lista; 'Guardar' no se activa", async () => {
-      const fetchMock = stubFetch();
+      const fetchMock = stubFetch({ experiences: EXPERIENCES });
       renderPage();
       await waitUntilLoaded();
       fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
@@ -692,7 +717,7 @@ describe("InterviewPage (RF-10)", () => {
     });
 
     it("borrar pide confirmación y la quita de la lista", async () => {
-      const fetchMock = stubFetch();
+      const fetchMock = stubFetch({ experiences: EXPERIENCES });
       renderPage();
       await waitUntilLoaded();
 
@@ -705,7 +730,7 @@ describe("InterviewPage (RF-10)", () => {
     });
 
     it("la X del campo lo borra y lo cierra", async () => {
-      stubFetch();
+      stubFetch({ experiences: EXPERIENCES });
       renderPage();
       await waitUntilLoaded();
       fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
@@ -715,6 +740,128 @@ describe("InterviewPage (RF-10)", () => {
 
       expect(within(question("c1")).queryByLabelText("Nueva experiencia")).not.toBeInTheDocument();
       expect(within(question("c1")).getByRole("button", { name: /tus experiencias/i })).toHaveAttribute("aria-expanded", "false");
+    });
+  });
+
+  describe("sugerencias de la IA a partir de una experiencia (RF-45)", () => {
+    function renderWithAi({ suggestionsEnabled, suggestion, experiences }: { suggestionsEnabled: boolean; suggestion?: unknown; experiences?: unknown[] }) {
+      const fetchMock = stubFetch({ experiences: experiences ?? [...EXPERIENCES, { id: "e-sport", categoryId: "c2", text: "Me cuesta salir a correr", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ ok: true, json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable: true }) });
+        if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiSuggestionsEnabled: suggestionsEnabled }) });
+        if (url === "/api/recommendations/suggest-options") return Promise.resolve({ ok: true, json: async () => suggestion ?? { helps: [], difficulties: [] } });
+        return defaultImplementation(url, init);
+      });
+      render(
+        withClient(
+          <MemoryRouter>
+            <SessionProvider>
+              <InterviewPage />
+            </SessionProvider>
+          </MemoryRouter>,
+        ),
+      );
+      return fetchMock;
+    }
+
+    function experienceItem(text: string) {
+      return within(question("c1")).getByText(text).closest("li") as HTMLElement;
+    }
+
+    it("sin activarlas, ninguna experiencia ofrece sugerencias, pero el diario dice dónde activarlas", async () => {
+      renderWithAi({ suggestionsEnabled: false });
+      await waitUntilLoaded();
+      await within(question("c1")).findByText("Mes justo");
+
+      expect(screen.queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+      expect(await within(question("c1")).findByRole("link", { name: "Actívalas en Privacidad y datos" })).toHaveAttribute("href", "/perfil/datos");
+      expect(within(question("c2")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("Pareja está excluida de la IA: ni botón ni aviso, aunque estén activadas", async () => {
+      renderWithAi({ suggestionsEnabled: true, experiences: [{ id: "e-pareja", categoryId: "c3", text: "Nos cuesta hablar", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      await waitUntilLoaded();
+      toggleCategory("pareja");
+
+      expect(await within(question("c3")).findByText("Nos cuesta hablar")).toBeInTheDocument();
+      expect(within(question("c3")).queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+      expect(within(question("c3")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("activadas, el aviso de dónde activarlas ya no sale", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+      await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" });
+
+      expect(within(question("c1")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("activadas, cada experiencia de una categoría no sensible lo ofrece (con el aviso sobre los nombres); las sensibles no", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+
+      expect(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" })).toBeInTheDocument();
+      expect(within(question("c1")).getAllByText(/no escribas nombres de otras personas/i).length).toBeGreaterThan(0);
+      expect(within(question("c2")).queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+    });
+
+    it("pide las sugerencias de esa experiencia y las enseña, de la IA, sin marcarlas todavía", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, suggestion: { helps: ["economia.apps"], difficulties: ["mirarMisCuentas"] } });
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+
+      const item = experienceItem("Mes justo");
+      expect(await within(item).findByText("La IA sugiere:")).toBeInTheDocument();
+      expect(within(item).getByText("Sugerido por IA")).toBeInTheDocument();
+      expect(within(item).getByRole("button", { name: "Marcar «Apps de finanzas»" })).toBeInTheDocument();
+      expect(within(item).getByRole("button", { name: "Marcar «Mirar mis cuentas»" })).toBeInTheDocument();
+      const body = JSON.parse(postCalls(fetchMock, "/api/recommendations/suggest-options")[0][1].body as string);
+      expect(body).toEqual({ experienceId: "e2", locale: "es" });
+      expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(0);
+    });
+
+    it("aceptar una la marca como si la tocara el usuario; descartar otra solo la quita", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, suggestion: { helps: ["economia.apps"], difficulties: ["mirarMisCuentas"] } });
+      await waitUntilLoaded();
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+      const item = experienceItem("Mes justo");
+
+      fireEvent.click(await within(item).findByRole("button", { name: "Marcar «Mirar mis cuentas»" }));
+      fireEvent.click(within(item).getByRole("button", { name: "Descartar «Apps de finanzas»" }));
+
+      await waitFor(() => expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(1));
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/difficulties")[0][1].body as string)).toEqual({ categoryId: "c1", tags: ["mirarMisCuentas"] });
+      expect(postCalls(fetchMock, "/api/categories/experience")).toHaveLength(0);
+      expect(within(item).queryByRole("button", { name: /Mirar mis cuentas|Apps de finanzas/ })).not.toBeInTheDocument();
+    });
+
+    it("con palabras ofensivas, avisa antes de enviar nada; 'Cancelar' no envía y 'Enviar igualmente' sí", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, experiences: [{ id: "e-mal", categoryId: "c1", text: "Mi jefe es un gilipollas y no me sube el sueldo", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      await waitUntilLoaded();
+      const item = () => experienceItem("Mi jefe es un gilipollas y no me sube el sueldo");
+
+      fireEvent.click(await within(item()).findByRole("button", { name: "Sugerir opciones con IA" }));
+      expect(within(item()).getByText(/tiene palabras que preferimos no enviar a la ia/i)).toBeInTheDocument();
+      expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(0);
+
+      fireEvent.click(within(item()).getByRole("button", { name: "Cancelar" }));
+      expect(within(item()).getByRole("button", { name: "Sugerir opciones con IA" })).toBeInTheDocument();
+      expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(0);
+
+      fireEvent.click(within(item()).getByRole("button", { name: "Sugerir opciones con IA" }));
+      fireEvent.click(within(item()).getByRole("button", { name: "Enviar igualmente" }));
+      await waitFor(() => expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(1));
+    });
+
+    it("si no hay nada que proponer, lo dice", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+
+      expect(await within(experienceItem("Mes justo")).findByText("No hemos encontrado opciones en esta experiencia.")).toBeInTheDocument();
     });
   });
 

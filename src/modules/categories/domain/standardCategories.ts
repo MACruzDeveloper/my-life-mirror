@@ -14,6 +14,8 @@ import type { CategoryText } from "./CatalogCategory.js";
 export interface StandardCategoryTemplate {
   readonly key: string;
   readonly isSensitiveData: boolean;
+  /** RF-45: fuera de la IA sin ser sensible (ver `CatalogCategory.aiExcluded`). */
+  readonly aiExcluded?: boolean;
   /** Obligatorio en cada idioma soportado: el compilador avisa si se añade uno sin traducir. */
   readonly translations: Record<Locale, CategoryText>;
 }
@@ -38,6 +40,7 @@ export const STANDARD_CATEGORIES: readonly StandardCategoryTemplate[] = [
   {
     key: "pareja",
     isSensitiveData: false,
+    aiExcluded: true,
     translations: {
       es: { name: "Pareja", description: "Tu relación de pareja, si la tienes." },
       en: { name: "Relationship", description: "Your relationship with your partner, if you have one." },

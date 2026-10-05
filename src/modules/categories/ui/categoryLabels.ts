@@ -8,6 +8,8 @@ export interface CategoryLabel {
   description: string;
   /** Clave estable de las categorías estándar (ejemplos de la entrevista, plantillas). */
   key?: string;
+  /** RF-45: fuera de la IA (además de las sensibles). */
+  aiExcluded?: boolean;
 }
 
 const EMPTY_LABEL: CategoryLabel = { name: "", description: "" };
@@ -23,7 +25,7 @@ export function resolveCategoryLabel(labelsById: Map<string, CatalogLabelDto>, c
   const locale = isSupportedLocale(language) ? language : DEFAULT_LOCALE;
   const text = entry.translations[locale] ?? entry.translations[DEFAULT_LOCALE];
   if (!text) return EMPTY_LABEL;
-  return { name: text.name, description: text.description, ...(entry.key ? { key: entry.key } : {}) };
+  return { name: text.name, description: text.description, ...(entry.key ? { key: entry.key } : {}), ...(entry.aiExcluded ? { aiExcluded: true } : {}) };
 }
 
 /**

@@ -7,4 +7,6 @@ export interface IdeaTexts {
   candidatesFor(categoryKey: string, locale: Locale): IdeaCandidate[];
   /** Textos de las opciones de RF-41, en ese idioma; las desconocidas se descartan. */
   experienceLabels(tags: readonly string[], locale: Locale): string[];
+  /** RF-45: textos de las situaciones de RF-42, en ese idioma; las desconocidas se descartan. */
+  situationLabels(keys: readonly string[], locale: Locale): string[];
 }
