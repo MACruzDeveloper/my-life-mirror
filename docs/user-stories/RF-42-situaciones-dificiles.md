@@ -25,7 +25,7 @@ Para que la app no me proponga ideas que no puedo o no quiero hacer (si me cuest
 
 ## Reglas
 
-**Situaciones** (clave · texto en español):
+**Situaciones** (clave · texto en español; las claves y su orden, en `situations.json` desde CAT-01):
 
 | Clave | Texto |
 |---|---|
@@ -41,21 +41,7 @@ Para que la app no me proponga ideas que no puedo o no quiero hacer (si me cuest
 | `cambiosDeRutina` | Cambiar mi rutina |
 | `pocoTiempoLibre` | Tener poco tiempo libre |
 
-**Ideas que chocan con cada situación:**
-
-| Situación | Ideas |
-|---|---|
-| `salirDeCasa` | deporte.1, deporte.4, deporte.5, aventura.1, aventura.4, espiritualidad.5, vidaSocial.2 |
-| `sitiosConGente` | vidaSocial.5, aventura.4 |
-| `darElPrimerPaso` | vidaSocial.1, vidaSocial.2, vidaSocial.3, vidaSocial.5, familia.2, familia.4 |
-| `actividadesEnGrupo` | vidaSocial.3, vidaSocial.5 |
-| `hablarDeLoQueSiento` | economia.5, pareja.3, sexo.1, familia.5 |
-| `llamarPorTelefono` | familia.1 |
-| `contactoConFamilia` | familia.1, familia.2, familia.3, familia.4, familia.5 |
-| `apuntarYRegistrar` | economia.1, economia.4, aventura.2, espiritualidad.2, inversiones.3, general.1 |
-| `mirarMisCuentas` | economia.1, inversiones.1 |
-| `cambiosDeRutina` | aventura.1, pareja.4, deporte.4 |
-| `pocoTiempoLibre` | deporte.2, inversiones.1 |
+**Ideas que chocan con cada situación:** desde CAT-01 viven como datos en [`situations.json`](../../src/modules/recommendations/domain/catalog/situations.json) (`clashesWith` de cada situación), la única fuente; los tests del catálogo comprueban que cada choque apunta a una idea que existe. Para revisarlos o cambiarlos, se edita ese archivo.
 
 **Ideas permitidas** para una categoría y lo marcado en ella: sus ideas menos las que chocan; si no queda ninguna, las generales menos las que chocan. Las ofrecidas en una categoría son las situaciones de la tabla que tocan alguna de sus ideas (las de una categoría sin ideas propias, las que tocan las generales), en el orden de la tabla.
 
@@ -102,3 +88,4 @@ Para que la app no me proponga ideas que no puedo o no quiero hacer (si me cuest
 - **v1.0 (5 oct. 2026)** — versión inicial. La lista de situaciones y la tabla de choques, pendientes de revisión del autor.
 - **v1.1 (5 oct. 2026)** — reacción al marcar una opción (aquí y en "¿Qué te ayuda?"): "✓ Guardado" con lo que cambia y, cuando cambian las ideas, su número y un pulso en "Ideas para…". "Guardar" no se activa (RF-12). Petición del autor: "necesitamos alguna reacción al seleccionar una opción".
 - **v1.2 (5 oct. 2026)** — tras probarla: el mismo pulso para las dos listas, el mensaje en la línea de su título (sin saltos), títulos más cortos con icono y flecha, y la X en "Tu experiencia".
+- **v1.3 (5 oct. 2026)** — CAT-01: la tabla de choques pasa a `situations.json`, la única fuente (se quita de aquí para que no haya dos copias que puedan dejar de coincidir).

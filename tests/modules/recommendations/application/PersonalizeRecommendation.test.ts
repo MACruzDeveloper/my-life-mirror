@@ -39,6 +39,8 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
   const byKey = (key: string) => listed.value.find((c) => c.catalogId === entries.find((e) => e.key === key)?.id)!;
   const finances = byKey("economia");
   const sport = byKey("deporte");
+  const couple = byKey("pareja");
+  await categoryRepository.save({ ...couple, status: "active" });
   await categoryRepository.save({ ...finances, status: "active", experienceTags: ["economia.presupuesto"] });
   await categoryRepository.save({ ...sport, status: "active" });
 
@@ -50,12 +52,14 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
     { id: "a1", userId: "u1", categoryId: finances.id, score: 6, recordedAt: new Date("2026-09-01T10:00:00Z") },
     { id: "a2", userId: "u1", categoryId: finances.id, score: 3, note: "texto privado que nunca debe salir", recordedAt: new Date("2026-10-01T10:00:00Z") },
     { id: "a3", userId: "u1", categoryId: sport.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
+    { id: "a4", userId: "u1", categoryId: couple.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
   ]);
 
   const recommendationRepository = new InMemoryRecommendationRepository();
   await recommendationRepository.saveMany([
     { id: "r-finances", userId: "u1", categoryId: finances.id, templateKey: "economia.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-sport", userId: "u1", categoryId: sport.id, templateKey: "deporte.1", threshold: 5, status: "pending", createdAt: clock.now() },
+    { id: "r-couple", userId: "u1", categoryId: couple.id, templateKey: "pareja.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-done", userId: "u1", categoryId: finances.id, templateKey: "economia.2", threshold: 5, status: "done", createdAt: clock.now() },
   ]);
 
@@ -174,6 +178,7 @@ describe("PersonalizeRecommendation (RF-40)", () => {
     ["el usuario no lo ha activado", { aiIdeasEnabled: false }, "r-finances"],
     ["no hay proveedor configurado", { available: false }, "r-finances"],
     ["la categoría es sensible (Deporte)", {}, "r-sport"],
+    ["la categoría está excluida de la IA (Pareja)", {}, "r-couple"],
     ["la recomendación ya no está abierta", {}, "r-done"],
     ["el escritor falla", { writer: new ScriptedWriter(async () => Promise.reject(new Error("caído"))) }, "r-finances"],
     ["el escritor tarda demasiado", { writer: new ScriptedWriter(() => new Promise((resolve) => setTimeout(() => resolve({ templateKey: "economia.1", text: "x".repeat(60) }), 500))) }, "r-finances"],

@@ -1,5 +1,10 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// La entrevista entera en jsdom (MUI, varias consultas, una pregunta por categoría) tarda ~1 s por test
+// solo; con toda la batería en paralelo puede multiplicarse y rozar los 5 s por defecto. Medido el 5 oct.:
+// no es una regresión (antes de RF-44 ya iba a ~0,64 s por test), así que se ajusta el límite solo aquí.
+vi.setConfig({ testTimeout: 15_000 });
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
@@ -27,6 +32,14 @@ const HISTORY = [
   { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, note: "Mes justo" }] },
 ];
 
+// RF-44: el diario de experiencias (la más reciente primero, como lo devuelve el servidor).
+const EXPERIENCES = [
+  { id: "e3", categoryId: "c1", text: "Este mes he ahorrado un poco", createdAt: "2026-09-18T10:00:00.000Z" },
+  { id: "e2", categoryId: "c1", text: "Mes justo", createdAt: "2026-01-15T10:00:00.000Z" },
+  { id: "e1", categoryId: "c1", text: "Empecé a apuntar gastos", createdAt: "2025-12-01T10:00:00.000Z" },
+  { id: "e0", categoryId: "c1", text: "Primera nota", createdAt: "2025-11-01T10:00:00.000Z" },
+];
+
 interface StubOptions {
   latest?: unknown;
   history?: unknown;
@@ -34,9 +47,13 @@ interface StubOptions {
   /** Recomendaciones abiertas después de guardar (las devuelve el POST, PERF-01; por defecto, las mismas que antes). */
   recommendationsAfterSave?: unknown;
   saveResponse?: () => Promise<unknown>;
+  /** RF-44: experiencias del diario (GET /api/categories/diary). */
+  experiences?: unknown;
 }
 
-function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse }: StubOptions = {}) {
+// Por defecto, el diario vacío: cada experiencia añade botones a la página y encarece todas las búsquedas por rol.
+
+function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [] }: StubOptions = {}) {
   const fetchMock: ReturnType<typeof vi.fn> = vi.fn((url: string, init?: RequestInit) => {
     if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => CATEGORIES });
     if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
@@ -55,6 +72,12 @@ function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], r
         return Promise.resolve({ ok: false, json: async () => ({ error: "Requiere consentimiento", code: "CONSENT_REQUIRED" }) });
       }
       return Promise.resolve({ ok: true, json: async () => ({ ...category, status: "active" }) });
+    }
+    if (url.startsWith("/api/categories/diary")) {
+      if (!init?.method || init.method === "GET") return Promise.resolve({ ok: true, json: async () => experiences });
+      if (init.method === "DELETE") return Promise.resolve({ ok: true, json: async () => ({ deleted: true }) });
+      const { categoryId, text } = JSON.parse(init.body as string);
+      return Promise.resolve({ ok: true, json: async () => ({ id: `e-${text}`, categoryId, text, createdAt: "2026-10-05T10:00:00.000Z" }) });
     }
     if (url === "/api/categories/experience") {
       const { categoryId, tags } = JSON.parse(init?.body as string);
@@ -265,6 +288,24 @@ describe("InterviewPage (RF-10)", () => {
     });
   });
 
+  it("si la carga falla, lo dice y deja reintentar (sin reintentos automáticos)", async () => {
+    let categoriesCalls = 0;
+    const fetchMock = stubFetch();
+    const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+    fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+      if (url === "/api/categories" && (categoriesCalls += 1) === 1) return Promise.resolve({ ok: false, status: 500, json: async () => ({ error: "caído" }) });
+      return defaultImplementation(url, init);
+    });
+    renderPage();
+
+    const alert = await screen.findByText("No se pudieron cargar tus categorías");
+    fireEvent.click(within(alert.closest("[role=alert]") as HTMLElement).getByRole("button", { name: "Reintentar" }));
+
+    await waitUntilLoaded();
+    expect(screen.queryByText("No se pudieron cargar tus categorías")).not.toBeInTheDocument();
+    expect(categoriesCalls).toBe(2);
+  });
+
   it("lista todas las categorías; las activas salen marcadas y con su pregunta", async () => {
     stubFetch();
     renderPage();
@@ -313,33 +354,27 @@ describe("InterviewPage (RF-10)", () => {
     expect(screen.queryByRole("button", { name: /guardar cambios/i })).not.toBeInTheDocument();
   });
 
-  it("se puede puntuar por primera vez una categoría sin puntuación previa, con su experiencia privada", async () => {
+  it("se puede puntuar por primera vez una categoría sin puntuación previa (la experiencia ya no va con la puntuación, RF-44)", async () => {
     const fetchMock = stubFetch();
     renderPage();
     await waitUntilLoaded();
 
     chooseScore("deporte", 8);
-    fireEvent.click(screen.getAllByRole("button", { name: /tu experiencia \(privada\)/i })[1]);
-    fireEvent.change(screen.getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "voy al gimnasio" } });
     fireEvent.click(saveButton("Deporte"));
 
     expect(await within(question("c2")).findByRole("status")).toHaveTextContent(/guardado ahora/i);
-    expect(screen.queryByLabelText(/tu experiencia \(privada\)/i)).not.toBeInTheDocument();
     const [call] = postCalls(fetchMock, "/api/assessments");
-    expect(JSON.parse(call[1].body as string)).toEqual({ entries: [{ categoryId: "c2", score: 8, note: "voy al gimnasio" }] });
+    expect(JSON.parse(call[1].body as string)).toEqual({ entries: [{ categoryId: "c2", score: 8 }] });
   });
 
   describe("respuesta inmediata (UX-05)", () => {
-    it("bajo su pregunta se ve la última actualización (fecha y cambio) y la última experiencia, como privada", async () => {
+    it("bajo su pregunta se ve la última actualización (fecha y cambio)", async () => {
       stubFetch();
       renderPage();
       await waitUntilLoaded();
 
       const box = (await within(question("c1")).findByText(/última actualización/i)).closest("[data-last-update]") as HTMLElement;
       expect(box).toHaveTextContent("Última actualización: 18 de septiembre de 2026 · 6 → 4");
-      expect(box).toHaveTextContent(/tu última experiencia \(privada\)/i);
-      expect(box).toHaveTextContent(/este mes he ahorrado un poco/i);
-      expect(screen.queryByText(/mes justo/i)).not.toBeInTheDocument();
       expect(within(question("c2")).queryByText(/última actualización/i)).not.toBeInTheDocument();
     });
 
@@ -468,15 +503,11 @@ describe("InterviewPage (RF-10)", () => {
         expect(within(progressPanel()).queryByRole("button", { name: /pareja/i })).not.toBeInTheDocument();
       });
 
-      it("cambiar una categoría la marca 'sin guardar' (también al escribir su experiencia) y guardarla, 'guardada hoy'", async () => {
+      it("cambiar la puntuación de una categoría la marca 'sin guardar' y guardarla, 'guardada hoy'", async () => {
         stubFetch();
         renderPage();
         await waitUntilLoaded();
 
-        fireEvent.click(within(question("c1")).getByRole("button", { name: /tu experiencia \(privada\)/i }));
-        fireEvent.change(within(question("c1")).getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "algo" } });
-        expect(progressItem("economía")).toHaveTextContent(/sin guardar/i);
-        fireEvent.change(within(question("c1")).getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "" } });
         chooseScore("economía", 4);
         expect(progressItem("economía")).toHaveTextContent(/sin guardar/i);
 
@@ -631,34 +662,206 @@ describe("InterviewPage (RF-10)", () => {
       await waitUntilLoaded();
       chooseScore("economía", 3);
 
-      for (const name of [/qué te ayuda/i, /qué te lo pone difícil/i, /tu experiencia \(privada\)/i]) {
+      for (const name of [/qué te ayuda/i, /qué te lo pone difícil/i, /tus experiencias/i]) {
         expect(within(question("c1")).getByRole("button", { name })).toHaveAttribute("aria-expanded", "false");
       }
     });
 
-    it("'Tu experiencia' se puede cerrar con la X: borra lo escrito y vuelve al estado inicial", async () => {
+    it("'Tus experiencias' avisa de que solo las ve el usuario y nunca van a la IA", async () => {
       stubFetch();
       renderPage();
       await waitUntilLoaded();
-      fireEvent.click(within(question("c1")).getByRole("button", { name: /tu experiencia \(privada\)/i }));
-      fireEvent.change(within(question("c1")).getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "algo" } });
-      expect(saveButton("Economía")).toBeEnabled();
+
+      fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
+
+      expect(within(question("c1")).getByText("Solo las ves tú. Nunca se envían a la IA ni se comparten con nadie.")).toBeInTheDocument();
+    });
+  });
+
+  describe("diario de experiencias (RF-44)", () => {
+    function diary(categoryId: string) {
+      return within(question(categoryId)).getByRole("list", { name: /tus experiencias/i });
+    }
+
+    it("enseña las 3 más recientes de cada categoría, con su fecha, y 'Ver todas (N)'", async () => {
+      stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+
+      const items = within(await within(question("c1")).findByRole("list", { name: /tus experiencias/i })).getAllByRole("listitem");
+      expect(items.map((item) => item.textContent)).toEqual([
+        expect.stringMatching(/18 de septiembre de 2026.*Este mes he ahorrado un poco/),
+        expect.stringMatching(/15 de enero de 2026.*Mes justo/),
+        expect.stringMatching(/1 de diciembre de 2025.*Empecé a apuntar gastos/),
+      ]);
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Ver todas (4)" }));
+      expect(within(diary("c1")).getAllByRole("listitem")).toHaveLength(4);
+      expect(within(question("c2")).queryByRole("list", { name: /tus experiencias/i })).not.toBeInTheDocument();
+    });
+
+    it("'Añadir' guarda la experiencia al momento, sin puntuar: 'Guardada' y arriba de la lista; 'Guardar' no se activa", async () => {
+      const fetchMock = stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+      fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
+
+      fireEvent.change(within(question("c1")).getByLabelText("Nueva experiencia"), { target: { value: "Hoy he cobrado" } });
+      expect(saveButton("Economía")).toBeDisabled();
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Añadir" }));
+
+      expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Guardada");
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/diary")[0][1].body as string)).toEqual({ categoryId: "c1", text: "Hoy he cobrado" });
+      expect(within(diary("c1")).getAllByRole("listitem")[0]).toHaveTextContent("Hoy he cobrado");
+      expect(within(question("c1")).getByLabelText("Nueva experiencia")).toHaveValue("");
+      expect(postCalls(fetchMock, "/api/assessments")).toHaveLength(0);
+    });
+
+    it("borrar pide confirmación y la quita de la lista", async () => {
+      const fetchMock = stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Borrar la experiencia del 15 de enero de 2026" }));
+      const dialog = screen.getByRole("dialog", { name: /borrar esta experiencia/i });
+      fireEvent.click(within(dialog).getByRole("button", { name: "Borrar" }));
+
+      await waitFor(() => expect(within(diary("c1")).queryByText("Mes justo")).not.toBeInTheDocument());
+      expect(fetchMock.mock.calls.some(([url, init]) => url === "/api/categories/diary?id=e2" && init?.method === "DELETE")).toBe(true);
+    });
+
+    it("la X del campo lo borra y lo cierra", async () => {
+      stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+      fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
+      fireEvent.change(within(question("c1")).getByLabelText("Nueva experiencia"), { target: { value: "algo" } });
 
       fireEvent.click(within(question("c1")).getByRole("button", { name: "Borrar y cerrar" }));
 
-      expect(within(question("c1")).queryByLabelText(/tu experiencia \(privada\)/i)).not.toBeInTheDocument();
-      expect(within(question("c1")).getByRole("button", { name: /tu experiencia \(privada\)/i })).toHaveAttribute("aria-expanded", "false");
-      expect(saveButton("Economía")).toBeDisabled();
+      expect(within(question("c1")).queryByLabelText("Nueva experiencia")).not.toBeInTheDocument();
+      expect(within(question("c1")).getByRole("button", { name: /tus experiencias/i })).toHaveAttribute("aria-expanded", "false");
+    });
+  });
+
+  describe("sugerencias de la IA a partir de una experiencia (RF-45)", () => {
+    function renderWithAi({ suggestionsEnabled, suggestion, experiences }: { suggestionsEnabled: boolean; suggestion?: unknown; experiences?: unknown[] }) {
+      const fetchMock = stubFetch({ experiences: experiences ?? [...EXPERIENCES, { id: "e-sport", categoryId: "c2", text: "Me cuesta salir a correr", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ ok: true, json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable: true }) });
+        if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiSuggestionsEnabled: suggestionsEnabled }) });
+        if (url === "/api/recommendations/suggest-options") return Promise.resolve({ ok: true, json: async () => suggestion ?? { helps: [], difficulties: [] } });
+        return defaultImplementation(url, init);
+      });
+      render(
+        withClient(
+          <MemoryRouter>
+            <SessionProvider>
+              <InterviewPage />
+            </SessionProvider>
+          </MemoryRouter>,
+        ),
+      );
+      return fetchMock;
+    }
+
+    function experienceItem(text: string) {
+      return within(question("c1")).getByText(text).closest("li") as HTMLElement;
+    }
+
+    it("sin activarlas, ninguna experiencia ofrece sugerencias, pero el diario dice dónde activarlas", async () => {
+      renderWithAi({ suggestionsEnabled: false });
+      await waitUntilLoaded();
+      await within(question("c1")).findByText("Mes justo");
+
+      expect(screen.queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+      expect(await within(question("c1")).findByRole("link", { name: "Actívalas en Privacidad y datos" })).toHaveAttribute("href", "/perfil/datos");
+      expect(within(question("c2")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
     });
 
-    it("'Tu experiencia (privada)' avisa de que solo la ve el usuario y nunca va a la IA", async () => {
-      stubFetch();
-      renderPage();
+    it("Pareja está excluida de la IA: ni botón ni aviso, aunque estén activadas", async () => {
+      renderWithAi({ suggestionsEnabled: true, experiences: [{ id: "e-pareja", categoryId: "c3", text: "Nos cuesta hablar", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      await waitUntilLoaded();
+      toggleCategory("pareja");
+
+      expect(await within(question("c3")).findByText("Nos cuesta hablar")).toBeInTheDocument();
+      expect(within(question("c3")).queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+      expect(within(question("c3")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("activadas, el aviso de dónde activarlas ya no sale", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+      await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" });
+
+      expect(within(question("c1")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("activadas, cada experiencia de una categoría no sensible lo ofrece (con el aviso sobre los nombres); las sensibles no", async () => {
+      renderWithAi({ suggestionsEnabled: true });
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getAllByRole("button", { name: /tu experiencia \(privada\)/i })[0]);
+      expect(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" })).toBeInTheDocument();
+      expect(within(question("c1")).getAllByText(/no escribas nombres de otras personas/i).length).toBeGreaterThan(0);
+      expect(within(question("c2")).queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+    });
 
-      expect(screen.getByText("Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.")).toBeInTheDocument();
+    it("pide las sugerencias de esa experiencia y las enseña, de la IA, sin marcarlas todavía", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, suggestion: { helps: ["economia.apps"], difficulties: ["mirarMisCuentas"] } });
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+
+      const item = experienceItem("Mes justo");
+      expect(await within(item).findByText("La IA sugiere:")).toBeInTheDocument();
+      expect(within(item).getByText("Sugerido por IA")).toBeInTheDocument();
+      expect(within(item).getByRole("button", { name: "Marcar «Apps de finanzas»" })).toBeInTheDocument();
+      expect(within(item).getByRole("button", { name: "Marcar «Mirar mis cuentas»" })).toBeInTheDocument();
+      const body = JSON.parse(postCalls(fetchMock, "/api/recommendations/suggest-options")[0][1].body as string);
+      expect(body).toEqual({ experienceId: "e2", locale: "es" });
+      expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(0);
+    });
+
+    it("aceptar una la marca como si la tocara el usuario; descartar otra solo la quita", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, suggestion: { helps: ["economia.apps"], difficulties: ["mirarMisCuentas"] } });
+      await waitUntilLoaded();
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+      const item = experienceItem("Mes justo");
+
+      fireEvent.click(await within(item).findByRole("button", { name: "Marcar «Mirar mis cuentas»" }));
+      fireEvent.click(within(item).getByRole("button", { name: "Descartar «Apps de finanzas»" }));
+
+      await waitFor(() => expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(1));
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/difficulties")[0][1].body as string)).toEqual({ categoryId: "c1", tags: ["mirarMisCuentas"] });
+      expect(postCalls(fetchMock, "/api/categories/experience")).toHaveLength(0);
+      expect(within(item).queryByRole("button", { name: /Mirar mis cuentas|Apps de finanzas/ })).not.toBeInTheDocument();
+    });
+
+    it("con palabras ofensivas, avisa antes de enviar nada; 'Cancelar' no envía y 'Enviar igualmente' sí", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, experiences: [{ id: "e-mal", categoryId: "c1", text: "Mi jefe es un gilipollas y no me sube el sueldo", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      await waitUntilLoaded();
+      const item = () => experienceItem("Mi jefe es un gilipollas y no me sube el sueldo");
+
+      fireEvent.click(await within(item()).findByRole("button", { name: "Sugerir opciones con IA" }));
+      expect(within(item()).getByText(/tiene palabras que preferimos no enviar a la ia/i)).toBeInTheDocument();
+      expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(0);
+
+      fireEvent.click(within(item()).getByRole("button", { name: "Cancelar" }));
+      expect(within(item()).getByRole("button", { name: "Sugerir opciones con IA" })).toBeInTheDocument();
+      expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(0);
+
+      fireEvent.click(within(item()).getByRole("button", { name: "Sugerir opciones con IA" }));
+      fireEvent.click(within(item()).getByRole("button", { name: "Enviar igualmente" }));
+      await waitFor(() => expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(1));
+    });
+
+    it("si no hay nada que proponer, lo dice", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+
+      expect(await within(experienceItem("Mes justo")).findByText("No hemos encontrado opciones en esta experiencia.")).toBeInTheDocument();
     });
   });
 

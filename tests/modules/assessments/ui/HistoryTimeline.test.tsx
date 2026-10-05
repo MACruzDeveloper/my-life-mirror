@@ -12,9 +12,9 @@ const session = (recordedAt: string, score: number, previousScore?: number) => (
   entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score, ...(previousScore !== undefined ? { previousScore } : {}) }],
 });
 
-function stubHistory(sessions: unknown[]) {
+function stubHistory(sessions: unknown[], experiences: unknown[] = []) {
   const fetchMock = vi.fn((url: string) =>
-    Promise.resolve({ ok: true, json: async () => (url === "/api/categories/translations" ? categoryLabelsFixture() : sessions) }),
+    Promise.resolve({ ok: true, json: async () => (url === "/api/categories/translations" ? categoryLabelsFixture() : url === "/api/categories/diary" ? experiences : sessions) }),
   );
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
@@ -83,23 +83,47 @@ describe("HistoryTimeline (UX-04, en Resultados desde UX-05)", () => {
     expect(await screen.findByText(/Finances: 6 → 4/)).toBeInTheDocument();
   });
 
-  it("un guardado con experiencia la muestra debajo del cambio (UX-05)", async () => {
-    stubHistory([{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4, previousScore: 6, note: "Este mes he ahorrado un poco" }] }]);
+  it("las experiencias del diario salen en su día, bajo su categoría; la nota antigua de la evaluación ya no (RF-44)", async () => {
+    stubHistory(
+      [{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4, previousScore: 6, note: "Nota antigua copiada" }] }],
+      [{ id: "e1", categoryId: "c1", text: "Nota antigua copiada", createdAt: "2026-09-18T10:00:00.000Z" }, { id: "e2", categoryId: "c1", text: "Otra del mismo día", createdAt: "2026-09-18T20:00:00.000Z" }],
+    );
     render(withClient(<HistoryTimeline />));
 
     fireEvent.click(await screen.findByRole("button", { name: /ver mi historial/i }));
-    expect(screen.getByText(/«este mes he ahorrado un poco»/i)).toBeInTheDocument();
+    expect(await screen.findByText("«Otra del mismo día»")).toBeInTheDocument();
+    expect(screen.getAllByText("«Nota antigua copiada»")).toHaveLength(1);
+  });
+
+  it("un día con experiencias pero sin puntuaciones también sale, con la categoría y sus experiencias (RF-44)", async () => {
+    stubHistory(
+      [{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4 }] }],
+      [{ id: "e1", categoryId: "c1", text: "Solo escribí", createdAt: "2026-09-25T10:00:00.000Z" }],
+    );
+    render(withClient(<HistoryTimeline />));
+
+    fireEvent.click(await screen.findByRole("button", { name: "Ver mi historial (2)" }));
+    const items = within(screen.getByRole("list", { name: /historial de cambios/i })).getAllByRole("listitem");
+    expect(items[0]).toHaveTextContent("25 de septiembre");
+    expect(items[0]).toHaveTextContent("Economía");
+    expect(items[0]).toHaveTextContent("«Solo escribí»");
   });
 
   it("agrupa por día: lo guardado categoría a categoría el mismo día sale junto, con el cambio del día y todas sus experiencias (UX-05)", async () => {
-    stubHistory([
-      { recordedAt: "2026-09-18T18:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 3, previousScore: 4, note: "Al final peor" }] },
-      { recordedAt: "2026-09-18T11:00:00.000Z", entries: [{ categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 7, previousScore: 5 }] },
-      { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4, previousScore: 6, note: "Mes justo" }] },
-      // La primera vez que se puntúa Deporte (sin "antes"): el cambio del día empieza en esta puntuación.
-      { recordedAt: "2026-09-18T09:00:00.000Z", entries: [{ categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 5 }] },
-      session("2026-09-02T10:00:00.000Z", 6, 5),
-    ]);
+    stubHistory(
+      [
+        { recordedAt: "2026-09-18T18:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 3, previousScore: 4 }] },
+        { recordedAt: "2026-09-18T11:00:00.000Z", entries: [{ categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 7, previousScore: 5 }] },
+        { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4, previousScore: 6 }] },
+        // La primera vez que se puntúa Deporte (sin "antes"): el cambio del día empieza en esta puntuación.
+        { recordedAt: "2026-09-18T09:00:00.000Z", entries: [{ categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 5 }] },
+        session("2026-09-02T10:00:00.000Z", 6, 5),
+      ],
+      [
+        { id: "e2", categoryId: "c1", text: "Al final peor", createdAt: "2026-09-18T18:00:00.000Z" },
+        { id: "e1", categoryId: "c1", text: "Mes justo", createdAt: "2026-09-18T10:00:00.000Z" },
+      ],
+    );
     render(withClient(<HistoryTimeline />));
 
     fireEvent.click(await screen.findByRole("button", { name: "Ver mi historial (2)" }));

@@ -200,6 +200,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **5 oct. 2026** — *"ahora mismo al añadir una experiencia no veo que afecte a la app… el usuario debe poder añadir más de una experiencia, y también eliminarlas… ¿Cómo podríamos resolver este punto y hacerlo útil sin chocar con la ética? ¿Hay alguna forma de proteger las respuestas de la IA?… No puedo consultarlo con el tutor hasta la presentación… estaría bien ofrecer de lo que es capaz la app trabajando con la IA"*
 → Se rechaza el pulso en las ideas al guardar una experiencia (sugeriría que cambian por lo escrito, contra la promesa del campo) y se definen dos requisitos: **RF-44**, un diario de experiencias sin IA (varias, sin puntuar, eliminables, tabla propia) y **RF-45**, la IA traduce una experiencia a las listas cerradas de RF-41/RF-42 y el usuario acepta o descarta (voluntario y por experiencia, salida validada, datos personales quitados, sin sensibles, sin valorar el estado de la persona). El dilema queda en ADR-05, apartado 4.4, para el tutor.
 
+**5 oct. 2026** — *"al activar los dos switches en Privacidad no me han cargado las categorías… la idea es que solo se pueda hacer en categorías no sensibles, por lo que quizá se puede añadir Pareja también a categoría sensible… podemos poner un validador en el input… que no pueda poner contenido sensible o poco ético, ni insultos"* (+ elecciones del autor)
+→ El error de carga no se reproduce; se añade "Reintentar" (sin reintentos automáticos). **Pareja:** no se vuelve "sensible" (eso exige consentimiento RGPD y una migración delicada para quien ya la tiene) sino "excluida de la IA" (`aiExcluded` en el catálogo). **Validación:** el diario no se valida (es privado; filtrar emociones sería detectar riesgo, RES-09); solo se avisa al enviar a la IA si hay insultos, y decide el usuario.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

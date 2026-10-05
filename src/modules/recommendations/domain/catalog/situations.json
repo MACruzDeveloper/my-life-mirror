@@ -1,0 +1,13 @@
+[
+  {"key": "salirDeCasa", "clashesWith": ["vidaSocial.2", "deporte.1", "deporte.4", "deporte.5", "aventura.1", "aventura.4", "espiritualidad.5"]},
+  {"key": "sitiosConGente", "clashesWith": ["vidaSocial.5", "aventura.4"]},
+  {"key": "darElPrimerPaso", "clashesWith": ["vidaSocial.1", "vidaSocial.2", "vidaSocial.3", "vidaSocial.5", "familia.2", "familia.4"]},
+  {"key": "actividadesEnGrupo", "clashesWith": ["vidaSocial.3", "vidaSocial.5"]},
+  {"key": "hablarDeLoQueSiento", "clashesWith": ["economia.5", "pareja.3", "sexo.1", "familia.5"]},
+  {"key": "llamarPorTelefono", "clashesWith": ["familia.1"]},
+  {"key": "contactoConFamilia", "clashesWith": ["familia.1", "familia.2", "familia.3", "familia.4", "familia.5"]},
+  {"key": "apuntarYRegistrar", "clashesWith": ["economia.1", "economia.4", "aventura.2", "espiritualidad.2", "inversiones.3", "general.1"]},
+  {"key": "mirarMisCuentas", "clashesWith": ["economia.1", "inversiones.1"]},
+  {"key": "cambiosDeRutina", "clashesWith": ["pareja.4", "deporte.4", "aventura.1"]},
+  {"key": "pocoTiempoLibre", "clashesWith": ["deporte.2", "inversiones.1"]}
+]

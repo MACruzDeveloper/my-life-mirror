@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { InMemoryPersonalizedIdeaRepository } from "@modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository";
+import { InMemoryExperienceRepository } from "@modules/assessments/infrastructure/InMemoryExperienceRepository";
 import { createAdminUserActions } from "@modules/accounts/application/AdminUserActions";
 import { createRegisterUser } from "@modules/accounts/application/RegisterUser";
 import { createUpdateProfile } from "@modules/accounts/application/UpdateProfile";
@@ -39,6 +40,7 @@ async function setup() {
     assessmentRepository,
     recommendationRepository,
     personalizedIdeaRepository: new InMemoryPersonalizedIdeaRepository(),
+    experienceRepository: new InMemoryExperienceRepository(),
     auditRepository,
     registerUser: createRegisterUser(authProvider, updateProfile),
     updateProfile,
