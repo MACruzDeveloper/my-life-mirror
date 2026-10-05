@@ -20,6 +20,10 @@ import { createPersonalizeRecommendation } from "#modules/recommendations/applic
 import type { IdeaReviewer, IdeaWriter } from "#modules/recommendations/domain/IdeaWriter.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infrastructure/FakeIdeaWriter.js";
+import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
+import type { OptionSuggester } from "#modules/recommendations/domain/OptionSuggester.js";
+import { createSuggestExperienceOptions } from "#modules/recommendations/application/SuggestExperienceOptions.js";
+import { createSetAiSuggestions } from "#modules/accounts/application/SetAiSuggestions.js";
 import { InMemoryPersonalizedIdeaRepository } from "#modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository.js";
 import { InMemoryExperienceRepository } from "#modules/assessments/infrastructure/InMemoryExperienceRepository.js";
 import { SupabaseExperienceRepository } from "#modules/assessments/infrastructure/SupabaseExperienceRepository.js";
@@ -130,9 +134,10 @@ function createPersonalizedIdeaRepository(environment: Environment): Personalize
  * - sin valor: función apagada (producción hasta RF-40b); la opción ni se ofrece.
  * - `anthropic`: llegará con RF-40b; hasta entonces, apagada con un aviso en el log.
  */
-function createIdeaProvider(): { writer?: IdeaWriter; reviewer: IdeaReviewer } {
+function createIdeaProvider(): { writer?: IdeaWriter; reviewer: IdeaReviewer; suggester?: OptionSuggester } {
   const provider = process.env.AI_IDEAS_PROVIDER?.trim();
-  if (provider === "fake") return { writer: new FakeIdeaWriter(), reviewer: new FakeIdeaReviewer() };
+  // RF-45 usa el mismo proveedor que RF-40: disponible o no a la vez.
+  if (provider === "fake") return { writer: new FakeIdeaWriter(), reviewer: new FakeIdeaReviewer(), suggester: new FakeOptionSuggester() };
   if (provider) logger.warn("AI_IDEAS_PROVIDER desconocido o sin implementar: ideas con IA apagadas", { provider });
   return { reviewer: new FakeIdeaReviewer() };
 }
@@ -266,6 +271,8 @@ export interface AppContext {
   listRecommendations: ReturnType<typeof createListRecommendations>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
   aiIdeasAvailable: boolean;
+  setAiSuggestions: ReturnType<typeof createSetAiSuggestions>;
+  suggestExperienceOptions: ReturnType<typeof createSuggestExperienceOptions>;
   personalizeRecommendation: ReturnType<typeof createPersonalizeRecommendation>;
   setAiIdeas: ReturnType<typeof createSetAiIdeas>;
 }
@@ -358,6 +365,16 @@ export function createAppContext(environment: Environment = detectEnvironment())
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
     aiIdeasAvailable: ideaProvider.writer !== undefined,
+    setAiSuggestions: createSetAiSuggestions({ profileRepository, clock }),
+    suggestExperienceOptions: createSuggestExperienceOptions({
+      experienceRepository,
+      categoryRepository,
+      catalog: categoryCatalogRepository,
+      profileRepository,
+      ideaTexts: new JsonIdeaTexts(),
+      suggester: ideaProvider.suggester,
+      report: (reason, error) => logger.warn("Sin sugerencias de la IA (RF-45)", { reason, ...(error ? { error: String(error) } : {}) }),
+    }),
     personalizeRecommendation: createPersonalizeRecommendation({
       recommendationRepository,
       categoryRepository,

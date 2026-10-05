@@ -10,7 +10,7 @@ export const catalogIdOf = (key: string) => `k-${key}`;
  */
 export function categoryLabelsFixture(extra: CatalogLabelDto[] = []): CatalogLabelDto[] {
   return [
-    ...STANDARD_CATEGORIES.map((standard) => ({ catalogId: catalogIdOf(standard.key), key: standard.key, translations: standard.translations })),
+    ...STANDARD_CATEGORIES.map((standard) => ({ catalogId: catalogIdOf(standard.key), key: standard.key, translations: standard.translations, ...(standard.aiExcluded ? { aiExcluded: true } : {}) })),
     ...extra,
   ];
 }

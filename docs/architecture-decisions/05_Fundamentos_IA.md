@@ -81,6 +81,8 @@ Hasta aquí, la regla era que el texto libre nunca llega a la IA (RES-09: no se 
 3. Minimización: se eliminan nombres, emails, teléfonos, enlaces y números largos antes de enviar; nunca categorías sensibles, ids ni datos de la cuenta; sin retención en el proveedor.
 4. Sin detección de riesgo: no se le pide valorar nada y su salida no puede expresarlo; la respuesta al contenido difícil sigue siendo el enlace permanente a las líneas de ayuda (RF-30), para todos.
 5. Transparencia: política de privacidad y etiqueta "Sugerido por IA".
+6. Categorías fuera de la IA sin ser sensibles: la marca `aiExcluded` del catálogo (Pareja) las deja fuera de RF-40 y RF-45 sin pedir consentimiento para activarlas, porque no son datos de categoría especial del RGPD.
+7. Aviso, no bloqueo: si una experiencia lleva insultos, se avisa al enviarla y decide el usuario. El diario no se valida: es privado, y filtrar cómo se siente la persona sería detectar riesgo (RES-09).
 
 Es un dilema que se presentará al tutor (anotado en el tablero): procesar texto libre con IA, aunque sea para devolver una lista cerrada, es más intrusivo que no hacerlo. La alternativa conservadora es RF-44 solo (diario privado sin IA), que ya tiene valor por sí mismo.
 
@@ -119,3 +121,5 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 - **v1.6 (5 oct. 2026)** — apartado 4.3.3: las situaciones de RF-42 filtran las ideas antes de la IA y no se le envían.
 - **v1.7 (5 oct. 2026)** — apartado 4.4: excepción acotada para el texto libre (RF-45), con sus salvaguardas, y el dilema anotado para el tutor.
 - **v1.8 (5 oct. 2026)** — CAT-01: los términos del filtro pasan a `domain/catalog/safetyTerms.json`, junto al resto del contenido curado.
+- **v1.9 (5 oct. 2026)** — apartado 4.4 implementado contra un *Fake* (RF-45 v1.2); el modelo real llegará con RF-40b, junto con el de las ideas.
+- **v1.10 (5 oct. 2026)** — apartado 4.4: categorías excluidas de la IA sin ser sensibles (Pareja) y aviso de términos ofensivos solo al enviar.

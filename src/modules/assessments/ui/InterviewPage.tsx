@@ -21,7 +21,8 @@ import { useTranslation } from "react-i18next";
 import interviewerAvatar from "../../../assets/avatars/interviewer.svg";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
-import { useAiIdeasActive } from "@modules/accounts/ui/queries";
+import { useAiIdeasActive, useAiSuggestionsActive } from "@modules/accounts/ui/queries";
+import { useOptionalSession } from "@shared/ui/context/SessionContext";
 import { PERSONALIZED_IDEAS_KEY, RECOMMENDATIONS_KEY, useRecommendations, type RecommendationDto } from "@modules/recommendations/ui/queries";
 import { Bubble } from "./interview/Bubble";
 import { PENDING_COLORS } from "./interview/pendingColors";
@@ -86,7 +87,7 @@ const categoryRequest = (categoryId: string) => ({
  * Ver docs/user-stories/RF-10-entrevista.md y UX-05-respuesta-inmediata-entrevista.md.
  */
 export function InterviewPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
   const isDesktop = useMediaQuery(useTheme().breakpoints.up("lg"), { noSsr: true });
@@ -120,6 +121,8 @@ export function InterviewPage() {
   const recommendations = useRecommendations().data ?? [];
   const experiences = useExperiences().data ?? [];
   const personalizeIdeas = useAiIdeasActive();
+  const suggestionsActive = useAiSuggestionsActive();
+  const suggestionsAvailable = useOptionalSession()?.aiIdeasAvailable === true;
 
   const savedScores: Record<string, number> = {};
   for (const latestScore of latestScoresQuery.data ?? []) if (latestScore.score !== undefined) savedScores[latestScore.categoryId] = latestScore.score;
@@ -199,6 +202,21 @@ export function InterviewPage() {
     } catch {
       queryClient.setQueryData(EXPERIENCES_KEY, previous);
       setPageError(t("entrevista.errorExperienciaBorrar"));
+    }
+  }
+
+  /** RF-45: opciones que la IA propone para una experiencia; `null` si no se pudo (la interfaz lo trata como "sin sugerencias"). */
+  async function suggestOptions(experience: ExperienceDto): Promise<{ helps: string[]; difficulties: string[] } | null> {
+    try {
+      const response = await fetch("/api/recommendations/suggest-options", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ experienceId: experience.id, locale: i18n.language }),
+      });
+      if (!response.ok) return null;
+      return (await response.json()) as { helps: string[]; difficulties: string[] };
+    } catch {
+      return null;
     }
   }
 
@@ -526,7 +544,26 @@ export function InterviewPage() {
       </Typography>
       {isFirstInterview && <InterviewSteps active={step} />}
 
-      {(categoriesQuery.isError || latestScoresQuery.isError) && <Alert severity="error">{t("entrevista.errorCarga")}</Alert>}
+      {/* Sin reintentos automáticos (ver createQueryClient), pero el usuario puede pedirlo: si no, el error se quedaba hasta volver a entrar. */}
+      {(categoriesQuery.isError || latestScoresQuery.isError) && (
+        <Alert
+          severity="error"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => {
+                if (categoriesQuery.isError) void categoriesQuery.refetch();
+                if (latestScoresQuery.isError) void latestScoresQuery.refetch();
+              }}
+            >
+              {t("comun.reintentar")}
+            </Button>
+          }
+        >
+          {t("entrevista.errorCarga")}
+        </Alert>
+      )}
       {pageError && <Alert severity="error">{pageError}</Alert>}
 
       {isFirstInterview && step === "intro" && (
@@ -650,6 +687,8 @@ export function InterviewPage() {
           justAddedExperienceId={justAddedExperienceId}
           onAddExperience={addExperience}
           onDeleteExperience={(experience) => void deleteExperience(experience)}
+          onSuggestOptions={suggestionsActive ? suggestOptions : undefined}
+          suggestionsAvailable={suggestionsAvailable}
           onScore={(categoryId, score) => setDraftScores((current) => ({ ...current, [categoryId]: score }))}
           onToggleTag={(target, tag) => void toggleExperienceTag(target, tag)}
           onToggleDifficulty={(target, situation) => void toggleDifficultyTag(target, situation)}

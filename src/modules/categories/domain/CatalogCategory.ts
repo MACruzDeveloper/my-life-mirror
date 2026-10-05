@@ -24,5 +24,15 @@ export interface CatalogCategory {
   readonly key?: string;
   readonly translations: Partial<Record<Locale, CategoryText>>;
   readonly isSensitiveData: boolean;
+  /**
+   * RF-45: nunca va a la IA (ni RF-40 ni RF-45), sin ser sensible: no pide
+   * consentimiento al activarla. Las sensibles quedan siempre fuera de la IA.
+   */
+  readonly aiExcluded?: boolean;
   readonly retiredAt?: Date;
+}
+
+/** RF-40/RF-45: una categoría se queda fuera de la IA si es sensible o si el catálogo la excluye. */
+export function isExcludedFromAi(isSensitiveData: boolean, catalogEntry: Pick<CatalogCategory, "aiExcluded"> | undefined): boolean {
+  return isSensitiveData || catalogEntry?.aiExcluded === true;
 }

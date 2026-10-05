@@ -53,7 +53,7 @@ async function setup() {
   ]);
   await personalizedIdeaRepository.save({ recommendationId: "r-ana", userId: ana.id, locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", experienceTags: [], model: "fake", createdAt: clock.now() });
   await experienceRepository.save({ id: "e-ana", userId: ana.id, categoryId: financesAna.id, text: "Este mes he ahorrado un poco", createdAt: new Date("2026-09-21T10:00:00.000Z") });
-  await profileRepository.save({ ...(await profileRepository.findByUserId(ana.id))!, aiIdeasEnabled: true, aiIdeasEnabledAt: "2026-09-20T10:00:00.000Z" });
+  await profileRepository.save({ ...(await profileRepository.findByUserId(ana.id))!, aiIdeasEnabled: true, aiIdeasEnabledAt: "2026-09-20T10:00:00.000Z", aiSuggestionsEnabled: true, aiSuggestionsEnabledAt: "2026-10-05T10:00:00.000Z" });
   await createGrantConsent(consentRepository, clock)({ userId: ana.id, categoryId: sexAna.id, policyVersion: "2026-09" });
 
   return {
@@ -89,6 +89,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     expect(data.consents).toEqual([{ category: "Sexo", policyVersion: "2026-09", grantedAt: "2026-09-20T10:00:00.000Z" }]);
     // RF-40: la elección y las ideas personalizadas también son datos suyos.
     expect(data.aiIdeas).toEqual({ enabled: true, enabledAt: "2026-09-20T10:00:00.000Z" });
+    expect(data.aiSuggestions).toEqual({ enabled: true, enabledAt: "2026-10-05T10:00:00.000Z" });
     expect(data.experiences).toEqual([{ category: "Economía", text: "Este mes he ahorrado un poco", createdAt: "2026-09-21T10:00:00.000Z" }]);
     expect(data.personalizedIdeas).toEqual([{ category: "Economía", locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: "2026-09-20T10:00:00.000Z" }]);
   });

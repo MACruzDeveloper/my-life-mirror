@@ -26,7 +26,7 @@ import { scoreBand } from "../scoreBand";
 import { Bubble, PendingBadge } from "./Bubble";
 import { PENDING_COLORS } from "./pendingColors";
 import type { ExperienceDto } from "../queries";
-import { ExperienceJournal } from "./ExperienceJournal";
+import { ExperienceJournal, type ExperienceSuggestions } from "./ExperienceJournal";
 import { ToggleRow } from "./ToggleRow";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -75,6 +75,10 @@ interface CategoryQuestionProps {
   justAddedExperienceId?: string;
   onAddExperience: (categoryId: string, text: string) => Promise<boolean>;
   onDeleteExperience: (experience: ExperienceDto) => void;
+  /** RF-45: pide a la IA opciones para una experiencia; solo con las sugerencias activadas. */
+  onSuggestOptions?: (experience: ExperienceDto) => Promise<{ helps: string[]; difficulties: string[] } | null>;
+  /** RF-45: la función existe en este despliegue (aunque el usuario no la haya activado). */
+  suggestionsAvailable?: boolean;
 }
 
 export type TagFeedback = "helps" | "difficulties" | "experienceAdded" | "experienceDeleted";
@@ -105,11 +109,25 @@ export function CategoryQuestion({
   justAddedExperienceId,
   onAddExperience,
   onDeleteExperience,
+  onSuggestOptions,
+  suggestionsAvailable = false,
 }: CategoryQuestionProps) {
   const { t, i18n } = useTranslation();
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [helpsOpen, setHelpsOpen] = useState(false);
   const [difficultiesOpen, setDifficultiesOpen] = useState(false);
+  // RF-45: nunca en categorías sensibles, en las excluidas de la IA (Pareja) ni en las que no tienen listas (sin clave del catálogo).
+  const suggestions: ExperienceSuggestions | undefined =
+    onSuggestOptions && !category.isSensitiveData && !label.aiExcluded && label.key
+      ? {
+          onSuggest: onSuggestOptions,
+          onAccept: (kind, key) => {
+            // Como si lo tocara el usuario; si ya estaba marcada, no se desmarca.
+            if (kind === "helps" && !(category.experienceTags ?? []).includes(key)) onToggleTag(category, key);
+            if (kind === "difficulties" && !(category.difficultyTags ?? []).includes(key)) onToggleDifficulty(category, key);
+          },
+        }
+      : undefined;
   const isUnanswered = score === undefined;
   const isSaving = saveStatus?.kind === "saving";
   const hasChanges = !isUnanswered && scoreChanged;
@@ -269,6 +287,8 @@ export function CategoryQuestion({
           statusText={feedbackText("experienceAdded") ?? feedbackText("experienceDeleted")}
           onAdd={(text) => onAddExperience(category.id, text)}
           onDelete={onDeleteExperience}
+          suggestions={suggestions}
+          suggestionsHint={suggestionsAvailable && !category.isSensitiveData && !label.aiExcluded && Boolean(label.key)}
         />
         {/* UX-05: con una idea abierta, las ideas están a un toque; debajo de las tres opciones de la pregunta (y cambian con "¿Qué te ayuda?" si RF-40 está activo). */}
         {recommendation && (

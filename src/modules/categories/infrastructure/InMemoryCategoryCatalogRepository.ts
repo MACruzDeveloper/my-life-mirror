@@ -11,7 +11,7 @@ export class InMemoryCategoryCatalogRepository implements CategoryCatalogReposit
   private readonly entries = new Map<string, CatalogCategory>(
     STANDARD_CATEGORIES.map((standard) => {
       const id = randomUUID();
-      return [id, { id, key: standard.key, translations: standard.translations, isSensitiveData: standard.isSensitiveData }];
+      return [id, { id, key: standard.key, translations: standard.translations, isSensitiveData: standard.isSensitiveData, ...(standard.aiExcluded ? { aiExcluded: true } : {}) }];
     }),
   );
 

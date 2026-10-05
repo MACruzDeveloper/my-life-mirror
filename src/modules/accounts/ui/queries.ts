@@ -10,6 +10,8 @@ export interface ProfileResponse {
   timeZone?: string;
   /** RF-40: ideas personalizadas con IA activadas por el usuario. */
   aiIdeasEnabled?: boolean;
+  /** RF-45: sugerencias de la IA a partir de las experiencias, activadas por el usuario. */
+  aiSuggestionsEnabled?: boolean;
 }
 
 export const PROFILE_KEY = ["profile"] as const;
@@ -26,4 +28,12 @@ export function useAiIdeasActive(): boolean {
   // Sin la función disponible ni siquiera se pide el perfil.
   const profile = useProfile(available);
   return available && profile.data?.aiIdeasEnabled === true;
+}
+
+/** RF-45: el botón "Sugerir opciones con IA" solo aparece si la función existe y el usuario la activó. */
+export function useAiSuggestionsActive(): boolean {
+  const session = useOptionalSession();
+  const available = session?.aiIdeasAvailable === true;
+  const profile = useProfile(available);
+  return available && profile.data?.aiSuggestionsEnabled === true;
 }
