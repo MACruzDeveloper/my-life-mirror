@@ -40,11 +40,40 @@ test.describe("Idioma en las páginas públicas (RNF-10)", () => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "es");
 
-    await page.getByRole("button", { name: "English" }).click();
+    await page.getByRole("switch", { name: "English" }).click();
 
     await expect(page.getByRole("link", { name: "Create account" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await page.reload();
     await expect(page.getByRole("link", { name: "Create account" })).toBeVisible();
+  });
+});
+
+test.describe("Líneas de ayuda (RF-30)", () => {
+  test("desde el pie de la portada, sin cuenta, se llega a las líneas de ayuda con sus números para llamar", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("contentinfo").getByRole("link", { name: "¿Necesitas ayuda ahora?" }).click();
+
+    await expect(page).toHaveURL(/\/ayuda$/);
+    await expect(page.getByRole("heading", { level: 1, name: "¿Necesitas ayuda ahora?" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Llamar al 024" })).toHaveAttribute("href", "tel:024");
+    await expect(page.getByRole("link", { name: "Llamar al 112" })).toHaveAttribute("href", "tel:112");
+    await expect(page.getByRole("link", { name: "Find A Helpline" })).toHaveAttribute("href", "https://findahelpline.com");
+  });
+});
+
+test.describe("Capas CSS: el CSS propio gana a Material UI sin !important", () => {
+  test("una regla sin capa se impone a la de MUI aunque tenga menos especificidad", async ({ page }) => {
+    await page.goto("/");
+    const button = page.getByRole("link", { name: "Crear cuenta" });
+    await expect(button).toHaveClass(/MuiButton-root/);
+    await expect(button).not.toHaveCSS("text-transform", "lowercase");
+
+    // Como si estuviera en skin.css: sin capa, sin !important y con especificidad cero (`:where`), menor
+    // que la de MUI (una clase). Sin capas perdería siempre; con ellas gana por estar fuera de la capa `mui`.
+    await page.addStyleTag({ content: ":where(.MuiButton-root) { text-transform: lowercase; }" });
+
+    await expect(button).toHaveCSS("text-transform", "lowercase");
   });
 });

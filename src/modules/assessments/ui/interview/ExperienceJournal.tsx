@@ -24,6 +24,7 @@ import Link from "@mui/material/Link";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { hasOffensiveTerms } from "@modules/recommendations/domain/offensiveTerms";
+import { HelpLink } from "@shared/ui/components/HelpLink";
 import type { ExperienceDto, ShareOutcome } from "../queries";
 import { ToggleRow } from "./ToggleRow";
 
@@ -388,6 +389,12 @@ export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd,
             {t("entrevista.sugerenciasPistaEnlace")}
           </Link>
         </Typography>
+      )}
+      {/* RF-30: junto a lo que escribe el usuario, la ayuda a mano; igual para todos, sin mirar el texto (RES-09). */}
+      {(open || experiences.length > 0) && (
+        <Box sx={{ mt: 0.75 }}>
+          <HelpLink />
+        </Box>
       )}
       {experiences.length > VISIBLE_EXPERIENCES && (
         <Button size="small" onClick={() => setShowAll((current) => !current)} sx={{ mt: 0.5 }}>

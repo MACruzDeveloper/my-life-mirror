@@ -50,11 +50,14 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: /administración/i })).toHaveAttribute("href", "/admin");
   });
 
-  it("el botón de cerrar sesión llama al callback recibido", () => {
+  it("cerrar sesión es el icono típico de salir (con su nombre accesible) y llama al callback recibido", () => {
     const onLogout = vi.fn();
     renderHeader({ onLogout });
 
-    fireEvent.click(screen.getByRole("button", { name: /cerrar sesión/i }));
+    const logout = screen.getByRole("button", { name: "Cerrar sesión" });
+    expect(within(logout).getByTestId("LogoutIcon")).toBeInTheDocument();
+    expect(logout).not.toHaveTextContent("Cerrar sesión");
+    fireEvent.click(logout);
 
     expect(onLogout).toHaveBeenCalledTimes(1);
   });
@@ -62,7 +65,7 @@ describe("Header", () => {
   it("el selector de idioma cambia el idioma activo", async () => {
     renderHeader();
 
-    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(screen.getByRole("switch", { name: "English" }));
 
     expect(await screen.findByRole("button", { name: /log out/i })).toBeInTheDocument();
   });
@@ -88,7 +91,7 @@ describe("Header", () => {
       renderHeader({ isAdmin: true });
 
       expect(screen.getByText("MyLifeMirror")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "English" })).toBeInTheDocument();
+      expect(screen.getByRole("switch", { name: "English" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /abrir menú/i })).toBeInTheDocument();
       expect(screen.queryByRole("link", { name: /inicio/i })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /cerrar sesión/i })).not.toBeInTheDocument();

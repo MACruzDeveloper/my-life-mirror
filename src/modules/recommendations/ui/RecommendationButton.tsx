@@ -22,6 +22,7 @@ import { keyframes } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { sharedExperiencesKey, useSharedExperiences, type SharedExperienceDto } from "@modules/assessments/ui/queries";
 import { useCategories } from "@modules/categories/ui/queries";
+import { HelpLink } from "@shared/ui/components/HelpLink";
 import { allowedTemplateKeys } from "../domain/ideaSituations";
 import { usePersonalizedIdea } from "./queries";
 
@@ -362,6 +363,10 @@ function SharedExperiencesList({ experiences, categoryId, reported, onReported }
       <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1.5 }}>
         {t("recomendaciones.avisoOtros")}
       </Typography>
+      {/* RF-30: junto a lo que escriben otras personas. */}
+      <Box sx={{ mt: 0.5 }}>
+        <HelpLink />
+      </Box>
     </>
   );
 }

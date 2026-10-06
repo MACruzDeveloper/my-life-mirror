@@ -737,6 +737,14 @@ describe("InterviewPage (RF-10)", () => {
       expect(fetchMock.mock.calls.some(([url, init]) => url === "/api/categories/diary?id=e2" && init?.method === "DELETE")).toBe(true);
     });
 
+    it("RF-30: junto al diario, el enlace a las líneas de ayuda", async () => {
+      stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByRole("link", { name: "¿Necesitas ayuda ahora?" })).toHaveAttribute("href", "/ayuda");
+    });
+
     it("la X del campo lo borra y lo cierra", async () => {
       stubFetch({ experiences: EXPERIENCES });
       renderPage();

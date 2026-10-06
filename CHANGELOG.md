@@ -5,6 +5,18 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (diseño)
+
+- Capas CSS: Material UI va en la capa `mui` y el CSS propio (`skin.css`, clases `mlm-`) le gana sin `!important` (ADR-07, apartado 4.1). Comprobado con un E2E en navegador real.
+- El selector de idioma de la cabecera es un interruptor entre las banderas de España y Reino Unido (pulsar una bandera también elige su idioma).
+- Cerrar sesión es el icono típico de salir, con su nombre accesible y *tooltip*; en el menú móvil, icono y texto.
+
+### Añadido (RF-30, líneas de ayuda)
+
+- Pantalla pública `/ayuda`, "¿Necesitas ayuda ahora?", con y sin sesión (con la cabecera y las migas que tocan en cada caso, para poder salir): la línea 024 y el 112 con un botón para llamar, Find A Helpline para fuera de España, y que la app no es un servicio profesional ni de emergencias. Las líneas son datos estáticos; solo se consulta la sesión, para la cabecera.
+- El enlace "¿Necesitas ayuda ahora?" al pie de todas las pantallas (públicas y protegidas), junto al diario de experiencias y en la pestaña "De otras personas". Igual para todo el mundo: nunca aparece por lo que alguien puntúe o escriba (RES-09).
+- Las líneas pasan a `wellbeing/domain/catalog/helplines.json` (CAT-01) y sus textos a las traducciones, con tests de integridad. El *smoke* de producción comprueba también `/ayuda`.
+
 ### Cambiado (Deporte deja de ser sensible)
 
 - Deporte ya no es categoría sensible: activarla no pide consentimiento, y entra en las ideas con IA (RF-40), las sugerencias (RF-45) y las experiencias compartidas (RF-43), como el resto. Siguen siendo sensibles Sexo y Espiritualidad. Decisión del autor ("cualquier categoría puede tener algo sensible"); reversible si llega feedback negativo. Los consentimientos ya dados se conservan como historial.
