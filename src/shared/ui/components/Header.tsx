@@ -4,10 +4,13 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
@@ -97,6 +100,9 @@ export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
                   onLogout();
                 }}
               >
+                <ListItemIcon>
+                  <LogoutIcon fontSize="small" />
+                </ListItemIcon>
                 {t("panel.cerrarSesion")}
               </MenuItem>
             </Menu>
@@ -120,9 +126,11 @@ export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
               </Typography>
             ) : null}
             <LanguageSwitcher />
-            <Button size="small" variant="outlined" onClick={onLogout}>
-              {t("panel.cerrarSesion")}
-            </Button>
+            <Tooltip title={t("panel.cerrarSesion")}>
+              <IconButton size="small" aria-label={t("panel.cerrarSesion")} onClick={onLogout}>
+                <LogoutIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
         )}
       </Toolbar>

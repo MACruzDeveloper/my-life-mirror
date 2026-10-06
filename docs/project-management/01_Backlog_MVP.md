@@ -11,15 +11,15 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **RF-43** compartir experiencias que funcionan (desde el 5 oct., Could; [historia](../user-stories/RF-43-experiencias-compartidas.md), Nivel 3; reescrita por el autor): con 8 o más, "Compartir de forma anónima" en cada experiencia del diario, con vista previa y filtros (contacto, salud y finanzas, ofensivos); otras personas la leen en la pestaña "De otras personas" de la ventana de ideas (junto a "De la app" y "Con IA") y pueden reportarla, lo que la oculta al momento.
+- [ ] **RF-30** líneas de ayuda siempre a mano (desde el 6 oct.; [historia](../user-stories/RF-30-lineas-ayuda.md)): pantalla pública `/ayuda` con el 024, el 112 y Find A Helpline; enlace "¿Necesitas ayuda ahora?" al pie de todas las pantallas, junto al diario y en la pestaña "De otras personas". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09).
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
 
+- [ ] **Revisión antes de la entrega** (desde el 6 oct., decidido con el autor): 1) publicar la v1.2.0; 2) revisión de código de todo el Ciclo 2; 3) prueba exploratoria con el [guion de la demo](../validation/04_Guion_Demo_Cierre.md), actualizándolo; 4) si se puede, un segundo test de usabilidad centrado en lo nuevo (diario, compartir, pestañas de ideas).
 - [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
-- [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". También junto al diario de experiencias (RF-44) y a las sugerencias de RF-45. La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
 - [ ] **Demo final** — al terminar el proyecto, para la revisión de los profesores (no antes: solo revisan el proyecto terminado). [Guion](../validation/04_Guion_Demo_Cierre.md) ya preparado; se actualiza entonces con lo que haya del Ciclo 2.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
@@ -42,6 +42,7 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
 ## Hecho
 
+- [x] **RF-43** compartir experiencias que funcionan ([historia](../user-stories/RF-43-experiencias-compartidas.md), Nivel 3): con 8 o más, compartir de forma anónima con vista previa y filtros; pestaña "De otras personas" en la ventana de ideas, con reporte que oculta al momento. Con ella, Deporte deja de ser sensible (migraciones 0017-0019).
 - [x] **RF-45** la IA propone opciones a partir de una experiencia ([historia](../user-stories/RF-45-sugerencias-ia-experiencias.md), Nivel 3): voluntario y por experiencia, solo claves de las listas cerradas, datos personales quitados antes de enviar, sin categorías sensibles ni Pareja, aviso de términos ofensivos. Contra un *Fake*; el modelo real con RF-40b.
 - [x] **RF-44** diario de experiencias ([historia](../user-stories/RF-44-diario-experiencias.md)): varias por categoría, "Añadir" sin puntuar, lista con fechas y eliminar; tabla propia (las notas de las evaluaciones se copian).
 - [x] **CAT-01** contenido curado como datos ([historia](../user-stories/CAT-01-contenido-curado-json.md)): ideas, situaciones, opciones y términos de los filtros en JSON, en una carpeta `catalog/` de su módulo.
@@ -157,3 +158,5 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.47 (5 oct. 2026)** — RF-44 en curso, detrás de CAT-01 (en su rama, encima de la de CAT-01).
 - **v2.48 (5 oct. 2026)** — RF-45 en curso: el autor decide sumarla a la PR de CAT-01 y RF-44 ("la PR no es muy grande"), así que el límite WIP de 2 se supera a sabiendas durante esta PR.
 - **v2.49 (5 oct. 2026)** — CAT-01, RF-44 y RF-45 hechas (PR #26). RF-43 en curso, reescrita por el autor (compartir experiencias en lugar del agregado anónimo); su dilema se suma a la validación ética con el tutor.
+- **v2.50 (6 oct. 2026)** — RF-43 hecha (con Deporte ya no sensible); RF-30 en curso.
+- **v2.51 (6 oct. 2026)** — "Revisión antes de la entrega" en Listo (v1.2.0, revisión de código, prueba exploratoria, segundo test de usabilidad); también resumida en el README.

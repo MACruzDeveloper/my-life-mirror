@@ -10,7 +10,7 @@ const checks = [
     return res.status === 200 && (await res.text()).includes('id="root"') || `HTTP ${res.status}`;
   }],
   // Rutas de la app (React Router): al recargar o abrir un enlace, Vercel debe servir index.html.
-  ...["/inicio", "/login", "/restablecer-password", "/perfil/entrevista"].map((path) => [`ruta ${path}`, async () => {
+  ...["/inicio", "/login", "/restablecer-password", "/perfil/entrevista", "/ayuda"].map((path) => [`ruta ${path}`, async () => {
     const res = await fetch(`${base}${path}`);
     return res.status === 200 && (await res.text()).includes('id="root"') || `HTTP ${res.status}`;
   }]),

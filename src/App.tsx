@@ -14,6 +14,7 @@ import { Home } from '@modules/panel/ui/home/Home'
 import { InterviewPage } from '@modules/assessments/ui/InterviewPage'
 import { ResultsPage } from '@modules/assessments/ui/ResultsPage'
 import { AdminPage } from '@modules/admin/ui/AdminPage'
+import { HelpRoute } from '@modules/wellbeing/ui/HelpPage'
 import { AdminRoute } from '@modules/admin/ui/AdminRoute'
 import { ProtectedLayout } from '@shared/ui/components/ProtectedLayout'
 import { PublicLayout } from '@shared/ui/components/PublicLayout'
@@ -34,6 +35,9 @@ function App() {
           <Route path="/politica-privacidad" element={<PrivacyPolicyPage />} />
         </Route>
         {/* Ruta de diseño: un único SessionProvider para todas las pantallas protegidas (no se remonta al navegar). */}
+        {/* RF-30: pública, con la cabecera de la app si hay sesión. */}
+        <Route path="/ayuda" element={<HelpRoute />} />
+
         <Route element={<ProtectedRoute />}>
           <Route
             path="/inicio"

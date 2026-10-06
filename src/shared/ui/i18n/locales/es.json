@@ -18,7 +18,8 @@
     "perfil": "Perfil",
     "miPerfil": "Mi perfil",
     "politicaPrivacidad": "Política de privacidad",
-    "administracion": "Administración"
+    "administracion": "Administración",
+    "ayuda": "Ayuda"
   },
   "landing": {
     "titulo": "MyLifeMirror",
@@ -664,5 +665,29 @@
     "mirarMisCuentas": "Mirar mis cuentas",
     "cambiosDeRutina": "Cambiar mi rutina",
     "pocoTiempoLibre": "Tener poco tiempo libre"
+  },
+  "ayuda": {
+    "enlace": "¿Necesitas ayuda ahora?",
+    "titulo": "¿Necesitas ayuda ahora?",
+    "intro": "Si estás pasando por un momento muy difícil o piensas en hacerte daño, no tienes por qué pasarlo en soledad. Puedes hablar ahora con alguien, gratis y a cualquier hora.",
+    "espana": "En España",
+    "fueraEspana": "Fuera de España",
+    "peligro": "Si hay un peligro inmediato para ti o para otra persona, llama al 112.",
+    "llamar": "Llamar al {{telefono}}",
+    "aviso": "MyLifeMirror no es un servicio profesional ni de emergencias. Este enlace está siempre en la app, para todo el mundo: no aparece por nada que hayas puntuado o escrito.",
+    "lineas": {
+      "es024": {
+        "nombre": "Línea 024 — Atención a la conducta suicida",
+        "disponibilidad": "Gratuita, confidencial, 24 horas todos los días."
+      },
+      "es112": {
+        "nombre": "112 — Emergencias",
+        "disponibilidad": "24 horas todos los días, en toda la Unión Europea."
+      },
+      "findAHelpline": {
+        "nombre": "Find A Helpline",
+        "disponibilidad": "directorio internacional de líneas de ayuda verificadas: elige tu país."
+      }
+    }
   }
 }
