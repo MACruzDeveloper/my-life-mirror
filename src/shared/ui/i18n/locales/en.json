@@ -18,7 +18,8 @@
     "perfil": "Profile",
     "miPerfil": "My profile",
     "politicaPrivacidad": "Privacy policy",
-    "administracion": "Administration"
+    "administracion": "Administration",
+    "ayuda": "Help"
   },
   "landing": {
     "titulo": "MyLifeMirror",
@@ -664,5 +665,29 @@
     "mirarMisCuentas": "Looking at my finances",
     "cambiosDeRutina": "Changing my routine",
     "pocoTiempoLibre": "Having little free time"
+  },
+  "ayuda": {
+    "enlace": "Need help now?",
+    "titulo": "Need help now?",
+    "intro": "If you're going through a very hard time or thinking about hurting yourself, you don't have to go through it alone. You can talk to someone now, for free, at any time.",
+    "espana": "In Spain",
+    "fueraEspana": "Outside Spain",
+    "peligro": "If you or someone else is in immediate danger, call 112.",
+    "llamar": "Call {{telefono}}",
+    "aviso": "MyLifeMirror isn't a professional or emergency service. This link is always in the app, for everyone: it doesn't appear because of anything you scored or wrote.",
+    "lineas": {
+      "es024": {
+        "nombre": "024 Line — Suicidal behaviour support",
+        "disponibilidad": "Free, confidential, 24 hours a day, every day."
+      },
+      "es112": {
+        "nombre": "112 — Emergencies",
+        "disponibilidad": "24 hours a day, every day, throughout the European Union."
+      },
+      "findAHelpline": {
+        "nombre": "Find A Helpline",
+        "disponibilidad": "international directory of verified helplines: choose your country."
+      }
+    }
   }
 }

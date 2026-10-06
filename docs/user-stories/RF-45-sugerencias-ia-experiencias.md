@@ -95,3 +95,4 @@ SuggestExperienceOptions({ userId, experienceId, locale }) →
 - **v1.2 (5 oct. 2026)** — implementada contra el *Fake* (palabras clave: propone una opción si el texto contiene todas sus palabras significativas, para no proponer "Conocer gente nueva" por la palabra "gente"). Los textos de RF-40 que decían que las experiencias nunca van a la IA pasan a decir "para estas ideas".
 - **v1.3 (5 oct. 2026)** — tras probarla el autor: el diario dice dónde activarla si la función existe pero está desactivada, y el *Fake* compara por la raíz de las palabras ("viajé" encaja con "Viajar").
 - **v1.4 (5 oct. 2026)** — decisiones del autor: Pareja (y lo que el catálogo marque como `aiExcluded`) queda fuera de la IA sin volverse sensible; aviso de términos ofensivos solo al enviar a la IA, con "Enviar igualmente".
+- **v1.5 (6 oct. 2026)** — el enlace a las líneas de ayuda junto al diario ya está, con [RF-30](RF-30-lineas-ayuda.md).

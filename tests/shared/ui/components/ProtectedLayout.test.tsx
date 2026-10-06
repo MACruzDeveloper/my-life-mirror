@@ -33,6 +33,8 @@ describe("ProtectedLayout", () => {
     expect(within(breadcrumbs).getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/inicio");
     expect(within(breadcrumbs).getByText("Perfil")).toBeInTheDocument();
     expect(screen.getByText("Contenido de la página")).toBeInTheDocument();
+    // RF-30: al pie de toda pantalla protegida, igual para todo el mundo.
+    expect(within(screen.getByRole("contentinfo")).getByRole("link", { name: "¿Necesitas ayuda ahora?" })).toHaveAttribute("href", "/ayuda");
   });
 
   it("muestra el nombre en vez del email cuando el perfil ya lo tiene (/api/sesion)", async () => {
