@@ -140,6 +140,84 @@ describe("RecommendationButton (RF-18)", () => {
     });
   });
 
+  describe("lo que comparten otras personas (RF-43)", () => {
+    afterEach(() => vi.unstubAllGlobals());
+    const SHARED_URL = "/api/categories/shared?categoryId=c1&locale=es";
+
+    function stubShared(shared: unknown) {
+      const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<unknown>>((url) => {
+        if (url === SHARED_URL) return Promise.resolve({ ok: true, json: async () => shared });
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      return fetchMock;
+    }
+
+    function openIdeas() {
+      const client = createTestClient();
+      client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false }]);
+      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      return screen.getByRole("dialog");
+    }
+
+    it("con experiencias compartidas, la ventana tiene 'De la app' y 'De otras personas (N)'; en esta, solo el texto y el aviso", async () => {
+      stubShared([
+        { id: "s1", text: "Apunto los gastos cada domingo" },
+        { id: "s2", text: "Una hucha para los imprevistos" },
+      ]);
+      const dialog = openIdeas();
+
+      const othersTab = await within(dialog).findByRole("tab", { name: "De otras personas (2)" });
+      expect(within(dialog).getByRole("tab", { name: "De la app" })).toHaveAttribute("aria-selected", "true");
+      fireEvent.click(othersTab);
+
+      expect(within(dialog).getByText("Apunto los gastos cada domingo")).toBeInTheDocument();
+      expect(within(dialog).getByText("Una hucha para los imprevistos")).toBeInTheDocument();
+      expect(within(dialog).getByText(/experiencias de otras personas: no son consejo profesional/i)).toBeInTheDocument();
+      expect(within(dialog).queryByText("Idea 1 de 5")).not.toBeInTheDocument();
+    });
+
+    it("sin ninguna, no hay pestañas", async () => {
+      const fetchMock = stubShared([]);
+      const dialog = openIdeas();
+
+      await waitFor(() => expect(fetchMock.mock.calls.some(([url]) => url === SHARED_URL)).toBe(true));
+      expect(await within(dialog).findByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+      expect(within(dialog).queryAllByRole("tab")).toHaveLength(0);
+    });
+
+    it("reportar una la oculta al momento y da las gracias", async () => {
+      const fetchMock = stubShared([
+        { id: "s1", text: "Apunto los gastos cada domingo" },
+        { id: "s2", text: "Una hucha para los imprevistos" },
+      ]);
+      const dialog = openIdeas();
+      fireEvent.click(await within(dialog).findByRole("tab", { name: "De otras personas (2)" }));
+
+      fireEvent.click(within(within(dialog).getByText("Apunto los gastos cada domingo").closest("li") as HTMLElement).getByRole("button", { name: "Reportar" }));
+
+      expect(await within(dialog).findByText("Gracias. La hemos ocultado.")).toBeInTheDocument();
+      expect(within(dialog).queryByText("Apunto los gastos cada domingo")).not.toBeInTheDocument();
+      expect(within(dialog).getByText("Una hucha para los imprevistos")).toBeInTheDocument();
+      const reports = fetchMock.mock.calls.filter(([url, init]) => url === "/api/categories/shared" && init?.method === "POST");
+      expect(reports.map(([, init]) => JSON.parse(init?.body as string))).toEqual([{ id: "s1" }]);
+    });
+
+    it("volver a abrirla usa la caché: no repite la petición", async () => {
+      const fetchMock = stubShared([{ id: "s1", text: "Apunto los gastos cada domingo" }]);
+      const dialog = openIdeas();
+      await within(dialog).findByRole("tab", { name: "De otras personas (1)" });
+      fireEvent.click(within(dialog).getByRole("button", { name: /cerrar/i }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      await within(screen.getByRole("dialog")).findByRole("tab", { name: "De otras personas (1)" });
+
+      expect(fetchMock.mock.calls.filter(([url]) => url === SHARED_URL)).toHaveLength(1);
+    });
+  });
+
   describe("ideas personalizadas (RF-40)", () => {
     afterEach(() => vi.unstubAllGlobals());
 
@@ -169,8 +247,23 @@ describe("RecommendationButton (RF-18)", () => {
       expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
       expect(personalizeBodies(fetchMock)).toEqual([{ recommendationId: "r1", templateKey: "economia.1", locale: "es" }]);
 
-      fireEvent.click(within(dialog).getByRole("button", { name: "Ver la idea original" }));
+      // RF-43: la original está en su pestaña ("De la app"); se abre en "Con IA".
+      expect(within(dialog).getByRole("tab", { name: "Con IA" })).toHaveAttribute("aria-selected", "true");
+      fireEvent.click(within(dialog).getByRole("tab", { name: "De la app" }));
       expect(within(dialog).getByText(/si te apetece, anota durante una semana/i)).toBeInTheDocument();
+      expect(within(dialog).queryByText("Personalizada con IA")).not.toBeInTheDocument();
+    });
+
+    it("el carrusel va por la misma idea en las dos pestañas", async () => {
+      stubPersonalize(async () => ({ ok: true, json: async () => ({ source: "catalog", templateKey: "economia.2" }) }));
+      renderPersonalized();
+
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      const dialog = screen.getByRole("dialog");
+      fireEvent.click(await within(dialog).findByRole("button", { name: "Idea siguiente" }));
+      fireEvent.click(within(dialog).getByRole("tab", { name: "De la app" }));
+
+      expect(within(dialog).getByText("Idea 2 de 5")).toBeInTheDocument();
     });
 
     it("si el servidor devuelve la plantilla curada, se ve como siempre, sin etiqueta de IA", async () => {

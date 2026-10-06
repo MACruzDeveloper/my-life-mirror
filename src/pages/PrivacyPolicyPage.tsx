@@ -62,6 +62,12 @@ export function PrivacyPolicyPage() {
           {t("politicaPrivacidad.iaSugerenciasTexto")}
         </Typography>
         <Typography variant="h6" component="h2" gutterBottom sx={{ mt: 3 }}>
+          {t("politicaPrivacidad.compartidasTitulo")}
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          {t("politicaPrivacidad.compartidasTexto")}
+        </Typography>
+        <Typography variant="h6" component="h2" gutterBottom sx={{ mt: 3 }}>
           {t("politicaPrivacidad.tusDerechosTitulo")}
         </Typography>
         <Typography variant="body1" sx={{ mb: 2 }}>

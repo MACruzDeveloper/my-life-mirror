@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -11,16 +12,19 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { keyframes } from "@mui/material/styles";
+import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
+import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import Link from "@mui/material/Link";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { hasOffensiveTerms } from "@modules/recommendations/domain/offensiveTerms";
-import type { ExperienceDto } from "../queries";
+import type { ExperienceDto, ShareOutcome } from "../queries";
 import { ToggleRow } from "./ToggleRow";
 
 /** Las que se ven sin pulsar "Ver todas". */
@@ -43,6 +47,17 @@ export interface ExperienceSuggestions {
   onAccept: (kind: SuggestionKind, key: string) => void;
 }
 
+/**
+ * RF-43: compartir de forma anónima. Se pasa siempre (una compartida se puede
+ * dejar de compartir aunque la puntuación baje); `canShare` dice si se pueden
+ * compartir más: categoría no sensible ni excluida y última puntuación de 8 o más.
+ */
+export interface ExperienceSharing {
+  canShare: boolean;
+  onShare: (experience: ExperienceDto) => Promise<ShareOutcome>;
+  onUnshare: (experience: ExperienceDto) => void;
+}
+
 interface ExperienceJournalProps {
   /** Las de esta categoría, la más reciente primero. */
   experiences: ExperienceDto[];
@@ -56,6 +71,92 @@ interface ExperienceJournalProps {
   suggestions?: ExperienceSuggestions;
   /** RF-45: la función existe pero el usuario no la ha activado; se le dice dónde (sin esto, no hay forma de descubrirla aquí). */
   suggestionsHint?: boolean;
+  sharing?: ExperienceSharing;
+}
+
+/**
+ * RF-43: la ventana de compartir: primero cómo la verán otras personas y qué
+ * implica; nada se publica sin "Compartir". Si el servidor la rechaza por los
+ * filtros, lo dice aquí mismo (qué quitar) y no se cierra.
+ */
+function ShareDialog({ experience, onShare, onClose }: { experience: ExperienceDto | null; onShare: (experience: ExperienceDto) => Promise<ShareOutcome>; onClose: () => void }) {
+  const { t } = useTranslation();
+  const titleId = useId();
+  const [sending, setSending] = useState(false);
+  const [rejection, setRejection] = useState<string | null>(null);
+
+  function close() {
+    setRejection(null);
+    onClose();
+  }
+
+  async function confirm() {
+    if (!experience) return;
+    setSending(true);
+    const outcome = await onShare(experience);
+    setSending(false);
+    if (outcome.ok) close();
+    else setRejection(t(`entrevista.compartirRechazo.${outcome.reason}`));
+  }
+
+  return (
+    <Dialog open={experience !== null} onClose={close} aria-labelledby={titleId} fullWidth maxWidth="xs">
+      <DialogTitle id={titleId}>{t("entrevista.compartir")}</DialogTitle>
+      <DialogContent>
+        <DialogContentText variant="body2">{t("entrevista.compartirVistaPrevia")}</DialogContentText>
+        <Box component="blockquote" sx={{ m: 0, my: 1.5, p: 1.5, borderRadius: 2, bgcolor: "action.hover", whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
+          <Typography variant="body2">{experience?.text}</Typography>
+        </Box>
+        <Box component="ul" sx={{ m: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+          {(["compartirAnonima", "compartirRetirable", "compartirReportable"] as const).map((key) => (
+            <Typography key={key} component="li" variant="body2" color="text.secondary">
+              {t(`entrevista.${key}`)}
+            </Typography>
+          ))}
+        </Box>
+        {rejection && (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            {rejection}
+          </Alert>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={close}>{t("entrevista.cancelar")}</Button>
+        <Button variant="contained" disabled={sending || rejection !== null} onClick={() => void confirm()}>
+          {t("entrevista.compartirConfirmar")}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+/** RF-43: el estado de una experiencia respecto a compartirla, y su acción. */
+function ShareControls({ experience, sharing, onShare }: { experience: ExperienceDto; sharing: ExperienceSharing; onShare: () => void }) {
+  const { t } = useTranslation();
+  if (experience.reported) {
+    return (
+      <Typography variant="caption" color="text.secondary" sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
+        <FlagOutlinedIcon sx={{ fontSize: 14 }} />
+        {t("entrevista.retiradaReporte")}
+      </Typography>
+    );
+  }
+  if (experience.shared) {
+    return (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap", mt: 0.5 }}>
+        <Chip icon={<VolunteerActivismOutlinedIcon />} label={t("entrevista.compartida")} size="small" color="success" variant="outlined" />
+        <Button size="small" color="inherit" onClick={() => sharing.onUnshare(experience)} sx={{ textTransform: "none", px: 0.5 }}>
+          {t("entrevista.dejarDeCompartir")}
+        </Button>
+      </Box>
+    );
+  }
+  if (!sharing.canShare) return null;
+  return (
+    <Button size="small" startIcon={<VolunteerActivismOutlinedIcon fontSize="small" />} onClick={onShare} sx={{ mt: 0.5, textTransform: "none", px: 0.5 }}>
+      {t("entrevista.compartir")}
+    </Button>
+  );
 }
 
 /**
@@ -169,7 +270,7 @@ function ExperienceSuggestionsBox({ experience, suggestions }: { experience: Exp
  * pueden borrar; se ven las más recientes y "Ver todas". El texto que se escribe
  * vive aquí: escribir solo vuelve a pintar este campo, no la entrevista entera.
  */
-export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd, onDelete, suggestions, suggestionsHint = false }: ExperienceJournalProps) {
+export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd, onDelete, suggestions, suggestionsHint = false, sharing }: ExperienceJournalProps) {
   const { t, i18n } = useTranslation();
   const listLabelId = useId();
   const [open, setOpen] = useState(false);
@@ -177,6 +278,11 @@ export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd,
   const [adding, setAdding] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<ExperienceDto | null>(null);
+  const [pendingShare, setPendingShare] = useState<ExperienceDto | null>(null);
+  const canShare = sharing?.canShare === true;
+  // RF-43: la app lo ofrece cuando hay alguna que se pueda compartir.
+  const offerSharing = canShare && experiences.some((experience) => !experience.shared && !experience.reported);
+  const privacyNote = suggestions ? (canShare ? "experienciasPrivadasConIaCompartir" : "experienciasPrivadasConIa") : canShare ? "experienciasPrivadasCompartir" : "experienciasPrivadas";
   const formatDate = (isoDate: string) => new Date(isoDate).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" });
   const visible = showAll ? experiences : experiences.slice(0, VISIBLE_EXPERIENCES);
   const title = experiences.length > 0 ? t("entrevista.experienciasTituloN", { count: experiences.length }) : t("entrevista.experienciasTitulo");
@@ -206,7 +312,7 @@ export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd,
             label={t("entrevista.nuevaExperiencia")}
             value={text}
             onChange={(event) => setText(event.target.value)}
-            helperText={suggestions ? t("entrevista.experienciasPrivadasConIa") : t("entrevista.experienciasPrivadas")}
+            helperText={t(`entrevista.${privacyNote}`)}
             multiline
             minRows={2}
             slotProps={{
@@ -255,6 +361,7 @@ export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd,
                 <Typography variant="body2" sx={{ overflowWrap: "anywhere", whiteSpace: "pre-line" }}>
                   {experience.text}
                 </Typography>
+                {sharing && <ShareControls experience={experience} sharing={sharing} onShare={() => setPendingShare(experience)} />}
                 {suggestions && <ExperienceSuggestionsBox experience={experience} suggestions={suggestions} />}
               </Box>
               <IconButton size="small" aria-label={t("entrevista.borrarExperiencia", { fecha: formatDate(experience.createdAt) })} onClick={() => setPendingDelete(experience)}>
@@ -263,6 +370,11 @@ export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd,
             </Box>
           ))}
         </Box>
+      )}
+      {offerSharing && (
+        <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.75 }}>
+          {t("entrevista.compartirOferta")}
+        </Typography>
       )}
       {suggestions && experiences.length > 0 && (
         <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.75 }}>
@@ -282,6 +394,7 @@ export function ExperienceJournal({ experiences, statusText, justAddedId, onAdd,
           {showAll ? t("entrevista.verMenos") : t("entrevista.verTodas", { count: experiences.length })}
         </Button>
       )}
+      {sharing && <ShareDialog experience={pendingShare} onShare={sharing.onShare} onClose={() => setPendingShare(null)} />}
       <Dialog open={pendingDelete !== null} onClose={() => setPendingDelete(null)} aria-labelledby={`${listLabelId}-borrar`}>
         <DialogTitle id={`${listLabelId}-borrar`}>{t("entrevista.borrarExperienciaTitulo")}</DialogTitle>
         <DialogContent>

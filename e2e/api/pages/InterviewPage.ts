@@ -95,6 +95,22 @@ export class InterviewPage {
     return this.page.getByRole("group", { name: new RegExp(`qué te ayuda\\? ${name}`, "i") });
   }
 
+  /** RF-44: escribe y añade una experiencia al diario de una categoría (el diario debe estar abierto o se abre). */
+  async addExperience(name: string, text: string) {
+    await this.goToQuestions();
+    const question = this.question(name);
+    const field = question.getByLabel("Nueva experiencia");
+    if (!(await field.isVisible())) await question.getByRole("button", { name: /tus experiencias/i }).click();
+    await field.fill(text);
+    await question.getByRole("button", { name: "Añadir" }).click();
+    await expect(this.experience(name, text)).toBeVisible();
+  }
+
+  /** RF-44: una experiencia del diario de una categoría, por su texto. */
+  experience(name: string, text: string) {
+    return this.question(name).getByRole("listitem").filter({ hasText: text });
+  }
+
   /** UX-05: "Cambios guardados", que se abre solo si el guardado abre una idea nueva. */
   savedIdeaDialog() {
     return this.page.getByRole("dialog", { name: "Cambios guardados" });

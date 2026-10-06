@@ -29,6 +29,12 @@ import { InMemoryExperienceRepository } from "#modules/assessments/infrastructur
 import { SupabaseExperienceRepository } from "#modules/assessments/infrastructure/SupabaseExperienceRepository.js";
 import { type ExperienceRepository } from "#modules/assessments/domain/Experience.js";
 import { createAddExperience, createDeleteExperience, createListExperiences } from "#modules/assessments/application/Experiences.js";
+import {
+  createListSharedExperiences,
+  createReportSharedExperience,
+  createShareExperience,
+  createUnshareExperience,
+} from "#modules/assessments/application/SharedExperiences.js";
 import { JsonIdeaTexts } from "#modules/recommendations/infrastructure/JsonIdeaTexts.js";
 import { SupabasePersonalizedIdeaRepository } from "#modules/recommendations/infrastructure/SupabasePersonalizedIdeaRepository.js";
 import { createSetAiIdeas } from "#modules/accounts/application/SetAiIdeas.js";
@@ -267,6 +273,10 @@ export interface AppContext {
   addExperience: ReturnType<typeof createAddExperience>;
   listExperiences: ReturnType<typeof createListExperiences>;
   deleteExperience: ReturnType<typeof createDeleteExperience>;
+  shareExperience: ReturnType<typeof createShareExperience>;
+  unshareExperience: ReturnType<typeof createUnshareExperience>;
+  listSharedExperiences: ReturnType<typeof createListSharedExperiences>;
+  reportSharedExperience: ReturnType<typeof createReportSharedExperience>;
   recommendationRepository: RecommendationRepository;
   listRecommendations: ReturnType<typeof createListRecommendations>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
@@ -362,6 +372,11 @@ export function createAppContext(environment: Environment = detectEnvironment())
     addExperience: createAddExperience({ experienceRepository, categoryRepository, clock }),
     listExperiences: createListExperiences(experienceRepository),
     deleteExperience: createDeleteExperience(experienceRepository),
+    // RF-43: compartir experiencias de forma anónima, leerlas y reportarlas.
+    shareExperience: createShareExperience({ experienceRepository, categoryRepository, catalog: categoryCatalogRepository, assessmentRepository, clock }),
+    unshareExperience: createUnshareExperience(experienceRepository),
+    listSharedExperiences: createListSharedExperiences({ experienceRepository, categoryRepository, catalog: categoryCatalogRepository }),
+    reportSharedExperience: createReportSharedExperience({ experienceRepository, clock }),
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
     aiIdeasAvailable: ideaProvider.writer !== undefined,

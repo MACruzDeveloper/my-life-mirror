@@ -94,6 +94,18 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     expect(data.personalizedIdeas).toEqual([{ category: "Economía", locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: "2026-09-20T10:00:00.000Z" }]);
   });
 
+  it("RF-43: dice qué experiencias están compartidas y cuáles se retiraron tras un reporte", async () => {
+    const { exportUserData, experienceRepository, ana } = await setup();
+    const [experience] = await experienceRepository.findByUserId(ana.id);
+    await experienceRepository.save({ ...experience, sharedAt: new Date("2026-10-05T10:00:00.000Z"), sharedLocale: "es", sharedCategoryKey: "economia", reportedAt: new Date("2026-10-06T10:00:00.000Z") });
+
+    const result = await exportUserData({ id: ana.id, email: ana.email });
+
+    expect(result.ok && result.value.experiences).toEqual([
+      { category: "Economía", text: "Este mes he ahorrado un poco", createdAt: "2026-09-21T10:00:00.000Z", sharedAt: "2026-10-05T10:00:00.000Z", reportedAt: "2026-10-06T10:00:00.000Z" },
+    ]);
+  });
+
   it("no incluye nada de otros usuarios", async () => {
     const { exportUserData, ana, luis } = await setup();
 

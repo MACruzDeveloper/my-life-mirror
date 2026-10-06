@@ -49,11 +49,13 @@ interface StubOptions {
   saveResponse?: () => Promise<unknown>;
   /** RF-44: experiencias del diario (GET /api/categories/diary). */
   experiences?: unknown;
+  /** RF-43: si compartir falla los filtros del servidor, el motivo (422). */
+  shareRejection?: string;
 }
 
 // Por defecto, el diario vacío: cada experiencia añade botones a la página y encarece todas las búsquedas por rol.
 
-function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [] }: StubOptions = {}) {
+function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [], shareRejection }: StubOptions = {}) {
   const fetchMock: ReturnType<typeof vi.fn> = vi.fn((url: string, init?: RequestInit) => {
     if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => CATEGORIES });
     if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
@@ -76,6 +78,12 @@ function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], r
     if (url.startsWith("/api/categories/diary")) {
       if (!init?.method || init.method === "GET") return Promise.resolve({ ok: true, json: async () => experiences });
       if (init.method === "DELETE") return Promise.resolve({ ok: true, json: async () => ({ deleted: true }) });
+      if (init.method === "PATCH") {
+        const { id, shared } = JSON.parse(init.body as string);
+        if (shared && shareRejection) return Promise.resolve({ ok: false, status: 422, json: async () => ({ error: "Not shareable", reason: shareRejection }) });
+        const experience = (experiences as { id: string }[]).find((candidate) => candidate.id === id);
+        return Promise.resolve({ ok: true, json: async () => ({ ...experience, shared, reported: false }) });
+      }
       const { categoryId, text } = JSON.parse(init.body as string);
       return Promise.resolve({ ok: true, json: async () => ({ id: `e-${text}`, categoryId, text, createdAt: "2026-10-05T10:00:00.000Z" }) });
     }
@@ -740,6 +748,91 @@ describe("InterviewPage (RF-10)", () => {
 
       expect(within(question("c1")).queryByLabelText("Nueva experiencia")).not.toBeInTheDocument();
       expect(within(question("c1")).getByRole("button", { name: /tus experiencias/i })).toHaveAttribute("aria-expanded", "false");
+    });
+  });
+
+  describe("compartir experiencias (RF-43)", () => {
+    const HIGH_SCORES = [{ ...LATEST[0], score: 9 }, { ...LATEST[1], score: 9 }];
+    const ONE_EXPERIENCE = [EXPERIENCES[0]];
+
+    function experienceItem(text: string) {
+      return within(question("c1")).getByText(text).closest("li") as HTMLElement;
+    }
+
+    function patchBodies(fetchMock: ReturnType<typeof stubFetch>) {
+      return fetchMock.mock.calls.filter(([url, init]) => url === "/api/categories/diary" && init?.method === "PATCH").map(([, init]) => JSON.parse(init.body as string));
+    }
+
+    it("con 8 o más, la app lo ofrece; compartir enseña antes cómo la verán otras personas y, al confirmar, queda 'Compartida'", async () => {
+      const fetchMock = stubFetch({ latest: HIGH_SCORES, experiences: ONE_EXPERIENCE });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByText(/puedes compartir una experiencia de forma anónima/i)).toBeInTheDocument();
+      fireEvent.click(within(experienceItem("Este mes he ahorrado un poco")).getByRole("button", { name: "Compartir de forma anónima" }));
+      const dialog = screen.getByRole("dialog", { name: "Compartir de forma anónima" });
+      expect(within(dialog).getByText("Este mes he ahorrado un poco")).toBeInTheDocument();
+      expect(within(dialog).getByText(/sin tu nombre, la fecha ni tu puntuación/i)).toBeInTheDocument();
+      expect(patchBodies(fetchMock)).toHaveLength(0);
+      fireEvent.click(within(dialog).getByRole("button", { name: "Compartir" }));
+
+      expect(await within(experienceItem("Este mes he ahorrado un poco")).findByText("Compartida")).toBeInTheDocument();
+      expect(patchBodies(fetchMock)).toEqual([{ id: "e3", shared: true, locale: "es" }]);
+      // La ventana tarda un momento en cerrarse; mientras, el resto de la página no es accesible.
+      expect(await within(experienceItem("Este mes he ahorrado un poco")).findByRole("button", { name: "Dejar de compartir" })).toBeInTheDocument();
+    });
+
+    it("con menos de 8, no se ofrece", async () => {
+      stubFetch({ experiences: ONE_EXPERIENCE });
+      renderPage();
+      await waitUntilLoaded();
+      await within(question("c1")).findByText("Este mes he ahorrado un poco");
+
+      expect(within(question("c1")).queryByRole("button", { name: "Compartir de forma anónima" })).not.toBeInTheDocument();
+      expect(within(question("c1")).queryByText(/puedes compartir una experiencia de forma anónima/i)).not.toBeInTheDocument();
+    });
+
+    it("nunca en una categoría sensible, aunque tenga 8 o más", async () => {
+      stubFetch({ latest: HIGH_SCORES, experiences: [{ id: "e-sport", categoryId: "c2", text: "Correr los sábados", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c2")).findByText("Correr los sábados")).toBeInTheDocument();
+      expect(within(question("c2")).queryByRole("button", { name: "Compartir de forma anónima" })).not.toBeInTheDocument();
+    });
+
+    it("si no pasa los filtros, la ventana dice qué quitar y no se comparte", async () => {
+      stubFetch({ latest: HIGH_SCORES, experiences: ONE_EXPERIENCE, shareRejection: "health" });
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Compartir de forma anónima" }));
+      const dialog = screen.getByRole("dialog", { name: "Compartir de forma anónima" });
+      fireEvent.click(within(dialog).getByRole("button", { name: "Compartir" }));
+
+      expect(await within(dialog).findByText(/salud, medicación, terapia o dinero/i)).toBeInTheDocument();
+      expect(within(experienceItem("Este mes he ahorrado un poco")).queryByText("Compartida")).not.toBeInTheDocument();
+    });
+
+    it("'Dejar de compartir' la vuelve privada", async () => {
+      const fetchMock = stubFetch({ latest: HIGH_SCORES, experiences: [{ ...EXPERIENCES[0], shared: true }] });
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Dejar de compartir" }));
+
+      expect(await within(experienceItem("Este mes he ahorrado un poco")).findByRole("button", { name: "Compartir de forma anónima" })).toBeInTheDocument();
+      expect(within(experienceItem("Este mes he ahorrado un poco")).queryByText("Compartida")).not.toBeInTheDocument();
+      expect(patchBodies(fetchMock)).toEqual([{ id: "e3", shared: false }]);
+    });
+
+    it("una retirada tras un reporte lo dice y no se puede volver a compartir", async () => {
+      stubFetch({ latest: HIGH_SCORES, experiences: [{ ...EXPERIENCES[0], shared: false, reported: true }] });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByText("Retirada tras un reporte")).toBeInTheDocument();
+      expect(within(question("c1")).queryByRole("button", { name: "Compartir de forma anónima" })).not.toBeInTheDocument();
     });
   });
 

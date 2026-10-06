@@ -4,11 +4,12 @@ import deactivate from "#shared/infrastructure/http/handlers/categories/deactiva
 import diary from "#shared/infrastructure/http/handlers/categories/diary.js";
 import difficulties from "#shared/infrastructure/http/handlers/categories/difficulties.js";
 import experience from "#shared/infrastructure/http/handlers/categories/experience.js";
+import shared from "#shared/infrastructure/http/handlers/categories/shared.js";
 import translations from "#shared/infrastructure/http/handlers/categories/translations.js";
 
 /**
- * Función serverless de `/api/categories/activate|deactivate|experience|difficulties|diary|translations`
+ * Función serverless de `/api/categories/activate|deactivate|experience|difficulties|diary|shared|translations`
  * (`/api/categories` a secas sigue siendo `index.ts`). Ver createRouter sobre
  * el límite de 12 funciones.
  */
-export default createRouter("/api/categories/", { activate, deactivate, experience, difficulties, diary, translations });
+export default createRouter("/api/categories/", { activate, deactivate, experience, difficulties, diary, shared, translations });

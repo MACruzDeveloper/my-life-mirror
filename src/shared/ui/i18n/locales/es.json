@@ -96,7 +96,7 @@
     "queDatosTitulo": "Qué datos recopilamos",
     "queDatosTexto": "Tu email, el nombre que nos das al registrarte, y las respuestas que registras en las categorías que actives (fecha de nacimiento, género si lo indicas, zona horaria, y tus evaluaciones por categoría).",
     "datosSensiblesTitulo": "Categorías de datos especialmente protegidas",
-    "datosSensiblesTexto": "Algunas categorías (sexo, deporte/salud, espiritualidad) se consideran datos de categoría especial según el RGPD (art. 9). Solo se activan y registran con tu consentimiento explícito, que puedes retirar en cualquier momento desactivando la categoría.",
+    "datosSensiblesTexto": "Algunas categorías (sexo, espiritualidad) se consideran datos de categoría especial según el RGPD (art. 9). Solo se activan y registran con tu consentimiento explícito, que puedes retirar en cualquier momento desactivando la categoría.",
     "paraQueTitulo": "Para qué los usamos",
     "paraQueTexto": "Únicamente para ofrecerte tu propio panel de seguimiento y sugerencias personalizadas dentro de la app. No se comparten con terceros ni se usan con fines publicitarios.",
     "tusDerechosTitulo": "Tus derechos",
@@ -106,7 +106,9 @@
     "iaTitulo": "Ideas personalizadas con IA",
     "iaTexto": "Es opcional y está desactivado por defecto. Si lo activas en Privacidad y datos, al abrir una idea para un área no sensible se envían a Anthropic, que actúa como encargado del tratamiento: la categoría, tu última puntuación y si va a mejor o a peor, las opciones que hayas marcado en \"¿Qué te ayuda?\" y las ideas de la app para esa categoría. Para estas ideas, nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles, ni la de Pareja. La idea resultante se guarda en tu cuenta para no volver a pedirla. Puedes desactivarlo cuando quieras y se borran las ideas personalizadas.",
     "iaSugerenciasTitulo": "Sugerencias de la IA a partir de tus experiencias",
-    "iaSugerenciasTexto": "También es opcional, aparte de lo anterior y desactivado por defecto. Si lo activas en Privacidad y datos, en cada experiencia de tu diario aparece «Sugerir opciones con IA»: al pulsarlo se envía a Anthropic, como encargado del tratamiento, solo la experiencia que tú le pidas analizar, junto con las opciones posibles de esa categoría, para que te proponga cuáles marcar en «¿Qué te ayuda?» o «¿Qué te lo pone difícil?». Tú aceptas o descartas cada propuesta; la IA no escribe nada sobre ti ni valora tu estado. Antes de enviarla quitamos emails, teléfonos, enlaces y números largos; los nombres no se pueden quitar con seguridad, así que te pedimos que no escribas nombres de otras personas si no quieres que se envíen. Nunca se envían tu nombre, tu email, tus puntuaciones ni las experiencias que no pidas analizar, y nunca se envían las categorías sensibles ni la de Pareja. Puedes desactivarlo cuando quieras; de la IA solo quedan las opciones que aceptes."
+    "iaSugerenciasTexto": "También es opcional, aparte de lo anterior y desactivado por defecto. Si lo activas en Privacidad y datos, en cada experiencia de tu diario aparece «Sugerir opciones con IA»: al pulsarlo se envía a Anthropic, como encargado del tratamiento, solo la experiencia que tú le pidas analizar, junto con las opciones posibles de esa categoría, para que te proponga cuáles marcar en «¿Qué te ayuda?» o «¿Qué te lo pone difícil?». Tú aceptas o descartas cada propuesta; la IA no escribe nada sobre ti ni valora tu estado. Antes de enviarla quitamos emails, teléfonos, enlaces y números largos; los nombres no se pueden quitar con seguridad, así que te pedimos que no escribas nombres de otras personas si no quieres que se envíen. Nunca se envían tu nombre, tu email, tus puntuaciones ni las experiencias que no pidas analizar, y nunca se envían las categorías sensibles ni la de Pareja. Puedes desactivarlo cuando quieras; de la IA solo quedan las opciones que aceptes.",
+    "compartidasTitulo": "Experiencias compartidas con otras personas",
+    "compartidasTexto": "Si tu última puntuación en un área es de 8 o más, puedes compartir de forma anónima una experiencia de tu diario para ayudar a otras personas. Solo se comparte la que tú elijas, después de ver cómo la verán. Las demás personas usuarias de la app leen solo el texto, entre las ideas de esa área y en tu mismo idioma: nunca tu nombre, tu email, la fecha ni tu puntuación. Antes de publicarla comprobamos que no lleve datos de contacto, consejos de salud o de dinero ni insultos. Nunca se comparten experiencias de las categorías sensibles ni de Pareja. Ten en cuenta que, si cuentas detalles muy personales, alguien que te conozca podría reconocerte. Puedes dejar de compartirla cuando quieras, en tu diario o en Privacidad y datos; si alguien la reporta, deja de verse. Se borra al borrar la experiencia o tu cuenta."
   },
   "entrevista": {
     "titulo": "Tu entrevista",
@@ -214,7 +216,29 @@
     "sugerenciasPista": "¿Quieres que la IA te sugiera opciones a partir de tus experiencias?",
     "sugerenciasPistaEnlace": "Actívalas en Privacidad y datos",
     "avisoOfensivo": "Esta experiencia tiene palabras que preferimos no enviar a la IA. Puedes borrarla y escribirla de otra forma, o enviarla igualmente.",
-    "enviarIgualmente": "Enviar igualmente"
+    "enviarIgualmente": "Enviar igualmente",
+    "compartir": "Compartir de forma anónima",
+    "compartirOferta": "Te va bien en esta área: puedes compartir una experiencia de forma anónima para ayudar a otras personas.",
+    "compartirVistaPrevia": "Así la verán otras personas a las que les cuesta más esta área:",
+    "compartirAnonima": "Sin tu nombre, la fecha ni tu puntuación.",
+    "compartirRetirable": "Puedes dejar de compartirla cuando quieras.",
+    "compartirReportable": "Otras personas pueden reportarla; si lo hacen, deja de verse.",
+    "compartirConfirmar": "Compartir",
+    "compartida": "Compartida",
+    "dejarDeCompartir": "Dejar de compartir",
+    "retiradaReporte": "Retirada tras un reporte",
+    "errorDejarDeCompartir": "No se ha podido dejar de compartir la experiencia. Inténtalo de nuevo.",
+    "experienciasPrivadasCompartir": "Solo las ves tú, salvo las que compartas de forma anónima. Nunca se envían a la IA.",
+    "experienciasPrivadasConIaCompartir": "Solo las ves tú, salvo las que compartas de forma anónima. A la IA solo va la que tú le pidas analizar.",
+    "compartirRechazo": {
+      "contact": "Para compartirla no puede llevar emails, teléfonos, enlaces ni números largos. Bórrala y escribe otra sin ellos.",
+      "health": "Para compartirla no puede hablar de salud, medicación, terapia o dinero (inversiones, préstamos…): la app no difunde consejos de ese tipo entre personas. Bórrala y escribe otra sin ellos.",
+      "offensive": "Para compartirla no puede llevar insultos ni palabras ofensivas. Bórrala y escribe otra sin ellos.",
+      "score": "Solo se puede compartir con una puntuación de 8 o más en esta área.",
+      "category": "En esta área no se comparten experiencias.",
+      "reported": "Esta experiencia se retiró tras un reporte y no se puede volver a compartir.",
+      "error": "No se ha podido compartir. Inténtalo de nuevo."
+    }
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -408,7 +432,10 @@
     "sugerenciasQueSeEnvia": "Si lo activas, en cada experiencia de tu diario aparece «Sugerir opciones con IA». Al pulsarlo, se envía a un servicio de IA (Anthropic) solo la experiencia que tú le pidas analizar, junto con las opciones posibles de esa categoría, para que te proponga cuáles marcar en «¿Qué te ayuda?» o «¿Qué te lo pone difícil?». Tú aceptas o descartas cada propuesta; la IA no escribe nada sobre ti.",
     "sugerenciasQueSeQuita": "Antes de enviarla quitamos emails, teléfonos, enlaces y números largos. Los nombres no se pueden quitar con seguridad: si no quieres que se envíen, no escribas nombres de otras personas.",
     "sugerenciasQueNunca": "Nunca se envían tu nombre, tu email, tus puntuaciones ni las experiencias que no pidas analizar, y nunca se envían las categorías sensibles ni la de Pareja.",
-    "sugerenciasRevocable": "Está desactivado por defecto y puedes desactivarlo cuando quieras. De la IA solo quedan las opciones que aceptes."
+    "sugerenciasRevocable": "Está desactivado por defecto y puedes desactivarlo cuando quieras. De la IA solo quedan las opciones que aceptes.",
+    "compartidasTitulo": "Experiencias compartidas",
+    "compartidasTexto": "Las experiencias de tu diario que has compartido de forma anónima para ayudar a otras personas. Solo ven el texto: ni tu nombre, ni la fecha, ni tu puntuación.",
+    "compartidasNinguna": "No tienes ninguna experiencia compartida."
   },
   "recomendaciones": {
     "ideaAnterior": "Idea anterior",
@@ -493,8 +520,13 @@
     "ideaPara": "Idea para {{categoria}}",
     "personalizando": "Personalizando tu idea…",
     "personalizadaConIa": "Personalizada con IA",
-    "verOriginal": "Ver la idea original",
-    "ocultarOriginal": "Ocultar la original"
+    "pestanaApp": "De la app",
+    "pestanaIa": "Con IA",
+    "pestanaOtros": "De otras personas ({{count}})",
+    "reportar": "Reportar",
+    "reportada": "Gracias. La hemos ocultado.",
+    "errorReportar": "No se ha podido reportar. Inténtalo de nuevo.",
+    "avisoOtros": "Experiencias de otras personas: no son consejo profesional. Si alguna no te parece adecuada, repórtala."
   },
   "evolucion": {
     "titulo": "Tu evolución",
