@@ -15,7 +15,7 @@ import { useLatestScores } from "./queries";
 
 /**
  * Resultados (dentro de Mi perfil): las tarjetas de detalle de cada categoría
- * activa — última puntuación, nota, fecha y banda — con el botón de la
+ * activa — última puntuación, fecha y banda — con el botón de la
  * recomendación si la hay, y el historial de cambios por día (UX-05). La vista
  * gráfica (evolución) está en Inicio (RF-16).
  */

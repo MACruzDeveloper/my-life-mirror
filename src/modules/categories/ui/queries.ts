@@ -13,11 +13,15 @@ export interface CategoryDto {
   status: "active" | "inactive";
   /** RF-41: opciones marcadas de "¿Qué te ayuda?" (claves de `experienceOptions`). */
   experienceTags?: string[];
+  /** RF-42: situaciones que se lo ponen difícil (claves de `ideaSituations`). */
+  difficultyTags?: string[];
 }
 
 export interface CatalogLabelDto {
   catalogId: string;
   key?: string;
+  /** RF-45: fuera de la IA. */
+  aiExcluded?: boolean;
   translations: Partial<Record<Locale, { name: string; description: string }>>;
 }
 

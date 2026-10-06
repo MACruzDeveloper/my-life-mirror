@@ -1,9 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import CssBaseline from '@mui/material/CssBaseline'
-import { ThemeProvider } from '@mui/material/styles'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { theme } from '@shared/ui/theme'
+import { StyleProviders } from '@shared/ui/StyleProviders'
 import { createQueryClient } from '@shared/ui/api/queryClient'
 import './index.css'
 import '@shared/ui/css/skin.css'
@@ -15,10 +13,9 @@ const queryClient = createQueryClient()
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <StyleProviders>
         <App />
-      </ThemeProvider>
+      </StyleProviders>
     </QueryClientProvider>
   </StrictMode>,
 )

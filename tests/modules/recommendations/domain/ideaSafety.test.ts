@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { checkIdeaSafety, termToPattern } from "@modules/recommendations/domain/ideaSafety";
-import terms from "@modules/recommendations/domain/ideaSafetyTerms.json";
+import terms from "@modules/recommendations/domain/catalog/safetyTerms.json";
 import type { IdeaRequest } from "@modules/recommendations/domain/IdeaWriter";
 import evaluation from "./ideaSafety.cases.json";
 
@@ -29,7 +29,7 @@ describe("checkIdeaSafety (RF-40): conjunto de evaluación", () => {
   }
 });
 
-describe("ideaSafetyTerms.json (RF-40): la lista editable", () => {
+describe("catalog/safetyTerms.json (RF-40): la lista editable", () => {
   it("tiene los mismos tipos de término en español y en inglés, ninguno vacío", () => {
     expect(Object.keys(terms.es).sort()).toEqual(Object.keys(terms.en).sort());
     for (const locale of ["es", "en"] as const) {

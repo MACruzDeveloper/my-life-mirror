@@ -29,6 +29,13 @@ export class JsonIdeaTexts implements IdeaTexts {
     });
   }
 
+  situationLabels(keys: readonly string[], locale: Locale): string[] {
+    return keys.flatMap((key) => {
+      const label = lookup(RESOURCES[locale], `situaciones.${key}`);
+      return label ? [label] : [];
+    });
+  }
+
   experienceLabels(tags: readonly string[], locale: Locale): string[] {
     return tags.flatMap((tag) => {
       const label = lookup(RESOURCES[locale], `experiencias.${tag}`);

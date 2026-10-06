@@ -55,7 +55,7 @@ El diseño de arriba, concretado en la [historia RF-40](../user-stories/RF-40-id
 
 - **Qué recibe la IA:** clave de la categoría, última puntuación, tendencia (sube, baja, igual o primera vez), los textos de las opciones de "¿Qué te ayuda?" (RF-41, lista cerrada) y las **cinco** ideas curadas de esa categoría (el catálogo pasó de 2 a 5 por categoría para que haya entre qué elegir; redactadas con ayuda de IA y revisadas por el autor). Nunca: nombre, email, ids, la experiencia privada ni nada de categorías sensibles.
 - **Cuándo:** la primera vez que el usuario abre la idea; se guarda por recomendación e idioma (`personalized_ideas`, migración 0011) y las siguientes veces se lee lo guardado. Así solo se paga por lo que se lee y se sabe el idioma.
-- **Filtro determinista** (`checkIdeaSafety`; los términos, en `recommendations/domain/ideaSafetyTerms.json`, por idioma y tipo, editables sin tocar la lógica y solo en el servidor: no van en las traducciones porque esas viajan completas al navegador): la idea elegida tiene que estar entre las candidatas, entre 40 y 400 caracteres, y sin ningún término bloqueado en español o inglés (diagnósticos y lenguaje clínico, medicación, productos financieros, obligación, juicio, enlaces, correos y teléfonos). Su conjunto de evaluación (22 casos) es un test y se reutilizará con el modelo real. Filtra **lo que escribe la IA, no lo que escribe la persona** (RES-09).
+- **Filtro determinista** (`checkIdeaSafety`; los términos, en `recommendations/domain/catalog/safetyTerms.json` (desde CAT-01), por idioma y tipo, editables sin tocar la lógica y solo en el servidor: no van en las traducciones porque esas viajan completas al navegador): la idea elegida tiene que estar entre las candidatas, entre 40 y 400 caracteres, y sin ningún término bloqueado en español o inglés (diagnósticos y lenguaje clínico, medicación, productos financieros, obligación, juicio, enlaces, correos y teléfonos). Su conjunto de evaluación (22 casos) es un test y se reutilizará con el modelo real. Filtra **lo que escribe la IA, no lo que escribe la persona** (RES-09).
 - **Caída segura:** sin proveedor, sin activar, recomendación cerrada, categoría sensible o sin clave, error, más de 8 s, filtro o revisión fallidos → la interfaz pinta la plantilla curada de siempre. Nunca un error para el usuario.
 - **Proveedor:** `AI_IDEAS_PROVIDER=fake` (escritor determinista) en desarrollo local y E2E; **sin valor en producción**, donde la opción ni se ofrece hasta RF-40b. Cada idea guarda qué la escribió (`model`).
 - **Consentimiento:** interruptor en *Privacidad y datos* (desactivado por defecto), con qué se envía y qué no; se guarda la fecha de activación y desactivarlo borra las ideas personalizadas. La política de privacidad tiene su apartado. Exportación y borrado (RF-05) las incluyen.
@@ -68,6 +68,24 @@ Con UX-05, la ventana de ideas pasa a ser un carrusel con las cinco ideas curada
 - **Se guarda por recomendación, idea e idioma** (migración 0012), con las opciones de "¿Qué te ayuda?" con las que se escribió. Si cambian, la siguiente vez que se vea se reescribe. La experiencia escrita sigue sin ir nunca a la IA (RES-09).
 - **Coste con el modelo real:** una llamada por idea vista (como mucho cinco por recomendación) y otra cada vez que cambien las opciones; siempre al verla, nunca por adelantado.
 
+#### 4.3.3 Situaciones que lo ponen difícil (RF-42, 5 oct. 2026)
+
+Las situaciones que el usuario marca con una puntuación baja (lista cerrada, nunca rasgos ni salud) **no se envían a la IA**: se quitan antes las ideas que chocan con ellas, en el carrusel, al crear una recomendación y en el servidor, que rechaza personalizar una idea que choque. Filtrar antes basta para que la IA no proponga lo que no se puede hacer, sin darle más datos de los necesarios (minimización).
+
+### 4.4 Texto libre del usuario hacia la IA, con salvaguardas (RF-45, 5 oct. 2026)
+
+Hasta aquí, la regla era que el texto libre nunca llega a la IA (RES-09: no se puede detectar contenido de crisis y no se debe intentar). RF-45 abre una excepción acotada, para que la experiencia que escribe el usuario sirva de algo: **la IA no escribe nada sobre la persona ni valora su estado; solo traduce su texto a las listas cerradas que ya existen** ("¿Qué te ayuda?", "¿Qué te lo pone difícil?"), y el usuario acepta o descarta cada propuesta. Salvaguardas ([historia RF-45](../user-stories/RF-45-sugerencias-ia-experiencias.md), Nivel 3):
+
+1. Consentimiento explícito y granular: un interruptor propio, desactivado por defecto, y un toque por experiencia.
+2. Salida cerrada y validada: solo claves de las listas de esa categoría; lo demás se descarta. Nunca se enseña ni se guarda texto de la IA.
+3. Minimización: se eliminan nombres, emails, teléfonos, enlaces y números largos antes de enviar; nunca categorías sensibles, ids ni datos de la cuenta; sin retención en el proveedor.
+4. Sin detección de riesgo: no se le pide valorar nada y su salida no puede expresarlo; la respuesta al contenido difícil sigue siendo el enlace permanente a las líneas de ayuda (RF-30), para todos.
+5. Transparencia: política de privacidad y etiqueta "Sugerido por IA".
+6. Categorías fuera de la IA sin ser sensibles: la marca `aiExcluded` del catálogo (Pareja) las deja fuera de RF-40 y RF-45 sin pedir consentimiento para activarlas, porque no son datos de categoría especial del RGPD.
+7. Aviso, no bloqueo: si una experiencia lleva insultos, se avisa al enviarla y decide el usuario. El diario no se valida: es privado, y filtrar cómo se siente la persona sería detectar riesgo (RES-09).
+
+Es un dilema que se presentará al tutor (anotado en el tablero): procesar texto libre con IA, aunque sea para devolver una lista cerrada, es más intrusivo que no hacerlo. La alternativa conservadora es RF-44 solo (diario privado sin IA), que ya tiene valor por sí mismo.
+
 ## 5. Resumen de lo añadido a los requisitos
 
 | RF | Qué añade | Prioridad | Plataforma |
@@ -76,6 +94,7 @@ Con UX-05, la ventana de ideas pasa a ser un carrusel con las cinco ideas curada
 | RF-36 | Consulta en lenguaje natural sobre el propio historial (RAG) | Could | Claude API + embeddings, sin LangChain |
 | RF-37 | Asistente de redacción del mensaje de RF-32, con verificación CoT + test-time compute | Could | Claude API |
 | RF-40 | Recomendaciones personalizadas con IA, ancladas al catálogo, con verificación y caída segura (apartado 4.3) | Should (Ciclo 2) | Claude API (Haiku) |
+| RF-45 | La IA propone opciones de las listas cerradas a partir de una experiencia, voluntario y con salvaguardas (apartado 4.4) | Could (Ciclo 2) | Claude API (Haiku) |
 
 Los tres quedan como Could — candidatos de Ciclo 3 o posteriores, no del MVP. Dado el alcance real del proyecto (RES-01, RES-02), es razonable que alguno de los tres no llegue a implementarse a tiempo; quedan documentados igualmente para la memoria del TFM como parte del razonamiento arquitectónico, se construyan o no.
 
@@ -99,3 +118,8 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 - **v1.3 (2 oct. 2026)** — apartado 4.3.1: RF-40a construido contra un *Fake* (qué recibe la IA, cuándo, filtro y su conjunto de evaluación, caída segura, proveedor por variable de entorno, consentimiento).
 - **v1.4 (3 oct. 2026)** — los términos del filtro pasan a un archivo de datos propio (`ideaSafetyTerms.json`).
 - **v1.5 (3 oct. 2026)** — apartado 4.3.2: carrusel de ideas (la IA reescribe la que se ve, ya no elige) y reescritura cuando cambian las opciones de "¿Qué te ayuda?".
+- **v1.6 (5 oct. 2026)** — apartado 4.3.3: las situaciones de RF-42 filtran las ideas antes de la IA y no se le envían.
+- **v1.7 (5 oct. 2026)** — apartado 4.4: excepción acotada para el texto libre (RF-45), con sus salvaguardas, y el dilema anotado para el tutor.
+- **v1.8 (5 oct. 2026)** — CAT-01: los términos del filtro pasan a `domain/catalog/safetyTerms.json`, junto al resto del contenido curado.
+- **v1.9 (5 oct. 2026)** — apartado 4.4 implementado contra un *Fake* (RF-45 v1.2); el modelo real llegará con RF-40b, junto con el de las ideas.
+- **v1.10 (5 oct. 2026)** — apartado 4.4: categorías excluidas de la IA sin ser sensibles (Pareja) y aviso de términos ofensivos solo al enviar.

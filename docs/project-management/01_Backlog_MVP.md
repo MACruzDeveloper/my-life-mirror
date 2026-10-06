@@ -11,19 +11,15 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 
 ## En curso (límite WIP: 2)
 
-- [ ] **UX-06** distribución de la entrevista y menú plegable (desde el 4 oct.; [historia](../user-stories/UX-06-distribucion-entrevista-menu.md)): al actualizar, "Tus categorías" y "Requieren tu consentimiento" en acordeones (columna derecha en escritorio, encima de las preguntas en móvil), y el menú de Mi perfil como `Drawer` plegable a iconos.
-
-- [ ] **PERF-01** menos llamadas al guardar en la entrevista (desde el 4 oct.; [historia](../user-stories/PERF-01-menos-llamadas-guardar.md)): el `POST /api/assessments` devuelve las últimas puntuaciones y las recomendaciones; de 4 llamadas a 2 por guardado y el modal de la idea en la mitad de tiempo (medido en local). GraphQL descartado.
-- [ ] **UX-07** primera entrevista por pasos (desde el 4 oct.; [historia](../user-stories/UX-07-primera-entrevista-pasos.md)): introducción → categorías con botones (sensibles aparte, con consentimiento) → preguntas, con indicador de pasos. Solo la primera vez.
+- [ ] **RF-30** líneas de ayuda siempre a mano (desde el 6 oct.; [historia](../user-stories/RF-30-lineas-ayuda.md)): pantalla pública `/ayuda` con el 024, el 112 y Find A Helpline; enlace "¿Necesitas ayuda ahora?" al pie de todas las pantallas, junto al diario y en la pestaña "De otras personas". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09).
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
-- [ ] **RF-42** situaciones que lo ponen difícil (nuevo, Should): con puntuación baja, la entrevista pregunta "¿Qué te lo pone difícil?" con una lista cerrada de situaciones (no rasgos ni salud); las ideas que choquen no se proponen, tampoco por IA. Sustituye la idea aplazada del 29 sept.
-- [ ] **RF-43** lo que funciona a otros (nuevo, Could): con puntuación alta, agregado anónimo de las opciones de RF-41 de quienes van bien en esa categoría, con tamaño mínimo de grupo y posibilidad de excluirse. Primer paso, ligero y sin texto libre, hacia RF-32/RF-33.
+
+- [ ] **Revisión antes de la entrega** (desde el 6 oct., decidido con el autor): 1) publicar la v1.2.0; 2) revisión de código de todo el Ciclo 2; 3) prueba exploratoria con el [guion de la demo](../validation/04_Guion_Demo_Cierre.md), actualizándolo; 4) si se puede, un segundo test de usabilidad centrado en lo nuevo (diario, compartir, pestañas de ideas).
 - [ ] **RF-40b** adaptador real de Anthropic (Claude Haiku) y evaluación con el modelo — cuando haya crédito de API. PR 4.
-- [ ] **RF-30** pantalla de líneas de ayuda: enlace discreto y permanente "¿Necesitas ayuda ahora?". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09). La lógica ya existe. PR 5 (opcional, recomendado).
 - [ ] **Demo final** — al terminar el proyecto, para la revisión de los profesores (no antes: solo revisan el proyecto terminado). [Guion](../validation/04_Guion_Demo_Cierre.md) ya preparado; se actualiza entonces con lo que haya del Ciclo 2.
 
 ### ─── LÍNEA DE CORTE ─── (si el tiempo no llega, lo de abajo no se hace en el Ciclo 1)
@@ -38,7 +34,7 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 - **RF-17** (puntuación global ponderada, Could): sin planificar; decidir según el tiempo que quede tras la validación. (RF-15 ya está hecho.)
 - **Aviso a usuarios de categorías nuevas/retiradas** (idea): depende de RF-23 (notificaciones, bajo la línea de corte) y de consentimiento a comunicaciones.
 - **Campos JSON de la API en español** (`autenticado`, `sesionIniciada`, `rol`, `creadoEn`, `ultimoAcceso`, `suspendido`, `mensaje`): lo único del código que sigue en español sin ser dato guardado. Cambiarlos exige tocar servidor, cliente y tests a la vez; se hará en una PR aparte si compensa.
-- **Validación ética con el tutor** (pendiente, sin fecha): comentar el enfoque de RF-29/RES-09 (sugerir apoyo profesional sin detección algorítmica de riesgo), por si el máster exige alguna revisión ética adicional al tratarse de bienestar emocional. Pesa más ahora con RF-40 (IA). Venía de los "Próximos pasos" de los requisitos.
+- **Validación ética con el tutor** (en la presentación, final de octubre; además de RF-29/RES-09, el dilema de RF-45: texto libre hacia la IA con salvaguardas, ADR-05 apartado 4.4; y el de RF-43: texto de un usuario que leen otros, sin moderador, con filtros y reporte): comentar el enfoque de RF-29/RES-09 (sugerir apoyo profesional sin detección algorítmica de riesgo), por si el máster exige alguna revisión ética adicional al tratarse de bienestar emocional. Pesa más ahora con RF-40 (IA). Venía de los "Próximos pasos" de los requisitos.
 - **`requestId` en los logs** (idea): un id por petición para seguirla entre funciones distintas en los logs de Vercel. Venía del "Próximo paso" de ADR-08.
 - **Contenido editable desde `/admin`** (idea, ADM-04; después de RF-40a, decidido el 29 sept.): el catálogo de ideas (con traducciones y etiquetas de situación), las opciones de "¿Qué te ayuda?" y las situaciones a evitar pasan a la base de datos, editables como las categorías de ADM-02 (retirar, nunca borrar: los usuarios guardan sus claves). Es lo que ya pedía RD-09 ("catálogo gestionable sin tocar código").
 - **Volver a ejecutar los E2E con `api/` en todas las PRs** (a final de octubre): quitar `branches: [main]` en `.github/workflows/e2e-api.yml`. Hasta entonces solo en las PRs a `main`, a petición del autor (tardaban en cada PR).
@@ -46,6 +42,14 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 
 ## Hecho
 
+- [x] **RF-43** compartir experiencias que funcionan ([historia](../user-stories/RF-43-experiencias-compartidas.md), Nivel 3): con 8 o más, compartir de forma anónima con vista previa y filtros; pestaña "De otras personas" en la ventana de ideas, con reporte que oculta al momento. Con ella, Deporte deja de ser sensible (migraciones 0017-0019).
+- [x] **RF-45** la IA propone opciones a partir de una experiencia ([historia](../user-stories/RF-45-sugerencias-ia-experiencias.md), Nivel 3): voluntario y por experiencia, solo claves de las listas cerradas, datos personales quitados antes de enviar, sin categorías sensibles ni Pareja, aviso de términos ofensivos. Contra un *Fake*; el modelo real con RF-40b.
+- [x] **RF-44** diario de experiencias ([historia](../user-stories/RF-44-diario-experiencias.md)): varias por categoría, "Añadir" sin puntuar, lista con fechas y eliminar; tabla propia (las notas de las evaluaciones se copian).
+- [x] **CAT-01** contenido curado como datos ([historia](../user-stories/CAT-01-contenido-curado-json.md)): ideas, situaciones, opciones y términos de los filtros en JSON, en una carpeta `catalog/` de su módulo.
+- [x] **RF-42** situaciones que lo ponen difícil ([historia](../user-stories/RF-42-situaciones-dificiles.md)): con puntuación baja, "¿Qué te lo pone difícil?" con una lista cerrada de situaciones; las ideas que chocan no se proponen (carrusel, recomendaciones nuevas, IA). Lista y choques pendientes de revisión del autor.
+- [x] **UX-07** primera entrevista por pasos ([historia](../user-stories/UX-07-primera-entrevista-pasos.md)): introducción → categorías con botones (sensibles aparte, con consentimiento) → preguntas, con indicador de pasos. Solo la primera vez.
+- [x] **PERF-01** menos llamadas al guardar en la entrevista ([historia](../user-stories/PERF-01-menos-llamadas-guardar.md)): el `POST /api/assessments` devuelve las últimas puntuaciones y las recomendaciones; de 4 llamadas a 2 por guardado y el modal de la idea en la mitad de tiempo (medido en local). GraphQL descartado.
+- [x] **UX-06** distribución de la entrevista y menú plegable ([historia](../user-stories/UX-06-distribucion-entrevista-menu.md)): al actualizar, "Tus categorías" y "Requieren tu consentimiento" en acordeones (columna derecha en escritorio, encima de las preguntas en móvil), y el menú de Mi perfil como `Drawer` plegable a iconos.
 - [x] **UX-05** respuesta inmediata en la entrevista ([historia](../user-stories/UX-05-respuesta-inmediata-entrevista.md)): un "Guardar" por categoría, a la derecha de la puntuación; "Guardado ahora" en la categoría o, si el guardado abre una idea nueva, una ventana con ella; carrusel con las 5 ideas de la categoría y "Ideas para X" en la pregunta (con RF-40, se reescriben al cambiar "¿Qué te ayuda?", RF-40 v1.1); la última actualización y la última experiencia bajo cada pregunta; panel de progreso en la columna derecha; el historial pasa a Resultados, agrupado por día. Petición del autor (3 oct.): "si no, el usuario no sabe qué ha pasado".
 - [x] **RF-40a** ideas personalizadas con IA contra un *Fake*: interruptor voluntario, la IA reescribe una idea del catálogo (ampliado a 5 por categoría) con filtro y caída al texto curado — [historia](../user-stories/RF-40-ideas-personalizadas-ia.md) (Nivel 3). Las 27 ideas nuevas, pendientes de una revisión a fondo del autor.
 - [x] **Imports `#shared`/`#modules`** en el código del servidor, probados con un `vercel build` real antes de convertir 265 imports.
@@ -147,3 +151,12 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.40 (4 oct. 2026)** — UX-05 hecha; UX-06 en curso (categorías en acordeón y menú `Drawer`); PERF-01 y UX-07 añadidas a "Listo" (confirmadas por el autor).
 - **v2.41 (4 oct. 2026)** — PERF-01 en curso y hecha en la rama (junto con UX-06; irán en la misma PR que el renombrado y UX-07, decisión del autor).
 - **v2.42 (4 oct. 2026)** — UX-07 hecha en la rama (con UX-06 y PERF-01, para la misma PR que el renombrado).
+- **v2.43 (5 oct. 2026)** — v1.1.0 en producción (UX-05, UX-06, UX-07, PERF-01): pasan a "Hecho"; RF-42 en curso.
+- **v2.44 (5 oct. 2026)** — CAT-01 añadida detrás de RF-42 (contenido curado en JSON por módulo); ADM-04 sigue como idea, a decidir según el tiempo.
+- **v2.45 (5 oct. 2026)** — RF-44 y RF-45 añadidas detrás de CAT-01; el dilema de RF-45 se suma a la validación ética con el tutor.
+- **v2.46 (5 oct. 2026)** — RF-42 hecha (PR #25); CAT-01 en curso.
+- **v2.47 (5 oct. 2026)** — RF-44 en curso, detrás de CAT-01 (en su rama, encima de la de CAT-01).
+- **v2.48 (5 oct. 2026)** — RF-45 en curso: el autor decide sumarla a la PR de CAT-01 y RF-44 ("la PR no es muy grande"), así que el límite WIP de 2 se supera a sabiendas durante esta PR.
+- **v2.49 (5 oct. 2026)** — CAT-01, RF-44 y RF-45 hechas (PR #26). RF-43 en curso, reescrita por el autor (compartir experiencias en lugar del agregado anónimo); su dilema se suma a la validación ética con el tutor.
+- **v2.50 (6 oct. 2026)** — RF-43 hecha (con Deporte ya no sensible); RF-30 en curso.
+- **v2.51 (6 oct. 2026)** — "Revisión antes de la entrega" en Listo (v1.2.0, revisión de código, prueba exploratoria, segundo test de usabilidad); también resumida en el README.

@@ -7,6 +7,7 @@ import { DataPrivacyPage } from "@modules/accounts/ui/DataPrivacyPage";
 import { SessionProvider } from "@shared/ui/context/SessionContext";
 import { createTestClient, withClient } from "../../../helpers/queryClient";
 import type { QueryClient } from "@tanstack/react-query";
+import { categoryLabelsFixture } from "../../../helpers/categoryLabels";
 
 function renderPage(client: QueryClient = createTestClient()) {
   return render(
@@ -20,6 +21,10 @@ function renderPage(client: QueryClient = createTestClient()) {
       client,
     ),
   );
+}
+
+function deleteCalls(fetchMock: ReturnType<typeof vi.fn>) {
+  return fetchMock.mock.calls.filter(([url]) => url === "/api/accounts/delete-account");
 }
 
 function openDialog() {
@@ -73,7 +78,8 @@ describe("DataPrivacyPage (RF-05)", () => {
 
     expect(within(dialog).getByText(/no se puede deshacer/i)).toBeInTheDocument();
     expect(within(dialog).getByRole("button", { name: /eliminar definitivamente/i })).toBeDisabled();
-    expect(fetchMock).not.toHaveBeenCalled();
+    // La página sí lee sus datos (p. ej. las experiencias compartidas, RF-43); lo que no hace es eliminar.
+    expect(deleteCalls(fetchMock)).toHaveLength(0);
   });
 
   it("con la contraseña correcta elimina la cuenta, vacía la caché y lleva a la página pública", async () => {
@@ -88,8 +94,7 @@ describe("DataPrivacyPage (RF-05)", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
 
     await waitFor(() => expect(screen.getByText("Página pública")).toBeInTheDocument());
-    const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("/api/accounts/delete-account");
+    const [[, init]] = deleteCalls(fetchMock);
     expect(JSON.parse(init.body)).toEqual({ password: "12345678" });
     expect(client.getQueryData(["categories"])).toBeUndefined();
   });
@@ -129,7 +134,7 @@ describe("DataPrivacyPage (RF-05)", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: /cancelar/i }));
 
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(deleteCalls(fetchMock)).toHaveLength(0);
   });
 
   describe("ideas personalizadas con IA (RF-40)", () => {
@@ -165,7 +170,7 @@ describe("DataPrivacyPage (RF-05)", () => {
 
       const toggle = await screen.findByRole("switch", { name: /ideas personalizadas con ia/i });
       expect(toggle).not.toBeChecked();
-      expect(screen.getByText(/nunca se envían tu nombre, tu email, tu experiencia privada ni las categorías sensibles/i)).toBeInTheDocument();
+      expect(screen.getByText(/nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles/i)).toBeInTheDocument();
     });
 
     it("activarla y desactivarla lo guarda en el servidor", async () => {
@@ -188,6 +193,104 @@ describe("DataPrivacyPage (RF-05)", () => {
       await screen.findByRole("button", { name: /descargar mis datos/i });
       await new Promise((resolve) => setTimeout(resolve, 50));
       expect(screen.queryByRole("switch", { name: /ideas personalizadas con ia/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("sugerencias de la IA a partir de tus experiencias (RF-45)", () => {
+    function stubSuggestions({ available, enabled }: { available: boolean; enabled: boolean }) {
+      const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ ok: true, json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable: available }) });
+        if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiSuggestionsEnabled: enabled }) });
+        if (url === "/api/accounts/ai-suggestions") {
+          const { enabled: next } = JSON.parse(init?.body as string);
+          return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiSuggestionsEnabled: next }) });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      return fetchMock;
+    }
+
+    function renderWithSession() {
+      return render(
+        withClient(
+          <MemoryRouter initialEntries={["/perfil/datos"]}>
+            <SessionProvider>
+              <DataPrivacyPage />
+            </SessionProvider>
+          </MemoryRouter>,
+        ),
+      );
+    }
+
+    it("se ofrece desactivada, aparte de la de ideas, y explica qué se envía, qué se quita y qué nunca", async () => {
+      stubSuggestions({ available: true, enabled: false });
+      renderWithSession();
+
+      const toggle = await screen.findByRole("switch", { name: /sugerencias de la ia a partir de tus experiencias/i });
+      expect(toggle).not.toBeChecked();
+      expect(screen.getByText(/solo la experiencia que tú le pidas analizar/i)).toBeInTheDocument();
+      expect(screen.getByText(/quitamos emails, teléfonos, enlaces y números largos/i)).toBeInTheDocument();
+      expect(screen.getByText(/nunca se envían las categorías sensibles/i)).toBeInTheDocument();
+    });
+
+    it("activarla y desactivarla lo guarda en el servidor", async () => {
+      const fetchMock = stubSuggestions({ available: true, enabled: false });
+      renderWithSession();
+      const name = /sugerencias de la ia a partir de tus experiencias/i;
+
+      fireEvent.click(await screen.findByRole("switch", { name }));
+      await waitFor(() => expect(screen.getByRole("switch", { name })).toBeChecked());
+      fireEvent.click(screen.getByRole("switch", { name }));
+      await waitFor(() => expect(screen.getByRole("switch", { name })).not.toBeChecked());
+
+      const bodies = fetchMock.mock.calls.filter(([url]) => url === "/api/accounts/ai-suggestions").map(([, init]) => JSON.parse(init?.body as string));
+      expect(bodies).toEqual([{ enabled: true }, { enabled: false }]);
+    });
+
+    it("sin la función disponible no se ofrece", async () => {
+      stubSuggestions({ available: false, enabled: false });
+      renderWithSession();
+
+      await screen.findByRole("button", { name: /descargar mis datos/i });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(screen.queryByRole("switch", { name: /sugerencias de la ia/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("experiencias compartidas (RF-43)", () => {
+    function stubShared(experiences: unknown[]) {
+      const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+        if (url === "/api/categories/diary" && init?.method === "PATCH") {
+          const { id, shared } = JSON.parse(init.body as string);
+          return Promise.resolve({ ok: true, json: async () => ({ ...(experiences as { id: string }[]).find((experience) => experience.id === id), shared }) });
+        }
+        if (url === "/api/categories/diary") return Promise.resolve({ ok: true, json: async () => experiences });
+        if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false }] });
+        if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      return fetchMock;
+    }
+
+    it("lista las compartidas, con su categoría, y 'Dejar de compartir' las vuelve privadas", async () => {
+      const fetchMock = stubShared([
+        { id: "e1", categoryId: "c1", text: "Apunto los gastos cada domingo", createdAt: "2026-10-05T10:00:00.000Z", shared: true },
+        { id: "e2", categoryId: "c1", text: "Esta es privada", createdAt: "2026-10-04T10:00:00.000Z", shared: false },
+      ]);
+      renderPage();
+
+      const section = (await screen.findByRole("heading", { name: "Experiencias compartidas" })).closest("section") as HTMLElement;
+      const item = (await within(section).findByText("Apunto los gastos cada domingo")).closest("li") as HTMLElement;
+      expect(await within(item).findByText("Economía")).toBeInTheDocument();
+      expect(within(section).queryByText("Esta es privada")).not.toBeInTheDocument();
+
+      fireEvent.click(within(item).getByRole("button", { name: "Dejar de compartir" }));
+
+      expect(await within(section).findByText("No tienes ninguna experiencia compartida.")).toBeInTheDocument();
+      const patches = fetchMock.mock.calls.filter(([url, init]) => url === "/api/categories/diary" && init?.method === "PATCH");
+      expect(patches.map(([, init]) => JSON.parse(init?.body as string))).toEqual([{ id: "e1", shared: false }]);
     });
   });
 });

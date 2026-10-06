@@ -5,6 +5,69 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-10-06
+
+Antes de desplegar: migraciones **0013 a 0019**, en orden (ya ejecutadas en producción). Ninguna rompe datos: añaden columnas y tablas, o cambian la categoría Deporte.
+
+### Cambiado (diseño)
+
+- Capas CSS: Material UI va en la capa `mui` y el CSS propio (`skin.css`, clases `mlm-`) le gana sin `!important` (ADR-07, apartado 4.1). Comprobado con un E2E en navegador real.
+- El selector de idioma de la cabecera es un interruptor entre las banderas de España y Reino Unido (pulsar una bandera también elige su idioma).
+- Cerrar sesión es el icono típico de salir, con su nombre accesible y *tooltip*; en el menú móvil, icono y texto.
+
+### Añadido (RF-30, líneas de ayuda)
+
+- Pantalla pública `/ayuda`, "¿Necesitas ayuda ahora?", con y sin sesión (con la cabecera y las migas que tocan en cada caso, para poder salir): la línea 024 y el 112 con un botón para llamar, Find A Helpline para fuera de España, y que la app no es un servicio profesional ni de emergencias. Las líneas son datos estáticos; solo se consulta la sesión, para la cabecera.
+- El enlace "¿Necesitas ayuda ahora?" al pie de todas las pantallas (públicas y protegidas), junto al diario de experiencias y en la pestaña "De otras personas". Igual para todo el mundo: nunca aparece por lo que alguien puntúe o escriba (RES-09).
+- Las líneas pasan a `wellbeing/domain/catalog/helplines.json` (CAT-01) y sus textos a las traducciones, con tests de integridad. El *smoke* de producción comprueba también `/ayuda`.
+
+### Cambiado (Deporte deja de ser sensible)
+
+- Deporte ya no es categoría sensible: activarla no pide consentimiento, y entra en las ideas con IA (RF-40), las sugerencias (RF-45) y las experiencias compartidas (RF-43), como el resto. Siguen siendo sensibles Sexo y Espiritualidad. Decisión del autor ("cualquier categoría puede tener algo sensible"); reversible si llega feedback negativo. Los consentimientos ya dados se conservan como historial.
+- **Migración 0018** (catálogo y copia de cada usuario): ejecutarla antes de desplegar.
+- Su descripción pasa a "Actividad física y movimiento" (antes, "y salud"): **migración 0019**, que no pisa una descripción editada desde el admin.
+
+### Añadido (RF-43, compartir experiencias que funcionan)
+
+- Con una última puntuación de 8 o más en una categoría, cada experiencia del diario ofrece "Compartir de forma anónima", y la app lo sugiere bajo el diario. Antes de publicarse, una ventana enseña cómo la verán otras personas (solo el texto: sin nombre, fecha ni puntuación) y qué implica. Nunca en categorías sensibles ni en Pareja.
+- Filtros al compartir: datos de contacto (emails, teléfonos, enlaces, números largos), consejo de salud o de dinero (los grupos clínico, profesional y financiero de `safetyTerms.json`) e insultos (`offensiveTerms.json`). Si falla alguno, no se publica y se explica qué quitar. El diario privado sigue sin validarse, y cómo se siente la persona nunca se filtra (RES-09).
+- La ventana de ideas tiene pestañas cuando hay más de una fuente: "De la app" (el carrusel de siempre), "Con IA" (RF-40, en lugar del enlace "Ver la idea original") y "De otras personas (N)", con hasta 10 experiencias compartidas de esa categoría en el idioma de la interfaz, el aviso de que no son consejo profesional y "Reportar": un reporte la oculta al momento para todos, y su autor la ve como "Retirada tras un reporte" (no se puede volver a compartir).
+- "Dejar de compartir" en el diario y en la sección nueva "Experiencias compartidas" de *Privacidad y datos*. La exportación (RF-05) dice qué experiencias están compartidas o retiradas; borrarlas o borrar la cuenta borra lo compartido. Apartado nuevo en la política de privacidad.
+- **Migración 0017** (`experiences.shared_at`, `shared_locale`, `shared_category_key`, `reported_at`): ejecutarla antes de desplegar. `PATCH /api/categories/diary` y `/api/categories/shared` (sin funciones nuevas: 11/12).
+- Abrir la ventana de ideas con categoría hace una lectura más, la de "De otras personas" (una vez; luego sale de la caché). El guardado sigue siendo de 2 peticiones (PERF-01).
+
+### Añadido (RF-45, sugerencias de la IA a partir de una experiencia)
+
+- Consentimiento propio en *Privacidad y datos*, "Sugerencias de la IA a partir de tus experiencias" (desactivado por defecto, aparte del de RF-40), con qué se envía, qué se quita y qué nunca. Con él, cada experiencia del diario de una categoría no sensible ofrece "Sugerir opciones con IA".
+- La IA solo traduce esa experiencia a las listas cerradas ("¿Qué te ayuda?", "¿Qué te lo pone difícil?"): se ven como propuestas "Sugerido por IA" que el usuario marca o descarta; aceptar una la marca como si la tocara él (con su "✓" y el pulso en las ideas). Nunca se enseña ni se guarda texto de la IA.
+- Salvaguardas: salida validada (solo claves posibles de esa categoría), datos personales quitados antes de enviar (emails, enlaces, teléfonos, números largos; los nombres no, y se avisa), nunca categorías sensibles, ids ni puntuaciones, y caída a "sin sugerencias" si algo falla o tarda más de 8 s. Proveedor *Fake* (palabras clave) en local y E2E; el modelo real, con RF-40b.
+- **Migración 0015** (`profiles.ai_suggestions_enabled` y su fecha): ejecutarla antes de desplegar. Acciones `/api/accounts/ai-suggestions` y `/api/recommendations/suggest-options` (sin funciones nuevas: 11/12). La elección entra en la exportación (RF-05).
+- **Pareja queda fuera de la IA** (ni ideas personalizadas ni sugerencias) sin volverse sensible: marca `aiExcluded` en el catálogo, **migración 0016** (ejecutarla antes de desplegar). No pide consentimiento para activarla; las sensibles siguen fuera siempre.
+- Aviso al pulsar "Sugerir opciones con IA" si la experiencia lleva insultos o palabras ofensivas (lista curada `offensiveTerms.json`): el usuario puede enviarla igualmente o cancelar. El diario no se valida, y cómo se siente la persona ("estoy fatal", "no puedo más") nunca avisa.
+- Si la función existe pero no está activada, el diario dice dónde activarla ("Actívalas en Privacidad y datos"); antes no había forma de descubrirla desde la entrevista.
+- El *Fake* reconoce otras formas de la misma palabra ("viajé" → "Viajar", "comida nueva" → "Probar comidas nuevas"), para poder probarlo con frases naturales.
+- La política de privacidad tiene su apartado, y los textos de RF-40 ("nunca se envían tus experiencias privadas") pasan a decir "para estas ideas", porque ya no es cierto en general.
+
+### Añadido (RF-44, diario de experiencias)
+
+- "Tus experiencias (privadas)" en cada pregunta: varias por categoría, con su propio "Añadir" (no hace falta puntuar), "✓ Guardada" en la línea del título, la lista de las 3 más recientes con su fecha y "Ver todas", y borrar cada una con confirmación. Siguen siendo privadas: nunca van a la IA.
+- **Migración 0014** (tabla `experiences`): copia a ella las notas que ya había en las evaluaciones, con su fecha; ejecutarla antes de desplegar. La nota original se conserva en su evaluación (inmutable, RF-12), pero la interfaz ya solo enseña las experiencias: en la entrevista, en el historial de Resultados (en su día, también los días sin puntuaciones) y no en las tarjetas. Acción `/api/categories/diary` (sin función nueva: 11/12). Entran en la exportación y el borrado de datos (RF-05).
+- "Guardar" vuelve a ser solo para la puntuación (antes también se activaba al escribir la nota).
+
+### Cambiado (CAT-01, contenido curado como datos)
+
+- Las ideas del catálogo, las situaciones de RF-42 con sus choques, las opciones de "¿Qué te ayuda?" y los términos del filtro de IA pasan de constantes en el código a JSON en `domain/catalog/` de su módulo (`ideas.json`, `situations.json`, `safetyTerms.json`, `helpOptions.json`), con la forma de las futuras tablas de ADM-04. Sin cambios de comportamiento: los tests de siempre pasan sin tocarlos.
+- Tests de integridad del catálogo: claves únicas, choques que apuntan a ideas que existen, opciones de categorías estándar, siempre alguna idea general sin choques y texto en español e inglés para todo.
+
+### Añadido (RF-42, situaciones que lo ponen difícil)
+
+- "¿Qué te lo pone difícil?" en cada pregunta con una puntuación baja (o una idea abierta): situaciones de una lista cerrada (salir de casa, sitios con mucha gente, dar el primer paso…), nunca rasgos ni salud, solo las que afectan a las ideas de esa categoría. Se guardan al momento.
+- Las ideas que chocan con lo marcado no se proponen: ni en el carrusel, ni al crear una recomendación nueva, ni personalizadas por IA (el servidor lo rechaza). Las situaciones no se envían a la IA. Si chocan todas las de una categoría, se usan las generales.
+- **Migración 0013** (`categories.difficulty_tags`): ejecutarla antes de desplegar. Acción `/api/categories/difficulties` (sin función nueva: 11/12). Entran en la exportación de datos (RF-05).
+- La lista de situaciones y qué idea choca con cuál, pendientes de revisión del autor (en la historia RF-42).
+- Reacción al marcar una opción (aquí y en "¿Qué te ayuda?"): un "✓" con lo que cambia ("Ideas actualizadas", "Lo tendrán en cuenta", "Para tus próximas ideas" o "Guardado"), en la línea de su título para que al irse no salte nada (en móvil, dentro del título un momento); y "Ideas para Economía (4)" dice cuántas quedan y da un pulso suave (sin pulso con "reducir movimiento"). "Guardar" no se activa: crearía una evaluación sin cambio de puntuación.
+- Los tres títulos de cada pregunta llevan icono y flecha para que se vea que se despliegan; "¿Qué te ayuda en esta área?" pasa a "¿Qué te ayuda?". "Tu experiencia (privada)" se cierra con su título o con una X que borra lo escrito. "Ideas para…" va debajo de las tres, como su resultado.
+
 ## [1.1.0] - 2026-10-04
 
 ### Cambiado (proyecto)
@@ -17,7 +80,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ### Cambiado (UX-06, distribución de la entrevista y menú plegable)
 
-- Al actualizar la entrevista, "Tus categorías" y "Requieren tu consentimiento" van en dos acordeones plegados con cuántas hay activas ("2 de 6 activas"): en escritorio, en la columna derecha encima del progreso; en móvil, encima de las preguntas. La primera entrevista sigue con las dos columnas abiertas (sus pasos llegarán con UX-07).
+- Al actualizar la entrevista, "Tus categorías" y "Requieren tu consentimiento" van en dos acordeones plegados con cuántas hay activas ("2 de 6 activas"): en escritorio, en la columna derecha encima del progreso; en móvil, encima de las preguntas. En la primera entrevista se eligen en su paso (UX-07).
 - El menú de Mi perfil es un `Drawer` de Material UI con iconos: en escritorio se puede plegar a solo iconos (se recuerda en el navegador); en móvil se abre con un botón que muestra la sección actual ("☰ Entrevista"), para no confundirlo con el menú de la cabecera.
 - La introducción y las preguntas de la entrevista van en dos bloques con fondo distinto (las preguntas, con su título "¿Cómo te sientes en cada una?").
 - La columna derecha de la entrevista (categorías y progreso) se queda fija entera al desplazarse; el progreso también es un acordeón (abierto por defecto, con el resumen visible al plegarlo).
@@ -41,6 +104,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 - El `POST /api/assessments` devuelve también las últimas puntuaciones y las recomendaciones abiertas; la entrevista las pone en la caché y solo vuelve a pedir el historial. De 4 llamadas a 2 por guardado, y el modal de la idea sale en la mitad de tiempo (medido en local). Un E2E lo vigila.
 - La barra de desplazamiento de la columna derecha, fina y semitransparente; sus acordeones, sin bordes ni sombras.
+
+### Corregido (entrevista)
+
+- Si las categorías o las puntuaciones no cargaban, el aviso se quedaba hasta volver a entrar: ahora tiene "Reintentar". Sigue sin haber reintentos automáticos (un fallo se enseña, no se esconde).
 
 ### Corregido (UX-06)
 

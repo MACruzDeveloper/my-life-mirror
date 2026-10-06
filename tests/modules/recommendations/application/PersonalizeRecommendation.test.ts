@@ -38,9 +38,11 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
   const entries = await catalog.findAll();
   const byKey = (key: string) => listed.value.find((c) => c.catalogId === entries.find((e) => e.key === key)?.id)!;
   const finances = byKey("economia");
-  const sport = byKey("deporte");
+  const spirituality = byKey("espiritualidad");
+  const couple = byKey("pareja");
+  await categoryRepository.save({ ...couple, status: "active" });
   await categoryRepository.save({ ...finances, status: "active", experienceTags: ["economia.presupuesto"] });
-  await categoryRepository.save({ ...sport, status: "active" });
+  await categoryRepository.save({ ...spirituality, status: "active" });
 
   const profileRepository = new InMemoryProfileRepository();
   await profileRepository.save({ userId: "u1", name: "Ana", aiIdeasEnabled: options.aiIdeasEnabled ?? true });
@@ -49,13 +51,15 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
   await assessmentRepository.saveMany([
     { id: "a1", userId: "u1", categoryId: finances.id, score: 6, recordedAt: new Date("2026-09-01T10:00:00Z") },
     { id: "a2", userId: "u1", categoryId: finances.id, score: 3, note: "texto privado que nunca debe salir", recordedAt: new Date("2026-10-01T10:00:00Z") },
-    { id: "a3", userId: "u1", categoryId: sport.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
+    { id: "a3", userId: "u1", categoryId: spirituality.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
+    { id: "a4", userId: "u1", categoryId: couple.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
   ]);
 
   const recommendationRepository = new InMemoryRecommendationRepository();
   await recommendationRepository.saveMany([
     { id: "r-finances", userId: "u1", categoryId: finances.id, templateKey: "economia.1", threshold: 5, status: "pending", createdAt: clock.now() },
-    { id: "r-sport", userId: "u1", categoryId: sport.id, templateKey: "deporte.1", threshold: 5, status: "pending", createdAt: clock.now() },
+    { id: "r-spirituality", userId: "u1", categoryId: spirituality.id, templateKey: "espiritualidad.1", threshold: 5, status: "pending", createdAt: clock.now() },
+    { id: "r-couple", userId: "u1", categoryId: couple.id, templateKey: "pareja.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-done", userId: "u1", categoryId: finances.id, templateKey: "economia.2", threshold: 5, status: "done", createdAt: clock.now() },
   ]);
 
@@ -150,6 +154,18 @@ describe("PersonalizeRecommendation (RF-40)", () => {
     if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
   });
 
+  it("una idea que choca con lo que se lo pone difícil se rechaza, tampoco se personaliza (RF-42)", async () => {
+    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Una idea que no debería llegar a escribirse nunca, ni personalizada." }));
+    const { personalize, categoryRepository, finances } = await setup({ writer });
+    await categoryRepository.save({ ...(await categoryRepository.findById("u1", finances.id))!, difficultyTags: ["apuntarYRegistrar"] });
+
+    const result = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.4", locale: "es" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+    expect(writer.calls).toHaveLength(0);
+  });
+
   it("sin IA, la idea pedida del carrusel se devuelve como curada", async () => {
     const { personalize } = await setup({ aiIdeasEnabled: false });
 
@@ -161,7 +177,8 @@ describe("PersonalizeRecommendation (RF-40)", () => {
   const catalogCases: [string, Parameters<typeof setup>[0], string][] = [
     ["el usuario no lo ha activado", { aiIdeasEnabled: false }, "r-finances"],
     ["no hay proveedor configurado", { available: false }, "r-finances"],
-    ["la categoría es sensible (Deporte)", {}, "r-sport"],
+    ["la categoría es sensible (Espiritualidad)", {}, "r-spirituality"],
+    ["la categoría está excluida de la IA (Pareja)", {}, "r-couple"],
     ["la recomendación ya no está abierta", {}, "r-done"],
     ["el escritor falla", { writer: new ScriptedWriter(async () => Promise.reject(new Error("caído"))) }, "r-finances"],
     ["el escritor tarda demasiado", { writer: new ScriptedWriter(() => new Promise((resolve) => setTimeout(() => resolve({ templateKey: "economia.1", text: "x".repeat(60) }), 500))) }, "r-finances"],

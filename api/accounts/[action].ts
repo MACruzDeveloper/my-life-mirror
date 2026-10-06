@@ -1,5 +1,6 @@
 import { createRouter } from "#shared/infrastructure/http/router.js";
 import aiIdeas from "#shared/infrastructure/http/handlers/accounts/ai-ideas.js";
+import aiSuggestions from "#shared/infrastructure/http/handlers/accounts/ai-suggestions.js";
 import deleteAccount from "#shared/infrastructure/http/handlers/accounts/delete-account.js";
 import exportData from "#shared/infrastructure/http/handlers/accounts/export-data.js";
 import login from "#shared/infrastructure/http/handlers/accounts/login.js";
@@ -17,6 +18,7 @@ import session from "#shared/infrastructure/http/handlers/accounts/session.js";
  */
 export default createRouter("/api/accounts/", {
   "ai-ideas": aiIdeas,
+  "ai-suggestions": aiSuggestions,
   "delete-account": deleteAccount,
   "export-data": exportData,
   login,

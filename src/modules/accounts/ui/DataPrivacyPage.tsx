@@ -12,7 +12,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { AiIdeasSection } from "./AiIdeasSection";
+import { AiIdeasSection, AiSuggestionsSection } from "./AiOptInSection";
+import { SharedExperiencesSection } from "./SharedExperiencesSection";
 
 /**
  * Vista de RF-05 (y RNF-12): descargar mis datos y eliminar mi cuenta. Ambas
@@ -90,6 +91,8 @@ export function DataPrivacyPage() {
       </Typography>
 
       <AiIdeasSection />
+      <AiSuggestionsSection />
+      <SharedExperiencesSection />
       <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         <Typography variant="subtitle1" component="h2">
           {t("datos.exportarTitulo")}

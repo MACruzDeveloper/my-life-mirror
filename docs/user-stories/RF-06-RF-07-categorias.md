@@ -9,7 +9,7 @@ Para centrar la app solo en lo que quiero seguir, sin ruido de lo que no
 
 ## Alcance
 
-- **RF-06** — catálogo inicial de 9 categorías estándar: economía, vida social, pareja, sexo, deporte, aventura, espiritualidad, familia, inversiones. `sexo`, `deporte` y `espiritualidad` están marcadas `esDatoSensible=true` (categoría especial RGPD Art. 9 — sexo/orientación, salud, religión — RNF-04/RES-04); el resto, `false`.
+- **RF-06** — catálogo inicial de 9 categorías estándar: economía, vida social, pareja, sexo, deporte, aventura, espiritualidad, familia, inversiones. `sexo` y `espiritualidad` están marcadas `esDatoSensible=true` (categoría especial RGPD Art. 9 — sexo/orientación, religión — RNF-04/RES-04); el resto, `false`. `deporte` también lo estuvo hasta el 6 oct. 2026.
 - **RF-07** — activar/desactivar cada categoría individualmente. Activar una sensible dispara el flujo de consentimiento (RF-04) ya construido, por fin conectado a un disparador real — ver 08_Diagrama_Secuencia_Consentimiento.md.
 - **RF-08** (categorías personalizadas) queda fuera — Could, fuera del MVP por ahora. El modelo (`type: "standard" | "custom"`) ya lo admite sin cambios futuros.
 - **Sin RN de RD-02 sobre dónde vive el catálogo**: cada usuario tiene su propia copia de las 9 categorías estándar (mismo modelo que ya usa `Categoria` en RD-02 — sin tabla de catálogo global aparte), sembrada la primera vez que consulta su lista — no en el registro, para no acoplar `RegisterUser` a un módulo más.
@@ -55,3 +55,5 @@ Es una respuesta de negocio esperable, no un dato mal formado — de ahí un `Co
 - **v1.0 (15 sept. 2026)** — versión inicial.
 - **v1.1 (19 sept. 2026)** — la página de categorías desaparece: las categorías se eligen/activan desde la entrevista ([RF-10-entrevista.md](RF-10-entrevista.md)), con el mismo consentimiento para las sensibles. desactivar es desmarcarla ahí. La gestión del catálogo por el administrador se plantea en [ADM-01](ADM-01-panel-administracion.md).
 - **v1.2 (19 sept. 2026)** — el catálogo estándar deja de estar fijo en código: pasa a la tabla `category_catalog` y `ListCategories` sincroniza con ella al listar ([ADM-02](ADM-02-catalogo-categorias.md)); `ActivateCategory` rechaza las retiradas.
+- **v1.3 (6 oct. 2026)** — Deporte deja de ser sensible (decisión del autor): migración 0018, que cambia el catálogo y la copia de cada usuario. Entra así en la IA (RF-40, RF-45) y en las experiencias compartidas (RF-43), como el resto de áreas no sensibles.
+- **v1.4 (6 oct. 2026)** — la descripción de Deporte pasa a "Actividad física y movimiento" (antes, "y salud"; migración 0019).

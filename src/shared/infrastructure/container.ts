@@ -20,7 +20,21 @@ import { createPersonalizeRecommendation } from "#modules/recommendations/applic
 import type { IdeaReviewer, IdeaWriter } from "#modules/recommendations/domain/IdeaWriter.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infrastructure/FakeIdeaWriter.js";
+import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
+import type { OptionSuggester } from "#modules/recommendations/domain/OptionSuggester.js";
+import { createSuggestExperienceOptions } from "#modules/recommendations/application/SuggestExperienceOptions.js";
+import { createSetAiSuggestions } from "#modules/accounts/application/SetAiSuggestions.js";
 import { InMemoryPersonalizedIdeaRepository } from "#modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository.js";
+import { InMemoryExperienceRepository } from "#modules/assessments/infrastructure/InMemoryExperienceRepository.js";
+import { SupabaseExperienceRepository } from "#modules/assessments/infrastructure/SupabaseExperienceRepository.js";
+import { type ExperienceRepository } from "#modules/assessments/domain/Experience.js";
+import { createAddExperience, createDeleteExperience, createListExperiences } from "#modules/assessments/application/Experiences.js";
+import {
+  createListSharedExperiences,
+  createReportSharedExperience,
+  createShareExperience,
+  createUnshareExperience,
+} from "#modules/assessments/application/SharedExperiences.js";
 import { JsonIdeaTexts } from "#modules/recommendations/infrastructure/JsonIdeaTexts.js";
 import { SupabasePersonalizedIdeaRepository } from "#modules/recommendations/infrastructure/SupabasePersonalizedIdeaRepository.js";
 import { createSetAiIdeas } from "#modules/accounts/application/SetAiIdeas.js";
@@ -57,6 +71,7 @@ import { createListCategories } from "#modules/categories/application/ListCatego
 import { createActivateCategory } from "#modules/categories/application/ActivateCategory.js";
 import { createDeactivateCategory } from "#modules/categories/application/DeactivateCategory.js";
 import { createSetCategoryExperience } from "#modules/categories/application/SetCategoryExperience.js";
+import { createSetCategoryDifficulties } from "#modules/recommendations/application/SetCategoryDifficulties.js";
 import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
 import { InMemoryAssessmentRepository } from "#modules/assessments/infrastructure/InMemoryAssessmentRepository.js";
 import { SupabaseAssessmentRepository } from "#modules/assessments/infrastructure/SupabaseAssessmentRepository.js";
@@ -103,6 +118,14 @@ function createAuthProvider(environment: Environment): AuthProvider {
   return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
 }
 
+function createExperienceRepository(environment: Environment): ExperienceRepository {
+  if (environment === "test") {
+    return new InMemoryExperienceRepository();
+  }
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseExperienceRepository(url, serviceRoleKey);
+}
+
 function createPersonalizedIdeaRepository(environment: Environment): PersonalizedIdeaRepository {
   if (environment === "test") {
     return new InMemoryPersonalizedIdeaRepository();
@@ -117,9 +140,10 @@ function createPersonalizedIdeaRepository(environment: Environment): Personalize
  * - sin valor: función apagada (producción hasta RF-40b); la opción ni se ofrece.
  * - `anthropic`: llegará con RF-40b; hasta entonces, apagada con un aviso en el log.
  */
-function createIdeaProvider(): { writer?: IdeaWriter; reviewer: IdeaReviewer } {
+function createIdeaProvider(): { writer?: IdeaWriter; reviewer: IdeaReviewer; suggester?: OptionSuggester } {
   const provider = process.env.AI_IDEAS_PROVIDER?.trim();
-  if (provider === "fake") return { writer: new FakeIdeaWriter(), reviewer: new FakeIdeaReviewer() };
+  // RF-45 usa el mismo proveedor que RF-40: disponible o no a la vez.
+  if (provider === "fake") return { writer: new FakeIdeaWriter(), reviewer: new FakeIdeaReviewer(), suggester: new FakeOptionSuggester() };
   if (provider) logger.warn("AI_IDEAS_PROVIDER desconocido o sin implementar: ideas con IA apagadas", { provider });
   return { reviewer: new FakeIdeaReviewer() };
 }
@@ -241,14 +265,24 @@ export interface AppContext {
   activateCategory: ReturnType<typeof createActivateCategory>;
   deactivateCategory: ReturnType<typeof createDeactivateCategory>;
   setCategoryExperience: ReturnType<typeof createSetCategoryExperience>;
+  setCategoryDifficulties: ReturnType<typeof createSetCategoryDifficulties>;
   assessmentRepository: AssessmentRepository;
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
   getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
+  addExperience: ReturnType<typeof createAddExperience>;
+  listExperiences: ReturnType<typeof createListExperiences>;
+  deleteExperience: ReturnType<typeof createDeleteExperience>;
+  shareExperience: ReturnType<typeof createShareExperience>;
+  unshareExperience: ReturnType<typeof createUnshareExperience>;
+  listSharedExperiences: ReturnType<typeof createListSharedExperiences>;
+  reportSharedExperience: ReturnType<typeof createReportSharedExperience>;
   recommendationRepository: RecommendationRepository;
   listRecommendations: ReturnType<typeof createListRecommendations>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
   aiIdeasAvailable: boolean;
+  setAiSuggestions: ReturnType<typeof createSetAiSuggestions>;
+  suggestExperienceOptions: ReturnType<typeof createSuggestExperienceOptions>;
   personalizeRecommendation: ReturnType<typeof createPersonalizeRecommendation>;
   setAiIdeas: ReturnType<typeof createSetAiIdeas>;
 }
@@ -266,6 +300,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const registerUser = createRegisterUser(authProvider, updateProfile);
   const recommendationRepository = createRecommendationRepository(environment);
   const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
+  const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider();
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
   const generateRecommendations = createGenerateRecommendations({
@@ -294,13 +329,14 @@ export function createAppContext(environment: Environment = detectEnvironment())
       assessmentRepository,
       recommendationRepository,
       personalizedIdeaRepository,
+      experienceRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -320,6 +356,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     activateCategory: createActivateCategory(categoryRepository, checkConsent, categoryCatalogRepository),
     deactivateCategory: createDeactivateCategory(categoryRepository),
     setCategoryExperience: createSetCategoryExperience(categoryRepository, categoryCatalogRepository),
+    setCategoryDifficulties: createSetCategoryDifficulties(categoryRepository, categoryCatalogRepository),
     assessmentRepository,
     // Las recomendaciones son secundarias: un fallo se registra pero nunca deshace el guardado de la entrevista.
     recordAssessments: createRecordAssessments(assessmentRepository, categoryRepository, clock, async (userId, saved) => {
@@ -331,9 +368,28 @@ export function createAppContext(environment: Environment = detectEnvironment())
     }),
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
     getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
+    // RF-44: el diario de experiencias, separado de las evaluaciones.
+    addExperience: createAddExperience({ experienceRepository, categoryRepository, clock }),
+    listExperiences: createListExperiences(experienceRepository),
+    deleteExperience: createDeleteExperience(experienceRepository),
+    // RF-43: compartir experiencias de forma anónima, leerlas y reportarlas.
+    shareExperience: createShareExperience({ experienceRepository, categoryRepository, catalog: categoryCatalogRepository, assessmentRepository, clock }),
+    unshareExperience: createUnshareExperience(experienceRepository),
+    listSharedExperiences: createListSharedExperiences({ experienceRepository, categoryRepository, catalog: categoryCatalogRepository }),
+    reportSharedExperience: createReportSharedExperience({ experienceRepository, clock }),
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
     aiIdeasAvailable: ideaProvider.writer !== undefined,
+    setAiSuggestions: createSetAiSuggestions({ profileRepository, clock }),
+    suggestExperienceOptions: createSuggestExperienceOptions({
+      experienceRepository,
+      categoryRepository,
+      catalog: categoryCatalogRepository,
+      profileRepository,
+      ideaTexts: new JsonIdeaTexts(),
+      suggester: ideaProvider.suggester,
+      report: (reason, error) => logger.warn("Sin sugerencias de la IA (RF-45)", { reason, ...(error ? { error: String(error) } : {}) }),
+    }),
     personalizeRecommendation: createPersonalizeRecommendation({
       recommendationRepository,
       categoryRepository,

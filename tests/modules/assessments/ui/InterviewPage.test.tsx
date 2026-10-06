@@ -1,5 +1,10 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// La entrevista entera en jsdom (MUI, varias consultas, una pregunta por categoría) tarda ~1 s por test
+// solo; con toda la batería en paralelo puede multiplicarse y rozar los 5 s por defecto. Medido el 5 oct.:
+// no es una regresión (antes de RF-44 ya iba a ~0,64 s por test), así que se ajusta el límite solo aquí.
+vi.setConfig({ testTimeout: 15_000 });
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
@@ -27,6 +32,14 @@ const HISTORY = [
   { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, note: "Mes justo" }] },
 ];
 
+// RF-44: el diario de experiencias (la más reciente primero, como lo devuelve el servidor).
+const EXPERIENCES = [
+  { id: "e3", categoryId: "c1", text: "Este mes he ahorrado un poco", createdAt: "2026-09-18T10:00:00.000Z" },
+  { id: "e2", categoryId: "c1", text: "Mes justo", createdAt: "2026-01-15T10:00:00.000Z" },
+  { id: "e1", categoryId: "c1", text: "Empecé a apuntar gastos", createdAt: "2025-12-01T10:00:00.000Z" },
+  { id: "e0", categoryId: "c1", text: "Primera nota", createdAt: "2025-11-01T10:00:00.000Z" },
+];
+
 interface StubOptions {
   latest?: unknown;
   history?: unknown;
@@ -34,9 +47,15 @@ interface StubOptions {
   /** Recomendaciones abiertas después de guardar (las devuelve el POST, PERF-01; por defecto, las mismas que antes). */
   recommendationsAfterSave?: unknown;
   saveResponse?: () => Promise<unknown>;
+  /** RF-44: experiencias del diario (GET /api/categories/diary). */
+  experiences?: unknown;
+  /** RF-43: si compartir falla los filtros del servidor, el motivo (422). */
+  shareRejection?: string;
 }
 
-function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse }: StubOptions = {}) {
+// Por defecto, el diario vacío: cada experiencia añade botones a la página y encarece todas las búsquedas por rol.
+
+function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [], shareRejection }: StubOptions = {}) {
   const fetchMock: ReturnType<typeof vi.fn> = vi.fn((url: string, init?: RequestInit) => {
     if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => CATEGORIES });
     if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
@@ -55,6 +74,18 @@ function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], r
         return Promise.resolve({ ok: false, json: async () => ({ error: "Requiere consentimiento", code: "CONSENT_REQUIRED" }) });
       }
       return Promise.resolve({ ok: true, json: async () => ({ ...category, status: "active" }) });
+    }
+    if (url.startsWith("/api/categories/diary")) {
+      if (!init?.method || init.method === "GET") return Promise.resolve({ ok: true, json: async () => experiences });
+      if (init.method === "DELETE") return Promise.resolve({ ok: true, json: async () => ({ deleted: true }) });
+      if (init.method === "PATCH") {
+        const { id, shared } = JSON.parse(init.body as string);
+        if (shared && shareRejection) return Promise.resolve({ ok: false, status: 422, json: async () => ({ error: "Not shareable", reason: shareRejection }) });
+        const experience = (experiences as { id: string }[]).find((candidate) => candidate.id === id);
+        return Promise.resolve({ ok: true, json: async () => ({ ...experience, shared, reported: false }) });
+      }
+      const { categoryId, text } = JSON.parse(init.body as string);
+      return Promise.resolve({ ok: true, json: async () => ({ id: `e-${text}`, categoryId, text, createdAt: "2026-10-05T10:00:00.000Z" }) });
     }
     if (url === "/api/categories/experience") {
       const { categoryId, tags } = JSON.parse(init?.body as string);
@@ -265,6 +296,24 @@ describe("InterviewPage (RF-10)", () => {
     });
   });
 
+  it("si la carga falla, lo dice y deja reintentar (sin reintentos automáticos)", async () => {
+    let categoriesCalls = 0;
+    const fetchMock = stubFetch();
+    const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+    fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+      if (url === "/api/categories" && (categoriesCalls += 1) === 1) return Promise.resolve({ ok: false, status: 500, json: async () => ({ error: "caído" }) });
+      return defaultImplementation(url, init);
+    });
+    renderPage();
+
+    const alert = await screen.findByText("No se pudieron cargar tus categorías");
+    fireEvent.click(within(alert.closest("[role=alert]") as HTMLElement).getByRole("button", { name: "Reintentar" }));
+
+    await waitUntilLoaded();
+    expect(screen.queryByText("No se pudieron cargar tus categorías")).not.toBeInTheDocument();
+    expect(categoriesCalls).toBe(2);
+  });
+
   it("lista todas las categorías; las activas salen marcadas y con su pregunta", async () => {
     stubFetch();
     renderPage();
@@ -313,33 +362,27 @@ describe("InterviewPage (RF-10)", () => {
     expect(screen.queryByRole("button", { name: /guardar cambios/i })).not.toBeInTheDocument();
   });
 
-  it("se puede puntuar por primera vez una categoría sin puntuación previa, con su experiencia privada", async () => {
+  it("se puede puntuar por primera vez una categoría sin puntuación previa (la experiencia ya no va con la puntuación, RF-44)", async () => {
     const fetchMock = stubFetch();
     renderPage();
     await waitUntilLoaded();
 
     chooseScore("deporte", 8);
-    fireEvent.click(screen.getAllByRole("button", { name: /tu experiencia \(privada\)/i })[1]);
-    fireEvent.change(screen.getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "voy al gimnasio" } });
     fireEvent.click(saveButton("Deporte"));
 
     expect(await within(question("c2")).findByRole("status")).toHaveTextContent(/guardado ahora/i);
-    expect(screen.queryByLabelText(/tu experiencia \(privada\)/i)).not.toBeInTheDocument();
     const [call] = postCalls(fetchMock, "/api/assessments");
-    expect(JSON.parse(call[1].body as string)).toEqual({ entries: [{ categoryId: "c2", score: 8, note: "voy al gimnasio" }] });
+    expect(JSON.parse(call[1].body as string)).toEqual({ entries: [{ categoryId: "c2", score: 8 }] });
   });
 
   describe("respuesta inmediata (UX-05)", () => {
-    it("bajo su pregunta se ve la última actualización (fecha y cambio) y la última experiencia, como privada", async () => {
+    it("bajo su pregunta se ve la última actualización (fecha y cambio)", async () => {
       stubFetch();
       renderPage();
       await waitUntilLoaded();
 
       const box = (await within(question("c1")).findByText(/última actualización/i)).closest("[data-last-update]") as HTMLElement;
       expect(box).toHaveTextContent("Última actualización: 18 de septiembre de 2026 · 6 → 4");
-      expect(box).toHaveTextContent(/tu última experiencia \(privada\)/i);
-      expect(box).toHaveTextContent(/este mes he ahorrado un poco/i);
-      expect(screen.queryByText(/mes justo/i)).not.toBeInTheDocument();
       expect(within(question("c2")).queryByText(/última actualización/i)).not.toBeInTheDocument();
     });
 
@@ -440,7 +483,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía" }));
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía (5)" }));
 
       const dialog = screen.getByRole("dialog");
       expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
@@ -468,15 +511,11 @@ describe("InterviewPage (RF-10)", () => {
         expect(within(progressPanel()).queryByRole("button", { name: /pareja/i })).not.toBeInTheDocument();
       });
 
-      it("cambiar una categoría la marca 'sin guardar' (también al escribir su experiencia) y guardarla, 'guardada hoy'", async () => {
+      it("cambiar la puntuación de una categoría la marca 'sin guardar' y guardarla, 'guardada hoy'", async () => {
         stubFetch();
         renderPage();
         await waitUntilLoaded();
 
-        fireEvent.click(within(question("c1")).getByRole("button", { name: /tu experiencia \(privada\)/i }));
-        fireEvent.change(within(question("c1")).getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "algo" } });
-        expect(progressItem("economía")).toHaveTextContent(/sin guardar/i);
-        fireEvent.change(within(question("c1")).getByLabelText(/tu experiencia \(privada\)/i), { target: { value: "" } });
         chooseScore("economía", 4);
         expect(progressItem("economía")).toHaveTextContent(/sin guardar/i);
 
@@ -531,7 +570,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      const toggle = screen.getByRole("button", { name: "¿Qué te ayuda en esta área? (1)" });
+      const toggle = screen.getByRole("button", { name: "¿Qué te ayuda? (1)" });
       expect(toggle).toHaveAttribute("aria-expanded", "false");
       fireEvent.click(toggle);
 
@@ -546,7 +585,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
 
       expect(await within(helpsGroup("economía")).findByRole("button", { name: "Apps de finanzas", pressed: true })).toBeInTheDocument();
@@ -563,7 +602,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage(client);
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
 
       await waitFor(() => expect(client.getQueryState(["personalized-ideas", "r1", "economia.1", "es", "economia.apps|economia.presupuesto"])?.isInvalidated).toBe(true));
@@ -597,9 +636,9 @@ describe("InterviewPage (RF-10)", () => {
       await waitUntilLoaded();
       const personalizeCalls = () => fetchMock.mock.calls.filter(([urlCalled]) => urlCalled === "/api/recommendations/personalize").length;
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
-      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía" }));
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: /^Ideas para Economía/ }));
       await waitFor(() => expect(personalizeCalls()).toBe(1));
       confirmExperience();
 
@@ -618,21 +657,451 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda en esta área\? \(1\)/i }));
+      fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
       fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
 
       await waitFor(() => expect(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeInTheDocument());
       expect(screen.getByText(/no se pudo guardar tu elección/i)).toBeInTheDocument();
     });
 
-    it("'Tu experiencia (privada)' avisa de que solo la ve el usuario y nunca va a la IA", async () => {
+    it("las tres opciones de cada pregunta son desplegables y lo indican (aria-expanded)", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+      chooseScore("economía", 3);
+
+      for (const name of [/qué te ayuda/i, /qué te lo pone difícil/i, /tus experiencias/i]) {
+        expect(within(question("c1")).getByRole("button", { name })).toHaveAttribute("aria-expanded", "false");
+      }
+    });
+
+    it("'Tus experiencias' avisa de que solo las ve el usuario y nunca van a la IA", async () => {
       stubFetch();
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(screen.getAllByRole("button", { name: /tu experiencia \(privada\)/i })[0]);
+      fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
 
-      expect(screen.getByText("Solo la ves tú. Nunca se envía a la IA ni se comparte con nadie.")).toBeInTheDocument();
+      expect(within(question("c1")).getByText("Solo las ves tú. Nunca se envían a la IA ni se comparten con nadie.")).toBeInTheDocument();
+    });
+  });
+
+  describe("diario de experiencias (RF-44)", () => {
+    function diary(categoryId: string) {
+      return within(question(categoryId)).getByRole("list", { name: /tus experiencias/i });
+    }
+
+    it("enseña las 3 más recientes de cada categoría, con su fecha, y 'Ver todas (N)'", async () => {
+      stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+
+      const items = within(await within(question("c1")).findByRole("list", { name: /tus experiencias/i })).getAllByRole("listitem");
+      expect(items.map((item) => item.textContent)).toEqual([
+        expect.stringMatching(/18 de septiembre de 2026.*Este mes he ahorrado un poco/),
+        expect.stringMatching(/15 de enero de 2026.*Mes justo/),
+        expect.stringMatching(/1 de diciembre de 2025.*Empecé a apuntar gastos/),
+      ]);
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Ver todas (4)" }));
+      expect(within(diary("c1")).getAllByRole("listitem")).toHaveLength(4);
+      expect(within(question("c2")).queryByRole("list", { name: /tus experiencias/i })).not.toBeInTheDocument();
+    });
+
+    it("'Añadir' guarda la experiencia al momento, sin puntuar: 'Guardada' y arriba de la lista; 'Guardar' no se activa", async () => {
+      const fetchMock = stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+      fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
+
+      fireEvent.change(within(question("c1")).getByLabelText("Nueva experiencia"), { target: { value: "Hoy he cobrado" } });
+      expect(saveButton("Economía")).toBeDisabled();
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Añadir" }));
+
+      expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Guardada");
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/diary")[0][1].body as string)).toEqual({ categoryId: "c1", text: "Hoy he cobrado" });
+      expect(within(diary("c1")).getAllByRole("listitem")[0]).toHaveTextContent("Hoy he cobrado");
+      expect(within(question("c1")).getByLabelText("Nueva experiencia")).toHaveValue("");
+      expect(postCalls(fetchMock, "/api/assessments")).toHaveLength(0);
+    });
+
+    it("borrar pide confirmación y la quita de la lista", async () => {
+      const fetchMock = stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Borrar la experiencia del 15 de enero de 2026" }));
+      const dialog = screen.getByRole("dialog", { name: /borrar esta experiencia/i });
+      fireEvent.click(within(dialog).getByRole("button", { name: "Borrar" }));
+
+      await waitFor(() => expect(within(diary("c1")).queryByText("Mes justo")).not.toBeInTheDocument());
+      expect(fetchMock.mock.calls.some(([url, init]) => url === "/api/categories/diary?id=e2" && init?.method === "DELETE")).toBe(true);
+    });
+
+    it("RF-30: junto al diario, el enlace a las líneas de ayuda", async () => {
+      stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByRole("link", { name: "¿Necesitas ayuda ahora?" })).toHaveAttribute("href", "/ayuda");
+    });
+
+    it("la X del campo lo borra y lo cierra", async () => {
+      stubFetch({ experiences: EXPERIENCES });
+      renderPage();
+      await waitUntilLoaded();
+      fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
+      fireEvent.change(within(question("c1")).getByLabelText("Nueva experiencia"), { target: { value: "algo" } });
+
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Borrar y cerrar" }));
+
+      expect(within(question("c1")).queryByLabelText("Nueva experiencia")).not.toBeInTheDocument();
+      expect(within(question("c1")).getByRole("button", { name: /tus experiencias/i })).toHaveAttribute("aria-expanded", "false");
+    });
+  });
+
+  describe("compartir experiencias (RF-43)", () => {
+    const HIGH_SCORES = [{ ...LATEST[0], score: 9 }, { ...LATEST[1], score: 9 }];
+    const ONE_EXPERIENCE = [EXPERIENCES[0]];
+
+    function experienceItem(text: string) {
+      return within(question("c1")).getByText(text).closest("li") as HTMLElement;
+    }
+
+    function patchBodies(fetchMock: ReturnType<typeof stubFetch>) {
+      return fetchMock.mock.calls.filter(([url, init]) => url === "/api/categories/diary" && init?.method === "PATCH").map(([, init]) => JSON.parse(init.body as string));
+    }
+
+    it("con 8 o más, la app lo ofrece; compartir enseña antes cómo la verán otras personas y, al confirmar, queda 'Compartida'", async () => {
+      const fetchMock = stubFetch({ latest: HIGH_SCORES, experiences: ONE_EXPERIENCE });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByText(/puedes compartir una experiencia de forma anónima/i)).toBeInTheDocument();
+      fireEvent.click(within(experienceItem("Este mes he ahorrado un poco")).getByRole("button", { name: "Compartir de forma anónima" }));
+      const dialog = screen.getByRole("dialog", { name: "Compartir de forma anónima" });
+      expect(within(dialog).getByText("Este mes he ahorrado un poco")).toBeInTheDocument();
+      expect(within(dialog).getByText(/sin tu nombre, la fecha ni tu puntuación/i)).toBeInTheDocument();
+      expect(patchBodies(fetchMock)).toHaveLength(0);
+      fireEvent.click(within(dialog).getByRole("button", { name: "Compartir" }));
+
+      expect(await within(experienceItem("Este mes he ahorrado un poco")).findByText("Compartida")).toBeInTheDocument();
+      expect(patchBodies(fetchMock)).toEqual([{ id: "e3", shared: true, locale: "es" }]);
+      // La ventana tarda un momento en cerrarse; mientras, el resto de la página no es accesible.
+      expect(await within(experienceItem("Este mes he ahorrado un poco")).findByRole("button", { name: "Dejar de compartir" })).toBeInTheDocument();
+    });
+
+    it("con menos de 8, no se ofrece", async () => {
+      stubFetch({ experiences: ONE_EXPERIENCE });
+      renderPage();
+      await waitUntilLoaded();
+      await within(question("c1")).findByText("Este mes he ahorrado un poco");
+
+      expect(within(question("c1")).queryByRole("button", { name: "Compartir de forma anónima" })).not.toBeInTheDocument();
+      expect(within(question("c1")).queryByText(/puedes compartir una experiencia de forma anónima/i)).not.toBeInTheDocument();
+    });
+
+    it("nunca en una categoría sensible, aunque tenga 8 o más", async () => {
+      stubFetch({ latest: HIGH_SCORES, experiences: [{ id: "e-sport", categoryId: "c2", text: "Correr los sábados", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c2")).findByText("Correr los sábados")).toBeInTheDocument();
+      expect(within(question("c2")).queryByRole("button", { name: "Compartir de forma anónima" })).not.toBeInTheDocument();
+    });
+
+    it("si no pasa los filtros, la ventana dice qué quitar y no se comparte", async () => {
+      stubFetch({ latest: HIGH_SCORES, experiences: ONE_EXPERIENCE, shareRejection: "health" });
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Compartir de forma anónima" }));
+      const dialog = screen.getByRole("dialog", { name: "Compartir de forma anónima" });
+      fireEvent.click(within(dialog).getByRole("button", { name: "Compartir" }));
+
+      expect(await within(dialog).findByText(/salud, medicación, terapia o dinero/i)).toBeInTheDocument();
+      expect(within(experienceItem("Este mes he ahorrado un poco")).queryByText("Compartida")).not.toBeInTheDocument();
+    });
+
+    it("'Dejar de compartir' la vuelve privada", async () => {
+      const fetchMock = stubFetch({ latest: HIGH_SCORES, experiences: [{ ...EXPERIENCES[0], shared: true }] });
+      renderPage();
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Dejar de compartir" }));
+
+      expect(await within(experienceItem("Este mes he ahorrado un poco")).findByRole("button", { name: "Compartir de forma anónima" })).toBeInTheDocument();
+      expect(within(experienceItem("Este mes he ahorrado un poco")).queryByText("Compartida")).not.toBeInTheDocument();
+      expect(patchBodies(fetchMock)).toEqual([{ id: "e3", shared: false }]);
+    });
+
+    it("una retirada tras un reporte lo dice y no se puede volver a compartir", async () => {
+      stubFetch({ latest: HIGH_SCORES, experiences: [{ ...EXPERIENCES[0], shared: false, reported: true }] });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByText("Retirada tras un reporte")).toBeInTheDocument();
+      expect(within(question("c1")).queryByRole("button", { name: "Compartir de forma anónima" })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("sugerencias de la IA a partir de una experiencia (RF-45)", () => {
+    function renderWithAi({ suggestionsEnabled, suggestion, experiences }: { suggestionsEnabled: boolean; suggestion?: unknown; experiences?: unknown[] }) {
+      const fetchMock = stubFetch({ experiences: experiences ?? [...EXPERIENCES, { id: "e-sport", categoryId: "c2", text: "Me cuesta salir a correr", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ ok: true, json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable: true }) });
+        if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", aiSuggestionsEnabled: suggestionsEnabled }) });
+        if (url === "/api/recommendations/suggest-options") return Promise.resolve({ ok: true, json: async () => suggestion ?? { helps: [], difficulties: [] } });
+        return defaultImplementation(url, init);
+      });
+      render(
+        withClient(
+          <MemoryRouter>
+            <SessionProvider>
+              <InterviewPage />
+            </SessionProvider>
+          </MemoryRouter>,
+        ),
+      );
+      return fetchMock;
+    }
+
+    function experienceItem(text: string) {
+      return within(question("c1")).getByText(text).closest("li") as HTMLElement;
+    }
+
+    it("sin activarlas, ninguna experiencia ofrece sugerencias, pero el diario dice dónde activarlas", async () => {
+      renderWithAi({ suggestionsEnabled: false });
+      await waitUntilLoaded();
+      await within(question("c1")).findByText("Mes justo");
+
+      expect(screen.queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+      expect(await within(question("c1")).findByRole("link", { name: "Actívalas en Privacidad y datos" })).toHaveAttribute("href", "/perfil/datos");
+      expect(within(question("c2")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("Pareja está excluida de la IA: ni botón ni aviso, aunque estén activadas", async () => {
+      renderWithAi({ suggestionsEnabled: true, experiences: [{ id: "e-pareja", categoryId: "c3", text: "Nos cuesta hablar", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      await waitUntilLoaded();
+      toggleCategory("pareja");
+
+      expect(await within(question("c3")).findByText("Nos cuesta hablar")).toBeInTheDocument();
+      expect(within(question("c3")).queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+      expect(within(question("c3")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("activadas, el aviso de dónde activarlas ya no sale", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+      await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" });
+
+      expect(within(question("c1")).queryByRole("link", { name: "Actívalas en Privacidad y datos" })).not.toBeInTheDocument();
+    });
+
+    it("activadas, cada experiencia de una categoría no sensible lo ofrece (con el aviso sobre los nombres); las sensibles no", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+
+      expect(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" })).toBeInTheDocument();
+      expect(within(question("c1")).getAllByText(/no escribas nombres de otras personas/i).length).toBeGreaterThan(0);
+      expect(within(question("c2")).queryByRole("button", { name: "Sugerir opciones con IA" })).not.toBeInTheDocument();
+    });
+
+    it("pide las sugerencias de esa experiencia y las enseña, de la IA, sin marcarlas todavía", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, suggestion: { helps: ["economia.apps"], difficulties: ["mirarMisCuentas"] } });
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+
+      const item = experienceItem("Mes justo");
+      expect(await within(item).findByText("La IA sugiere:")).toBeInTheDocument();
+      expect(within(item).getByText("Sugerido por IA")).toBeInTheDocument();
+      expect(within(item).getByRole("button", { name: "Marcar «Apps de finanzas»" })).toBeInTheDocument();
+      expect(within(item).getByRole("button", { name: "Marcar «Mirar mis cuentas»" })).toBeInTheDocument();
+      const body = JSON.parse(postCalls(fetchMock, "/api/recommendations/suggest-options")[0][1].body as string);
+      expect(body).toEqual({ experienceId: "e2", locale: "es" });
+      expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(0);
+    });
+
+    it("aceptar una la marca como si la tocara el usuario; descartar otra solo la quita", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, suggestion: { helps: ["economia.apps"], difficulties: ["mirarMisCuentas"] } });
+      await waitUntilLoaded();
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+      const item = experienceItem("Mes justo");
+
+      fireEvent.click(await within(item).findByRole("button", { name: "Marcar «Mirar mis cuentas»" }));
+      fireEvent.click(within(item).getByRole("button", { name: "Descartar «Apps de finanzas»" }));
+
+      await waitFor(() => expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(1));
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/difficulties")[0][1].body as string)).toEqual({ categoryId: "c1", tags: ["mirarMisCuentas"] });
+      expect(postCalls(fetchMock, "/api/categories/experience")).toHaveLength(0);
+      expect(within(item).queryByRole("button", { name: /Mirar mis cuentas|Apps de finanzas/ })).not.toBeInTheDocument();
+    });
+
+    it("con palabras ofensivas, avisa antes de enviar nada; 'Cancelar' no envía y 'Enviar igualmente' sí", async () => {
+      const fetchMock = renderWithAi({ suggestionsEnabled: true, experiences: [{ id: "e-mal", categoryId: "c1", text: "Mi jefe es un gilipollas y no me sube el sueldo", createdAt: "2026-09-01T10:00:00.000Z" }] });
+      await waitUntilLoaded();
+      const item = () => experienceItem("Mi jefe es un gilipollas y no me sube el sueldo");
+
+      fireEvent.click(await within(item()).findByRole("button", { name: "Sugerir opciones con IA" }));
+      expect(within(item()).getByText(/tiene palabras que preferimos no enviar a la ia/i)).toBeInTheDocument();
+      expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(0);
+
+      fireEvent.click(within(item()).getByRole("button", { name: "Cancelar" }));
+      expect(within(item()).getByRole("button", { name: "Sugerir opciones con IA" })).toBeInTheDocument();
+      expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(0);
+
+      fireEvent.click(within(item()).getByRole("button", { name: "Sugerir opciones con IA" }));
+      fireEvent.click(within(item()).getByRole("button", { name: "Enviar igualmente" }));
+      await waitFor(() => expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(1));
+    });
+
+    it("si no hay nada que proponer, lo dice", async () => {
+      renderWithAi({ suggestionsEnabled: true });
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+
+      expect(await within(experienceItem("Mes justo")).findByText("No hemos encontrado opciones en esta experiencia.")).toBeInTheDocument();
+    });
+  });
+
+  describe("¿Qué te lo pone difícil? (RF-42)", () => {
+    function difficultiesToggle(categoryId: string) {
+      return within(question(categoryId)).queryByRole("button", { name: /qué te lo pone difícil/i });
+    }
+
+    it("con una puntuación alta y sin idea abierta no se pregunta", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(difficultiesToggle("c1")).not.toBeInTheDocument();
+    });
+
+    it("con una puntuación baja aparece, plegado, con las situaciones de esa categoría", async () => {
+      stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("economía", 3);
+      const toggle = difficultiesToggle("c1")!;
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+      fireEvent.click(toggle);
+
+      const group = within(question("c1")).getByRole("group", { name: /qué te lo pone difícil/i });
+      expect(within(group).getAllByRole("button").map((button) => button.textContent)).toEqual(["Hablar de lo que siento o me preocupa", "Apuntar cosas o llevar registros", "Mirar mis cuentas"]);
+    });
+
+    it("con una idea abierta también aparece, aunque la puntuación ya no sea baja", async () => {
+      stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+      renderPage();
+      await waitUntilLoaded();
+
+      expect(await within(question("c1")).findByRole("button", { name: /qué te lo pone difícil/i })).toBeInTheDocument();
+    });
+
+    it("marcar una situación se ve al momento y se guarda", async () => {
+      const fetchMock = stubFetch();
+      renderPage();
+      await waitUntilLoaded();
+      chooseScore("economía", 3);
+      fireEvent.click(difficultiesToggle("c1")!);
+
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+      expect(await within(question("c1")).findByRole("button", { name: "Mirar mis cuentas", pressed: true })).toBeInTheDocument();
+      await waitFor(() => expect(postCalls(fetchMock, "/api/categories/difficulties")).toHaveLength(1));
+      expect(JSON.parse(postCalls(fetchMock, "/api/categories/difficulties")[0][1].body as string)).toEqual({ categoryId: "c1", tags: ["mirarMisCuentas"] });
+    });
+
+    describe("reacción al marcar", () => {
+      it("con idea abierta: 'Ideas actualizadas', y el botón de ideas dice cuántas quedan y da un pulso", async () => {
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        const ideasButton = await within(question("c1")).findByRole("button", { name: "Ideas para Economía (5)" });
+        expect(ideasButton).not.toHaveAttribute("data-pulse");
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Ideas actualizadas");
+        expect(within(question("c1")).getByRole("button", { name: "Ideas para Economía (4)" })).toHaveAttribute("data-pulse", "true");
+      });
+
+      it("sin idea abierta: 'Para tus próximas ideas'", async () => {
+        stubFetch();
+        renderPage();
+        await waitUntilLoaded();
+        chooseScore("economía", 3);
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Para tus próximas ideas");
+      });
+
+      it("'¿Qué te ayuda?' sin IA: el mismo pulso en las ideas, pero el texto solo dice 'Guardado' (no promete un cambio)", async () => {
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        await within(question("c1")).findByRole("button", { name: /^Ideas para Economía/ });
+        fireEvent.click(within(question("c1")).getByRole("button", { name: /qué te ayuda/i }));
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Apps de finanzas" }));
+
+        const status = await within(question("c1")).findByRole("status");
+        expect(status.textContent?.trim()).toBe("Guardado");
+        expect(within(question("c1")).getByRole("button", { name: /^Ideas para Economía/ })).toHaveAttribute("data-pulse", "true");
+      });
+
+      it("en pantallas anchas, el mensaje sale a la derecha del título de su lista, en la misma línea (no hace saltar nada al irse)", async () => {
+        // jsdom no evalúa media queries: se simula una pantalla ancha.
+        vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("min-width"), media: query, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, onchange: null, dispatchEvent: () => false }));
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        const status = await within(question("c1")).findByRole("status");
+        expect(status).toBeVisible();
+        expect(status.parentElement).toBe(difficultiesToggle("c1")!.parentElement);
+        vi.unstubAllGlobals();
+      });
+
+      it("en móvil (no cabe al lado), el título enseña la confirmación un momento y conserva su nombre", async () => {
+        stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
+        renderPage();
+        await waitUntilLoaded();
+        fireEvent.click(difficultiesToggle("c1")!);
+
+        fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+        expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Ideas actualizadas");
+        const toggle = difficultiesToggle("c1")!;
+        expect(toggle).toHaveAccessibleName(/qué te lo pone difícil/i);
+        expect(within(toggle).getByText("Ideas actualizadas")).toBeInTheDocument();
+      });
+    });
+
+    it("si el servidor lo rechaza, la marca se deshace y se avisa", async () => {
+      const fetchMock = stubFetch();
+      const defaultImplementation = fetchMock.getMockImplementation() as (url: string, init?: RequestInit) => Promise<unknown>;
+      fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+        url === "/api/categories/difficulties" ? Promise.resolve({ ok: false, json: async () => ({ error: "Unknown situation" }) }) : defaultImplementation(url, init),
+      );
+      renderPage();
+      await waitUntilLoaded();
+      chooseScore("economía", 3);
+      fireEvent.click(difficultiesToggle("c1")!);
+
+      fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
+
+      expect(await screen.findByText(/no se pudo guardar tu elección/i)).toBeInTheDocument();
+      expect(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas", pressed: false })).toBeInTheDocument();
     });
   });
 

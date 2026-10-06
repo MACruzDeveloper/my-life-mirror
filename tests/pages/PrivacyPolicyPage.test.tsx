@@ -25,8 +25,23 @@ describe("PrivacyPolicyPage (RNF-05)", () => {
     );
 
     expect(screen.getByRole("heading", { name: /ideas personalizadas con ia/i })).toBeInTheDocument();
-    const text = screen.getByText(/desactivado por defecto/i).textContent ?? "";
+    const text = screen.getByText(/al abrir una idea para un área no sensible/i).textContent ?? "";
     expect(text).toMatch(/anthropic/i);
-    expect(text).toMatch(/nunca se envían tu nombre, tu email, tu experiencia privada ni las categorías sensibles/i);
+    expect(text).toMatch(/nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles/i);
+  });
+
+  it("explica las sugerencias a partir de las experiencias: aparte, por experiencia, qué se quita y qué nunca (RF-45)", () => {
+    render(
+      <MemoryRouter>
+        <PrivacyPolicyPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: /sugerencias de la ia a partir de tus experiencias/i })).toBeInTheDocument();
+    const text = screen.getByText(/solo la experiencia que tú le pidas analizar/i).textContent ?? "";
+    expect(text).toMatch(/desactivado por defecto/i);
+    expect(text).toMatch(/quitamos emails, teléfonos, enlaces y números largos/i);
+    expect(text).toMatch(/nunca se envían las categorías sensibles/i);
+    expect(text).toMatch(/la ia no escribe nada sobre ti/i);
   });
 });

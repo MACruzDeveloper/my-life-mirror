@@ -7,7 +7,7 @@ import { newUser } from "./pages/users";
 
 // En local y en CI el proveedor es el *Fake* (AI_IDEAS_PROVIDER=fake, scripts/local-supabase.mjs).
 test.describe("RF-40: ideas personalizadas con IA", () => {
-  test("activada, la idea de un área baja sale personalizada con su etiqueta y la original; desactivada, vuelve la curada", async ({ page }) => {
+  test("activada, la idea de un área baja sale personalizada con su etiqueta y la original en su pestaña; desactivada, vuelve la curada", async ({ page }) => {
     await new AccountPages(page).register(newUser());
     const interview = new InterviewPage(page);
     await interview.open();
@@ -31,8 +31,10 @@ test.describe("RF-40: ideas personalizadas con IA", () => {
     await expect(dialog.getByText("Personalizada con IA")).toBeVisible();
     await expect(dialog).toContainText("llevar un presupuesto");
     await expect(dialog).toContainText(/no sustituyen el asesoramiento/i);
-    await dialog.getByRole("button", { name: "Ver la idea original" }).click();
+    // RF-43: la original está en su pestaña.
+    await dialog.getByRole("tab", { name: "De la app" }).click();
     await expect(dialog).toContainText(/en qué se va tu dinero/i);
+    await dialog.getByRole("tab", { name: "Con IA" }).click();
     // UX-05: carrusel con las demás ideas de la categoría, también personalizadas.
     await dialog.getByRole("button", { name: "Idea siguiente" }).click();
     await expect(dialog).toContainText("Idea 2 de 5");
@@ -44,7 +46,7 @@ test.describe("RF-40: ideas personalizadas con IA", () => {
     const moreHelps = await interview.openHelps("Economía");
     await moreHelps.getByRole("button", { name: "Apps de finanzas" }).click();
     await expect(moreHelps.getByRole("button", { name: "Apps de finanzas", pressed: true })).toBeVisible();
-    await interview.question("Economía").getByRole("button", { name: "Ideas para Economía" }).click();
+    await interview.question("Economía").getByRole("button", { name: /^Ideas para Economía/ }).click();
     await expect(page.getByRole("dialog")).toContainText("apps de finanzas");
     await page.getByRole("dialog").getByRole("button", { name: /cerrar/i }).click();
 

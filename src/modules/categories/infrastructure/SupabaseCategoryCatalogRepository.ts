@@ -7,6 +7,7 @@ interface CatalogRow {
   id: string;
   key: string | null;
   is_sensitive_data: boolean;
+  ai_excluded: boolean | null;
   retired_at: string | null;
 }
 
@@ -33,7 +34,7 @@ export class SupabaseCategoryCatalogRepository implements CategoryCatalogReposit
 
   async findAll(): Promise<CatalogCategory[]> {
     const [catalog, translations] = await Promise.all([
-      this.client.from("category_catalog").select("id, key, is_sensitive_data, retired_at"),
+      this.client.from("category_catalog").select("id, key, is_sensitive_data, ai_excluded, retired_at"),
       this.client.from("category_translations").select("catalog_id, locale, name, description"),
     ]);
     if (catalog.error) throw new Error(`No se pudo leer el catálogo: ${catalog.error.message}`);
@@ -50,6 +51,7 @@ export class SupabaseCategoryCatalogRepository implements CategoryCatalogReposit
       ...(row.key ? { key: row.key } : {}),
       translations: byCatalogId.get(row.id) ?? {},
       isSensitiveData: row.is_sensitive_data,
+      ...(row.ai_excluded ? { aiExcluded: true } : {}),
       ...(row.retired_at ? { retiredAt: new Date(row.retired_at) } : {}),
     }));
   }
@@ -64,6 +66,7 @@ export class SupabaseCategoryCatalogRepository implements CategoryCatalogReposit
       name: defaultText.name,
       description: defaultText.description,
       is_sensitive_data: category.isSensitiveData,
+      ai_excluded: category.aiExcluded === true,
       retired_at: category.retiredAt ? category.retiredAt.toISOString() : null,
     });
     if (error) throw new Error(`No se pudo guardar la categoría del catálogo: ${error.message}`);

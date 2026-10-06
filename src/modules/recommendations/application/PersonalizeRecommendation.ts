@@ -6,11 +6,13 @@ import type { ProfileRepository } from "#modules/accounts/domain/ProfileReposito
 import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
 import type { CategoryCatalogRepository } from "#modules/categories/domain/CategoryCatalogRepository.js";
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
+import { isExcludedFromAi } from "#modules/categories/domain/CatalogCategory.js";
 import type { IdeaRequest, IdeaReviewer, IdeaTrend, IdeaWriter } from "../domain/IdeaWriter.js";
 import type { IdeaTexts } from "../domain/IdeaTexts.js";
 import { checkIdeaSafety } from "../domain/ideaSafety.js";
 import type { PersonalizedIdeaRepository } from "../domain/PersonalizedIdea.js";
 import { isOpen } from "../domain/Recommendation.js";
+import { allowedTemplateKeys } from "../domain/ideaSituations.js";
 import { templateKeysFor } from "../domain/recommendationCatalog.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
@@ -80,17 +82,23 @@ export function createPersonalizeRecommendation(deps: Dependencies) {
     if (!recommendation) return err(new NotFoundError("Recommendation not found"));
 
     const category = await categoryRepository.findById(input.userId, recommendation.categoryId);
-    const categoryKey = category ? (await catalog.findAll()).find((entry) => entry.id === category.catalogId)?.key : undefined;
+    const catalogEntry = category ? (await catalog.findAll()).find((entry) => entry.id === category.catalogId) : undefined;
+    const categoryKey = catalogEntry?.key;
     const templateKey = input.templateKey ?? recommendation.templateKey;
     if (templateKey !== recommendation.templateKey && !templateKeysFor(categoryKey).includes(templateKey)) {
       return err(new ValidationError("Template does not belong to this category"));
+    }
+    // RF-42: una idea que choca con lo que se le pone difícil no se propone, tampoco personalizada.
+    if (!allowedTemplateKeys(categoryKey, category?.difficultyTags ?? []).includes(templateKey)) {
+      return err(new ValidationError("Template clashes with a difficult situation"));
     }
     const curated: PersonalizedResult = { source: "catalog", templateKey };
 
     if (!writer || !isOpen(recommendation)) return ok(curated);
     const profile = await profileRepository.findByUserId(input.userId);
     if (profile?.aiIdeasEnabled !== true) return ok(curated);
-    if (!category || category.isSensitiveData || !categoryKey) return ok(curated);
+    // Ni sensibles ni las que el catálogo deja fuera de la IA (Pareja, RF-45 v1.4).
+    if (!category || isExcludedFromAi(category.isSensitiveData, catalogEntry) || !categoryKey) return ok(curated);
 
     // Se reutiliza solo si se escribió con las mismas opciones de "¿Qué te ayuda?" que hay ahora.
     const experienceTags = category.experienceTags ?? [];
