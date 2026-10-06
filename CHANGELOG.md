@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-10-06
+
+Antes de desplegar: migraciones **0013 a 0019**, en orden (ya ejecutadas en producción). Ninguna rompe datos: añaden columnas y tablas, o cambian la categoría Deporte.
+
 ### Cambiado (diseño)
 
 - Capas CSS: Material UI va en la capa `mui` y el CSS propio (`skin.css`, clases `mlm-`) le gana sin `!important` (ADR-07, apartado 4.1). Comprobado con un E2E en navegador real.
