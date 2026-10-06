@@ -22,7 +22,7 @@ Hasta ahora, "Tu experiencia (privada)" era una nota que solo se guardaba junto 
 - **Dónde se ven:** la lista en cada pregunta (sustituye a "Tu última experiencia") y el historial de Resultados, en su día.
 - **"Guardar" vuelve a ser solo para la puntuación:** escribir una experiencia ya no lo activa (tiene su propio "Añadir").
 - **API:** acciones `experiences` (listar, añadir y borrar) en un router existente, sin función nueva.
-- **Fuera de alcance:** editar una experiencia (se borra y se escribe otra), adjuntos, compartirlas y la IA (RF-45).
+- **Fuera de alcance:** editar una experiencia (se borra y se escribe otra), adjuntos, compartirlas (llega con RF-43) y la IA (RF-45).
 
 ## Criterios de aceptación
 
@@ -54,3 +54,4 @@ Hasta ahora, "Tu experiencia (privada)" era una nota que solo se guardaba junto 
 
 - **v1.0 (5 oct. 2026)** — versión inicial. Petición del autor: "al añadir una experiencia no veo que afecte a la app… el usuario debe poder añadir más de una experiencia, y también eliminarlas".
 - **v1.1 (5 oct. 2026)** — antes de implementarla: el enlace a las líneas de ayuda pasa a RF-30 (no tiene pantalla todavía); la nota antigua se conserva en su evaluación pero solo se enseñan las experiencias; "Guardar" vuelve a ser solo para la puntuación.
+- **v1.2 (5 oct. 2026)** — compartir una experiencia de forma anónima llega con [RF-43](RF-43-experiencias-compartidas.md).

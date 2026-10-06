@@ -23,7 +23,7 @@ export interface UserDataExport {
   aiSuggestions: { enabled: boolean; enabledAt?: string };
   personalizedIdeas: { category: string; locale: string; templateKey: string; text: string; model: string; createdAt: string }[];
   /** RF-44: el diario de experiencias, de la más antigua a la más reciente. */
-  experiences: { category: string; text: string; createdAt: string }[];
+  experiences: { category: string; text: string; createdAt: string; sharedAt?: string; reportedAt?: string }[];
 }
 
 interface Dependencies {
@@ -81,7 +81,14 @@ export function createExportUserData({ profileRepository, categoryRepository, co
       }),
       experiences: [...experiences]
         .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-        .map((experience) => ({ category: names.get(experience.categoryId) ?? "", text: experience.text, createdAt: experience.createdAt.toISOString() })),
+        .map((experience) => ({
+          category: names.get(experience.categoryId) ?? "",
+          text: experience.text,
+          createdAt: experience.createdAt.toISOString(),
+          // RF-43: compartida de forma anónima, y si se retiró tras un reporte.
+          ...(experience.sharedAt && { sharedAt: experience.sharedAt.toISOString() }),
+          ...(experience.reportedAt && { reportedAt: experience.reportedAt.toISOString() }),
+        })),
       assessments: [...assessments]
         .sort((a, b) => a.recordedAt.getTime() - b.recordedAt.getTime())
         .map((a) => ({ category: names.get(a.categoryId) ?? "", score: a.score, ...(a.note ? { note: a.note } : {}), recordedAt: a.recordedAt.toISOString() })),

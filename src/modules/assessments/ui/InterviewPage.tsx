@@ -32,7 +32,17 @@ import { InterviewSteps, type InterviewStep } from "./interview/InterviewSteps";
 import { CategoryQuestion, type CategorySaveStatus, type LastUpdate, type TagFeedback } from "./interview/CategoryQuestion";
 import { InterviewProgress, type ProgressStatus } from "./interview/InterviewProgress";
 import { SavedIdeaDialog } from "./interview/SavedIdeaDialog";
-import { ASSESSMENTS_KEY, EXPERIENCES_KEY, HISTORY_KEY, LATEST_SCORES_KEY, useAssessmentHistory, useExperiences, useLatestScores, type ExperienceDto } from "./queries";
+import {
+  ASSESSMENTS_KEY,
+  EXPERIENCES_KEY,
+  HISTORY_KEY,
+  LATEST_SCORES_KEY,
+  useAssessmentHistory,
+  useExperienceSharing,
+  useExperiences,
+  useLatestScores,
+  type ExperienceDto,
+} from "./queries";
 import type { LatestScoreDto } from "./ScoreCards";
 
 /** Lleva a la pregunta de una categoría; sin animación si el usuario prefiere menos movimiento. */
@@ -120,6 +130,7 @@ export function InterviewPage() {
   const historyQuery = useAssessmentHistory();
   const recommendations = useRecommendations().data ?? [];
   const experiences = useExperiences().data ?? [];
+  const experienceSharing = useExperienceSharing();
   const personalizeIdeas = useAiIdeasActive();
   const suggestionsActive = useAiSuggestionsActive();
   const suggestionsAvailable = useOptionalSession()?.aiIdeasAvailable === true;
@@ -203,6 +214,11 @@ export function InterviewPage() {
       queryClient.setQueryData(EXPERIENCES_KEY, previous);
       setPageError(t("entrevista.errorExperienciaBorrar"));
     }
+  }
+
+  /** RF-43: dejar de compartir es inmediato; si el servidor falla, vuelve a estar compartida y se avisa. */
+  async function unshareExperience(experience: ExperienceDto) {
+    if (!(await experienceSharing.unshare(experience))) setPageError(t("entrevista.errorDejarDeCompartir"));
   }
 
   /** RF-45: opciones que la IA propone para una experiencia; `null` si no se pudo (la interfaz lo trata como "sin sugerencias"). */
@@ -689,6 +705,9 @@ export function InterviewPage() {
           onDeleteExperience={(experience) => void deleteExperience(experience)}
           onSuggestOptions={suggestionsActive ? suggestOptions : undefined}
           suggestionsAvailable={suggestionsAvailable}
+          savedScore={savedScores[category.id]}
+          onShareExperience={(experience) => experienceSharing.share(experience, i18n.language)}
+          onUnshareExperience={(experience) => void unshareExperience(experience)}
           onScore={(categoryId, score) => setDraftScores((current) => ({ ...current, [categoryId]: score }))}
           onToggleTag={(target, tag) => void toggleExperienceTag(target, tag)}
           onToggleDifficulty={(target, situation) => void toggleDifficultyTag(target, situation)}

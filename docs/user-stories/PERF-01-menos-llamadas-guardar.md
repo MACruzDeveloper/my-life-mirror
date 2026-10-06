@@ -48,3 +48,4 @@ En local no hay latencia de red ni arranques en frío. En producción (Dublín, 
 ## Historial de cambios
 
 - **v1.0 (4 oct. 2026)** — versión inicial. Se escribió después del código, y no antes como manda el proceso: el alcance ya estaba en el tablero desde el mismo día y el cambio era pequeño, pero queda anotado.
+- **v1.1 (5 oct. 2026)** — con RF-43, la ventana de la idea hace una lectura propia, "De otras personas" (`GET /api/categories/shared`, una vez y luego de la caché). El guardado sigue siendo de 2 peticiones; el test cuenta las lanzadas menos las abortadas (en desarrollo, StrictMode monta la ventana dos veces y la primera se aborta).

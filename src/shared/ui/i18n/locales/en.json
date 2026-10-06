@@ -96,7 +96,7 @@
     "queDatosTitulo": "What data we collect",
     "queDatosTexto": "Your email, the name you give us when registering, and the entries you record in the categories you turn on (date of birth, gender if you provide it, time zone, and your per-category check-ins).",
     "datosSensiblesTitulo": "Specially protected data categories",
-    "datosSensiblesTexto": "Some categories (sex, sport/health, spirituality) count as special category data under GDPR (art. 9). They're only turned on and recorded with your explicit consent, which you can withdraw at any time by turning the category off.",
+    "datosSensiblesTexto": "Some categories (sex, spirituality) count as special category data under GDPR (art. 9). They're only turned on and recorded with your explicit consent, which you can withdraw at any time by turning the category off.",
     "paraQueTitulo": "What we use it for",
     "paraQueTexto": "Only to give you your own tracking dashboard and personalized suggestions inside the app. It is never shared with third parties or used for advertising.",
     "tusDerechosTitulo": "Your rights",
@@ -106,7 +106,9 @@
     "iaTitulo": "AI-personalised ideas",
     "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive area, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\" and the app's ideas for that category. For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted.",
     "iaSugerenciasTitulo": "AI suggestions from your experiences",
-    "iaSugerenciasTexto": "This is also optional, separate from the above and off by default. If you turn it on in Privacy and data, each experience in your diary shows “Suggest options with AI”: pressing it sends to Anthropic, as data processor, only the experience you ask to analyse, together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you and doesn't assess how you are. Before sending it we remove emails, phone numbers, links and long numbers; names can't be removed reliably, so we ask you not to write other people's names if you don't want them sent. Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent. You can turn it off whenever you like; only the options you accept remain from the AI."
+    "iaSugerenciasTexto": "This is also optional, separate from the above and off by default. If you turn it on in Privacy and data, each experience in your diary shows “Suggest options with AI”: pressing it sends to Anthropic, as data processor, only the experience you ask to analyse, together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you and doesn't assess how you are. Before sending it we remove emails, phone numbers, links and long numbers; names can't be removed reliably, so we ask you not to write other people's names if you don't want them sent. Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent. You can turn it off whenever you like; only the options you accept remain from the AI.",
+    "compartidasTitulo": "Experiences shared with other people",
+    "compartidasTexto": "If your latest score in an area is 8 or more, you can anonymously share an experience from your diary to help other people. Only the one you choose is shared, after you see how it will look. Other people using the app only read the text, among the ideas for that area and in your same language: never your name, your email, the date or your score. Before publishing it we check that it has no contact details, health or money advice, or insults. Experiences from sensitive categories or Relationship are never shared. Bear in mind that if you tell very personal details, someone who knows you might recognise you. You can stop sharing it whenever you like, in your diary or in Privacy and data; if someone reports it, it's hidden. It's deleted when you delete the experience or your account."
   },
   "entrevista": {
     "titulo": "Your interview",
@@ -214,7 +216,29 @@
     "sugerenciasPista": "Want the AI to suggest options from your experiences?",
     "sugerenciasPistaEnlace": "Turn them on in Privacy and data",
     "avisoOfensivo": "This experience has words we'd rather not send to the AI. You can delete it and write it another way, or send it anyway.",
-    "enviarIgualmente": "Send anyway"
+    "enviarIgualmente": "Send anyway",
+    "compartir": "Share anonymously",
+    "compartirOferta": "You're doing well in this area: you can share an experience anonymously to help other people.",
+    "compartirVistaPrevia": "This is how other people who find this area harder will see it:",
+    "compartirAnonima": "Without your name, the date or your score.",
+    "compartirRetirable": "You can stop sharing it whenever you like.",
+    "compartirReportable": "Other people can report it; if they do, it's hidden.",
+    "compartirConfirmar": "Share",
+    "compartida": "Shared",
+    "dejarDeCompartir": "Stop sharing",
+    "retiradaReporte": "Removed after a report",
+    "errorDejarDeCompartir": "We couldn't stop sharing the experience. Please try again.",
+    "experienciasPrivadasCompartir": "Only you can see them, except the ones you share anonymously. They're never sent to the AI.",
+    "experienciasPrivadasConIaCompartir": "Only you can see them, except the ones you share anonymously. Only the one you ask to analyse goes to the AI.",
+    "compartirRechazo": {
+      "contact": "To share it, it can't contain emails, phone numbers, links or long numbers. Delete it and write another one without them.",
+      "health": "To share it, it can't talk about health, medication, therapy or money (investments, loans…): the app doesn't pass on that kind of advice between people. Delete it and write another one without them.",
+      "offensive": "To share it, it can't contain insults or offensive words. Delete it and write another one without them.",
+      "score": "You can only share with a score of 8 or more in this area.",
+      "category": "Experiences aren't shared in this area.",
+      "reported": "This experience was removed after a report and can't be shared again.",
+      "error": "We couldn't share it. Please try again."
+    }
   },
   "resultados": {
     "titulo": "Your results",
@@ -408,7 +432,10 @@
     "sugerenciasQueSeEnvia": "If you turn it on, each experience in your diary shows “Suggest options with AI”. When you press it, only the experience you ask to analyse is sent to an AI service (Anthropic), together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you.",
     "sugerenciasQueSeQuita": "Before sending it we remove emails, phone numbers, links and long numbers. Names can't be removed reliably: if you don't want them sent, don't write other people's names.",
     "sugerenciasQueNunca": "Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent.",
-    "sugerenciasRevocable": "It's off by default and you can turn it off whenever you like. Only the options you accept remain from the AI."
+    "sugerenciasRevocable": "It's off by default and you can turn it off whenever you like. Only the options you accept remain from the AI.",
+    "compartidasTitulo": "Shared experiences",
+    "compartidasTexto": "The experiences from your diary that you've shared anonymously to help other people. They only see the text: not your name, the date or your score.",
+    "compartidasNinguna": "You don't have any shared experiences."
   },
   "recomendaciones": {
     "ideaAnterior": "Previous idea",
@@ -493,8 +520,13 @@
     "ideaPara": "Idea for {{categoria}}",
     "personalizando": "Personalising your idea…",
     "personalizadaConIa": "Personalised with AI",
-    "verOriginal": "See the original idea",
-    "ocultarOriginal": "Hide the original"
+    "pestanaApp": "From the app",
+    "pestanaIa": "With AI",
+    "pestanaOtros": "From other people ({{count}})",
+    "reportar": "Report",
+    "reportada": "Thank you. We've hidden it.",
+    "errorReportar": "We couldn't report it. Please try again.",
+    "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it."
   },
   "evolucion": {
     "titulo": "Your evolution",

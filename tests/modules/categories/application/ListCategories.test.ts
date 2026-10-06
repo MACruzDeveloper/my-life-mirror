@@ -15,8 +15,8 @@ describe("ListCategories (RF-06)", () => {
       expect(result.value).toHaveLength(STANDARD_CATEGORIES.length);
       expect(result.value.every((c) => c.status === "inactive")).toBe(true);
       expect(result.value.every((c) => c.type === "standard")).toBe(true);
-      expect(result.value.some((c) => c.name === "Sexo" && c.isSensitiveData)).toBe(true);
-      expect(result.value.some((c) => c.name === "Economía" && !c.isSensitiveData)).toBe(true);
+      // Sensibles (RGPD art. 9): sexo y espiritualidad. Deporte dejó de serlo el 6 oct. (decisión del autor).
+      expect(result.value.filter((c) => c.isSensitiveData).map((c) => c.name).sort()).toEqual(["Espiritualidad", "Sexo"]);
     }
   });
 

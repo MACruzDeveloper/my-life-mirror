@@ -30,17 +30,17 @@ async function setup(options: { suggester?: OptionSuggester | null; enabled?: bo
   const entries = await catalog.findAll();
   const byKey = (key: string) => listed.value.find((c) => c.catalogId === entries.find((e) => e.key === key)?.id)!;
   const social = byKey("vidaSocial");
-  const sport = byKey("deporte");
+  const spirituality = byKey("espiritualidad");
   const couple = byKey("pareja");
   await categoryRepository.save({ ...couple, status: "active" });
   await categoryRepository.save({ ...social, status: "active", experienceTags: ["vidaSocial.planesTranquilos"] });
-  await categoryRepository.save({ ...sport, status: "active" });
+  await categoryRepository.save({ ...spirituality, status: "active" });
 
   const profileRepository = new InMemoryProfileRepository();
   await profileRepository.save({ userId: "u1", name: "Ana", aiSuggestionsEnabled: options.enabled ?? true });
   const experienceRepository = new InMemoryExperienceRepository();
   await experienceRepository.save({ id: "e-social", userId: "u1", categoryId: social.id, text: options.experienceText ?? "Me agobian los sitios con mucha gente; prefiero planes tranquilos. Escríbeme a ana@correo.es", createdAt: new Date() });
-  await experienceRepository.save({ id: "e-sport", userId: "u1", categoryId: sport.id, text: "Me cuesta salir a correr", createdAt: new Date() });
+  await experienceRepository.save({ id: "e-spirituality", userId: "u1", categoryId: spirituality.id, text: "Me cuesta encontrar un rato para meditar", createdAt: new Date() });
   await experienceRepository.save({ id: "e-couple", userId: "u1", categoryId: couple.id, text: "Nos cuesta hablar las cosas", createdAt: new Date() });
 
   const suggester = options.suggester === null ? undefined : (options.suggester ?? new FakeOptionSuggester());
@@ -89,7 +89,7 @@ describe("SuggestExperienceOptions (RF-45)", () => {
   const emptyCases: [string, Parameters<typeof setup>[0], string][] = [
     ["el usuario no lo ha activado", { enabled: false }, "e-social"],
     ["no hay proveedor", { suggester: null }, "e-social"],
-    ["la categoría es sensible (Deporte)", {}, "e-sport"],
+    ["la categoría es sensible (Espiritualidad)", {}, "e-spirituality"],
     ["la categoría está excluida de la IA (Pareja)", {}, "e-couple"],
     ["el proveedor falla", { suggester: new ScriptedSuggester(async () => Promise.reject(new Error("caído"))) }, "e-social"],
     ["el proveedor tarda demasiado", { suggester: new ScriptedSuggester(() => new Promise((resolve) => setTimeout(() => resolve({ helps: ["vidaSocial.quedarEnPersona"], difficulties: [] }), 500))) }, "e-social"],

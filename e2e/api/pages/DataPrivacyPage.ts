@@ -22,6 +22,11 @@ export class DataPrivacyPage {
     return this.page.getByRole("switch", { name: /sugerencias de la ia a partir de tus experiencias/i });
   }
 
+  /** RF-43: la sección de experiencias compartidas. */
+  sharedExperiences() {
+    return this.page.getByRole("region", { name: "Experiencias compartidas" });
+  }
+
   async exportData() {
     const download = this.page.waitForEvent("download");
     await this.page.getByRole("button", { name: "Descargar mis datos" }).click();

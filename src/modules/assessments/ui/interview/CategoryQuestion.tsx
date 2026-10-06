@@ -25,8 +25,9 @@ import type { RecommendationDto } from "@modules/recommendations/ui/queries";
 import { scoreBand } from "../scoreBand";
 import { Bubble, PendingBadge } from "./Bubble";
 import { PENDING_COLORS } from "./pendingColors";
-import type { ExperienceDto } from "../queries";
-import { ExperienceJournal, type ExperienceSuggestions } from "./ExperienceJournal";
+import { SHARE_MIN_SCORE } from "../../domain/Experience";
+import type { ExperienceDto, ShareOutcome } from "../queries";
+import { ExperienceJournal, type ExperienceSharing, type ExperienceSuggestions } from "./ExperienceJournal";
 import { ToggleRow } from "./ToggleRow";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -79,6 +80,11 @@ interface CategoryQuestionProps {
   onSuggestOptions?: (experience: ExperienceDto) => Promise<{ helps: string[]; difficulties: string[] } | null>;
   /** RF-45: la función existe en este despliegue (aunque el usuario no la haya activado). */
   suggestionsAvailable?: boolean;
+  /** RF-43: la última puntuación guardada (no la que se está cambiando), que decide si se puede compartir. */
+  savedScore?: number;
+  /** RF-43: compartir o dejar de compartir una experiencia. */
+  onShareExperience?: (experience: ExperienceDto) => Promise<ShareOutcome>;
+  onUnshareExperience?: (experience: ExperienceDto) => void;
 }
 
 export type TagFeedback = "helps" | "difficulties" | "experienceAdded" | "experienceDeleted";
@@ -111,6 +117,9 @@ export function CategoryQuestion({
   onDeleteExperience,
   onSuggestOptions,
   suggestionsAvailable = false,
+  savedScore,
+  onShareExperience,
+  onUnshareExperience,
 }: CategoryQuestionProps) {
   const { t, i18n } = useTranslation();
   const [examplesOpen, setExamplesOpen] = useState(false);
@@ -126,6 +135,15 @@ export function CategoryQuestion({
             if (kind === "helps" && !(category.experienceTags ?? []).includes(key)) onToggleTag(category, key);
             if (kind === "difficulties" && !(category.difficultyTags ?? []).includes(key)) onToggleDifficulty(category, key);
           },
+        }
+      : undefined;
+  // RF-43: mismas categorías que la IA (ni sensibles ni Pareja) y la misma regla que el servidor: última puntuación de 8 o más.
+  const sharing: ExperienceSharing | undefined =
+    onShareExperience && onUnshareExperience
+      ? {
+          canShare: !category.isSensitiveData && !label.aiExcluded && Boolean(label.key) && savedScore !== undefined && savedScore >= SHARE_MIN_SCORE,
+          onShare: onShareExperience,
+          onUnshare: onUnshareExperience,
         }
       : undefined;
   const isUnanswered = score === undefined;
@@ -289,6 +307,7 @@ export function CategoryQuestion({
           onDelete={onDeleteExperience}
           suggestions={suggestions}
           suggestionsHint={suggestionsAvailable && !category.isSensitiveData && !label.aiExcluded && Boolean(label.key)}
+          sharing={sharing}
         />
         {/* UX-05: con una idea abierta, las ideas están a un toque; debajo de las tres opciones de la pregunta (y cambian con "¿Qué te ayuda?" si RF-40 está activo). */}
         {recommendation && (
