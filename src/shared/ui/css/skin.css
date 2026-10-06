@@ -1,10 +1,14 @@
 /**
- * Skin/override global — para tus propios estilos por encima de Material UI.
- * MUI (Emotion) inyecta sus reglas en tiempo de ejecución, después de que
- * este archivo se cargue — a igual especificidad, las suyas ganarían. Por
- * eso las reglas de este archivo usan !important deliberadamente: es una
- * capa de skin final, no CSS de lógica de negocio, así que aquí sí compensa.
+ * Skin global: tus propios estilos por encima de Material UI, sin !important.
+ * MUI pone todos sus estilos (también los `sx`) en la capa CSS `mui`
+ * (`StyleProviders`, `enableCssLayer`), y el CSS sin capa, como este archivo,
+ * gana siempre a cualquier capa, sea cual sea la especificidad.
  *
- * Ejemplo (borrar cuando pongas los tuyos):
- * .MuiButton-root { border-radius: 4px !important; }
+ * Clases propias, con prefijo `mlm-` para no chocar con las de MUI:
+ *   .mlm-card { border-radius: 16px; }           →  <Box className="mlm-card">
+ * O los componentes de MUI por su clase estable:
+ *   .MuiButton-root { text-transform: none; }
+ *
+ * Lo global (colores, tipografía, bordes redondeados) va mejor en el tema
+ * (`src/shared/ui/theme.ts`), para que lo hereden todos los componentes.
  */

@@ -10,21 +10,34 @@ describe("LanguageSwitcher (RNF-10)", () => {
     await i18n.changeLanguage("es");
   });
 
-  it("en español ofrece 'English', nombrado en el idioma de destino para que lo reconozca quien no lee español", () => {
-    render(<LanguageSwitcher />);
+  it("es un interruptor 'English' (en inglés, para quien no lee español), desactivado en español, entre las dos banderas", () => {
+    const { container } = render(<LanguageSwitcher />);
 
-    const button = screen.getByRole("button", { name: "English" });
-    expect(button).toHaveAttribute("lang", "en");
-    expect(button).toHaveTextContent("EN");
+    const toggle = screen.getByRole("switch", { name: "English" });
+    expect(toggle).not.toBeChecked();
+    expect(toggle).toHaveAttribute("lang", "en");
+    expect(container.querySelectorAll("img")).toHaveLength(2);
   });
 
-  it("al pulsarlo cambia el idioma, actualiza el atributo lang de la página y ofrece volver a 'Español'", async () => {
+  it("activarlo pasa a inglés (y el atributo lang de la página); desactivarlo vuelve a español", async () => {
     render(<LanguageSwitcher />);
 
-    fireEvent.click(screen.getByRole("button", { name: "English" }));
-
+    fireEvent.click(screen.getByRole("switch", { name: "English" }));
     expect(i18n.language).toBe("en");
     expect(document.documentElement.lang).toBe("en");
-    expect(await screen.findByRole("button", { name: "Español" })).toHaveAttribute("lang", "es");
+    expect(await screen.findByRole("switch", { name: "English" })).toBeChecked();
+
+    fireEvent.click(screen.getByRole("switch", { name: "English" }));
+    expect(i18n.language).toBe("es");
+  });
+
+  it("pulsar una bandera elige su idioma", () => {
+    const { container } = render(<LanguageSwitcher />);
+    const [spanishFlag, englishFlag] = container.querySelectorAll("img");
+
+    fireEvent.click(englishFlag);
+    expect(i18n.language).toBe("en");
+    fireEvent.click(spanishFlag);
+    expect(i18n.language).toBe("es");
   });
 });

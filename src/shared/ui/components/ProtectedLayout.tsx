@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { Breadcrumbs, type BreadcrumbItem } from "./Breadcrumbs";
 import { Header } from "./Header";
+import { HelpFooter } from "./HelpLink";
 import { useSession } from "../context/SessionContext";
 
 export interface ProtectedLayoutProps {
@@ -38,6 +39,8 @@ export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps)
       <Header displayName={name ?? email} onLogout={handleLogout} isAdmin={rol === "admin"} />
       {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" /> : null}
       {children}
+      {/* RF-30: en toda pantalla protegida, igual para todo el mundo. */}
+      <HelpFooter />
     </>
   );
 }

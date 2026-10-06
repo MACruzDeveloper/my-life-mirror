@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
+import { MemoryRouter } from "react-router";
 import i18n from "@shared/ui/i18n";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { GENERAL_TEMPLATE_KEYS, templateKeysFor } from "@modules/recommendations/domain/recommendationCatalog";
@@ -156,7 +157,15 @@ describe("RecommendationButton (RF-18)", () => {
     function openIdeas() {
       const client = createTestClient();
       client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false }]);
-      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      // Con router: la pestaña enlaza a las líneas de ayuda (RF-30).
+      render(
+        withClient(
+          <MemoryRouter>
+            <RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />
+          </MemoryRouter>,
+          client,
+        ),
+      );
       fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
       return screen.getByRole("dialog");
     }
@@ -176,6 +185,8 @@ describe("RecommendationButton (RF-18)", () => {
       expect(within(dialog).getByText("Una hucha para los imprevistos")).toBeInTheDocument();
       expect(within(dialog).getByText(/experiencias de otras personas: no son consejo profesional/i)).toBeInTheDocument();
       expect(within(dialog).queryByText("Idea 1 de 5")).not.toBeInTheDocument();
+      // RF-30: junto a lo que escriben otras personas, la ayuda a mano.
+      expect(within(dialog).getByRole("link", { name: "¿Necesitas ayuda ahora?" })).toHaveAttribute("href", "/ayuda");
     });
 
     it("sin ninguna, no hay pestañas", async () => {

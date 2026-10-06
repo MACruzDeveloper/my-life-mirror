@@ -1,0 +1,5 @@
+[
+  { "key": "es024", "country": "ES", "phone": "024" },
+  { "key": "es112", "country": "ES", "phone": "112" },
+  { "key": "findAHelpline", "country": "INTL", "url": "https://findahelpline.com" }
+]

@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
+import { HelpFooter } from "./HelpLink";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 /**
@@ -8,9 +10,9 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
  * contraseña, política de privacidad): solo añade el selector de idioma
  * arriba a la derecha, para que alguien que no lee español pueda cambiar a
  * inglés antes de tener cuenta. Las pantallas protegidas lo tienen en su
- * cabecera (`Header`).
+ * cabecera (`Header`). Al pie, el enlace a las líneas de ayuda (RF-30).
  */
-export function PublicLayout() {
+export function PublicLayout({ children }: { children?: ReactNode }) {
   const { t } = useTranslation();
 
   return (
@@ -18,7 +20,8 @@ export function PublicLayout() {
       <Box component="nav" aria-label={t("comun.idioma")} sx={{ display: "flex", justifyContent: "flex-end", px: 2, pt: 1 }}>
         <LanguageSwitcher />
       </Box>
-      <Outlet />
+      {children ?? <Outlet />}
+      <HelpFooter />
     </>
   );
 }
