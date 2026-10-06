@@ -13,7 +13,7 @@ Para que me resulte más útil que una sugerencia genérica
 - **Cuándo:** la primera vez que ve una idea de una recomendación abierta. La ventana de ideas es un carrusel con las 5 del catálogo de la categoría (primero la recomendada, UX-05); cada una se personaliza al verla. Se guarda y las siguientes veces se lee lo guardado, **salvo que hayan cambiado sus opciones de "¿Qué te ayuda?"**: entonces se reescribe con las nuevas (v1.1).
 - **Qué hace la IA:** reescribe la idea del catálogo que el usuario está viendo en 2-3 frases cálidas que tengan en cuenta lo que le ayuda (RF-41) y si el área sube o baja. No inventa ideas nuevas.
 - **Caída segura:** si algo falla (sin activar, no disponible, categoría sensible, error, tiempo agotado, filtro, revisión), se ve el texto curado del catálogo, como hasta ahora.
-- **Transparencia:** la idea personalizada lleva la etiqueta "Personalizada con IA" y un enlace "Ver la idea original"; el aviso de RES-05 se ve siempre.
+- **Transparencia:** la idea personalizada lleva la etiqueta "Personalizada con IA" y la original está en la pestaña "De la app" (antes, un enlace "Ver la idea original"; RF-43); el aviso de RES-05 se ve siempre.
 - **En esta historia, el escritor es un *Fake*** determinista (`AI_IDEAS_PROVIDER=fake`, en desarrollo local y E2E). En producción la función está apagada (sin proveedor) hasta RF-40b (Anthropic).
 - **Catálogo:** pasa de 2 a 5 ideas por categoría (es/en), para que haya entre qué elegir. Redactadas con ayuda de IA y **revisadas por el autor** antes de fusionar: sigue siendo contenido curado (RD-09).
 - **Fuera de alcance:** el adaptador real (RF-40b), texto libre del usuario (nunca), categorías sensibles (v1), situaciones a evitar (idea RF-42), editar el catálogo desde el admin (idea ADM-04).
@@ -111,3 +111,4 @@ SetAiIdeas({ userId, enabled }) → Ok(Profile) | Err(NotFound sin perfil)
 
 - **v1.0 (2 oct. 2026)** — versión inicial (PR 3 del plan del Ciclo 2).
 - **v1.1 (3 oct. 2026)** — con el carrusel de UX-05, la IA reescribe la idea que el usuario está viendo (ya no elige entre las 5): `templateKey` en la petición, ideas guardadas por (recomendación, plantilla, idioma) y reescritas si cambian las opciones de "¿Qué te ayuda?". Petición del autor: "si luego selecciono algo en qué te ayuda debería ofrecerme otras ideas basadas en la respuesta".
+- **v1.2 (5 oct. 2026)** — con RF-43, la ventana de ideas pasa a pestañas: la personalizada en "Con IA" (la que se abre primero) y la original en "De la app", en lugar del enlace "Ver la idea original".

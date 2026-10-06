@@ -3,7 +3,7 @@
 **Nivel:** 2 — Spec Anchored ([10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md))
 **Referencias:** RF-04, RD-02 (`esDatoSensible`), RD-05, [08_Diagrama_Secuencia_Consentimiento.md](../requirements-analysis/08_Diagrama_Secuencia_Consentimiento.md)
 
-Como usuario que activa una categoría marcada como dato sensible (sexo, espiritualidad/religión, salud/deporte)
+Como usuario que activa una categoría marcada como dato sensible (sexo, espiritualidad/religión)
 Quiero que el sistema registre mi consentimiento explícito antes de activarla
 Para que mis datos sensibles solo se traten con mi autorización informada (RGPD)
 
@@ -39,3 +39,4 @@ Un consentimiento no es una casilla que se marca una vez para siempre: cubre una
 
 - **v1.0 (14 sept. 2026)** — versión inicial: alcance de Sprint 1 (dominio + aplicación), disparador real diferido a Sprint 2 (RF-07).
 - **v2.0 (15 sept. 2026)** — disparador real conectado (`ActivateCategory`, RF-06/RF-07): `api/grant-consent.ts`, primer endpoint de esta historia. Persistencia real en Supabase desde el principio (antes en memoria).
+- **v2.1 (6 oct. 2026)** — Deporte deja de ser sensible (decisión del autor, migración 0018): ya no pide consentimiento. Los consentimientos ya dados se conservan como historial. El E2E de esta historia pasa a usar Espiritualidad.

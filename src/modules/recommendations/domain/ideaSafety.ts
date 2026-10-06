@@ -9,7 +9,8 @@ export type IdeaSafetyResult = { safe: true } | { safe: false; reason: IdeaSafet
 const MIN_LENGTH = 40;
 const MAX_LENGTH = 400;
 
-function normalize(text: string): string {
+/** Sin tildes ni mayúsculas: así se comparan los textos con las listas de términos. */
+export function normalize(text: string): string {
   return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 

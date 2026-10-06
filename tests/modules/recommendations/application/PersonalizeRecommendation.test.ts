@@ -38,11 +38,11 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
   const entries = await catalog.findAll();
   const byKey = (key: string) => listed.value.find((c) => c.catalogId === entries.find((e) => e.key === key)?.id)!;
   const finances = byKey("economia");
-  const sport = byKey("deporte");
+  const spirituality = byKey("espiritualidad");
   const couple = byKey("pareja");
   await categoryRepository.save({ ...couple, status: "active" });
   await categoryRepository.save({ ...finances, status: "active", experienceTags: ["economia.presupuesto"] });
-  await categoryRepository.save({ ...sport, status: "active" });
+  await categoryRepository.save({ ...spirituality, status: "active" });
 
   const profileRepository = new InMemoryProfileRepository();
   await profileRepository.save({ userId: "u1", name: "Ana", aiIdeasEnabled: options.aiIdeasEnabled ?? true });
@@ -51,14 +51,14 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
   await assessmentRepository.saveMany([
     { id: "a1", userId: "u1", categoryId: finances.id, score: 6, recordedAt: new Date("2026-09-01T10:00:00Z") },
     { id: "a2", userId: "u1", categoryId: finances.id, score: 3, note: "texto privado que nunca debe salir", recordedAt: new Date("2026-10-01T10:00:00Z") },
-    { id: "a3", userId: "u1", categoryId: sport.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
+    { id: "a3", userId: "u1", categoryId: spirituality.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
     { id: "a4", userId: "u1", categoryId: couple.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
   ]);
 
   const recommendationRepository = new InMemoryRecommendationRepository();
   await recommendationRepository.saveMany([
     { id: "r-finances", userId: "u1", categoryId: finances.id, templateKey: "economia.1", threshold: 5, status: "pending", createdAt: clock.now() },
-    { id: "r-sport", userId: "u1", categoryId: sport.id, templateKey: "deporte.1", threshold: 5, status: "pending", createdAt: clock.now() },
+    { id: "r-spirituality", userId: "u1", categoryId: spirituality.id, templateKey: "espiritualidad.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-couple", userId: "u1", categoryId: couple.id, templateKey: "pareja.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-done", userId: "u1", categoryId: finances.id, templateKey: "economia.2", threshold: 5, status: "done", createdAt: clock.now() },
   ]);
@@ -177,7 +177,7 @@ describe("PersonalizeRecommendation (RF-40)", () => {
   const catalogCases: [string, Parameters<typeof setup>[0], string][] = [
     ["el usuario no lo ha activado", { aiIdeasEnabled: false }, "r-finances"],
     ["no hay proveedor configurado", { available: false }, "r-finances"],
-    ["la categoría es sensible (Deporte)", {}, "r-sport"],
+    ["la categoría es sensible (Espiritualidad)", {}, "r-spirituality"],
     ["la categoría está excluida de la IA (Pareja)", {}, "r-couple"],
     ["la recomendación ya no está abierta", {}, "r-done"],
     ["el escritor falla", { writer: new ScriptedWriter(async () => Promise.reject(new Error("caído"))) }, "r-finances"],

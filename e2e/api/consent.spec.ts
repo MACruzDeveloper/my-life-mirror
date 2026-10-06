@@ -11,17 +11,17 @@ test.describe("RF-04: consentimiento de las categorías sensibles", () => {
     await interview.startIfFirstTime();
 
     // UX-07: en la primera entrevista, las categorías se eligen en el paso 2, con botones.
-    await interview.categoryOption("Deporte").click();
+    await interview.categoryOption("Espiritualidad").click();
     const dialog = interview.consentDialog();
     await expect(dialog).toContainText(/datos sensibles/i);
     await expect(dialog.getByRole("link", { name: /política de privacidad/i })).toBeVisible();
     await dialog.getByRole("button", { name: "Aceptar y activar" }).click();
 
-    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "true");
+    await expect(interview.categoryOption("Espiritualidad")).toHaveAttribute("aria-pressed", "true");
     // Persistido en el servidor, no solo en pantalla.
     await page.reload();
     await interview.startIfFirstTime();
-    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "true");
+    await expect(interview.categoryOption("Espiritualidad")).toHaveAttribute("aria-pressed", "true");
   });
 
   test("cancelar deja la categoría sin activar", async ({ page }) => {
@@ -30,12 +30,12 @@ test.describe("RF-04: consentimiento de las categorías sensibles", () => {
     await interview.open();
     await interview.startIfFirstTime();
 
-    await interview.categoryOption("Deporte").click();
+    await interview.categoryOption("Espiritualidad").click();
     await interview.consentDialog().getByRole("button", { name: "Cancelar" }).click();
 
-    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "false");
+    await expect(interview.categoryOption("Espiritualidad")).toHaveAttribute("aria-pressed", "false");
     await page.reload();
     await interview.startIfFirstTime();
-    await expect(interview.categoryOption("Deporte")).toHaveAttribute("aria-pressed", "false");
+    await expect(interview.categoryOption("Espiritualidad")).toHaveAttribute("aria-pressed", "false");
   });
 });

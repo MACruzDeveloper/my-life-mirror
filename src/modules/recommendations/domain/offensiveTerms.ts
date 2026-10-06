@@ -1,9 +1,5 @@
 import terms from "./catalog/offensiveTerms.json" with { type: "json" };
-import { termToPattern } from "./ideaSafety.js";
-
-function normalize(text: string): string {
-  return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-}
+import { normalize, termToPattern } from "./ideaSafety.js";
 
 /** Mismo formato que el filtro de ideas (`termToPattern`): sin tildes, palabra entera o prefijo con `*`. */
 const PATTERNS: readonly RegExp[] = [...terms.es, ...terms.en].map(termToPattern);
