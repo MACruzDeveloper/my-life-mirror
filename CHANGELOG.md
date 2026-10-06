@@ -5,6 +5,21 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (Deporte deja de ser sensible)
+
+- Deporte ya no es categoría sensible: activarla no pide consentimiento, y entra en las ideas con IA (RF-40), las sugerencias (RF-45) y las experiencias compartidas (RF-43), como el resto. Siguen siendo sensibles Sexo y Espiritualidad. Decisión del autor ("cualquier categoría puede tener algo sensible"); reversible si llega feedback negativo. Los consentimientos ya dados se conservan como historial.
+- **Migración 0018** (catálogo y copia de cada usuario): ejecutarla antes de desplegar.
+- Su descripción pasa a "Actividad física y movimiento" (antes, "y salud"): **migración 0019**, que no pisa una descripción editada desde el admin.
+
+### Añadido (RF-43, compartir experiencias que funcionan)
+
+- Con una última puntuación de 8 o más en una categoría, cada experiencia del diario ofrece "Compartir de forma anónima", y la app lo sugiere bajo el diario. Antes de publicarse, una ventana enseña cómo la verán otras personas (solo el texto: sin nombre, fecha ni puntuación) y qué implica. Nunca en categorías sensibles ni en Pareja.
+- Filtros al compartir: datos de contacto (emails, teléfonos, enlaces, números largos), consejo de salud o de dinero (los grupos clínico, profesional y financiero de `safetyTerms.json`) e insultos (`offensiveTerms.json`). Si falla alguno, no se publica y se explica qué quitar. El diario privado sigue sin validarse, y cómo se siente la persona nunca se filtra (RES-09).
+- La ventana de ideas tiene pestañas cuando hay más de una fuente: "De la app" (el carrusel de siempre), "Con IA" (RF-40, en lugar del enlace "Ver la idea original") y "De otras personas (N)", con hasta 10 experiencias compartidas de esa categoría en el idioma de la interfaz, el aviso de que no son consejo profesional y "Reportar": un reporte la oculta al momento para todos, y su autor la ve como "Retirada tras un reporte" (no se puede volver a compartir).
+- "Dejar de compartir" en el diario y en la sección nueva "Experiencias compartidas" de *Privacidad y datos*. La exportación (RF-05) dice qué experiencias están compartidas o retiradas; borrarlas o borrar la cuenta borra lo compartido. Apartado nuevo en la política de privacidad.
+- **Migración 0017** (`experiences.shared_at`, `shared_locale`, `shared_category_key`, `reported_at`): ejecutarla antes de desplegar. `PATCH /api/categories/diary` y `/api/categories/shared` (sin funciones nuevas: 11/12).
+- Abrir la ventana de ideas con categoría hace una lectura más, la de "De otras personas" (una vez; luego sale de la caché). El guardado sigue siendo de 2 peticiones (PERF-01).
+
 ### Añadido (RF-45, sugerencias de la IA a partir de una experiencia)
 
 - Consentimiento propio en *Privacidad y datos*, "Sugerencias de la IA a partir de tus experiencias" (desactivado por defecto, aparte del de RF-40), con qué se envía, qué se quita y qué nunca. Con él, cada experiencia del diario de una categoría no sensible ofrece "Sugerir opciones con IA".

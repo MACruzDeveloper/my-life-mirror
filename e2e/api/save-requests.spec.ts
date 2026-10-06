@@ -1,11 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Request } from "@playwright/test";
 import { AccountPages } from "./pages/AccountPages";
 import { InterviewPage } from "./pages/InterviewPage";
 import { newUser } from "./pages/users";
 
 // PERF-01: el guardado devuelve las últimas puntuaciones y las recomendaciones; solo se vuelve a pedir el historial.
 test.describe("PERF-01: menos llamadas al guardar en la entrevista", () => {
-  test("guardar una categoría hace 2 peticiones y la idea nueva sale igual en el modal", async ({ page }) => {
+  test("guardar una categoría hace 2 peticiones (más la de la pestaña de otras personas, RF-43) y la idea nueva sale igual en el modal", async ({ page }) => {
     await new AccountPages(page).register(newUser());
     const interview = new InterviewPage(page);
     await interview.open();
@@ -16,11 +16,15 @@ test.describe("PERF-01: menos llamadas al guardar en la entrevista", () => {
     await interview.activate("Economía");
     await refreshAfterActivating;
 
-    const requests: string[] = [];
+    // Las que se lanzan desde aquí, menos las abortadas: en desarrollo, StrictMode monta la ventana dos veces y
+    // la primera lectura de la pestaña de RF-43 se aborta (AbortController); en producción no se lanza.
+    // Una duplicada de verdad sí contaría.
+    const requests = new Map<Request, string>();
     page.on("request", (request) => {
       const { pathname } = new URL(request.url());
-      if (pathname.startsWith("/api/")) requests.push(`${request.method()} ${pathname}`);
+      if (pathname.startsWith("/api/")) requests.set(request, `${request.method()} ${pathname}`);
     });
+    page.on("requestfailed", (request) => requests.delete(request));
     const historyAfterSaving = page.waitForResponse(isGet("/api/assessments/history"));
     await interview.score("Economía", 2);
     await interview.save("Economía");
@@ -28,6 +32,7 @@ test.describe("PERF-01: menos llamadas al guardar en la entrevista", () => {
     await historyAfterSaving;
     await page.waitForTimeout(500); // margen por si saliera alguna petición más, que haría fallar el test
 
-    expect(requests.sort()).toEqual(["GET /api/assessments/history", "POST /api/assessments"]);
+    // El guardado sigue siendo 2 peticiones; la tercera es de la ventana: lo que comparten otras personas (RF-43).
+    expect([...requests.values()].sort()).toEqual(["GET /api/assessments/history", "GET /api/categories/shared", "POST /api/assessments"]);
   });
 });

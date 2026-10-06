@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -9,14 +10,17 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Link from "@mui/material/Link";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import { keyframes } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
+import { sharedExperiencesKey, useSharedExperiences, type SharedExperienceDto } from "@modules/assessments/ui/queries";
 import { useCategories } from "@modules/categories/ui/queries";
 import { allowedTemplateKeys } from "../domain/ideaSituations";
 import { usePersonalizedIdea } from "./queries";
@@ -56,8 +60,9 @@ const ideasPulse = keyframes`
  * una ventana al pulsarlo. Sin ventanas que se abran solas (RES-07).
  * RF-40: si el usuario activó las ideas con IA, la ventana pide la versión
  * personalizada (la primera vez tarda un poco; luego sale de la caché) y la
- * muestra con su etiqueta y la idea original a un clic. Ante cualquier
- * respuesta que no sea una idea de IA, se ve el texto curado de siempre.
+ * muestra con su etiqueta en la pestaña "Con IA" (la original, en "De la app").
+ * Ante cualquier respuesta que no sea una idea de IA, se ve el texto curado.
+ * RF-43: lo que comparten otras personas, en la pestaña "De otras personas".
  */
 export function RecommendationButton({ templateKey, categoryName, label, recommendationId, categoryId, personalize = false, pulseKey = 0 }: RecommendationButtonProps) {
   const { t } = useTranslation();
@@ -126,18 +131,24 @@ function carouselKeys(templateKey: string, difficultyTags: readonly string[]): s
 
 /**
  * Las ideas de una categoría en un carrusel (UX-05): primero la recomendada y
- * después el resto del catálogo curado, con "anterior/siguiente". Cada una,
- * personalizada si RF-40 está activo; el aviso de RES-05 se ve siempre. Lo
- * comparten esta ventana y la de "Cambios guardados" de la entrevista.
+ * después el resto del catálogo curado, con "anterior/siguiente". Con RF-40
+ * activo, en pestañas: "De la app" y "Con IA" (la misma idea, personalizada);
+ * con experiencias compartidas en la categoría (RF-43), "De otras personas".
+ * El aviso de RES-05 se ve siempre. Lo comparten esta ventana y la de
+ * "Cambios guardados" de la entrevista.
  */
 export function IdeaContent(props: IdeaContentProps) {
-  return props.categoryId ? <IdeaCarouselForCategory {...props} categoryId={props.categoryId} /> : <IdeaCarousel {...props} difficultyTags={[]} />;
+  return props.categoryId ? <IdeaCarouselForCategory {...props} categoryId={props.categoryId} /> : <IdeaCarousel {...props} difficultyTags={[]} shared={[]} />;
 }
 
-/** RF-42: con su categoría, el carrusel quita las ideas que chocan; espera a tener las categorías para no enseñarlas ni un momento. */
+/**
+ * RF-42: con su categoría, el carrusel quita las ideas que chocan; espera a tener las categorías para no enseñarlas ni un momento.
+ * RF-43: y pide lo que comparten otras personas en ella (solo con la ventana abierta; luego, de la caché).
+ */
 function IdeaCarouselForCategory(props: IdeaContentProps & { categoryId: string }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const categoriesQuery = useCategories();
+  const sharedQuery = useSharedExperiences(props.categoryId, i18n.language, true);
   if (categoriesQuery.data === undefined && !categoriesQuery.isError) {
     return (
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
@@ -150,11 +161,19 @@ function IdeaCarouselForCategory(props: IdeaContentProps & { categoryId: string 
   }
   const categories = categoriesQuery.data;
   const difficultyTags = (Array.isArray(categories) ? categories.find((category) => category.id === props.categoryId)?.difficultyTags : undefined) ?? [];
-  return <IdeaCarousel {...props} difficultyTags={difficultyTags} />;
+  return <IdeaCarousel {...props} difficultyTags={difficultyTags} shared={Array.isArray(sharedQuery.data) ? sharedQuery.data : []} />;
 }
 
-function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId, personalize = false, difficultyTags }: IdeaContentProps & { difficultyTags: readonly string[] }) {
+type IdeaTab = "app" | "ai" | "others";
+
+function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId, personalize = false, difficultyTags, shared }: IdeaContentProps & { difficultyTags: readonly string[]; shared: SharedExperienceDto[] }) {
   const { t } = useTranslation();
+  const tabsId = useId();
+  const withAi = personalize && recommendationId !== undefined;
+  const [reportedOne, setReportedOne] = useState(false);
+  const tabs: IdeaTab[] = ["app", ...(withAi ? (["ai"] as const) : []), ...(shared.length > 0 || reportedOne ? (["others"] as const) : [])];
+  const [chosenTab, setTab] = useState<IdeaTab>(withAi ? "ai" : "app");
+  const tab = tabs.includes(chosenTab) ? chosenTab : tabs[0];
   const keys = carouselKeys(templateKey, difficultyTags);
   const [rawIndex, setIndex] = useState(0);
   // Si la lista se acorta con la ventana abierta (se marcó una situación), el índice no se sale.
@@ -163,11 +182,57 @@ function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId,
   const curatedText = t(`recomendaciones.plantillas.${currentKey}`, { categoria: categoryName });
   const move = (step: number) => setIndex((index + step + keys.length) % keys.length);
 
+  const tabLabel = (value: IdeaTab) => (value === "app" ? t("recomendaciones.pestanaApp") : value === "ai" ? t("recomendaciones.pestanaIa") : t("recomendaciones.pestanaOtros", { count: shared.length }));
+
+  return (
+    <>
+      {tabs.length > 1 && (
+        <Tabs
+          value={tab}
+          onChange={(_, value: IdeaTab) => setTab(value)}
+          variant="fullWidth"
+          sx={{ mb: 2, minHeight: 40, borderBottom: 1, borderColor: "divider", "& .MuiTab-root": { minHeight: 40, px: 1, textTransform: "none", fontSize: "0.85rem" } }}
+        >
+          {tabs.map((value) => (
+            <Tab key={value} value={value} label={tabLabel(value)} id={`${tabsId}-${value}`} aria-controls={`${tabsId}-panel`} />
+          ))}
+        </Tabs>
+      )}
+      <Box role={tabs.length > 1 ? "tabpanel" : undefined} id={`${tabsId}-panel`} aria-labelledby={tabs.length > 1 ? `${tabsId}-${tab}` : undefined}>
+        {tab === "others" && categoryId ? (
+          <SharedExperiencesList experiences={shared} categoryId={categoryId} reported={reportedOne} onReported={() => setReportedOne(true)} />
+        ) : (
+          <IdeaSlides
+            keys={keys}
+            index={index}
+            move={move}
+            curatedText={curatedText}
+            personalized={tab === "ai" && recommendationId ? { recommendationId, categoryId } : undefined}
+          />
+        )}
+      </Box>
+    </>
+  );
+}
+
+interface IdeaSlidesProps {
+  keys: string[];
+  index: number;
+  move: (step: number) => void;
+  curatedText: string;
+  /** RF-40: la pestaña "Con IA". */
+  personalized?: { recommendationId: string; categoryId?: string };
+}
+
+/** La idea que se ve (curada o personalizada), el carrusel y el aviso de RES-05. */
+function IdeaSlides({ keys, index, move, curatedText, personalized }: IdeaSlidesProps) {
+  const { t } = useTranslation();
+  const currentKey = keys[index];
   return (
     <>
       <Box aria-live="polite" sx={{ minHeight: 96 }}>
-        {personalize && recommendationId ? (
-          <PersonalizedIdea key={currentKey} recommendationId={recommendationId} templateKey={currentKey} categoryId={categoryId} categoryName={categoryName} curatedText={curatedText} />
+        {personalized ? (
+          <PersonalizedIdea key={currentKey} recommendationId={personalized.recommendationId} templateKey={currentKey} categoryId={personalized.categoryId} curatedText={curatedText} />
         ) : (
           <DialogContentText sx={{ color: "text.primary", mb: 2 }}>{curatedText}</DialogContentText>
         )}
@@ -200,13 +265,11 @@ interface PersonalizedIdeaProps {
   recommendationId: string;
   templateKey: string;
   categoryId?: string;
-  categoryName: string;
   curatedText: string;
 }
 
-function PersonalizedIdea({ recommendationId, templateKey, categoryId, categoryName, curatedText }: PersonalizedIdeaProps) {
+function PersonalizedIdea({ recommendationId, templateKey, categoryId, curatedText }: PersonalizedIdeaProps) {
   const { t, i18n } = useTranslation();
-  const [showOriginal, setShowOriginal] = useState(false);
   // Las opciones de "¿Qué te ayuda?" salen de la caché de categorías (la entrevista la actualiza al marcarlas).
   // Se espera a tenerlas: si no, se pedía con "sin opciones" y otra vez al llegar (dos peticiones).
   const categoriesQuery = useCategories();
@@ -234,14 +297,71 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, categoryN
     <Box sx={{ mb: 2 }}>
       <Chip icon={<AutoAwesomeOutlinedIcon fontSize="small" />} label={t("recomendaciones.personalizadaConIa")} size="small" variant="outlined" sx={{ mb: 1 }} />
       <DialogContentText sx={{ color: "text.primary" }}>{data.text}</DialogContentText>
-      <Link component="button" type="button" variant="body2" onClick={() => setShowOriginal((current) => !current)} sx={{ mt: 1 }}>
-        {showOriginal ? t("recomendaciones.ocultarOriginal") : t("recomendaciones.verOriginal")}
-      </Link>
-      {showOriginal && (
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          {t(`recomendaciones.plantillas.${data.templateKey}`, { categoria: categoryName })}
-        </Typography>
-      )}
     </Box>
+  );
+}
+
+interface SharedExperiencesListProps {
+  experiences: SharedExperienceDto[];
+  categoryId: string;
+  /** Ya se ha reportado una en esta ventana: se dan las gracias. */
+  reported: boolean;
+  onReported: () => void;
+}
+
+/**
+ * RF-43: lo que comparten otras personas a las que les va bien en esta área:
+ * solo el texto, con el aviso de que no es consejo profesional (RES-05).
+ * Reportar la oculta al momento para todos (sin moderador que la revise antes).
+ */
+function SharedExperiencesList({ experiences, categoryId, reported, onReported }: SharedExperiencesListProps) {
+  const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
+  const [failed, setFailed] = useState(false);
+
+  async function report(experience: SharedExperienceDto) {
+    setFailed(false);
+    try {
+      const response = await fetch("/api/categories/shared", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: experience.id }) });
+      if (!response.ok) throw new Error("rejected");
+      queryClient.setQueryData<SharedExperienceDto[]>(sharedExperiencesKey(categoryId, i18n.language), (current) => current?.filter((candidate) => candidate.id !== experience.id));
+      onReported();
+    } catch {
+      setFailed(true);
+    }
+  }
+
+  return (
+    <>
+      <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
+        {experiences.map((experience) => (
+          <Box component="li" key={experience.id} sx={{ p: 1.5, borderRadius: 2, bgcolor: "action.hover" }}>
+            <Typography variant="body2" sx={{ whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
+              {experience.text}
+            </Typography>
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button size="small" color="inherit" startIcon={<FlagOutlinedIcon fontSize="small" />} onClick={() => void report(experience)} sx={{ textTransform: "none", color: "text.secondary" }}>
+                {t("recomendaciones.reportar")}
+              </Button>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+      <Box aria-live="polite">
+        {reported && (
+          <Typography variant="body2" sx={{ mt: 1.5 }}>
+            {t("recomendaciones.reportada")}
+          </Typography>
+        )}
+        {failed && (
+          <Typography variant="body2" color="error" sx={{ mt: 1.5 }}>
+            {t("recomendaciones.errorReportar")}
+          </Typography>
+        )}
+      </Box>
+      <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1.5 }}>
+        {t("recomendaciones.avisoOtros")}
+      </Typography>
+    </>
   );
 }
