@@ -85,6 +85,19 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 
 ---
 
+## Estado del proyecto
+
+Funcionalidad del MVP y del Ciclo 2 terminada, salvo el proveedor real de IA (**RF-40b**): las ideas personalizadas y las sugerencias funcionan hoy contra un proveedor simulado y están desactivadas en producción hasta que haya crédito de API. Plazo del TFM: 31 de octubre de 2026.
+
+**Fase actual: revisión y pruebas antes de la entrega.**
+
+1. Publicar la v1.2.0, para probar en producción lo que verán los usuarios.
+2. Revisión de código de todo el Ciclo 2.
+3. Prueba exploratoria siguiendo el [guion de la demo](docs/validation/04_Guion_Demo_Cierre.md), que se actualiza a la vez.
+4. Si es posible, un segundo test de usabilidad centrado en lo nuevo: diario de experiencias, compartirlas y las pestañas de ideas.
+
+**Pendiente, de menor prioridad:** revisión del contenido curado (situaciones, términos ofensivos, ideas nuevas y vigencia de las líneas de ayuda), validación ética con el tutor y, por debajo de la línea de corte, RF-23 (notificaciones). El detalle, con las decisiones y la deuda técnica abiertas, está en el [tablero](docs/project-management/01_Backlog_MVP.md).
+
 ## Documentación
 
 - [docs/README.md](docs/README.md) — **mapa de toda la documentación** y por dónde empezar.
