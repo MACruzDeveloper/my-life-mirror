@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import { getAppContext } from "#shared/infrastructure/container.js";
 import { readCookie } from "#shared/infrastructure/cookies.js";
+import { bestEffort } from "#shared/infrastructure/http/bestEffort.js";
 import { logger } from "#shared/infrastructure/logger.js";
 
 const RecordAssessmentsSchema = z.object({
@@ -69,15 +70,14 @@ export default async function handler(req: IncomingMessage & { body: unknown }, 
 
     // PERF-01: lo que cambia al guardar va en la respuesta (las mismas formas que GET /api/assessments
     // y GET /api/recommendations), así la pantalla no tiene que volver a pedirlo: de 4 llamadas a 2.
-    const [latest, recommendations] = await Promise.all([getLatestScores(session.value.id), listRecommendations(session.value.id)]);
+    // Ya está guardado: si releer falla, se responde igual (sin esos datos, el cliente los vuelve a pedir).
+    const warn = (what: string) => (error: unknown) => logger.warn(`No se pudo releer ${what} tras guardar (el guardado es válido)`, { error: String(error) });
+    const [latest, recommendations] = await Promise.all([
+      bestEffort(() => getLatestScores(session.value.id), warn("las puntuaciones")),
+      bestEffort(() => listRecommendations(session.value.id), warn("las recomendaciones")),
+    ]);
     res.writeHead(201, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        recorded: result.value.length,
-        ...(latest.ok ? { latest: latest.value } : {}),
-        ...(recommendations.ok ? { recommendations: recommendations.value } : {}),
-      }),
-    );
+    res.end(JSON.stringify({ recorded: result.value.length, ...(latest && { latest }), ...(recommendations && { recommendations }) }));
   } catch (error) {
     logger.error("Error inesperado en /api/assessments", error, { route: "/api/assessments" });
     res.writeHead(500, { "Content-Type": "application/json" });

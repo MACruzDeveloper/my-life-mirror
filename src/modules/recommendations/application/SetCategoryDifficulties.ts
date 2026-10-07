@@ -32,8 +32,8 @@ export function createSetCategoryDifficulties(categoryRepository: CategoryReposi
     const tags = [...new Set(input.tags)];
     if (tags.some((tag) => !offered.has(tag))) return err(new ValidationError("Unknown situation for this category"));
 
-    const updated: Category = { ...category, difficultyTags: tags };
-    await categoryRepository.save(updated);
-    return ok(updated);
+    // Solo su lista; se devuelve la categoría releída, con la otra lista tal como está ahora.
+    await categoryRepository.updateTags(userId, category.id, { difficultyTags: tags });
+    return ok((await categoryRepository.findById(userId, category.id)) ?? { ...category, difficultyTags: tags });
   };
 }

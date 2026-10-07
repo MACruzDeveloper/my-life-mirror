@@ -316,6 +316,7 @@ export function CategoryQuestion({
               pulseKey={ideasPulse}
               recommendationId={recommendation.id}
               categoryId={category.id}
+              categoryKey={label.key}
               personalize={personalizeIdeas}
               templateKey={recommendation.templateKey}
               categoryName={label.name}

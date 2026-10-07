@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Category, CategoryStatus, CategoryType } from "../domain/Category.js";
-import type { CategoryRepository } from "../domain/CategoryRepository.js";
+import type { CategoryRepository, CategoryTags } from "../domain/CategoryRepository.js";
 
 interface CategoryRow {
   id: string;
@@ -90,6 +90,18 @@ export class SupabaseCategoryRepository implements CategoryRepository {
     const { error } = await this.client.from("categories").upsert(rowFromCategory(category));
     if (error) {
       throw new Error(`No se pudo guardar la categoría: ${error.message}`);
+    }
+  }
+
+  async updateTags(userId: string, categoryId: string, tags: CategoryTags): Promise<void> {
+    // Solo las columnas que cambian: un `upsert` de la fila entera pisaba la otra lista.
+    const changes = {
+      ...(tags.experienceTags && { experience_tags: [...tags.experienceTags] }),
+      ...(tags.difficultyTags && { difficulty_tags: [...tags.difficultyTags] }),
+    };
+    const { error } = await this.client.from("categories").update(changes).eq("user_id", userId).eq("id", categoryId);
+    if (error) {
+      throw new Error(`No se pudieron guardar las opciones de la categoría: ${error.message}`);
     }
   }
 

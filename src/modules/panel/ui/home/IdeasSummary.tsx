@@ -9,6 +9,8 @@ export interface IdeaSummaryItem {
   /** Para volver a pedir la idea personalizada si cambia "¿Qué te ayuda?" (RF-40 v1.1). */
   categoryId?: string;
   templateKey: string;
+  /** Clave de la categoría en el catálogo: decide qué ideas ofrece el carrusel. */
+  categoryKey?: string;
   /** Nombre ya en el idioma de la interfaz. */
   categoryName: string;
 }
@@ -38,6 +40,7 @@ export function IdeasSummary({ ideas, personalize = false }: { ideas: IdeaSummar
           <RecommendationButton
             recommendationId={idea.id}
             categoryId={idea.categoryId}
+            categoryKey={idea.categoryKey}
             personalize={personalize}
             key={idea.id}
             templateKey={idea.templateKey}

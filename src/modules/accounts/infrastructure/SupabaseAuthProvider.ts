@@ -96,10 +96,10 @@ export class SupabaseAuthProvider implements AuthProvider {
       throw new AuthenticationError("El enlace de recuperación no es válido o ha caducado");
     }
 
-    const { error: errorActualizar } = await this.client.auth.admin.updateUserById(data.user.id, {
+    const { error: updateError } = await this.client.auth.admin.updateUserById(data.user.id, {
       password: newPassword,
     });
-    if (errorActualizar) {
+    if (updateError) {
       throw new AuthenticationError("El enlace de recuperación no es válido o ha caducado");
     }
   }

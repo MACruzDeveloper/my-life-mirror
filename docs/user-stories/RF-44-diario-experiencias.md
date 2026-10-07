@@ -56,3 +56,4 @@ Hasta ahora, "Tu experiencia (privada)" era una nota que solo se guardaba junto 
 - **v1.1 (5 oct. 2026)** — antes de implementarla: el enlace a las líneas de ayuda pasa a RF-30 (no tiene pantalla todavía); la nota antigua se conserva en su evaluación pero solo se enseñan las experiencias; "Guardar" vuelve a ser solo para la puntuación.
 - **v1.2 (5 oct. 2026)** — compartir una experiencia de forma anónima llega con [RF-43](RF-43-experiencias-compartidas.md).
 - **v1.3 (6 oct. 2026)** — el enlace a las líneas de ayuda junto al diario ya está, con [RF-30](RF-30-lineas-ayuda.md).
+- **v1.4 (6 oct. 2026)** — revisión de código del Ciclo 2, decisión del autor: borrar una experiencia que venía de una nota antigua vacía también esa nota en su evaluación (sin tocar la puntuación ni la fecha). Antes seguía en la base, en la API del historial y en la exportación. El derecho al olvido prevalece sobre RF-12, como al borrar la cuenta.

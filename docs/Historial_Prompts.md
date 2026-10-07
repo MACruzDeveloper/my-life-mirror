@@ -209,6 +209,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **6 oct. 2026** — *"creo que podemos dejar Deporte como categoría no sensible. Si en el futuro recibo algún feedback negativo siempre podemos volver atrás. Pero sino, al final cualquier categoría puede tener algo sensible"*
 → Deporte deja de ser sensible (RF-04, RES-04, migración 0018 sobre el catálogo y la copia de cada usuario). Consecuencias explicadas: deja de pedir consentimiento y entra en la IA (RF-40, RF-45) y en las experiencias compartidas (RF-43). Su descripción pasa a "Actividad física y movimiento" (migración 0019).
 
+**6 oct. 2026** — revisión de código del Ciclo 2 (v1.0.1..v1.2.0): 10 hallazgos, verificados uno a uno (7 confirmados, 1 descartado por estar ya cubierto, 1 de limpieza, 1 decisión). *Elección del autor:* borrar del diario una experiencia que venía de una nota antigua vacía también esa nota en su evaluación.
+→ El derecho al olvido prevalece sobre la inmutabilidad de las evaluaciones (RF-12), como al borrar la cuenta (RF-05): se vacía la nota, nunca la puntuación ni la fecha. Las correcciones van en la v1.2.1.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*
