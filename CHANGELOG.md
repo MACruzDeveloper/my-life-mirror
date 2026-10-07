@@ -5,6 +5,27 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (código)
+
+- Los controladores con sesión usan una plantilla común (`sessionHandler`): método, sesión, validación, caso de uso y una sola tabla de errores a estados HTTP, en lugar de la misma secuencia copiada en cada uno (unas 750 líneas menos). Sin cambios para el usuario. Los de administración del catálogo pasan además a no guardarse en cachés intermedias y a registrar los accesos denegados, como el resto de la administración (ADR-03, apartado 3.4).
+
+## [1.2.1] - 2026-10-06
+
+Correcciones de la revisión de código del Ciclo 2. Sin migraciones.
+
+### Corregido
+
+- Marcar opciones de "¿Qué te ayuda?" y "¿Qué te lo pone difícil?" casi a la vez ya no hace que se pierda una: cada acción guarda solo su lista.
+- Si tras guardar una puntuación falla la relectura de puntuaciones o ideas, la respuesta ya no es un error (el guardado era válido y reintentar duplicaba la evaluación).
+- Las fechas y cantidades con separadores ("06-10-2026", "1.200.000") ya no se toman por teléfonos: se pueden compartir (RF-43) y llegan enteras a la IA (RF-45).
+- La pestaña "Con IA" ya no vuelve al texto curado sin avisar cuando el carrusel ofrece ideas generales: el servidor acepta las mismas ideas que ofrece el carrusel, y este decide por la clave de la categoría.
+- Borrar del diario una experiencia que venía de una nota antigua vacía también esa nota en su evaluación: ya no sale en el historial ni en la exportación.
+- Los E2E con `api/` esperan también a la tabla `experiences` tras vaciar la base (evita fallos intermitentes).
+
+### Cambiado
+
+- `withTimeout` y `bestEffort`, en `shared/`, en lugar de copiados; quedan en inglés los últimos nombres en español (`ruta`, `esAdmin`, `existentes`, `errorActualizar`); fuera un script temporal subido por error.
+
 ## [1.2.0] - 2026-10-06
 
 Antes de desplegar: migraciones **0013 a 0019**, en orden (ya ejecutadas en producción). Ninguna rompe datos: añaden columnas y tablas, o cambian la categoría Deporte.

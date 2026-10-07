@@ -14,6 +14,8 @@ export interface Experience {
   readonly categoryId: string;
   readonly text: string;
   readonly createdAt: Date;
+  /** RF-44: la evaluación de cuya nota antigua se copió (migración 0014); al borrarla, esa nota también se vacía. */
+  readonly sourceAssessmentId?: string;
   /** RF-43: compartida de forma anónima desde esta fecha; ausente = privada. */
   readonly sharedAt?: Date;
   /** RF-43: el idioma en que se escribió (solo la leen quienes usan la app en ese idioma). */

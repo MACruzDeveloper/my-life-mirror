@@ -371,7 +371,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     // RF-44: el diario de experiencias, separado de las evaluaciones.
     addExperience: createAddExperience({ experienceRepository, categoryRepository, clock }),
     listExperiences: createListExperiences(experienceRepository),
-    deleteExperience: createDeleteExperience(experienceRepository),
+    deleteExperience: createDeleteExperience({ experienceRepository, assessmentRepository }),
     // RF-43: compartir experiencias de forma anónima, leerlas y reportarlas.
     shareExperience: createShareExperience({ experienceRepository, categoryRepository, catalog: categoryCatalogRepository, assessmentRepository, clock }),
     unshareExperience: createUnshareExperience(experienceRepository),

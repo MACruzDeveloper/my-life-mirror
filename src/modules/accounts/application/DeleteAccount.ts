@@ -31,8 +31,8 @@ export function createDeleteAccount(dependencies: EraseUserDependencies) {
     // Siempre debe existir un administrador: el último no puede borrarse (antes de pedir la
     // contraseña — no es información sensible y así el usuario sabe qué hacer sin probar nada).
     const users = await authProvider.listAllUsers();
-    const esAdmin = users.some((u) => u.id === input.userId && u.rol === "admin");
-    if (esAdmin && users.filter((u) => u.rol === "admin").length <= 1) {
+    const isAdmin = users.some((u) => u.id === input.userId && u.rol === "admin");
+    if (isAdmin && users.filter((u) => u.rol === "admin").length <= 1) {
       return err(new ConflictError("Cannot delete the only administrator account"));
     }
 

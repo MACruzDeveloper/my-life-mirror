@@ -133,6 +133,18 @@ describe("RecommendationButton (RF-18)", () => {
       }
     });
 
+    it("una idea general de una categoría con ideas propias: el carrusel ofrece las de la categoría, no las generales", () => {
+      // P. ej., se creó cuando todas chocaban y después se desmarcó la situación.
+      const client = createTestClient();
+      client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false, difficultyTags: [] }]);
+      render(withClient(<RecommendationButton categoryId="c1" categoryKey="economia" templateKey="general.2" categoryName="Economía" />, client));
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      const dialog = screen.getByRole("dialog");
+
+      expect(within(dialog).getByText("Idea 1 de 5")).toBeInTheDocument();
+      expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+    });
+
     it("sin nada marcado, las cinco", () => {
       const dialog = renderWithDifficulties([]);
 

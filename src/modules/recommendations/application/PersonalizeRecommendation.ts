@@ -1,4 +1,5 @@
 import { type Result, err, ok } from "#shared/domain/Result.js";
+import { withTimeout } from "#shared/domain/withTimeout.js";
 import { NotFoundError, ValidationError } from "#shared/domain/DomainError.js";
 import type { Clock } from "#shared/domain/Clock.js";
 import { isSupportedLocale, type Locale } from "#shared/domain/locales.js";
@@ -13,7 +14,6 @@ import { checkIdeaSafety } from "../domain/ideaSafety.js";
 import type { PersonalizedIdeaRepository } from "../domain/PersonalizedIdea.js";
 import { isOpen } from "../domain/Recommendation.js";
 import { allowedTemplateKeys } from "../domain/ideaSituations.js";
-import { templateKeysFor } from "../domain/recommendationCatalog.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
 export interface PersonalizeRecommendationInput {
@@ -49,13 +49,6 @@ function trendOf(scores: number[]): IdeaTrend {
   return latest > previous ? "up" : latest < previous ? "down" : "steady";
 }
 
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error(`Tiempo agotado (${ms} ms)`)), ms);
-  });
-  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
-}
 
 /** Mismas opciones, en cualquier orden: la idea guardada sigue valiendo. */
 function sameTags(a: readonly string[], b: readonly string[]): boolean {
@@ -85,12 +78,10 @@ export function createPersonalizeRecommendation(deps: Dependencies) {
     const catalogEntry = category ? (await catalog.findAll()).find((entry) => entry.id === category.catalogId) : undefined;
     const categoryKey = catalogEntry?.key;
     const templateKey = input.templateKey ?? recommendation.templateKey;
-    if (templateKey !== recommendation.templateKey && !templateKeysFor(categoryKey).includes(templateKey)) {
-      return err(new ValidationError("Template does not belong to this category"));
-    }
-    // RF-42: una idea que choca con lo que se le pone difícil no se propone, tampoco personalizada.
+    // Las mismas que ofrece el carrusel: las de la categoría que no chocan con lo que se le pone difícil
+    // (RF-42) o, si chocan todas, las generales. Ni otra categoría ni una que choque, tampoco personalizada.
     if (!allowedTemplateKeys(categoryKey, category?.difficultyTags ?? []).includes(templateKey)) {
-      return err(new ValidationError("Template clashes with a difficult situation"));
+      return err(new ValidationError("Template is not offered for this category"));
     }
     const curated: PersonalizedResult = { source: "catalog", templateKey };
 

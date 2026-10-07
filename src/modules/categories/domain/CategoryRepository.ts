@@ -1,10 +1,17 @@
 import type { Category } from "./Category.js";
 
+export type CategoryTags = Partial<Pick<Category, "experienceTags" | "difficultyTags">>;
+
 /** Puerto — ADR-03 apartado 3.3. */
 export interface CategoryRepository {
   findByUserId(userId: string): Promise<Category[]>;
   findById(userId: string, categoryId: string): Promise<Category | undefined>;
   save(category: Category): Promise<void>;
+  /**
+   * RF-41/RF-42: cambia solo esas listas de la categoría, sin reescribir la fila: dos peticiones
+   * casi a la vez (una por lista) no se pisan. Nada si la categoría no es del usuario.
+   */
+  updateTags(userId: string, categoryId: string, tags: CategoryTags): Promise<void>;
   saveMany(categories: Category[]): Promise<void>;
   /** Borra todas las categorías del usuario (RF-05). Repetible. */
   deleteByUserId(userId: string): Promise<void>;

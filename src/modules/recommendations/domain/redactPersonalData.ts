@@ -4,7 +4,9 @@ const PLACEHOLDER = "[…]";
 const PATTERNS: RegExp[] = [
   /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g, // emails
   /\b(?:https?:\/\/|www\.)\S+/gi, // enlaces
-  /\+?\d(?:[\s.-]?\d){6,}/g, // teléfonos: 7 o más cifras, con espacios, puntos, guiones o prefijo +
+  // Teléfonos: 9 o más cifras (las españolas; las internacionales, con prefijo), con espacios, puntos,
+  // guiones o +. Con 7 u 8 se llevaba fechas ("06-10-2026") y cantidades ("1.200.000").
+  /\+?\d(?:[\s.-]?\d){8,}/g,
   /\b\d{6,}\b/g, // números largos (cuentas, documentos…)
 ];
 

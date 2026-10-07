@@ -96,3 +96,4 @@ SuggestExperienceOptions({ userId, experienceId, locale }) →
 - **v1.3 (5 oct. 2026)** — tras probarla el autor: el diario dice dónde activarla si la función existe pero está desactivada, y el *Fake* compara por la raíz de las palabras ("viajé" encaja con "Viajar").
 - **v1.4 (5 oct. 2026)** — decisiones del autor: Pareja (y lo que el catálogo marque como `aiExcluded`) queda fuera de la IA sin volverse sensible; aviso de términos ofensivos solo al enviar a la IA, con "Enviar igualmente".
 - **v1.5 (6 oct. 2026)** — el enlace a las líneas de ayuda junto al diario ya está, con [RF-30](RF-30-lineas-ayuda.md).
+- **v1.6 (6 oct. 2026)** — revisión de código: `redactPersonalData` toma por teléfono 9 o más cifras (antes 7), para no quitar fechas ("06-10-2026") ni cantidades ("1.200.000"). Afecta también a los filtros de RF-43.

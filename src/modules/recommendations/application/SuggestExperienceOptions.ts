@@ -1,4 +1,5 @@
 import { type Result, err, ok } from "#shared/domain/Result.js";
+import { withTimeout } from "#shared/domain/withTimeout.js";
 import { NotFoundError, ValidationError } from "#shared/domain/DomainError.js";
 import { isSupportedLocale } from "#shared/domain/locales.js";
 import type { ProfileRepository } from "#modules/accounts/domain/ProfileRepository.js";
@@ -27,13 +28,6 @@ interface Dependencies {
 
 const NONE: OptionSuggestion = { helps: [], difficulties: [] };
 
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error(`Tiempo agotado (${ms} ms)`)), ms);
-  });
-  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
-}
 
 /** Empareja claves con sus textos (descarta las que no tienen texto en ese idioma). */
 function labelled(keys: string[], labels: (keys: string[]) => string[]): OptionLabel[] {

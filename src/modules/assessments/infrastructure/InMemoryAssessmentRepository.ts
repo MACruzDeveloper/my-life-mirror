@@ -13,6 +13,14 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
     return this.assessments.filter((a) => a.userId === userId);
   }
 
+  async clearNote(userId: string, assessmentId: string): Promise<void> {
+    const index = this.assessments.findIndex((a) => a.id === assessmentId && a.userId === userId);
+    if (index === -1) return;
+    const withoutNote: Assessment = { ...this.assessments[index] };
+    delete (withoutNote as { note?: string }).note;
+    this.assessments[index] = withoutNote;
+  }
+
   async deleteByUserId(userId: string): Promise<void> {
     for (let i = this.assessments.length - 1; i >= 0; i--) {
       if (this.assessments[i].userId === userId) this.assessments.splice(i, 1);

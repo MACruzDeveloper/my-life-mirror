@@ -23,6 +23,10 @@ describe("filtros antes de compartir una experiencia con otras personas (RF-43)"
     expect(checkShareableText(text)).toEqual({ ok: false, reason: "offensive" });
   });
 
+  it("una fecha o una cantidad no son datos de contacto", () => {
+    expect(checkShareableText("El 06-10-2026 abrí una cuenta de ahorro y ya llevo 1.200.000 céntimos")).toEqual({ ok: true });
+  });
+
   it("no usa los grupos de obligación ni de juicio del filtro de ideas: en una experiencia propia son normales", () => {
     expect(checkShareableText("Pensaba que debes ahorrar mucho, y no: con poco basta")).toEqual({ ok: true });
   });
