@@ -60,6 +60,11 @@ export class SupabaseAssessmentRepository implements AssessmentRepository {
     return (data as AssessmentRow[]).map(toAssessment);
   }
 
+  async clearNote(userId: string, assessmentId: string): Promise<void> {
+    const { error } = await this.client.from("assessments").update({ note: null }).eq("id", assessmentId).eq("user_id", userId);
+    if (error) throw new Error(`No se pudo vaciar la nota de la evaluación: ${error.message}`);
+  }
+
   async deleteByUserId(userId: string): Promise<void> {
     const { error } = await this.client.from("assessments").delete().eq("user_id", userId);
     if (error) throw new Error(`No se pudieron borrar las evaluaciones: ${error.message}`);

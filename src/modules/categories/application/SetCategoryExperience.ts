@@ -32,8 +32,8 @@ export function createSetCategoryExperience(categoryRepository: CategoryReposito
     const tags = [...new Set(input.tags)];
     if (tags.some((tag) => !allowed.has(tag))) return err(new ValidationError("Unknown option for this category"));
 
-    const updated: Category = { ...category, experienceTags: tags };
-    await categoryRepository.save(updated);
-    return ok(updated);
+    // Solo su lista; se devuelve la categoría releída, con la otra lista tal como está ahora.
+    await categoryRepository.updateTags(userId, category.id, { experienceTags: tags });
+    return ok((await categoryRepository.findById(userId, category.id)) ?? { ...category, experienceTags: tags });
   };
 }

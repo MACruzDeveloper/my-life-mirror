@@ -40,7 +40,10 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
   const finances = byKey("economia");
   const spirituality = byKey("espiritualidad");
   const couple = byKey("pareja");
+  const family = byKey("familia");
   await categoryRepository.save({ ...couple, status: "active" });
+  // RF-42: "Contacto con la familia" choca con todas las ideas de Familia: se ofrecen las generales.
+  await categoryRepository.save({ ...family, status: "active", difficultyTags: ["contactoConFamilia"] });
   await categoryRepository.save({ ...finances, status: "active", experienceTags: ["economia.presupuesto"] });
   await categoryRepository.save({ ...spirituality, status: "active" });
 
@@ -53,6 +56,7 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
     { id: "a2", userId: "u1", categoryId: finances.id, score: 3, note: "texto privado que nunca debe salir", recordedAt: new Date("2026-10-01T10:00:00Z") },
     { id: "a3", userId: "u1", categoryId: spirituality.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
     { id: "a4", userId: "u1", categoryId: couple.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
+    { id: "a5", userId: "u1", categoryId: family.id, score: 2, recordedAt: new Date("2026-10-01T10:00:00Z") },
   ]);
 
   const recommendationRepository = new InMemoryRecommendationRepository();
@@ -60,6 +64,7 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
     { id: "r-finances", userId: "u1", categoryId: finances.id, templateKey: "economia.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-spirituality", userId: "u1", categoryId: spirituality.id, templateKey: "espiritualidad.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-couple", userId: "u1", categoryId: couple.id, templateKey: "pareja.1", threshold: 5, status: "pending", createdAt: clock.now() },
+    { id: "r-family", userId: "u1", categoryId: family.id, templateKey: "familia.1", threshold: 5, status: "pending", createdAt: clock.now() },
     { id: "r-done", userId: "u1", categoryId: finances.id, templateKey: "economia.2", threshold: 5, status: "done", createdAt: clock.now() },
   ]);
 
@@ -152,6 +157,16 @@ describe("PersonalizeRecommendation (RF-40)", () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("si todas las ideas de la categoría chocan, acepta las generales que ofrece el carrusel (RF-42)", async () => {
+    const { personalize } = await setup();
+
+    const general = await personalize({ userId: "u1", recommendationId: "r-family", templateKey: "general.2", locale: "es" });
+    const own = await personalize({ userId: "u1", recommendationId: "r-family", templateKey: "familia.2", locale: "es" });
+
+    expect(general.ok && general.value.templateKey).toBe("general.2");
+    expect(own.ok).toBe(false);
   });
 
   it("una idea que choca con lo que se lo pone difícil se rechaza, tampoco se personaliza (RF-42)", async () => {

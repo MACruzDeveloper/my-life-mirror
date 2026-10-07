@@ -13,8 +13,8 @@ export type HttpHandler = (req: HttpRequest, res: ServerResponse) => Promise<voi
  */
 export function createRouter(prefix: string, routes: Record<string, HttpHandler>): HttpHandler {
   return async (req, res) => {
-    const ruta = (req.url ?? "").split("?")[0];
-    const action = ruta.startsWith(prefix) ? ruta.slice(prefix.length).replace(/\/$/, "") : undefined;
+    const path = (req.url ?? "").split("?")[0];
+    const action = path.startsWith(prefix) ? path.slice(prefix.length).replace(/\/$/, "") : undefined;
     const handler = action && Object.hasOwn(routes, action) ? routes[action] : undefined;
 
     if (!handler) {

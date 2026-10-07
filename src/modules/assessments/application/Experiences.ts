@@ -3,6 +3,7 @@ import { type Result, err, ok } from "#shared/domain/Result.js";
 import { NotFoundError, ValidationError } from "#shared/domain/DomainError.js";
 import type { Clock } from "#shared/domain/Clock.js";
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
+import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
 import { type Experience, type ExperienceRepository, MAX_EXPERIENCE_LENGTH } from "../domain/Experience.js";
 
 interface AddDependencies {
@@ -42,9 +43,14 @@ export function createListExperiences(experienceRepository: ExperienceRepository
   };
 }
 
-export function createDeleteExperience(experienceRepository: ExperienceRepository) {
+/** Si venía de una nota antigua de una evaluación (migración 0014), esa nota se vacía también: borrar es borrar. */
+export function createDeleteExperience({ experienceRepository, assessmentRepository }: { experienceRepository: ExperienceRepository; assessmentRepository: AssessmentRepository }) {
   return async function deleteExperience(input: { userId: string; experienceId: string }): Promise<Result<true, NotFoundError>> {
-    const deleted = await experienceRepository.delete(input.userId.trim(), input.experienceId.trim());
-    return deleted ? ok(true) : err(new NotFoundError("Experience not found"));
+    const userId = input.userId.trim();
+    const experienceId = input.experienceId.trim();
+    const experience = (await experienceRepository.findByUserId(userId)).find((candidate) => candidate.id === experienceId);
+    if (!experience || !(await experienceRepository.delete(userId, experienceId))) return err(new NotFoundError("Experience not found"));
+    if (experience.sourceAssessmentId) await assessmentRepository.clearNote(userId, experience.sourceAssessmentId);
+    return ok(true);
   };
 }
