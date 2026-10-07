@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (código)
+
+- Los controladores con sesión usan una plantilla común (`sessionHandler`): método, sesión, validación, caso de uso y una sola tabla de errores a estados HTTP, en lugar de la misma secuencia copiada en cada uno (unas 750 líneas menos). Sin cambios para el usuario. Los de administración del catálogo pasan además a no guardarse en cachés intermedias y a registrar los accesos denegados, como el resto de la administración (ADR-03, apartado 3.4).
+
 ## [1.2.1] - 2026-10-06
 
 Correcciones de la revisión de código del Ciclo 2. Sin migraciones.
