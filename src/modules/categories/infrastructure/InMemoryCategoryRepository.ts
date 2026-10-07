@@ -1,5 +1,5 @@
 import type { Category } from "../domain/Category.js";
-import type { CategoryRepository } from "../domain/CategoryRepository.js";
+import type { CategoryRepository, CategoryTags } from "../domain/CategoryRepository.js";
 
 /** Fake para tests — ADR-03 apartado 3.6. */
 export class InMemoryCategoryRepository implements CategoryRepository {
@@ -19,6 +19,11 @@ export class InMemoryCategoryRepository implements CategoryRepository {
 
   async save(category: Category): Promise<void> {
     this.categories.set(this.key(category.userId, category.id), category);
+  }
+
+  async updateTags(userId: string, categoryId: string, tags: CategoryTags): Promise<void> {
+    const current = this.categories.get(this.key(userId, categoryId));
+    if (current) this.categories.set(this.key(userId, categoryId), { ...current, ...tags });
   }
 
   async saveMany(categories: Category[]): Promise<void> {

@@ -39,6 +39,11 @@ interface RecommendationButtonProps {
   recommendationId?: string;
   /** RF-40 v1.1: su categoría, para volver a pedir la idea si cambia "¿Qué te ayuda?". */
   categoryId?: string;
+  /**
+   * Clave de su categoría en el catálogo (`economia`): decide qué ideas ofrece el carrusel. Sin ella,
+   * se deduce de la plantilla, que falla con una idea general de una categoría con ideas propias.
+   */
+  categoryKey?: string;
   /** RF-40: la función está disponible y el usuario la activó (lo decide la página con `useAiIdeasActive`). */
   personalize?: boolean;
   /**
@@ -65,7 +70,7 @@ const ideasPulse = keyframes`
  * Ante cualquier respuesta que no sea una idea de IA, se ve el texto curado.
  * RF-43: lo que comparten otras personas, en la pestaña "De otras personas".
  */
-export function RecommendationButton({ templateKey, categoryName, label, recommendationId, categoryId, personalize = false, pulseKey = 0 }: RecommendationButtonProps) {
+export function RecommendationButton({ templateKey, categoryName, label, recommendationId, categoryId, categoryKey, personalize = false, pulseKey = 0 }: RecommendationButtonProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const titleId = useId();
@@ -101,7 +106,7 @@ export function RecommendationButton({ templateKey, categoryName, label, recomme
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby={titleId} fullWidth maxWidth="xs">
         <DialogTitle id={titleId}>{t("recomendaciones.dialogoTitulo", { categoria: categoryName })}</DialogTitle>
         <DialogContent>
-          <IdeaContent templateKey={templateKey} categoryName={categoryName} recommendationId={recommendationId} categoryId={categoryId} personalize={personalize} />
+          <IdeaContent templateKey={templateKey} categoryName={categoryName} recommendationId={recommendationId} categoryId={categoryId} categoryKey={categoryKey} personalize={personalize} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>{t("recomendaciones.cerrar")}</Button>
@@ -117,6 +122,7 @@ interface IdeaContentProps {
   categoryName: string;
   recommendationId?: string;
   categoryId?: string;
+  categoryKey?: string;
   personalize?: boolean;
 }
 
@@ -124,9 +130,10 @@ interface IdeaContentProps {
  * Las ideas del carrusel: las del catálogo de la categoría de la plantilla que no chocan con lo que
  * se le pone difícil (RF-42), empezando por la recomendada si se puede ("economia.3" → 3, 1, 2, 4, 5).
  */
-function carouselKeys(templateKey: string, difficultyTags: readonly string[]): string[] {
+function carouselKeys(templateKey: string, difficultyTags: readonly string[], categoryKey?: string): string[] {
   const prefix = templateKey.split(".")[0];
-  const allowed = allowedTemplateKeys(prefix === "general" ? undefined : prefix, difficultyTags);
+  // La misma regla que el servidor (PersonalizeRecommendation): por la clave de la categoría, no de la plantilla.
+  const allowed = allowedTemplateKeys(categoryKey ?? (prefix === "general" ? undefined : prefix), difficultyTags);
   return allowed.includes(templateKey) ? [templateKey, ...allowed.filter((key) => key !== templateKey)] : allowed;
 }
 
@@ -167,7 +174,7 @@ function IdeaCarouselForCategory(props: IdeaContentProps & { categoryId: string 
 
 type IdeaTab = "app" | "ai" | "others";
 
-function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId, personalize = false, difficultyTags, shared }: IdeaContentProps & { difficultyTags: readonly string[]; shared: SharedExperienceDto[] }) {
+function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId, categoryKey, personalize = false, difficultyTags, shared }: IdeaContentProps & { difficultyTags: readonly string[]; shared: SharedExperienceDto[] }) {
   const { t } = useTranslation();
   const tabsId = useId();
   const withAi = personalize && recommendationId !== undefined;
@@ -175,7 +182,7 @@ function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId,
   const tabs: IdeaTab[] = ["app", ...(withAi ? (["ai"] as const) : []), ...(shared.length > 0 || reportedOne ? (["others"] as const) : [])];
   const [chosenTab, setTab] = useState<IdeaTab>(withAi ? "ai" : "app");
   const tab = tabs.includes(chosenTab) ? chosenTab : tabs[0];
-  const keys = carouselKeys(templateKey, difficultyTags);
+  const keys = carouselKeys(templateKey, difficultyTags, categoryKey);
   const [rawIndex, setIndex] = useState(0);
   // Si la lista se acorta con la ventana abierta (se marcó una situación), el índice no se sale.
   const index = Math.min(rawIndex, Math.max(keys.length - 1, 0));

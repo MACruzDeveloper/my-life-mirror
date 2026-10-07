@@ -30,7 +30,7 @@ interface Dependencies {
  */
 export function createGenerateRecommendations({ recommendationRepository, categoryRepository, catalog, clock, threshold }: Dependencies) {
   return async function generateRecommendations(userId: string, assessments: Assessment[]): Promise<Result<Recommendation[], never>> {
-    const existentes = await recommendationRepository.findByUserId(userId);
+    const existing = await recommendationRepository.findByUserId(userId);
     const keysByCatalogId = new Map((await catalog.findAll()).map((entry) => [entry.id, entry.key]));
     const created: Recommendation[] = [];
 
@@ -40,7 +40,7 @@ export function createGenerateRecommendations({ recommendationRepository, catego
       const category = await categoryRepository.findById(userId, assessment.categoryId);
       if (!category || category.status !== "active") continue;
 
-      const forCategory = [...existentes, ...created].filter((r) => r.categoryId === category.id);
+      const forCategory = [...existing, ...created].filter((r) => r.categoryId === category.id);
       if (forCategory.some(isOpen)) continue;
 
       // RF-42: solo las ideas que no chocan con lo que se le pone difícil en esa categoría.

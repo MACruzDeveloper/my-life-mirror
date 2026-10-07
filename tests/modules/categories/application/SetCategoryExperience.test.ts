@@ -3,6 +3,7 @@ import { createListCategories } from "@modules/categories/application/ListCatego
 import { createSetCategoryExperience } from "@modules/categories/application/SetCategoryExperience";
 import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
 import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/InMemoryCategoryRepository";
+import { createSetCategoryDifficulties } from "@modules/recommendations/application/SetCategoryDifficulties";
 
 async function setup() {
   const categoryRepository = new InMemoryCategoryRepository();
@@ -11,7 +12,13 @@ async function setup() {
   if (!listed.ok) throw new Error("setup falló");
   const entries = await catalog.findAll();
   const byKey = (key: string) => listed.value.find((c) => c.catalogId === entries.find((e) => e.key === key)?.id)!;
-  return { categoryRepository, setCategoryExperience: createSetCategoryExperience(categoryRepository, catalog), sport: byKey("deporte"), finances: byKey("economia") };
+  return {
+    categoryRepository,
+    setCategoryExperience: createSetCategoryExperience(categoryRepository, catalog),
+    setCategoryDifficulties: createSetCategoryDifficulties(categoryRepository, catalog),
+    sport: byKey("deporte"),
+    finances: byKey("economia"),
+  };
 }
 
 describe("SetCategoryExperience (RF-41)", () => {
@@ -60,4 +67,17 @@ describe("SetCategoryExperience (RF-41)", () => {
 
     expect(result.ok && result.value).toMatchObject({ status: "active", name: finances.name, experienceTags: ["economia.presupuesto"] });
   });
+
+  it("a la vez que '¿Qué te lo pone difícil?', ninguna de las dos pisa a la otra (cada una guarda solo su lista)", async () => {
+    const { setCategoryExperience, setCategoryDifficulties, categoryRepository, finances } = await setup();
+
+    // Las dos leen la categoría antes de que la otra guarde, como dos peticiones casi simultáneas.
+    await Promise.all([
+      setCategoryExperience({ userId: "u1", categoryId: finances.id, tags: ["economia.presupuesto"] }),
+      setCategoryDifficulties({ userId: "u1", categoryId: finances.id, tags: ["mirarMisCuentas"] }),
+    ]);
+
+    expect(await categoryRepository.findById("u1", finances.id)).toMatchObject({ experienceTags: ["economia.presupuesto"], difficultyTags: ["mirarMisCuentas"] });
+  });
 });
+

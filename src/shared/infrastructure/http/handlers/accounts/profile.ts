@@ -1,12 +1,7 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-import { GENDERS } from "#modules/accounts/domain/Profile.js";
 import { z } from "zod";
-// Imports relativos, no alias — ver nota en container.ts / AGENTS.md.
-import { getAppContext } from "#shared/infrastructure/container.js";
-import { readCookie } from "#shared/infrastructure/cookies.js";
-import { logger } from "#shared/infrastructure/logger.js";
-
-type RequestWithBody = IncomingMessage & { body: unknown };
+import { ok } from "#shared/domain/Result.js";
+import { GENDERS } from "#modules/accounts/domain/Profile.js";
+import { action, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 
 const UpdateProfileSchema = z.object({
   name: z.string().optional(),
@@ -19,53 +14,16 @@ const UpdateProfileSchema = z.object({
  * Controlador HTTP — ADR-03 apartado 3.4 / RF-03. GET devuelve el perfil actual (o
  * `null` si aún no existe); POST actualiza (upsert parcial — solo los
  * campos indicados). Ambos exigen sesión activa — el `userId` sale siempre
- * de la cookie, nunca del cuerpo de la petición (evita que alguien edite el
+ * de la sesión, nunca del cuerpo de la petición (evita que alguien edite el
  * perfil de otro usuario).
  */
-export default async function handler(req: RequestWithBody, res: ServerResponse) {
-  try {
-    const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession, updateProfile, getProfile } = getAppContext();
-    const session = await verifySession(token);
-
-    if (!session.ok) {
-      res.writeHead(401, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "No autenticado" }));
-      return;
-    }
-
-    if (req.method === "GET") {
-      const result = await getProfile(session.value.id);
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(result.ok ? (result.value ?? null) : null));
-      return;
-    }
-
-    if (req.method !== "POST") {
-      res.writeHead(405, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Método no permitido" }));
-      return;
-    }
-
-    const data = UpdateProfileSchema.safeParse(req.body);
-    if (!data.success) {
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Petición mal formada" }));
-      return;
-    }
-
-    const result = await updateProfile({ userId: session.value.id, ...data.data });
-    if (!result.ok) {
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: result.error.message }));
-      return;
-    }
-
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(result.value));
-  } catch (error) {
-    logger.error("Error inesperado en /api/accounts/profile", error, { route: "/api/accounts/profile" });
-    res.writeHead(500, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Error interno del servidor" }));
-  }
-}
+export default sessionHandler({
+  route: "/api/accounts/profile",
+  GET: action({
+    execute: async ({ context, user }) => {
+      const result = await context.getProfile(user.id);
+      return ok(result.ok ? (result.value ?? null) : null);
+    },
+  }),
+  POST: action({ schema: UpdateProfileSchema, execute: ({ context, user, body }) => context.updateProfile({ userId: user.id, ...body }) }),
+});
