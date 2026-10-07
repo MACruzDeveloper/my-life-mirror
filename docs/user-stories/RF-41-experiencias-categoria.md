@@ -54,3 +54,4 @@ Para que las ideas que me proponga la app encajen conmigo, sabiendo que lo que e
 - **v1.1 (3 oct. 2026)** — el botón de guardar pasa a ser uno por categoría (UX-05).
 - **v1.2 (5 oct. 2026)** — el título pasa a "¿Qué te ayuda?" (más corto, para que quepa en móvil con su confirmación), con icono y flecha; "Tu experiencia (privada)" se cierra con su título o con la X (RF-42, v1.2).
 - **v1.3 (5 oct. 2026)** — la nota ("Tu experiencia (privada)") pasa a ser el diario de experiencias de RF-44: varias, con su propio "Añadir" y borrables.
+- **v1.4 (6 oct. 2026)** — revisión de código: guardar las opciones cambia solo su columna; antes se reescribía la fila y una petición casi simultánea de "¿Qué te lo pone difícil?" (o al revés) se perdía.

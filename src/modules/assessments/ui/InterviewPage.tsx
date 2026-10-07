@@ -726,7 +726,13 @@ export function InterviewPage() {
     </Box>
     )}
 
-    <SavedIdeaDialog recommendation={newIdea} categoryName={newIdea ? categoryLabel(newIdea.catalogId).name : ""} personalize={personalizeIdeas} onClose={() => setNewIdea(null)} />
+    <SavedIdeaDialog
+      recommendation={newIdea}
+      categoryName={newIdea ? categoryLabel(newIdea.catalogId).name : ""}
+      categoryKey={newIdea ? categoryLabel(newIdea.catalogId).key : undefined}
+      personalize={personalizeIdeas}
+      onClose={() => setNewIdea(null)}
+    />
 
     <Dialog open={categoryAwaitingConsent !== null} onClose={() => setCategoryAwaitingConsent(null)}>
       <DialogTitle>{t("categorias.modalTitulo")}</DialogTitle>

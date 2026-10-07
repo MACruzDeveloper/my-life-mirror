@@ -68,7 +68,7 @@ export async function resetLocalDatabase() {
  * "Could not find the table … in the schema cache" (1 de cada 4-5 ejecuciones, 3 oct.).
  * Se espera a que responda por las tablas que usa la app, incluida la de la última migración.
  */
-async function waitForSchema({ tables = ["profiles", "categories", "assessments", "recommendations", "personalized_ideas"], timeoutMs = 30_000 } = {}) {
+async function waitForSchema({ tables = ["profiles", "categories", "assessments", "recommendations", "personalized_ideas", "experiences"], timeoutMs = 30_000 } = {}) {
   const status = readStatus();
   const headers = { apikey: status.SERVICE_ROLE_KEY, Authorization: `Bearer ${status.SERVICE_ROLE_KEY}` };
   const deadline = Date.now() + timeoutMs;

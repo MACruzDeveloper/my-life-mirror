@@ -12,6 +12,7 @@ interface ExperienceRow {
   shared_locale: Locale | null;
   shared_category_key: string | null;
   reported_at: string | null;
+  source_assessment_id: string | null;
 }
 
 function experienceFromRow(row: ExperienceRow): Experience {
@@ -25,10 +26,11 @@ function experienceFromRow(row: ExperienceRow): Experience {
     ...(row.shared_locale && { sharedLocale: row.shared_locale }),
     ...(row.shared_category_key && { sharedCategoryKey: row.shared_category_key }),
     ...(row.reported_at && { reportedAt: new Date(row.reported_at) }),
+    ...(row.source_assessment_id && { sourceAssessmentId: row.source_assessment_id }),
   };
 }
 
-const COLUMNS = "id, user_id, category_id, text, created_at, shared_at, shared_locale, shared_category_key, reported_at";
+const COLUMNS = "id, user_id, category_id, text, created_at, shared_at, shared_locale, shared_category_key, reported_at, source_assessment_id";
 
 /** Adaptador real (migraciones 0014 y 0017). Sin test propio: solo mapea filas, como el resto de adaptadores Supabase. */
 export class SupabaseExperienceRepository implements ExperienceRepository {
@@ -55,6 +57,8 @@ export class SupabaseExperienceRepository implements ExperienceRepository {
       shared_locale: experience.sharedLocale ?? null,
       shared_category_key: experience.sharedCategoryKey ?? null,
       reported_at: experience.reportedAt?.toISOString() ?? null,
+      // Solo si la tiene: así nunca se borra el enlace con la nota de origen al guardar.
+      ...(experience.sourceAssessmentId && { source_assessment_id: experience.sourceAssessmentId }),
     });
     if (error) throw new Error(`No se pudo guardar la experiencia: ${error.message}`);
   }

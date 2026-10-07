@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createAddExperience, createDeleteExperience, createListExperiences } from "@modules/assessments/application/Experiences";
+import { InMemoryAssessmentRepository } from "@modules/assessments/infrastructure/InMemoryAssessmentRepository";
 import { InMemoryExperienceRepository } from "@modules/assessments/infrastructure/InMemoryExperienceRepository";
 import { createListCategories } from "@modules/categories/application/ListCategories";
 import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
@@ -13,10 +14,12 @@ async function setup() {
   await createListCategories(categoryRepository, new InMemoryCategoryCatalogRepository())("u1");
   const finances = (await categoryRepository.findByUserId("u1")).find((category) => category.name === "Economía")!;
   const experienceRepository = new InMemoryExperienceRepository();
+  const assessmentRepository = new InMemoryAssessmentRepository();
   return {
     add: createAddExperience({ experienceRepository, categoryRepository, clock }),
     list: createListExperiences(experienceRepository),
-    remove: createDeleteExperience(experienceRepository),
+    remove: createDeleteExperience({ experienceRepository, assessmentRepository }),
+    assessmentRepository,
     experienceRepository,
     finances,
     advance: (date: Date) => (now = date),
@@ -72,6 +75,22 @@ describe("diario de experiencias (RF-44)", () => {
     expect((await remove({ userId: "otro", experienceId: added.value.id })).ok).toBe(false);
     expect((await remove({ userId: "u1", experienceId: added.value.id })).ok).toBe(true);
     expect((await list("u1")).ok && (await list("u1"))).toMatchObject({ value: [] });
+  });
+
+  it("borrar una que venía de una nota antigua vacía también esa nota en su evaluación (derecho al olvido), sin tocar la puntuación", async () => {
+    const { remove, experienceRepository, assessmentRepository, finances } = await setup();
+    const recordedAt = new Date("2026-09-01T10:00:00Z");
+    await assessmentRepository.saveMany([
+      { id: "a-old", userId: "u1", categoryId: finances.id, score: 4, note: "Mes justo", recordedAt },
+      { id: "a-other", userId: "u1", categoryId: finances.id, score: 6, note: "Otra nota", recordedAt },
+    ]);
+    await experienceRepository.save({ id: "e-old", userId: "u1", categoryId: finances.id, text: "Mes justo", createdAt: recordedAt, sourceAssessmentId: "a-old" });
+
+    expect((await remove({ userId: "u1", experienceId: "e-old" })).ok).toBe(true);
+
+    const assessments = await assessmentRepository.findByUserId("u1");
+    expect(assessments.find((assessment) => assessment.id === "a-old")).toEqual({ id: "a-old", userId: "u1", categoryId: finances.id, score: 4, recordedAt });
+    expect(assessments.find((assessment) => assessment.id === "a-other")?.note).toBe("Otra nota");
   });
 
   it("exige usuario", async () => {
