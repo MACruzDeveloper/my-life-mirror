@@ -21,6 +21,11 @@ import type { IdeaReviewer, IdeaWriter } from "#modules/recommendations/domain/I
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infrastructure/FakeIdeaWriter.js";
 import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
+import { AnthropicIdeaReviewer, AnthropicIdeaWriter, AnthropicOptionSuggester } from "#modules/recommendations/infrastructure/anthropic/AnthropicIdeaProvider.js";
+import { createAnthropicModel } from "#modules/recommendations/infrastructure/anthropic/AnthropicStructuredModel.js";
+import { InMemoryAiUsageLimiter } from "#modules/recommendations/infrastructure/InMemoryAiUsageLimiter.js";
+import { SupabaseAiUsageLimiter } from "#modules/recommendations/infrastructure/SupabaseAiUsageLimiter.js";
+import { type AiUsageLimiter, parseAiDailyLimit } from "#modules/recommendations/domain/AiUsageLimiter.js";
 import type { OptionSuggester } from "#modules/recommendations/domain/OptionSuggester.js";
 import { createSuggestExperienceOptions } from "#modules/recommendations/application/SuggestExperienceOptions.js";
 import { createSetAiSuggestions } from "#modules/accounts/application/SetAiSuggestions.js";
@@ -134,17 +139,42 @@ function createPersonalizedIdeaRepository(environment: Environment): Personalize
   return new SupabasePersonalizedIdeaRepository(url, serviceRoleKey);
 }
 
+interface IdeaProvider {
+  writer?: IdeaWriter;
+  reviewer: IdeaReviewer;
+  suggester?: OptionSuggester;
+  /** Solo con el proveedor real: el *Fake* no gasta nada, así que no se cuenta. */
+  usageLimiter?: AiUsageLimiter;
+}
+
 /**
- * RF-40: quién escribe las ideas personalizadas, según `AI_IDEAS_PROVIDER`.
- * - `fake`: escritor determinista (desarrollo local y E2E).
- * - sin valor: función apagada (producción hasta RF-40b); la opción ni se ofrece.
- * - `anthropic`: llegará con RF-40b; hasta entonces, apagada con un aviso en el log.
+ * RF-40 y RF-45: quién escribe las ideas personalizadas y propone opciones, según
+ * `AI_IDEAS_PROVIDER` (el mismo proveedor para las dos: disponibles o no a la vez).
+ * - sin valor: funciones apagadas; las opciones ni se ofrecen.
+ * - `fake`: proveedor determinista y gratuito (desarrollo local, E2E y tests).
+ * - `anthropic` (RF-40b): el modelo real, con `ANTHROPIC_API_KEY` y un tope diario
+ *   por usuario (`AI_DAILY_LIMIT`). Sin clave, apagado con un aviso en el log.
  */
-function createIdeaProvider(): { writer?: IdeaWriter; reviewer: IdeaReviewer; suggester?: OptionSuggester } {
+function createIdeaProvider(environment: Environment, clock: Clock): IdeaProvider {
   const provider = process.env.AI_IDEAS_PROVIDER?.trim();
-  // RF-45 usa el mismo proveedor que RF-40: disponible o no a la vez.
   if (provider === "fake") return { writer: new FakeIdeaWriter(), reviewer: new FakeIdeaReviewer(), suggester: new FakeOptionSuggester() };
-  if (provider) logger.warn("AI_IDEAS_PROVIDER desconocido o sin implementar: ideas con IA apagadas", { provider });
+  if (provider === "anthropic") {
+    const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+    if (apiKey) {
+      const model = createAnthropicModel(apiKey);
+      const limit = parseAiDailyLimit(process.env.AI_DAILY_LIMIT);
+      const { url, serviceRoleKey } = environment === "test" ? { url: "", serviceRoleKey: "" } : supabaseCredentials();
+      return {
+        writer: new AnthropicIdeaWriter(model),
+        reviewer: new AnthropicIdeaReviewer(model),
+        suggester: new AnthropicOptionSuggester(model),
+        usageLimiter: environment === "test" ? new InMemoryAiUsageLimiter(limit, clock) : new SupabaseAiUsageLimiter(url, serviceRoleKey, limit, clock),
+      };
+    }
+    logger.warn("AI_IDEAS_PROVIDER=anthropic sin ANTHROPIC_API_KEY: IA apagada");
+  } else if (provider) {
+    logger.warn("AI_IDEAS_PROVIDER desconocido: IA apagada", { provider });
+  }
   return { reviewer: new FakeIdeaReviewer() };
 }
 
@@ -301,7 +331,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const recommendationRepository = createRecommendationRepository(environment);
   const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
-  const ideaProvider = createIdeaProvider();
+  const ideaProvider = createIdeaProvider(environment, clock);
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
   const generateRecommendations = createGenerateRecommendations({
     recommendationRepository,
@@ -388,6 +418,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
       profileRepository,
       ideaTexts: new JsonIdeaTexts(),
       suggester: ideaProvider.suggester,
+      usageLimiter: ideaProvider.usageLimiter,
       report: (reason, error) => logger.warn("Sin sugerencias de la IA (RF-45)", { reason, ...(error ? { error: String(error) } : {}) }),
     }),
     personalizeRecommendation: createPersonalizeRecommendation({
@@ -400,6 +431,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
       ideaTexts: new JsonIdeaTexts(),
       writer: ideaProvider.writer,
       reviewer: ideaProvider.reviewer,
+      usageLimiter: ideaProvider.usageLimiter,
       clock,
       report: (reason, error) => logger.warn("Idea personalizada descartada: se muestra el texto curado", { reason, ...(error ? { error: String(error) } : {}) }),
     }),

@@ -8,9 +8,10 @@ import type { CategoryCatalogRepository } from "#modules/categories/domain/Categ
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import { isExcludedFromAi } from "#modules/categories/domain/CatalogCategory.js";
 import { experienceOptionsFor } from "#modules/categories/domain/experienceOptions.js";
+import type { AiUsageLimiter } from "../domain/AiUsageLimiter.js";
 import type { IdeaTexts } from "../domain/IdeaTexts.js";
 import { situationOptionsFor } from "../domain/ideaSituations.js";
-import type { OptionLabel, OptionSuggester, OptionSuggestion } from "../domain/OptionSuggester.js";
+import type { OptionLabel, OptionSuggester, OptionSuggestion, SuggestionOutcome } from "../domain/OptionSuggester.js";
 import { redactPersonalData } from "../domain/redactPersonalData.js";
 
 interface Dependencies {
@@ -24,6 +25,8 @@ interface Dependencies {
   timeoutMs?: number;
   /** Para registrar por qué no hubo sugerencias (lo inyecta el contenedor con el logger). */
   report?: (reason: string, error?: unknown) => void;
+  /** RF-40b: tope diario por usuario con el proveedor real; sin él (el *Fake*), no se cuenta. */
+  usageLimiter?: AiUsageLimiter;
 }
 
 const NONE: OptionSuggestion = { helps: [], difficulties: [] };
@@ -48,7 +51,7 @@ export function createSuggestExperienceOptions(deps: Dependencies) {
   const timeoutMs = deps.timeoutMs ?? 8000;
   const report = deps.report ?? (() => {});
 
-  return async function suggestExperienceOptions(input: { userId: string; experienceId: string; locale: string }): Promise<Result<OptionSuggestion, NotFoundError | ValidationError>> {
+  return async function suggestExperienceOptions(input: { userId: string; experienceId: string; locale: string }): Promise<Result<SuggestionOutcome, NotFoundError | ValidationError>> {
     if (!isSupportedLocale(input.locale)) return err(new ValidationError("Locale is not supported"));
     const locale = input.locale;
 
@@ -71,6 +74,10 @@ export function createSuggestExperienceOptions(deps: Dependencies) {
     if (helpKeys.length === 0 && difficultyKeys.length === 0) return ok(NONE);
 
     try {
+      if (deps.usageLimiter && !(await deps.usageLimiter.tryConsume(input.userId))) {
+        report("tope diario de IA agotado");
+        return ok({ ...NONE, notice: "limit" });
+      }
       const suggestion = await withTimeout(
         suggester.suggest({
           locale,
@@ -86,7 +93,7 @@ export function createSuggestExperienceOptions(deps: Dependencies) {
       return ok({ helps: valid(suggestion?.helps, helpKeys), difficulties: valid(suggestion?.difficulties, difficultyKeys) });
     } catch (error) {
       report("proveedor de sugerencias", error);
-      return ok(NONE);
+      return ok({ ...NONE, notice: "unavailable" });
     }
   };
 }

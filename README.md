@@ -2,9 +2,48 @@
 
 Aplicación web para evaluar cómo va tu vida por áreas (economía, familia, deporte…), ver tu equilibrio y su evolución, y recibir ideas concretas para mejorar lo que tú elijas, **sin juicios ni comparaciones**. Trabajo de Fin de Máster del Máster en Desarrollo con IA (BIG School).
 
-- **Stack:** React 19 + TypeScript + Vite, Material UI, TanStack Query, react-i18next (español e inglés), Apache ECharts; funciones serverless en Vercel (`api/`); Supabase (Postgres + Auth).
 - **En producción:** https://my-life-mirror.vercel.app
-- **Arquitectura:** monolito modular con Clean Architecture en cada módulo (dominio / aplicación / infraestructura), TDD y especificación Spec Anchored. Ver [docs/](docs/).
+- **Arquitectura:** monolito modular con Clean Architecture en cada módulo (dominio / aplicación / infraestructura), TDD y especificación antes del código. Ver [docs/](docs/).
+
+## Entrega del TFM
+
+| Recurso | Dónde |
+|---|---|
+| Aplicación desplegada | https://my-life-mirror.vercel.app |
+| Usuario de prueba | ⏳ Pendiente de crear (ver [Usuario de prueba](#usuario-de-prueba)) |
+| Presentación (slides) | ⏳ Pendiente |
+| Vídeo explicativo | ⏳ Pendiente |
+| Código fuente | Este repositorio (público) |
+
+**Contenido:** [Funcionalidades](#funcionalidades-principales) · [Stack](#stack-tecnológico) · [Probarla en tu ordenador](#probarla-en-tu-ordenador-sin-cuentas) · [Usuario de prueba](#usuario-de-prueba) · [Estructura](#estructura-del-proyecto) · [Tests](#tests) · [Despliegue](#despliegue) · [Desarrollo con IA](#desarrollo-con-ia) · [Estado](#estado-del-proyecto) · [Documentación](#documentación)
+
+---
+
+## Funcionalidades principales
+
+- **Entrevista por áreas.** Eliges qué áreas de tu vida quieres mirar (economía, vida social, pareja, deporte, aventura, familia, inversiones…) y puntúas cada una del 1 al 10, cuando quieras y solo las que quieras. La primera vez va guiada en tres pasos.
+- **Tu equilibrio y tu evolución.** Un radar con todas tus áreas y gráficos de cómo cambia cada una con el tiempo. Los colores son suaves y van siempre con número y texto: el color nunca es la única señal.
+- **Ideas concretas, sin juicios.** Para las áreas con puntuación baja, la app propone ideas de un catálogo curado (5 por área), con el aviso de que no sustituyen el consejo profesional.
+- **Ideas a tu medida.** Marcas qué te ayuda y qué te lo pone difícil (listas cerradas), y las ideas que chocan con tu situación dejan de proponerse.
+- **Diario de experiencias.** Apuntas, por área, lo que te ha pasado o te ha funcionado. Es privado.
+- **Compartir lo que funciona.** Si un área te va bien (8 o más), puedes compartir una experiencia de forma anónima. Quien busca ideas en esa área la lee junto a las de la app. Pasa unos filtros antes de publicarse y cualquiera puede reportarla.
+- **IA opcional y acotada.** Desactivada por defecto. Puede reescribir una idea del catálogo para ti, o proponerte opciones de las listas a partir de una experiencia que tú elijas. Nunca valora cómo estás ni escribe consejos libres. *El modelo real está implementado y evaluado; falta activarlo en producción (ver [Estado](#estado-del-proyecto)).*
+- **Ayuda siempre a mano.** "¿Necesitas ayuda ahora?" en todas las pantallas, con líneas de ayuda reales. Igual para todo el mundo: la app no intenta detectar nada.
+- **Privacidad.** Consentimiento explícito para las áreas sensibles, exportación de todos tus datos en JSON y borrado completo de la cuenta.
+- **Administración.** Catálogo de áreas en varios idiomas, gestión de usuarios y registro de auditoría.
+- **Español e inglés**, y diseñada primero para móvil.
+
+## Stack tecnológico
+
+| Capa | Tecnología |
+|---|---|
+| Interfaz | React 19, TypeScript, Vite, Material UI, TanStack Query (caché de datos), react-i18next, Apache ECharts |
+| Servidor | Funciones serverless de Vercel (`api/`), Node, Zod para validar la entrada |
+| Datos y cuentas | Supabase: Postgres con migraciones SQL y autenticación gestionada |
+| IA | API de Anthropic (Claude Haiku 5.5) con salida estructurada, detrás de un puerto; un proveedor simulado para desarrollo y tests |
+| Calidad | Vitest y React Testing Library, Playwright (E2E), ESLint, Husky, GitHub Actions |
+
+Las decisiones y sus motivos están en los [ADR](docs/architecture-decisions/).
 
 ---
 
@@ -47,7 +86,57 @@ Una cuenta nueva solo tiene las respuestas de hoy. Para ver la evolución (y el 
 
 ### Idioma
 
-Español por defecto; el botón **EN** / **ES** de arriba a la derecha cambia a inglés (también antes de tener cuenta).
+Español por defecto; el interruptor con las banderas, arriba a la derecha, cambia a inglés (también antes de tener cuenta).
+
+---
+
+## Usuario de prueba
+
+⏳ **Pendiente de crear.** Habrá una cuenta en producción con un año de historial, ideas abiertas y experiencias en el diario, para ver la app con contenido sin tener que rellenarla:
+
+| | |
+|---|---|
+| Dirección | https://my-life-mirror.vercel.app |
+| Email | *(pendiente)* |
+| Contraseña | *(pendiente)* |
+
+También puedes crear tu propia cuenta: el registro está abierto y no pide confirmar el email. La administración no se ofrece en producción (gestiona usuarios reales); se puede probar en local, como se explica arriba.
+
+---
+
+## Estructura del proyecto
+
+```
+api/                    Funciones serverless de Vercel: una por capacidad (cuentas, categorías, evaluaciones…)
+src/
+  modules/              Un módulo por capacidad de negocio
+    accounts/             Registro, sesión, perfil, exportar y borrar datos
+    categories/           Áreas de la vida, catálogo y opciones de "qué te ayuda"
+    consent/              Consentimiento de las áreas sensibles
+    assessments/          Entrevista, puntuaciones, historial y diario de experiencias
+    recommendations/      Ideas, situaciones difíciles e IA
+    wellbeing/            Líneas de ayuda
+    panel/                Inicio (solo interfaz)
+    admin/                Administración (solo interfaz)
+  shared/               Lo común: Result, errores, contenedor, plantilla HTTP, tema, gráficos, traducciones
+  pages/                Portada y política de privacidad
+tests/                  Tests unitarios y de componentes, con la misma estructura que src/
+e2e/                    Tests de extremo a extremo (Playwright); e2e/api/ contra un Supabase local
+supabase/migrations/    Esquema de la base de datos, en orden
+scripts/                Arranque local, comprobaciones de api/ y de producción
+docs/                   Requisitos, decisiones de arquitectura, historias de usuario, validación
+```
+
+Dentro de cada módulo, las capas de Clean Architecture y la interfaz:
+
+| Carpeta | Qué hay | Regla |
+|---|---|---|
+| `domain/` | Entidades, reglas y puertos (interfaces). El contenido curado va en `domain/catalog/`, como JSON. | No depende de nada externo. |
+| `application/` | Casos de uso: uno por acción del usuario. | Solo conoce el dominio. |
+| `infrastructure/` | Adaptadores: Supabase, proveedor de IA, y sus dobles en memoria para los tests. | Implementa los puertos. |
+| `ui/` | Componentes de React. | Habla con el servidor por HTTP; nunca importa la infraestructura. |
+
+El detalle está en [ADR-03](docs/architecture-decisions/03_Arquitectura_Software.md).
 
 ---
 
@@ -69,7 +158,7 @@ npm run test:e2e:api -- --headed   # los navegadores se abren y la app se usa so
 npm run test:e2e:api -- --reporter=html && npx playwright show-report   # informe en el navegador
 ```
 
-En GitHub, cada PR ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**). Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (apartado 1.2).
+En GitHub, cada PR a `main` ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**), y tras cada despliegue de producción se ejecuta una comprobación (`npm run smoke:prod`). Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (apartado 1.2).
 
 ---
 
@@ -85,18 +174,37 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 
 ---
 
+## Despliegue
+
+- **Dónde:** [Vercel](https://vercel.com) sirve la interfaz y las funciones de `api/` (región de Dublín); [Supabase](https://supabase.com) aloja la base de datos y las cuentas. Los dos en su plan gratuito.
+- **Cómo:** cada fusión en `main` despliega producción. Cada entrega es una versión con su etiqueta (`v1.2.1`…) y su sección en el [CHANGELOG](CHANGELOG.md).
+- **Variables de entorno** (en Vercel; los nombres están en [.env.example](.env.example)): la URL y la clave de servicio de Supabase, la URL de la app y, para la IA, el proveedor y la clave de Anthropic. Las claves solo se usan en el servidor, nunca llegan al navegador.
+- **Base de datos:** las migraciones de `supabase/migrations/` se ejecutan a mano, en orden, antes de desplegar el código que las necesita.
+- **Límites del plan gratuito:** 12 funciones como máximo (de ahí una función por capacidad, hoy 11) y pausa de Supabase tras 7 días sin uso (un workflow la evita).
+
+---
+
+## Desarrollo con IA
+
+El proyecto se ha construido con un asistente de IA (Claude Code) como compañero de programación, con reglas escritas para que el resultado sea revisable:
+
+- **Convenciones en un solo sitio:** [AGENTS.md](AGENTS.md) recoge la arquitectura, las prohibiciones y los comandos que el asistente debe respetar.
+- **Especificación antes que código:** cada funcionalidad empieza por una historia de usuario con criterios Given/When/Then ([docs/user-stories/](docs/user-stories/)), y cada pieza por su test (TDD).
+- **Decisiones trazables:** [docs/Historial_Prompts.md](docs/Historial_Prompts.md) registra los prompts que fijaron una decisión de diseño, proceso o alcance, y qué se decidió.
+- **Controles automáticos:** nada se da por bueno sin lint, tipos, tests con umbral de cobertura, build y E2E (`npm run verify`), ni sin revisión de código.
+- **Límites éticos de la IA dentro de la app:** [ADR-05](docs/architecture-decisions/05_Fundamentos_IA.md) explica dónde se usa IA, dónde no y por qué (sin detección de riesgo, sin consejo generado libremente).
+
+---
+
 ## Estado del proyecto
 
-Funcionalidad del MVP y del Ciclo 2 terminada, salvo el proveedor real de IA (**RF-40b**): las ideas personalizadas y las sugerencias funcionan hoy contra un proveedor simulado y están desactivadas en producción hasta que haya crédito de API. Plazo del TFM: 31 de octubre de 2026.
+Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.2.1), con más de 700 tests. Entrega prevista del TFM: 20 de octubre de 2026.
 
-**Fase actual: revisión y pruebas antes de la entrega.**
+- **Pendiente:** activar en producción el modelo real de IA (RF-40b). Está implementado y evaluado ([resultados](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4); en local y en los tests se usa un proveedor simulado, para no gastar crédito.
+- **Para la entrega:** usuario de prueba, presentación y vídeo.
+- **Límites conocidos:** validación con una sola participante; política de privacidad sin revisión legal; contenido de ideas y líneas de ayuda pendiente de una última revisión.
 
-1. Publicar la v1.2.0, para probar en producción lo que verán los usuarios.
-2. Revisión de código de todo el Ciclo 2.
-3. Prueba exploratoria siguiendo el [guion de la demo](docs/validation/04_Guion_Demo_Cierre.md), que se actualiza a la vez.
-4. Si es posible, un segundo test de usabilidad centrado en lo nuevo: diario de experiencias, compartirlas y las pestañas de ideas.
-
-**Pendiente, de menor prioridad:** revisión del contenido curado (situaciones, términos ofensivos, ideas nuevas y vigencia de las líneas de ayuda), validación ética con el tutor y, por debajo de la línea de corte, RF-23 (notificaciones). El detalle, con las decisiones y la deuda técnica abiertas, está en el [tablero](docs/project-management/01_Backlog_MVP.md).
+El detalle, con las decisiones y la deuda técnica abiertas, está en el [tablero](docs/project-management/01_Backlog_MVP.md).
 
 ## Documentación
 

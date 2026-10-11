@@ -300,6 +300,18 @@ describe("RecommendationButton (RF-18)", () => {
       expect(within(dialog).queryByText("Personalizada con IA")).not.toBeInTheDocument();
     });
 
+    it("RF-40b: agotado el tope diario, se ve la idea original y se dice por qué", async () => {
+      stubPersonalize(async () => ({ ok: true, json: async () => ({ source: "catalog", templateKey: "economia.1", notice: "limit" }) }));
+      renderPersonalized();
+
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+
+      const dialog = screen.getByRole("dialog");
+      expect(await within(dialog).findByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+      expect(within(dialog).getByText(/máximo de usos de IA por hoy/i)).toBeInTheDocument();
+      expect(within(dialog).queryByText("Personalizada con IA")).not.toBeInTheDocument();
+    });
+
     it("si la petición falla, se ve la idea curada, sin error", async () => {
       stubPersonalize(async () => ({ ok: false, json: async () => ({ error: "caído" }) }));
       renderPersonalized();

@@ -107,8 +107,44 @@ SetAiIdeas({ userId, enabled }) → Ok(Profile) | Err(NotFound sin perfil)
 - Coste con el proveedor real (RF-40b): como mucho una llamada por idea vista (5 por recomendación) y otra cada vez que cambien las opciones; siempre al verla, nunca por adelantado.
 - API: `api/recommendations/[action].ts` con `personalize` (11/12 funciones) y la acción `ai-ideas` en el router de cuentas. La sesión dice si la función está disponible (`aiIdeasAvailable`).
 
+## RF-40b: el modelo real (11 oct. 2026)
+
+Sustituye al *Fake* en producción, para RF-40 (ideas) y RF-45 (sugerencias desde el diario). No cambia nada de lo anterior: mismos puertos, mismo filtro, misma caída al texto curado.
+
+- **Proveedor y modelo:** API de Anthropic, Claude Haiku 5.5 (`claude-haiku-5-5`), con esfuerzo bajo. Se activa con `AI_IDEAS_PROVIDER=anthropic` y `ANTHROPIC_API_KEY` (solo en el servidor). Sin clave, la función queda apagada, con un aviso en el log. En local y en los tests se sigue usando el *Fake*: desarrollar no gasta crédito.
+- **Salida estructurada:** cada llamada pide una respuesta con esquema (Zod). Si no encaja, si el modelo rehúsa o si falla o tarda, es un error del proveedor y se cae al texto curado (ideas) o a "sin sugerencias" (RF-45), como hasta ahora.
+- **Tres llamadas posibles:**
+  - *Escritor* (RF-40): reescribe **la** idea candidata, en el idioma pedido, en 1-3 frases (40-400 caracteres), con tono cálido y de propuesta. Puede apoyarse en lo que al usuario le ayuda y en la tendencia; no cita la puntuación.
+  - *Revisor* (RF-40): segunda pasada sobre el borrador; aprueba o rechaza con motivos (lenguaje diagnóstico, consejo profesional o financiero, obligación, juicio, se aparta de la idea original).
+  - *Sugeridor* (RF-45): devuelve solo claves de las opciones recibidas.
+- **Reglas del prompt** (las mismas que comprueba el filtro, más las que solo un modelo puede juzgar): nada de diagnósticos ni términos clínicos, medicación, terapia ni productos financieros; nada de "tienes que" o "deberías"; sin juicio ni alarde; sin enlaces ni teléfonos; sin inventar datos del usuario; sin valorar su estado (RES-09).
+- **Qué se envía:** lo de siempre (ver Contratos). El prompt no añade ningún dato del usuario.
+- **Tope de uso:** cada usuario puede provocar como mucho `AI_DAILY_LIMIT` usos de IA al día (por defecto 40; un uso = una idea personalizada o una sugerencia). Superado, se responde como si el proveedor no estuviera: texto curado o "sin sugerencias". Se cuenta en la base de datos (tabla `ai_usage`, migración 0020), porque las funciones no comparten memoria. Con el *Fake* no se cuenta.
+- **Coste:** crédito de prepago sin recarga automática (el tope real), límite mensual en la consola y el tope por usuario. Estimación: unas 0,05 céntimos de dólar por idea.
+- **Evaluación con el modelo real** (`npm run eval:ai`, solo a mano: gasta crédito): un conjunto de peticiones reales (categorías, idiomas, tendencias, con y sin "qué te ayuda") por el escritor y el revisor, y los borradores malos del conjunto del filtro por el revisor. Se mide cuántas ideas llegan al usuario (pasan filtro y revisión) y cuántos borradores malos se paran. Los resultados se anotan en ADR-05.
+
+### Criterios de aceptación (RF-40b)
+
+9. Given `AI_IDEAS_PROVIDER=anthropic` sin `ANTHROPIC_API_KEY`
+    When arranca el servidor
+    Then la IA queda apagada (la opción no se ofrece) y se avisa en el log
+
+10. Given el modelo devuelve algo que no encaja con el esquema, o rehúsa
+    When se pide una idea personalizada
+    Then se ve el texto curado, sin error
+
+11. Given un usuario que ya ha agotado su tope diario
+    When pide otra idea personalizada o una sugerencia
+    Then recibe el texto curado o "sin sugerencias", y no se llama al proveedor
+
+12. Given el proveedor *Fake*
+    When se usa la IA en local o en los tests
+    Then no se cuenta el uso ni se llama a ningún servicio externo
+
 ## Historial de cambios
 
 - **v1.0 (2 oct. 2026)** — versión inicial (PR 3 del plan del Ciclo 2).
 - **v1.1 (3 oct. 2026)** — con el carrusel de UX-05, la IA reescribe la idea que el usuario está viendo (ya no elige entre las 5): `templateKey` en la petición, ideas guardadas por (recomendación, plantilla, idioma) y reescritas si cambian las opciones de "¿Qué te ayuda?". Petición del autor: "si luego selecciono algo en qué te ayuda debería ofrecerme otras ideas basadas en la respuesta".
 - **v1.2 (5 oct. 2026)** — con RF-43, la ventana de ideas pasa a pestañas: la personalizada en "Con IA" (la que se abre primero) y la original en "De la app", en lugar del enlace "Ver la idea original".
+- **v1.3 (11 oct. 2026)** — RF-40b: el modelo real (Claude Haiku 5.5), salida estructurada, tope diario por usuario y evaluación con el modelo.
+- **v1.4 (11 oct. 2026)** — con el tope diario agotado, la ventana enseña la idea original y dice por qué; ante un fallo del proveedor sigue enseñando solo la idea original, como antes.

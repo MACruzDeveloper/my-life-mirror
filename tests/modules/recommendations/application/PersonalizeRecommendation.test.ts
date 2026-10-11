@@ -7,6 +7,7 @@ import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/I
 import { createPersonalizeRecommendation } from "@modules/recommendations/application/PersonalizeRecommendation";
 import type { IdeaDraft, IdeaRequest, IdeaReviewer, IdeaWriter } from "@modules/recommendations/domain/IdeaWriter";
 import { FakeIdeaWriter } from "@modules/recommendations/infrastructure/FakeIdeaWriter";
+import { InMemoryAiUsageLimiter } from "@modules/recommendations/infrastructure/InMemoryAiUsageLimiter";
 import { InMemoryPersonalizedIdeaRepository } from "@modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository";
 import { InMemoryRecommendationRepository } from "@modules/recommendations/infrastructure/InMemoryRecommendationRepository";
 import { JsonIdeaTexts } from "@modules/recommendations/infrastructure/JsonIdeaTexts";
@@ -30,7 +31,7 @@ class ScriptedWriter implements IdeaWriter {
 
 const approve: IdeaReviewer = { review: async () => ({ approved: true, reasons: [] }) };
 
-async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; aiIdeasEnabled?: boolean; available?: boolean } = {}) {
+async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; aiIdeasEnabled?: boolean; available?: boolean; dailyLimit?: number } = {}) {
   const categoryRepository = new InMemoryCategoryRepository();
   const catalog = new InMemoryCategoryCatalogRepository();
   const listed = await createListCategories(categoryRepository, catalog)("u1");
@@ -82,6 +83,7 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
     reviewer: options.reviewer ?? approve,
     clock,
     timeoutMs: 50,
+    usageLimiter: options.dailyLimit === undefined ? undefined : new InMemoryAiUsageLimiter(options.dailyLimit, clock),
   });
   return { personalize, writer, personalizedIdeaRepository, categoryRepository, finances };
 }
@@ -229,5 +231,30 @@ describe("PersonalizeRecommendation (RF-40)", () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  describe("tope diario de uso (RF-40b)", () => {
+    it("agotado el tope, se ve el texto curado (con el aviso 'limit') y no se llama al escritor", async () => {
+      const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Una versión personalizada con la longitud suficiente para pasar el filtro." }));
+      const { personalize } = await setup({ writer, dailyLimit: 1 });
+
+      const first = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.1", locale: "es" });
+      const second = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.2", locale: "es" });
+
+      expect(first.ok && first.value.source).toBe("ai");
+      expect(second).toEqual({ ok: true, value: { source: "catalog", templateKey: "economia.2", notice: "limit" } });
+      expect(writer.calls).toHaveLength(1);
+    });
+
+    it("una idea ya guardada no gasta uso: se puede volver a ver con el tope agotado", async () => {
+      const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Una versión personalizada con la longitud suficiente para pasar el filtro." }));
+      const { personalize } = await setup({ writer, dailyLimit: 1 });
+      await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.1", locale: "es" });
+
+      const again = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.1", locale: "es" });
+
+      expect(again.ok && again.value.source).toBe("ai");
+      expect(writer.calls).toHaveLength(1);
+    });
   });
 });

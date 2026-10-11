@@ -27,7 +27,7 @@ import { Bubble, PendingBadge } from "./Bubble";
 import { PENDING_COLORS } from "./pendingColors";
 import { SHARE_MIN_SCORE } from "../../domain/Experience";
 import type { ExperienceDto, ShareOutcome } from "../queries";
-import { ExperienceJournal, type ExperienceSharing, type ExperienceSuggestions } from "./ExperienceJournal";
+import { ExperienceJournal, type ExperienceSharing, type ExperienceSuggestions, type SuggestionsAnswer } from "./ExperienceJournal";
 import { ToggleRow } from "./ToggleRow";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -77,7 +77,7 @@ interface CategoryQuestionProps {
   onAddExperience: (categoryId: string, text: string) => Promise<boolean>;
   onDeleteExperience: (experience: ExperienceDto) => void;
   /** RF-45: pide a la IA opciones para una experiencia; solo con las sugerencias activadas. */
-  onSuggestOptions?: (experience: ExperienceDto) => Promise<{ helps: string[]; difficulties: string[] } | null>;
+  onSuggestOptions?: (experience: ExperienceDto) => Promise<SuggestionsAnswer | null>;
   /** RF-45: la función existe en este despliegue (aunque el usuario no la haya activado). */
   suggestionsAvailable?: boolean;
   /** RF-43: la última puntuación guardada (no la que se está cambiando), que decide si se puede compartir. */

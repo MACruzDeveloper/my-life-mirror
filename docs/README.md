@@ -1,5 +1,7 @@
 # Documentación de MyLifeMirror
 
+> **Este no es el README principal del proyecto.** Es el índice de la carpeta `docs/`. Para saber qué es la app, cómo probarla y qué se entrega, empieza por el [README del proyecto](../README.md).
+
 Mapa de todo lo que hay en `docs/`, una línea por documento, y por dónde empezar. El [README del proyecto](../README.md) explica cómo probar la app; [AGENTS.md](../AGENTS.md), las convenciones del código.
 
 ## Si tienes 20 minutos

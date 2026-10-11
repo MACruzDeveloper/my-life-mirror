@@ -9,6 +9,7 @@ import type { CategoryCatalogRepository } from "#modules/categories/domain/Categ
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import { isExcludedFromAi } from "#modules/categories/domain/CatalogCategory.js";
 import type { IdeaRequest, IdeaReviewer, IdeaTrend, IdeaWriter } from "../domain/IdeaWriter.js";
+import type { AiUsageLimiter } from "../domain/AiUsageLimiter.js";
 import type { IdeaTexts } from "../domain/IdeaTexts.js";
 import { checkIdeaSafety } from "../domain/ideaSafety.js";
 import type { PersonalizedIdeaRepository } from "../domain/PersonalizedIdea.js";
@@ -24,7 +25,8 @@ export interface PersonalizeRecommendationInput {
   locale: string;
 }
 
-export type PersonalizedResult = { source: "ai"; templateKey: string; text: string } | { source: "catalog"; templateKey: string };
+/** `notice: "limit"`: se ve el texto curado porque el usuario agotó su tope diario de IA (RF-40b), y la interfaz lo dice. */
+export type PersonalizedResult = { source: "ai"; templateKey: string; text: string } | { source: "catalog"; templateKey: string; notice?: "limit" };
 
 interface Dependencies {
   recommendationRepository: RecommendationRepository;
@@ -41,6 +43,8 @@ interface Dependencies {
   timeoutMs?: number;
   /** Para registrar por qué se cayó al texto curado (lo inyecta el contenedor con el logger). */
   report?: (reason: string, error?: unknown) => void;
+  /** RF-40b: tope diario por usuario con el proveedor real; sin él (el *Fake*), no se cuenta. */
+  usageLimiter?: AiUsageLimiter;
 }
 
 function trendOf(scores: number[]): IdeaTrend {
@@ -113,6 +117,11 @@ export function createPersonalizeRecommendation(deps: Dependencies) {
     };
 
     try {
+      // Solo aquí, cuando de verdad se va a pedir al proveedor: una idea ya guardada no gasta uso.
+      if (deps.usageLimiter && !(await deps.usageLimiter.tryConsume(input.userId))) {
+        report("tope diario de IA agotado");
+        return ok({ ...curated, notice: "limit" });
+      }
       const draft = await withTimeout(writer.write(request), timeoutMs);
       const safety = checkIdeaSafety(draft, request);
       if (!safety.safe) {

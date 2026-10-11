@@ -5,6 +5,15 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-40b, el modelo real de IA)
+
+- Las ideas personalizadas (RF-40) y las sugerencias desde el diario (RF-45) pueden funcionar con el modelo real: Claude Haiku 5.5 por la API de Anthropic, con salida estructurada. Se activa con `AI_IDEAS_PROVIDER=anthropic` y `ANTHROPIC_API_KEY` (solo en el servidor); sin clave queda apagado. En local y en los tests sigue el proveedor simulado: desarrollar no gasta crédito.
+- Tope diario de usos de IA por usuario (`AI_DAILY_LIMIT`, 40 por defecto), contado en la base de datos. Superado, se ven las ideas originales. **Migración 0020** (`ai_usage` y su función): ejecutarla antes de activar el proveedor real.
+- El revisor recibe también lo que el usuario marcó en "¿Qué te ayuda?", para no tomar por inventado lo que el usuario dijo.
+- Evaluación con el modelo real (`npm run eval:ai`, solo a mano: gasta céntimos): 17 de 20 ideas llegan al usuario, el revisor para 23 de 23 borradores malos y las sugerencias no inventan ninguna clave (ADR-05, apartado 4.3.4).
+- La política de privacidad explica el contador de uso.
+- Mensajes claros cuando la IA no propone nada: "No hemos encontrado opciones nuevas" (ya están marcadas las que encajan o el texto no encaja con ninguna), tope diario agotado, o proveedor no disponible. Antes los tres casos daban el mismo texto. La ventana de ideas también avisa cuando enseña la idea original por el tope.
+
 ## [1.2.1] - 2026-10-07
 
 Correcciones de la revisión de código del Ciclo 2 y una plantilla común para los controladores. Sin migraciones.

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createAppContext, getAppContext } from "@shared/infrastructure/container";
 
 describe("container", () => {
@@ -28,5 +28,42 @@ describe("container", () => {
     const second = getAppContext();
 
     expect(first).toBe(second);
+  });
+
+  describe("proveedor de IA (RF-40, RF-40b)", () => {
+    afterEach(() => vi.unstubAllEnvs());
+
+    it("sin AI_IDEAS_PROVIDER, la IA está apagada", () => {
+      vi.stubEnv("AI_IDEAS_PROVIDER", "");
+
+      expect(createAppContext("test").aiIdeasAvailable).toBe(false);
+    });
+
+    it("con 'fake', disponible sin clave ni servicios externos", () => {
+      vi.stubEnv("AI_IDEAS_PROVIDER", "fake");
+      vi.stubEnv("ANTHROPIC_API_KEY", "");
+
+      expect(createAppContext("test").aiIdeasAvailable).toBe(true);
+    });
+
+    it("con 'anthropic' y su clave, disponible", () => {
+      vi.stubEnv("AI_IDEAS_PROVIDER", "anthropic");
+      vi.stubEnv("ANTHROPIC_API_KEY", "sk-ant-clave-de-prueba");
+
+      expect(createAppContext("test").aiIdeasAvailable).toBe(true);
+    });
+
+    it("con 'anthropic' pero sin clave, apagada (no se ofrece algo que no puede funcionar)", () => {
+      vi.stubEnv("AI_IDEAS_PROVIDER", "anthropic");
+      vi.stubEnv("ANTHROPIC_API_KEY", "");
+
+      expect(createAppContext("test").aiIdeasAvailable).toBe(false);
+    });
+
+    it("con un proveedor desconocido, apagada", () => {
+      vi.stubEnv("AI_IDEAS_PROVIDER", "otro");
+
+      expect(createAppContext("test").aiIdeasAvailable).toBe(false);
+    });
   });
 });

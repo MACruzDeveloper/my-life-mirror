@@ -18,6 +18,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "eval:ai": "RUN_AI_EVAL=1 node --env-file=.env ./node_modules/vitest/vitest.mjs run tests/eval",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:api": "node scripts/e2e-api.mjs",
@@ -26,6 +27,7 @@
     "verify": "npm run lint && npm run test:coverage && npm run build && npm run check:api && npm run test:e2e"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.4.0",
