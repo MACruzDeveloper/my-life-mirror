@@ -76,4 +76,30 @@ test.describe("Capas CSS: el CSS propio gana a Material UI sin !important", () =
 
     await expect(button).toHaveCSS("text-transform", "lowercase");
   });
+
+  // Fallo real en producción (11 oct.): un `* { box-sizing: border-box }` propio, sin capa, ganaba al
+  // `content-box` que MUI necesita en sus campos; quedaban en 33 px de alto y la etiqueta, descolocada.
+  test("el CSS propio no deforma los campos de texto de MUI: altura completa y etiqueta centrada", async ({ page }) => {
+    await page.goto("/olvide-password");
+    const field = page.locator(".MuiInputBase-root").filter({ has: page.getByLabel(/email/i) });
+
+    const box = await field.boundingBox();
+    const label = await page.locator("label", { hasText: /email/i }).boundingBox();
+
+    expect(box?.height).toBe(56);
+    // La etiqueta, sin escribir nada, queda dentro del campo y centrada en vertical.
+    const labelCentre = label!.y + label!.height / 2;
+    expect(Math.abs(labelCentre - (box!.y + box!.height / 2))).toBeLessThan(3);
+  });
+
+  test("las pantallas públicas de cuenta dan sitio al rastro de navegación en una sola línea (escritorio)", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 700 });
+    await page.goto("/olvide-password");
+
+    const breadcrumbs = page.getByRole("navigation", { name: "breadcrumb" });
+    await expect(breadcrumbs).toContainText("Recuperar contraseña");
+    // Una línea de texto: menos de dos alturas de línea.
+    expect((await breadcrumbs.locator("ol").boundingBox())!.height).toBeLessThan(40);
+  });
 });
+

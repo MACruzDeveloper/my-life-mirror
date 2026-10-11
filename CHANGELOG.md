@@ -5,6 +5,19 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Corregido (RF-38, recuperar la contraseña)
+
+- El enlace del correo de recuperación podía dejar a la persona en la portada, sin explicación, en vez de en "Elegir nueva contraseña". La portada reconoce ahora un enlace de recuperación (o el aviso de que está caducado) y lleva a su pantalla; y la dirección de vuelta se construye tolerando una barra final o espacios en `APP_URL`.
+
+### Corregido (interfaz)
+
+- Todos los campos de texto medían 33 px de alto en vez de 56, y la etiqueta quedaba descolocada sobre el borde cuando el campo estaba vacío. Un `* { box-sizing: border-box }` propio, sin capa CSS, ganaba desde la v1.2.0 al valor que Material UI necesita en sus campos. Se quita (ya lo aplica el `CssBaseline` de MUI dentro de su capa) y un E2E vigila la altura.
+- Las pantallas públicas de cuenta (registro, inicio de sesión, recuperar y cambiar contraseña) pasan de 360 a 440 px de ancho en escritorio: el rastro de navegación cabe en una línea.
+
+### Cambiado (dependencias)
+
+- 17 actualizaciones menores y de parche (PR de Dependabot), entre ellas React 19.3, Vite 8.3 y zod 4.6.5.
+
 ## [1.3.0] - 2026-10-11
 
 El modelo real de IA, la cuenta de prueba para la entrega del TFM y la primera revisión completa de seguridad. **Migraciones 0020 y 0021** (las dos ya ejecutadas en producción). Variables nuevas en Vercel: `AI_IDEAS_PROVIDER`, `ANTHROPIC_API_KEY` y `DEMO_USER_EMAIL`.

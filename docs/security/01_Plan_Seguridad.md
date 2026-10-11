@@ -146,6 +146,7 @@ Ordenados por importancia. "Paso" remite al apartado 4. Estado a 11 de octubre.
 | H12 | Sin copias de seguridad (plan gratuito de Supabase) ni alertas. | Baja | 10 | **Mitigado**: `npm run backup:db`. Alertas, abierto |
 | H13 | Credenciales del autor: un token clásico de GitHub sin caducidad y con todos los permisos; credenciales antiguas de MongoDB en el `.env` local. | Media | 1 | MongoDB, hecho. **Token y segundo factor, pendientes (autor)** |
 | H14 | *(Encontrado al aplicar el plan.)* El cambio de contraseña acepta cualquier token de sesión válido, no solo el de un enlace de recuperación. Quien robara una sesión podría cambiar la contraseña sin saber la anterior. La cookie es `HttpOnly`, así que robarla exige otro fallo antes. | Baja | — | Abierto. Arreglo: exigir que el token sea de recuperación; hay que probarlo con un correo real antes de tocarlo |
+| H17 | *(Encontrado al probar en producción.)* El enlace de recuperación de contraseña llevaba a la portada: la dirección de vuelta no coincidía con la lista de Supabase (`APP_URL` en Vercel). Además, el correo integrado de Supabase envía muy pocos mensajes por hora: recuperar la contraseña puede no estar disponible justo cuando hace falta. | Media | — | `APP_URL` corregida por el autor (pendiente de comprobar). En código, pendiente de publicar: la portada reconoce el enlace y la dirección tolera erratas. Correo propio (SMTP): después de la entrega |
 | H15 | *(Ídem.)* Supabase aplica su propio tope de inicios de sesión por IP, y para él todos los usuarios son la IP de Vercel: un atacante que lo agotara dejaría a todos sin poder entrar un rato. | Baja | 5 | **Mitigado**: el tope propio (30 por IP cada 15 min) corta antes |
 | H16 | *(Encontrado por Snyk.)* zod anota un error por cada elemento de una lista que no encaja, sin tope (CVE-2023-54404, sin versión corregida): un cuerpo de 4,5 MB consumía 1,4 GB de memoria en la función. | Media | 3 y 6 | **Mitigado**: tope de tamaño del cuerpo antes de validar y longitud máxima en las listas. Actualizar zod cuando haya corrección |
 
@@ -157,12 +158,13 @@ Ordenados por importancia. "Paso" remite al apartado 4. Estado a 11 de octubre.
   - [x] Credenciales de MongoDB borradas.
   - [ ] Segundo factor en GitHub, Vercel, Supabase y Anthropic. **Aplazado por el autor a después de la entrega** (decisión del 11 oct.); hasta entonces es el riesgo abierto más importante del plan.
   - [ ] Sustituir el token clásico de GitHub. En marcha: uno *fine-grained* solo para este repositorio (permisos en la guía 4.1); el clásico se borra cuando el autor haya revisado qué más lo usa.
-- [ ] **Paso 2. Seguridad del repositorio en GitHub** (Autor, guía 4.2).
+- [x] **Paso 2. Seguridad del repositorio en GitHub** (Autor, guía 4.2).
   - [x] `.github/dependabot.yml`: actualizaciones semanales de npm (agrupadas) y mensuales de las acciones, hacia `develop`.
   - [x] Workflow *Seguridad*: `npm audit` y CodeQL en cada PR, en cada push a `main` y `develop`, y cada lunes.
   - [x] Regla "Proteger main" creada (11 oct.): cambios solo por PR, sin *force push* ni borrado de la rama.
   - [x] Avisos de Dependabot y escaneo de secretos con bloqueo al subir, activados en GitHub (confirmado por el autor, 11 oct.).
-  - [ ] **Después de subir la rama**, cuando el workflow *Seguridad* haya corrido una vez: volver a la regla "Proteger main", marcar *Require status checks to pass* y añadir *Dependencias (npm audit)*, *Código (CodeQL)* y el de *E2E con api*. Antes no se puede: GitHub no ofrece un control que nunca se ha ejecutado, y exigir uno que no informa bloquea la PR.
+  - [x] Controles obligatorios en la regla "Proteger main" (*Dependencias (npm audit)*, *Código (CodeQL)* y *E2E con api*), añadidos tras su primera ejecución (11 oct.).
+  - [x] Dependabot en marcha: 9 PRs en su primera pasada. Fusionada la agrupada de menores y parches (probada antes en local: en GitHub esas PRs solo pasan la auditoría y CodeQL, no los tests). Las de versión mayor (TypeScript 7, react-router 8, jsdom 30, acciones) quedan para después de la entrega.
   - [x] Primera ejecución del workflow *Seguridad* (11 oct., sobre `develop`): correcta. **CodeQL, con las reglas ampliadas: 0 avisos.** Dependabot muestra 2 avisos (`source-map-js`, alto; `brace-expansion`, medio): son los del paso 3, que GitHub sigue viendo en `main` porque la corrección está en `develop`; se cierran solos al publicar la v1.3.0.
 - [x] **Paso 3. Dependencias y análisis del código.**
   - [x] Las 2 vulnerabilidades, corregidas (`npm audit fix`, sin cambios de versión mayor). `npm run audit` da 0.
@@ -256,6 +258,8 @@ En `src/` y en `api/`, el código que se ejecuta en producción, **cero avisos**
 
 ### 4.4 Antes de desplegar esta versión
 
+**Desplegada el 11 de octubre (v1.3.0).** Comprobado en producción: *smoke* con las cabeceras (11 de 11), registro con contraseña débil rechazado, petición de otra web rechazada (403), cuenta de prueba con la IA disponible, y los 2 avisos de Dependabot cerrados solos. La lista que se siguió:
+
 1. Ejecutar la **migración 0021** (`supabase/migrations/0021_attempt_counters.sql`) en el SQL Editor de Supabase. Sin ella el tope de intentos no funciona (el servidor deja pasar y lo anota en el registro).
 2. Opcional, en Supabase → Authentication → Sign In / Providers → Email: subir la longitud mínima de contraseña a 12. Los tipos de caracteres, mejor dejarlos sin exigir ahí: los comprueba la app, con mensajes propios.
 3. Tras desplegar, `npm run smoke:prod` comprueba las cabeceras; y conviene probar a mano un registro con una contraseña débil y otro con una buena.
@@ -279,3 +283,5 @@ Estas decisiones se revisan si la app pasa de ser un TFM a un producto con usuar
 - **v1.5 (11 oct. 2026)** — resultado de `snyk code test` (70 avisos, todos contraseñas de ejemplo en tests; ninguno en el código de producción) y valoración de la herramienta. Paso 3 cerrado.
 - **v1.6 (11 oct. 2026)** — paso 8 cerrado con la evaluación real (5 de 5 inyecciones resistidas); avisos y escaneo de GitHub confirmados; Snyk queda como prueba hecha, con el acceso retirado.
 - **v1.7 (11 oct. 2026)** — primera ejecución de CodeQL (0 avisos) y estado de los avisos de Dependabot.
+- **v1.8 (11 oct. 2026)** — v1.3.0 desplegada y comprobada; paso 2 cerrado (controles obligatorios en `main`, primera pasada de Dependabot).
+- **v1.9 (11 oct. 2026)** — H17: enlace de recuperación y límite del correo de Supabase.
