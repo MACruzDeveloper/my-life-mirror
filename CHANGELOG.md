@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.3.0] - 2026-10-11
+
+El modelo real de IA, la cuenta de prueba para la entrega del TFM y la primera revisión completa de seguridad. **Migraciones 0020 y 0021** (las dos ya ejecutadas en producción). Variables nuevas en Vercel: `AI_IDEAS_PROVIDER`, `ANTHROPIC_API_KEY` y `DEMO_USER_EMAIL`.
+
 ### Seguridad (primera revisión completa: [plan de seguridad](docs/security/01_Plan_Seguridad.md))
 
 - **Contraseñas fuertes (SEC-01):** las nuevas necesitan de 12 a 72 caracteres, con minúscula, mayúscula, número y símbolo, sin secuencias (`1234`, `qwerty`), sin ser una palabra común aunque lleve sustituciones (`P4ssw0rd!2026`) y sin el nombre ni el email. Registro y cambio de contraseña enseñan los requisitos desde el principio y los van marcando; el inicio de sesión no da ninguna pista. Las cuentas que ya existen no cambian.
