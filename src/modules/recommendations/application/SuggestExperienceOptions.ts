@@ -11,7 +11,7 @@ import { experienceOptionsFor } from "#modules/categories/domain/experienceOptio
 import type { AiUsageLimiter } from "../domain/AiUsageLimiter.js";
 import type { IdeaTexts } from "../domain/IdeaTexts.js";
 import { situationOptionsFor } from "../domain/ideaSituations.js";
-import type { OptionLabel, OptionSuggester, OptionSuggestion } from "../domain/OptionSuggester.js";
+import type { OptionLabel, OptionSuggester, OptionSuggestion, SuggestionOutcome } from "../domain/OptionSuggester.js";
 import { redactPersonalData } from "../domain/redactPersonalData.js";
 
 interface Dependencies {
@@ -51,7 +51,7 @@ export function createSuggestExperienceOptions(deps: Dependencies) {
   const timeoutMs = deps.timeoutMs ?? 8000;
   const report = deps.report ?? (() => {});
 
-  return async function suggestExperienceOptions(input: { userId: string; experienceId: string; locale: string }): Promise<Result<OptionSuggestion, NotFoundError | ValidationError>> {
+  return async function suggestExperienceOptions(input: { userId: string; experienceId: string; locale: string }): Promise<Result<SuggestionOutcome, NotFoundError | ValidationError>> {
     if (!isSupportedLocale(input.locale)) return err(new ValidationError("Locale is not supported"));
     const locale = input.locale;
 
@@ -76,7 +76,7 @@ export function createSuggestExperienceOptions(deps: Dependencies) {
     try {
       if (deps.usageLimiter && !(await deps.usageLimiter.tryConsume(input.userId))) {
         report("tope diario de IA agotado");
-        return ok(NONE);
+        return ok({ ...NONE, notice: "limit" });
       }
       const suggestion = await withTimeout(
         suggester.suggest({
@@ -93,7 +93,7 @@ export function createSuggestExperienceOptions(deps: Dependencies) {
       return ok({ helps: valid(suggestion?.helps, helpKeys), difficulties: valid(suggestion?.difficulties, difficultyKeys) });
     } catch (error) {
       report("proveedor de sugerencias", error);
-      return ok(NONE);
+      return ok({ ...NONE, notice: "unavailable" });
     }
   };
 }

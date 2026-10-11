@@ -92,14 +92,25 @@ describe("SuggestExperienceOptions (RF-45)", () => {
     ["no hay proveedor", { suggester: null }, "e-social"],
     ["la categoría es sensible (Espiritualidad)", {}, "e-spirituality"],
     ["la categoría está excluida de la IA (Pareja)", {}, "e-couple"],
-    ["el proveedor falla", { suggester: new ScriptedSuggester(async () => Promise.reject(new Error("caído"))) }, "e-social"],
-    ["el proveedor tarda demasiado", { suggester: new ScriptedSuggester(() => new Promise((resolve) => setTimeout(() => resolve({ helps: ["vidaSocial.quedarEnPersona"], difficulties: [] }), 500))) }, "e-social"],
   ];
   for (const [name, options, experienceId] of emptyCases) {
     it(`sin sugerencias (y sin error) si ${name}`, async () => {
       const { suggest } = await setup(options);
 
       expect(await suggest({ userId: "u1", experienceId, locale: "es" })).toEqual({ ok: true, value: empty });
+    });
+  }
+
+  // El proveedor falló: sin sugerencias y sin error, pero se dice (no es lo mismo que "no hay nada nuevo que proponer").
+  const failures: [string, OptionSuggester][] = [
+    ["falla", new ScriptedSuggester(async () => Promise.reject(new Error("caído")))],
+    ["tarda demasiado", new ScriptedSuggester(() => new Promise((resolve) => setTimeout(() => resolve({ helps: ["vidaSocial.quedarEnPersona"], difficulties: [] }), 500)))],
+  ];
+  for (const [name, suggester] of failures) {
+    it(`si el proveedor ${name}: sin sugerencias, con el aviso 'unavailable'`, async () => {
+      const { suggest } = await setup({ suggester });
+
+      expect(await suggest({ userId: "u1", experienceId: "e-social", locale: "es" })).toEqual({ ok: true, value: { ...empty, notice: "unavailable" } });
     });
   }
 
@@ -122,7 +133,7 @@ describe("SuggestExperienceOptions (RF-45)", () => {
     expect(!badLocale.ok && badLocale.error.code).toBe("VALIDATION_ERROR");
   });
 
-  it("RF-40b: agotado el tope diario, 'sin sugerencias' y no se llama al proveedor", async () => {
+  it("RF-40b: agotado el tope diario, sin sugerencias, con el aviso 'limit', y no se llama al proveedor", async () => {
     const suggester = new ScriptedSuggester(async () => ({ helps: [], difficulties: ["sitiosConGente"] }));
     const { suggest } = await setup({ suggester, dailyLimit: 1 });
 
@@ -130,7 +141,7 @@ describe("SuggestExperienceOptions (RF-45)", () => {
     const second = await suggest({ userId: "u1", experienceId: "e-social", locale: "es" });
 
     expect(first).toEqual({ ok: true, value: { helps: [], difficulties: ["sitiosConGente"] } });
-    expect(second).toEqual({ ok: true, value: empty });
+    expect(second).toEqual({ ok: true, value: { ...empty, notice: "limit" } });
     expect(suggester.calls).toHaveLength(1);
   });
 });

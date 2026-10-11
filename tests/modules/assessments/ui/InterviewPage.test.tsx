@@ -956,13 +956,26 @@ describe("InterviewPage (RF-10)", () => {
       await waitFor(() => expect(postCalls(fetchMock, "/api/recommendations/suggest-options")).toHaveLength(1));
     });
 
-    it("si no hay nada que proponer, lo dice", async () => {
+    it("si no hay nada nuevo que proponer (p. ej. ya tiene marcadas las que encajan), lo dice así", async () => {
       renderWithAi({ suggestionsEnabled: true });
       await waitUntilLoaded();
 
       fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
 
-      expect(await within(experienceItem("Mes justo")).findByText("No hemos encontrado opciones en esta experiencia.")).toBeInTheDocument();
+      expect(await within(experienceItem("Mes justo")).findByText("No hemos encontrado opciones nuevas en esta experiencia.")).toBeInTheDocument();
+    });
+
+    it.each([
+      ["limit", "Has llegado al máximo de usos de IA por hoy. Mañana puedes volver a probar."],
+      ["unavailable", "Ahora no se han podido pedir sugerencias. Prueba más tarde."],
+    ])("si no se ha podido preguntar (%s), dice por qué en lugar de 'no hemos encontrado'", async (notice, message) => {
+      renderWithAi({ suggestionsEnabled: true, suggestion: { helps: [], difficulties: [], notice } });
+      await waitUntilLoaded();
+
+      fireEvent.click(await within(experienceItem("Mes justo")).findByRole("button", { name: "Sugerir opciones con IA" }));
+
+      expect(await within(experienceItem("Mes justo")).findByText(message)).toBeInTheDocument();
+      expect(within(experienceItem("Mes justo")).queryByText(/no hemos encontrado/i)).not.toBeInTheDocument();
     });
   });
 

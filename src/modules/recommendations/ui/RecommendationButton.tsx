@@ -298,7 +298,17 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, curatedTe
   }
 
   if (data?.source !== "ai") {
-    return <DialogContentText sx={{ color: "text.primary", mb: 2 }}>{curatedText}</DialogContentText>;
+    return (
+      <>
+        <DialogContentText sx={{ color: "text.primary", mb: 2 }}>{curatedText}</DialogContentText>
+        {/* RF-40b: si es por el tope diario, se dice; ante un fallo del proveedor, solo la idea original. */}
+        {data?.notice === "limit" && (
+          <Typography variant="caption" color="text.secondary" component="p" sx={{ mb: 2 }}>
+            {t("recomendaciones.limiteIa")}
+          </Typography>
+        )}
+      </>
+    );
   }
 
   return (

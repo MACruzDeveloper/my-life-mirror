@@ -25,7 +25,8 @@ export interface PersonalizeRecommendationInput {
   locale: string;
 }
 
-export type PersonalizedResult = { source: "ai"; templateKey: string; text: string } | { source: "catalog"; templateKey: string };
+/** `notice: "limit"`: se ve el texto curado porque el usuario agotó su tope diario de IA (RF-40b), y la interfaz lo dice. */
+export type PersonalizedResult = { source: "ai"; templateKey: string; text: string } | { source: "catalog"; templateKey: string; notice?: "limit" };
 
 interface Dependencies {
   recommendationRepository: RecommendationRepository;
@@ -119,7 +120,7 @@ export function createPersonalizeRecommendation(deps: Dependencies) {
       // Solo aquí, cuando de verdad se va a pedir al proveedor: una idea ya guardada no gasta uso.
       if (deps.usageLimiter && !(await deps.usageLimiter.tryConsume(input.userId))) {
         report("tope diario de IA agotado");
-        return ok(curated);
+        return ok({ ...curated, notice: "limit" });
       }
       const draft = await withTimeout(writer.write(request), timeoutMs);
       const safety = checkIdeaSafety(draft, request);

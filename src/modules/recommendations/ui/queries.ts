@@ -22,7 +22,8 @@ export function useRecommendations() {
   return useQuery({ queryKey: RECOMMENDATIONS_KEY, queryFn: ({ signal }) => getJson<RecommendationDto[]>("/api/recommendations", signal) });
 }
 
-export type PersonalizedIdeaDto = { source: "ai"; templateKey: string; text: string } | { source: "catalog"; templateKey: string };
+/** `notice: "limit"`: se ve la idea original porque se agotó el tope diario de IA (RF-40b). */
+export type PersonalizedIdeaDto = { source: "ai"; templateKey: string; text: string } | { source: "catalog"; templateKey: string; notice?: "limit" };
 
 /**
  * RF-40. Fuera de `["assessments"]` a propósito: guardar puntuaciones no debe

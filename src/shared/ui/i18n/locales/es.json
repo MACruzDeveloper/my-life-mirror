@@ -212,7 +212,7 @@
     "sugeridoPorIa": "Sugerido por IA",
     "aceptarSugerencia": "Marcar «{{opcion}}»",
     "descartarSugerencia": "Descartar «{{opcion}}»",
-    "sinSugerencias": "No hemos encontrado opciones en esta experiencia.",
+    "sinSugerencias": "No hemos encontrado opciones nuevas en esta experiencia.",
     "sugiriendo": "Pensando sugerencias…",
     "experienciasPrivadasConIa": "Solo las ves tú. Nunca se comparten; a la IA solo va la que tú le pidas analizar.",
     "sugerenciasPista": "¿Quieres que la IA te sugiera opciones a partir de tus experiencias?",
@@ -240,7 +240,9 @@
       "category": "En esta área no se comparten experiencias.",
       "reported": "Esta experiencia se retiró tras un reporte y no se puede volver a compartir.",
       "error": "No se ha podido compartir. Inténtalo de nuevo."
-    }
+    },
+    "sugerenciasLimite": "Has llegado al máximo de usos de IA por hoy. Mañana puedes volver a probar.",
+    "sugerenciasNoDisponibles": "Ahora no se han podido pedir sugerencias. Prueba más tarde."
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -528,7 +530,8 @@
     "reportar": "Reportar",
     "reportada": "Gracias. La hemos ocultado.",
     "errorReportar": "No se ha podido reportar. Inténtalo de nuevo.",
-    "avisoOtros": "Experiencias de otras personas: no son consejo profesional. Si alguna no te parece adecuada, repórtala."
+    "avisoOtros": "Experiencias de otras personas: no son consejo profesional. Si alguna no te parece adecuada, repórtala.",
+    "limiteIa": "Has llegado al máximo de usos de IA por hoy: esta es la idea original. Mañana puedes volver a probar."
   },
   "evolucion": {
     "titulo": "Tu evolución",

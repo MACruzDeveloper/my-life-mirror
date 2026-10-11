@@ -40,10 +40,16 @@ const appear = keyframes`
 
 export type SuggestionKind = "helps" | "difficulties";
 
+export interface SuggestionsAnswer {
+  helps: string[];
+  difficulties: string[];
+  notice?: "limit" | "unavailable";
+}
+
 /** RF-45: solo si el usuario las activó y la categoría no es sensible; sin esto, no hay botón. */
 export interface ExperienceSuggestions {
-  /** Pide las opciones para esa experiencia; `null` si no se pudo (se trata como "sin sugerencias"). */
-  onSuggest: (experience: ExperienceDto) => Promise<{ helps: string[]; difficulties: string[] } | null>;
+  /** Pide las opciones para esa experiencia; `null` si no se pudo ni preguntar. `notice`: por qué no hay (tope diario o proveedor caído). */
+  onSuggest: (experience: ExperienceDto) => Promise<SuggestionsAnswer | null>;
   /** Aceptar una propuesta la marca como si la tocara el usuario (RF-41 / RF-42). */
   onAccept: (kind: SuggestionKind, key: string) => void;
 }
@@ -170,6 +176,8 @@ function ExperienceSuggestionsBox({ experience, suggestions }: { experience: Exp
   const [status, setStatus] = useState<"idle" | "warning" | "loading" | "done">("idle");
   const [items, setItems] = useState<{ kind: SuggestionKind; key: string }[]>([]);
   const [hadAny, setHadAny] = useState(false);
+  // Por qué no hay sugerencias, si no es que "no hay nada nuevo": no es lo mismo y el usuario debe saberlo.
+  const [notice, setNotice] = useState<"limit" | "unavailable" | undefined>(undefined);
   const labelOf = (item: { kind: SuggestionKind; key: string }) => t(item.kind === "helps" ? `experiencias.${item.key}` : `situaciones.${item.key}`);
 
   async function ask(confirmed = false) {
@@ -183,6 +191,7 @@ function ExperienceSuggestionsBox({ experience, suggestions }: { experience: Exp
     const found = result ? [...result.helps.map((key) => ({ kind: "helps" as const, key })), ...result.difficulties.map((key) => ({ kind: "difficulties" as const, key }))] : [];
     setItems(found);
     setHadAny(found.length > 0);
+    setNotice(result ? result.notice : "unavailable");
     setStatus("done");
   }
 
@@ -225,7 +234,7 @@ function ExperienceSuggestionsBox({ experience, suggestions }: { experience: Exp
   if (!hadAny) {
     return (
       <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.75 }}>
-        {t("entrevista.sinSugerencias")}
+        {notice === "limit" ? t("entrevista.sugerenciasLimite") : notice === "unavailable" ? t("entrevista.sugerenciasNoDisponibles") : t("entrevista.sinSugerencias")}
       </Typography>
     );
   }

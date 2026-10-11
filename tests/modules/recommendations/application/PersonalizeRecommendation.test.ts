@@ -234,7 +234,7 @@ describe("PersonalizeRecommendation (RF-40)", () => {
   });
 
   describe("tope diario de uso (RF-40b)", () => {
-    it("agotado el tope, se ve el texto curado y no se llama al escritor", async () => {
+    it("agotado el tope, se ve el texto curado (con el aviso 'limit') y no se llama al escritor", async () => {
       const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Una versión personalizada con la longitud suficiente para pasar el filtro." }));
       const { personalize } = await setup({ writer, dailyLimit: 1 });
 
@@ -242,7 +242,7 @@ describe("PersonalizeRecommendation (RF-40)", () => {
       const second = await personalize({ userId: "u1", recommendationId: "r-finances", templateKey: "economia.2", locale: "es" });
 
       expect(first.ok && first.value.source).toBe("ai");
-      expect(second).toEqual({ ok: true, value: { source: "catalog", templateKey: "economia.2" } });
+      expect(second).toEqual({ ok: true, value: { source: "catalog", templateKey: "economia.2", notice: "limit" } });
       expect(writer.calls).toHaveLength(1);
     });
 

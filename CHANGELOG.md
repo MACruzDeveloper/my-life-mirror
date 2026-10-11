@@ -12,6 +12,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 - El revisor recibe también lo que el usuario marcó en "¿Qué te ayuda?", para no tomar por inventado lo que el usuario dijo.
 - Evaluación con el modelo real (`npm run eval:ai`, solo a mano: gasta céntimos): 17 de 20 ideas llegan al usuario, el revisor para 23 de 23 borradores malos y las sugerencias no inventan ninguna clave (ADR-05, apartado 4.3.4).
 - La política de privacidad explica el contador de uso.
+- Mensajes claros cuando la IA no propone nada: "No hemos encontrado opciones nuevas" (ya están marcadas las que encajan o el texto no encaja con ninguna), tope diario agotado, o proveedor no disponible. Antes los tres casos daban el mismo texto. La ventana de ideas también avisa cuando enseña la idea original por el tope.
 
 ## [1.2.1] - 2026-10-07
 

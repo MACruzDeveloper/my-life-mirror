@@ -212,7 +212,7 @@
     "sugeridoPorIa": "Suggested by AI",
     "aceptarSugerencia": "Mark “{{opcion}}”",
     "descartarSugerencia": "Dismiss “{{opcion}}”",
-    "sinSugerencias": "We didn't find any options in this experience.",
+    "sinSugerencias": "We didn't find any new options in this experience.",
     "sugiriendo": "Thinking of suggestions…",
     "experienciasPrivadasConIa": "Only you can see them. They're never shared; only the one you ask to analyse goes to the AI.",
     "sugerenciasPista": "Want the AI to suggest options from your experiences?",
@@ -240,7 +240,9 @@
       "category": "Experiences aren't shared in this area.",
       "reported": "This experience was removed after a report and can't be shared again.",
       "error": "We couldn't share it. Please try again."
-    }
+    },
+    "sugerenciasLimite": "You've reached today's maximum of AI uses. You can try again tomorrow.",
+    "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later."
   },
   "resultados": {
     "titulo": "Your results",
@@ -528,7 +530,8 @@
     "reportar": "Report",
     "reportada": "Thank you. We've hidden it.",
     "errorReportar": "We couldn't report it. Please try again.",
-    "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it."
+    "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it.",
+    "limiteIa": "You've reached today's maximum of AI uses: this is the original idea. You can try again tomorrow."
   },
   "evolucion": {
     "titulo": "Your evolution",
