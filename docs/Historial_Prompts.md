@@ -212,6 +212,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **6 oct. 2026** — revisión de código del Ciclo 2 (v1.0.1..v1.2.0): 10 hallazgos, verificados uno a uno (7 confirmados, 1 descartado por estar ya cubierto, 1 de limpieza, 1 decisión). *Elección del autor:* borrar del diario una experiencia que venía de una nota antigua vacía también esa nota en su evaluación.
 → El derecho al olvido prevalece sobre la inmutabilidad de las evaluaciones (RF-12), como al borrar la cuenta (RF-05): se vacía la nota, nunca la puntuación ni la fecha. Las correcciones van en la v1.2.1.
 
+**11 oct. 2026** — *(documento de requisitos de entrega del máster)* *"analízalo y antes de cambiar nada dime si ves algo que nos falte o algo que todavía podamos mejorar"* → *"puedo añadirlo a mi cuenta Claude pro? Siempre poniendo límites fuertes para que el pago sea mínimo… no sería mejor dejarlo para el último paso?"* → *"podemos seguir con las pruebas fake en local y dejar estos 5$ para cuando lo revise el profesor?"*
+→ Faltaba casi todo lo de entrega (repositorio público, README con las secciones pedidas, usuario de prueba, slides, vídeo) y había un token de GitHub en 4 commits antiguos: se revoca y se reescribe el historial antes de publicar. **RF-40b se hace antes de entregar**, no al final: es un máster de desarrollo con IA y la IA de la app no se veía en producción; además es lo único con riesgo técnico. Modelo más barato (Claude Haiku 5.5), crédito de prepago sin recarga automática, límite mensual y tope diario por usuario. El desarrollo sigue con el proveedor simulado; el único gasto previo es evaluar con el modelo real (2 céntimos), que descubrió que el revisor rechazaba 12 de 20 ideas por no saber qué había marcado el usuario.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

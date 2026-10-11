@@ -1,3 +1,4 @@
+import { InMemoryAiUsageLimiter } from "@modules/recommendations/infrastructure/InMemoryAiUsageLimiter";
 import { describe, expect, it } from "vitest";
 import { InMemoryProfileRepository } from "@modules/accounts/infrastructure/InMemoryProfileRepository";
 import { InMemoryExperienceRepository } from "@modules/assessments/infrastructure/InMemoryExperienceRepository";
@@ -22,7 +23,7 @@ class ScriptedSuggester implements OptionSuggester {
   }
 }
 
-async function setup(options: { suggester?: OptionSuggester | null; enabled?: boolean; experienceText?: string } = {}) {
+async function setup(options: { suggester?: OptionSuggester | null; enabled?: boolean; experienceText?: string; dailyLimit?: number } = {}) {
   const categoryRepository = new InMemoryCategoryRepository();
   const catalog = new InMemoryCategoryCatalogRepository();
   const listed = await createListCategories(categoryRepository, catalog)("u1");
@@ -44,7 +45,7 @@ async function setup(options: { suggester?: OptionSuggester | null; enabled?: bo
   await experienceRepository.save({ id: "e-couple", userId: "u1", categoryId: couple.id, text: "Nos cuesta hablar las cosas", createdAt: new Date() });
 
   const suggester = options.suggester === null ? undefined : (options.suggester ?? new FakeOptionSuggester());
-  const suggest = createSuggestExperienceOptions({ experienceRepository, categoryRepository, catalog, profileRepository, ideaTexts: new JsonIdeaTexts(), suggester, timeoutMs: 50 });
+  const suggest = createSuggestExperienceOptions({ experienceRepository, categoryRepository, catalog, profileRepository, ideaTexts: new JsonIdeaTexts(), suggester, timeoutMs: 50, usageLimiter: options.dailyLimit === undefined ? undefined : new InMemoryAiUsageLimiter(options.dailyLimit, { now: () => new Date() }) });
   return { suggest };
 }
 
@@ -119,5 +120,17 @@ describe("SuggestExperienceOptions (RF-45)", () => {
 
     expect(!notFound.ok && notFound.error.code).toBe("NOT_FOUND");
     expect(!badLocale.ok && badLocale.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("RF-40b: agotado el tope diario, 'sin sugerencias' y no se llama al proveedor", async () => {
+    const suggester = new ScriptedSuggester(async () => ({ helps: [], difficulties: ["sitiosConGente"] }));
+    const { suggest } = await setup({ suggester, dailyLimit: 1 });
+
+    const first = await suggest({ userId: "u1", experienceId: "e-social", locale: "es" });
+    const second = await suggest({ userId: "u1", experienceId: "e-social", locale: "es" });
+
+    expect(first).toEqual({ ok: true, value: { helps: [], difficulties: ["sitiosConGente"] } });
+    expect(second).toEqual({ ok: true, value: empty });
+    expect(suggester.calls).toHaveLength(1);
   });
 });

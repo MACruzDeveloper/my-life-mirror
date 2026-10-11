@@ -72,6 +72,26 @@ Con UX-05, la ventana de ideas pasa a ser un carrusel con las cinco ideas curada
 
 Las situaciones que el usuario marca con una puntuación baja (lista cerrada, nunca rasgos ni salud) **no se envían a la IA**: se quitan antes las ideas que chocan con ellas, en el carrusel, al crear una recomendación y en el servidor, que rechaza personalizar una idea que choque. Filtrar antes basta para que la IA no proponga lo que no se puede hacer, sin darle más datos de los necesarios (minimización).
 
+#### 4.3.4 RF-40b: el modelo real y su evaluación (11 oct. 2026)
+
+- **Modelo:** Claude Haiku 5.5 (`claude-haiku-5-5`) por la API de Anthropic, con esfuerzo bajo y **salida estructurada** (la respuesta llega validada contra un esquema Zod). Es el modelo más barato de la familia y la tarea es corta: reescribir una frase, revisar un borrador o emparejar un texto con una lista. Un rechazo del modelo, una respuesta que no encaja, un fallo o más de 8 s acaban en el texto curado.
+- **Diseño:** el adaptador (`recommendations/infrastructure/anthropic/`) implementa los puertos que ya existían (`IdeaWriter`, `IdeaReviewer`, `OptionSuggester`) sobre un puerto mínimo, `StructuredModel`, que se simula en los tests. Desarrollar y probar no gasta crédito: en local y en los tests sigue el *Fake*.
+- **Coste bajo control, en tres capas:** crédito de prepago sin recarga automática (el tope real), límite mensual en la consola del proveedor y un **tope diario por usuario** (`AI_DAILY_LIMIT`, 40 por defecto), contado en la base de datos con una función que comprueba y suma en una sola sentencia (migración 0020). Una idea ya guardada no gasta uso.
+- **Evaluación con el modelo real** (`npm run eval:ai`, solo a mano; resultados del 11 oct.):
+
+  | Qué se mide | Primera pasada | Tras el ajuste |
+  |---|---|---|
+  | Ideas que llegan al usuario (pasan filtro y revisión), de 20 peticiones reales | 8 (40 %) | **17 (85 %)** |
+  | Borradores malos que para el revisor (5-7 de ellos, sutiles: el filtro de palabras no los ve) | 21 de 21 | **23 de 23** |
+  | Reescrituras buenas que el revisor aprueba | 2 de 5 | 4 de 5 |
+  | Sugerencias desde el diario con las opciones esperadas / claves inventadas | 6 de 6 / 0 | 6 de 6 / 0 |
+  | Coste de la pasada (72-74 llamadas) | 0,0099 USD | 0,0109 USD |
+  | Tiempo de una idea completa (escribir y revisar) | 3,7 s de mediana | 3,5 s de mediana |
+
+- **Lo que enseñó la primera pasada:** el revisor no recibía lo que el usuario había marcado en "¿Qué te ayuda?", así que rechazaba "ya que caminar te sienta bien…" por inventar un dato del usuario. Se le pasa esa lista (el escritor ya la recibía, no sale ningún dato nuevo) y se aclara al escritor que lo que ayuda es el motivo de la idea, nunca una segunda actividad. Sin evaluar con el modelo real, este fallo habría llegado a producción como "la IA no hace nada" (caída silenciosa al texto curado).
+- **Lo que no se ha tocado:** las 3 ideas que aún rechaza el revisor son casos en los que es estricto (un matiz añadido). Se acepta: el coste de un falso rechazo es ver la idea curada, que siempre es segura; el de un falso aprobado es mucho mayor. No se ha seguido ajustando contra el mismo conjunto para no sobreajustar el prompt a 20 casos.
+- **Límites de la evaluación:** conjunto pequeño (20 peticiones, 28 borradores, 6 experiencias), escrito por el propio autor con ayuda de la IA, y una sola pasada por configuración (las respuestas del modelo varían de una vez a otra). Mide que el circuito de seguridad funciona, no la calidad literaria de las ideas.
+
 ### 4.4 Texto libre del usuario hacia la IA, con salvaguardas (RF-45, 5 oct. 2026)
 
 Hasta aquí, la regla era que el texto libre nunca llega a la IA (RES-09: no se puede detectar contenido de crisis y no se debe intentar). RF-45 abre una excepción acotada, para que la experiencia que escribe el usuario sirva de algo: **la IA no escribe nada sobre la persona ni valora su estado; solo traduce su texto a las listas cerradas que ya existen** ("¿Qué te ayuda?", "¿Qué te lo pone difícil?"), y el usuario acepta o descarta cada propuesta. Salvaguardas ([historia RF-45](../user-stories/RF-45-sugerencias-ia-experiencias.md), Nivel 3):
@@ -123,3 +143,4 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 - **v1.8 (5 oct. 2026)** — CAT-01: los términos del filtro pasan a `domain/catalog/safetyTerms.json`, junto al resto del contenido curado.
 - **v1.9 (5 oct. 2026)** — apartado 4.4 implementado contra un *Fake* (RF-45 v1.2); el modelo real llegará con RF-40b, junto con el de las ideas.
 - **v1.10 (5 oct. 2026)** — apartado 4.4: categorías excluidas de la IA sin ser sensibles (Pareja) y aviso de términos ofensivos solo al enviar.
+- **v1.11 (11 oct. 2026)** — apartado 4.3.4: RF-40b, el modelo real (Claude Haiku 5.5), el control del coste y la evaluación con el modelo, con el fallo que descubrió y su arreglo.
