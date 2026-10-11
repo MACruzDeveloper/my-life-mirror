@@ -90,12 +90,12 @@ describe("DataPrivacyPage (RF-05)", () => {
     renderPage(client);
 
     const dialog = openDialog();
-    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "12345678" } });
+    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "Bici-Azul-Lluvia-47" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
 
     await waitFor(() => expect(screen.getByText("Página pública")).toBeInTheDocument());
     const [[, init]] = deleteCalls(fetchMock);
-    expect(JSON.parse(init.body)).toEqual({ password: "12345678" });
+    expect(JSON.parse(init.body)).toEqual({ password: "Bici-Azul-Lluvia-47" });
     expect(client.getQueryData(["categories"])).toBeUndefined();
   });
 
@@ -112,12 +112,24 @@ describe("DataPrivacyPage (RF-05)", () => {
     expect(within(dialog).getByRole("button", { name: /eliminar definitivamente/i })).toBeEnabled();
   });
 
+  it("TFM-01: la cuenta de demostración no se puede eliminar, y lo explica", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 400, json: async () => ({ error: "The demo account cannot be deleted", code: "DEMO_ACCOUNT" }) }));
+    renderPage();
+
+    const dialog = openDialog();
+    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "Bici-Azul-Lluvia-47" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
+
+    expect(await within(dialog).findByText(/cuenta de demostración/i)).toBeInTheDocument();
+    expect(screen.queryByText("Página pública")).not.toBeInTheDocument();
+  });
+
   it("si es el único administrador, explica por qué no puede y qué hacer (no un error genérico)", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 409, json: async () => ({ error: "Cannot delete the only administrator account", code: "CONFLICT" }) }));
     renderPage();
 
     const dialog = openDialog();
-    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "12345678" } });
+    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "Bici-Azul-Lluvia-47" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
 
     expect(await within(dialog).findByText(/único administrador/i)).toBeInTheDocument();

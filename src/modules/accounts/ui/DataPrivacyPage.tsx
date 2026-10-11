@@ -71,7 +71,8 @@ export function DataPrivacyPage() {
       if (!response.ok) {
         const data = await response.json();
         // 409 = es el único administrador: siempre debe existir uno (mensaje propio, traducido).
-        setDeleteError(response.status === 409 ? t("datos.errorUltimoAdmin") : (data.error ?? t("datos.errorEliminar")));
+        // TFM-01: la cuenta de demostración de la entrega está protegida.
+        setDeleteError(data.code === "DEMO_ACCOUNT" ? t("datos.errorCuentaDemo") : response.status === 409 ? t("datos.errorUltimoAdmin") : (data.error ?? t("datos.errorEliminar")));
         return;
       }
       // La cuenta ya no existe: nada de sus datos debe quedar en memoria.

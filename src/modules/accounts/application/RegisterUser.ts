@@ -1,7 +1,7 @@
 import { type Result, err, ok } from "#shared/domain/Result.js";
 import { type ConflictError, DomainError, ValidationError } from "#shared/domain/DomainError.js";
 import { Email } from "../domain/Email.js";
-import { Password } from "../domain/Password.js";
+import { Password, type WeakPasswordError } from "../domain/Password.js";
 import type { User } from "../domain/User.js";
 import type { AuthProvider } from "../domain/AuthProvider.js";
 import type { createUpdateProfile } from "./UpdateProfile.js";
@@ -33,15 +33,16 @@ export interface RegisterUserInput {
 export function createRegisterUser(authProvider: AuthProvider, updateProfile: ReturnType<typeof createUpdateProfile>) {
   return async function registerUser(
     input: RegisterUserInput,
-  ): Promise<Result<User, ValidationError | ConflictError>> {
+  ): Promise<Result<User, ValidationError | ConflictError | WeakPasswordError>> {
     const email = Email.create(input.email);
     if (!email.ok) return err(email.error);
 
-    const password = Password.create(input.password);
-    if (!password.ok) return err(password.error);
-
     const name = input.name.trim();
     if (name.length === 0) return err(new ValidationError("Name is required"));
+
+    // SEC-01: la contraseña tampoco puede contener el nombre ni el email.
+    const password = Password.create(input.password, { email: email.value.value, name });
+    if (!password.ok) return err(password.error);
 
     let user: User;
     try {

@@ -2,12 +2,12 @@
   "comun": {
     "email": "Email",
     "contrasena": "Contraseña",
-    "contrasenaAyuda": "Al menos 8 caracteres",
     "errorServidor": "No se pudo contactar con el servidor",
     "reintentar": "Reintentar",
     "idioma": "Idioma",
     "abrirMenu": "Abrir menú",
-    "cargando": "Cargando…"
+    "cargando": "Cargando…",
+    "demasiadosIntentos": "Demasiados intentos. Espera unos minutos y vuelve a probar."
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -33,14 +33,38 @@
     "botonEnviando": "Creando cuenta…",
     "exito": "Cuenta creada para {{email}}.",
     "irALogin": "Iniciar sesión",
-    "errorGenerico": "No se pudo completar el registro"
+    "errorGenerico": "No se pudo completar el registro",
+    "errorEmail": "No se ha podido crear la cuenta con este email. Si ya tienes una, inicia sesión o recupera tu contraseña."
   },
   "login": {
     "titulo": "Iniciar sesión",
     "boton": "Iniciar sesión",
     "botonEnviando": "Iniciando sesión…",
     "olvideContrasena": "¿Olvidaste tu contraseña?",
-    "errorGenerico": "No se pudo iniciar sesión"
+    "errorGenerico": "No se pudo iniciar sesión",
+    "errorCredenciales": "Email o contraseña incorrectos"
+  },
+  "contrasena": {
+    "requisitos": "Tu contraseña necesita:",
+    "reglas": {
+      "length": "Entre 12 y 72 caracteres",
+      "lowercase": "Una letra minúscula",
+      "uppercase": "Una letra mayúscula",
+      "digit": "Un número",
+      "symbol": "Un símbolo (por ejemplo - _ . ! ?)",
+      "sequence": "Sin secuencias ni repeticiones como 1234, abcd, qwerty o aaa",
+      "common": "Que no se parezca a una contraseña muy común (password, qwerty, el nombre de la app…)",
+      "personal": "Que no lleve tu nombre ni tu email"
+    },
+    "estado": {
+      "met": "Cumplido",
+      "pending": "Pendiente",
+      "missing": "Falta"
+    },
+    "consejo": "Una idea: une tres o cuatro palabras sin relación entre sí y añade un número y un símbolo.",
+    "mostrar": "Mostrar la contraseña",
+    "ocultar": "Ocultar la contraseña",
+    "noCumple": "La contraseña no cumple los requisitos. Mira lo que falta debajo del campo."
   },
   "olvidePassword": {
     "titulo": "Recuperar contraseña",
@@ -439,7 +463,8 @@
     "sugerenciasRevocable": "Está desactivado por defecto y puedes desactivarlo cuando quieras. De la IA solo quedan las opciones que aceptes.",
     "compartidasTitulo": "Experiencias compartidas",
     "compartidasTexto": "Las experiencias de tu diario que has compartido de forma anónima para ayudar a otras personas. Solo ven el texto: ni tu nombre, ni la fecha, ni tu puntuación.",
-    "compartidasNinguna": "No tienes ninguna experiencia compartida."
+    "compartidasNinguna": "No tienes ninguna experiencia compartida.",
+    "errorCuentaDemo": "Esta es la cuenta de demostración del proyecto y no se puede eliminar. Si quieres probar el borrado, crea una cuenta propia: se elimina de verdad, con todos sus datos."
   },
   "recomendaciones": {
     "ideaAnterior": "Idea anterior",

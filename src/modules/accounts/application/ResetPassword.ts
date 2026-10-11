@@ -1,6 +1,6 @@
 import { type Result, err, ok } from "#shared/domain/Result.js";
 import { type AuthenticationError, DomainError, ValidationError } from "#shared/domain/DomainError.js";
-import { Password } from "../domain/Password.js";
+import { Password, type WeakPasswordError } from "../domain/Password.js";
 import type { AuthProvider } from "../domain/AuthProvider.js";
 
 export interface ResetPasswordInput {
@@ -12,7 +12,7 @@ export interface ResetPasswordInput {
 export function createResetPassword(authProvider: AuthProvider) {
   return async function resetPassword(
     input: ResetPasswordInput,
-  ): Promise<Result<void, ValidationError | AuthenticationError>> {
+  ): Promise<Result<void, ValidationError | AuthenticationError | WeakPasswordError>> {
     const password = Password.create(input.password);
     if (!password.ok) return err(password.error);
 

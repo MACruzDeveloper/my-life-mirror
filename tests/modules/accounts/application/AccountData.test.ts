@@ -30,7 +30,7 @@ async function setup() {
   const experienceRepository = new InMemoryExperienceRepository();
   const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository };
 
-  const ana = await authProvider.register("ana@ejemplo.com", "12345678");
+  const ana = await authProvider.register("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
   const luis = await authProvider.register("luis@ejemplo.com", "abcdefgh");
   const updateProfile = createUpdateProfile(profileRepository);
   await updateProfile({ userId: ana.id, name: "Ana", birthDate: "1996-05-20", timeZone: "Europe/Madrid" });
@@ -119,7 +119,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
 
   it("sin perfil ni datos devuelve un documento válido con listas vacías", async () => {
     const { exportUserData, authProvider } = await setup();
-    const draft = await authProvider.register("nuevo@ejemplo.com", "12345678");
+    const draft = await authProvider.register("nuevo@ejemplo.com", "Bici-Azul-Lluvia-47");
 
     const result = await exportUserData({ id: draft.id, email: draft.email });
 
@@ -135,7 +135,7 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
   it("con la contraseña correcta borra evaluaciones, categorías, consentimientos, perfil y la cuenta de acceso", async () => {
     const { deleteAccount, ana, authProvider, assessmentRepository, categoryRepository, consentRepository, profileRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository } = await setup();
 
-    const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" });
+    const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
 
     expect(result.ok).toBe(true);
     expect(await recommendationRepository.findByUserId(ana.id)).toEqual([]);
@@ -145,7 +145,7 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
     expect(await categoryRepository.findByUserId(ana.id)).toEqual([]);
     expect(await consentRepository.findByUser(ana.id)).toEqual([]);
     expect(await profileRepository.findByUserId(ana.id)).toBeUndefined();
-    await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).rejects.toBeInstanceOf(AuthenticationError);
+    await expect(authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47")).rejects.toBeInstanceOf(AuthenticationError);
   });
 
   it("con una contraseña incorrecta se rechaza y no se borra nada", async () => {
@@ -157,7 +157,7 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
     if (!result.ok) expect(result.error).toBeInstanceOf(AuthenticationError);
     expect((await assessmentRepository.findByUserId(ana.id)).length).toBeGreaterThan(0);
     expect(await profileRepository.findByUserId(ana.id)).toBeDefined();
-    await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).resolves.toBeDefined();
+    await expect(authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47")).resolves.toBeDefined();
   });
 
   it("una contraseña vacía es un error de validación y no borra nada", async () => {
@@ -182,7 +182,7 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
   it("los datos y la cuenta de los demás usuarios quedan intactos", async () => {
     const { deleteAccount, ana, luis, authProvider, assessmentRepository, categoryRepository, profileRepository, recommendationRepository } = await setup();
 
-    await deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" });
+    await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
 
     expect((await assessmentRepository.findByUserId(luis.id)).length).toBe(1);
     expect(await recommendationRepository.findByUserId(luis.id)).toHaveLength(1);
@@ -200,23 +200,23 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
       return original(id);
     };
 
-    await expect(deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" })).rejects.toThrow();
-    const retry = await deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" });
+    await expect(deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" })).rejects.toThrow();
+    const retry = await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
 
     expect(retry.ok).toBe(true);
-    await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).rejects.toBeInstanceOf(AuthenticationError);
+    await expect(authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47")).rejects.toBeInstanceOf(AuthenticationError);
   });
 
   it("el único administrador no puede eliminar su cuenta: siempre debe existir uno", async () => {
     const { deleteAccount, ana, authProvider, profileRepository } = await setup();
     authProvider.assignRoleForTest("ana@ejemplo.com", "admin");
 
-    const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" });
+    const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBeInstanceOf(ConflictError);
     expect(await profileRepository.findByUserId(ana.id)).toBeDefined();
-    await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).resolves.toBeDefined();
+    await expect(authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47")).resolves.toBeDefined();
   });
 
   it("un administrador sí puede eliminar su cuenta si existe otro administrador", async () => {
@@ -224,10 +224,33 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
     authProvider.assignRoleForTest("ana@ejemplo.com", "admin");
     authProvider.assignRoleForTest("luis@ejemplo.com", "admin");
 
-    const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" });
+    const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
 
     expect(result.ok).toBe(true);
-    await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).rejects.toBeInstanceOf(AuthenticationError);
+    await expect(authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47")).rejects.toBeInstanceOf(AuthenticationError);
+  });
+
+  describe("cuenta de demostración protegida (TFM-01)", () => {
+    it("no se puede eliminar, ni con su contraseña: se explica que es de demostración", async () => {
+      const { ana, profileRepository, ...ports } = await setup();
+      const deleteAccount = createDeleteAccount({ ...ports, profileRepository, protectedEmail: "Ana@Ejemplo.com " });
+
+      const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.code).toBe("DEMO_ACCOUNT");
+      expect(await profileRepository.findByUserId(ana.id)).toBeDefined();
+    });
+
+    it("las demás cuentas se eliminan como siempre", async () => {
+      const { luis, authProvider, ...ports } = await setup();
+      const deleteAccount = createDeleteAccount({ ...ports, authProvider, protectedEmail: "ana@ejemplo.com" });
+
+      const result = await deleteAccount({ userId: luis.id, email: luis.email, password: "abcdefgh" });
+
+      expect(result.ok).toBe(true);
+      expect((await authProvider.listAllUsers()).map((user) => user.email)).toEqual(["ana@ejemplo.com"]);
+    });
   });
 
   it("la protección del último administrador se aplica antes de pedir la contraseña", async () => {

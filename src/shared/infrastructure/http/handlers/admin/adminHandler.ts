@@ -25,7 +25,6 @@ export function adminHandler<S extends z.ZodTypeAny, T>(options: {
   const run = action({ schema: options.schema as z.ZodTypeAny, execute: ({ context, user, body }) => options.execute(context, user, body as z.infer<S>) });
   return sessionHandler({
     route: options.route,
-    noStore: true,
     onDenied: (userId) => logger.warn("Acceso de administración denegado", { route: options.route, userId }),
     [options.method]: run,
   });

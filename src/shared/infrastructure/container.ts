@@ -9,6 +9,7 @@ import { SupabaseAuthProvider } from "#modules/accounts/infrastructure/SupabaseA
 import { createRegisterUser } from "#modules/accounts/application/RegisterUser.js";
 import { createLogIn } from "#modules/accounts/application/LogIn.js";
 import { createDeleteAccount } from "#modules/accounts/application/DeleteAccount.js";
+import { createEraseUser } from "#modules/accounts/application/EraseUser.js";
 import { createExportUserData } from "#modules/accounts/application/ExportUserData.js";
 import { createGenerateRecommendations } from "#modules/recommendations/application/GenerateRecommendations.js";
 import { createListRecommendations } from "#modules/recommendations/application/ListRecommendations.js";
@@ -23,6 +24,9 @@ import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infra
 import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
 import { AnthropicIdeaReviewer, AnthropicIdeaWriter, AnthropicOptionSuggester } from "#modules/recommendations/infrastructure/anthropic/AnthropicIdeaProvider.js";
 import { createAnthropicModel } from "#modules/recommendations/infrastructure/anthropic/AnthropicStructuredModel.js";
+import type { AttemptLimiter } from "#shared/domain/AttemptLimiter.js";
+import { InMemoryAttemptLimiter, UnlimitedAttemptLimiter } from "#shared/infrastructure/InMemoryAttemptLimiter.js";
+import { SupabaseAttemptLimiter } from "#shared/infrastructure/SupabaseAttemptLimiter.js";
 import { InMemoryAiUsageLimiter } from "#modules/recommendations/infrastructure/InMemoryAiUsageLimiter.js";
 import { SupabaseAiUsageLimiter } from "#modules/recommendations/infrastructure/SupabaseAiUsageLimiter.js";
 import { type AiUsageLimiter, parseAiDailyLimit } from "#modules/recommendations/domain/AiUsageLimiter.js";
@@ -121,6 +125,19 @@ function createAuthProvider(environment: Environment): AuthProvider {
     throw new Error("Falta APP_URL — ver .env.example");
   }
   return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
+}
+
+/**
+ * SEC-02: el contador de intentos vive en la base de datos (cada función
+ * serverless está aislada). Contra un Supabase local no hay tope: es la base
+ * de los E2E y de `dev:local`, donde una misma máquina registra decenas de
+ * cuentas en segundos, y no hay nada real que proteger.
+ */
+function createAttemptLimiter(environment: Environment, clock: Clock): AttemptLimiter {
+  if (environment === "test") return new InMemoryAttemptLimiter(clock);
+  const { url, serviceRoleKey } = supabaseCredentials();
+  if (["127.0.0.1", "localhost"].includes(new URL(url).hostname)) return new UnlimitedAttemptLimiter();
+  return new SupabaseAttemptLimiter(url, serviceRoleKey, clock);
 }
 
 function createExperienceRepository(environment: Environment): ExperienceRepository {
@@ -277,6 +294,8 @@ export interface AppContext {
   adminUsers: ReturnType<typeof createAdminUserActions>;
   exportUserData: ReturnType<typeof createExportUserData>;
   deleteAccount: ReturnType<typeof createDeleteAccount>;
+  /** Borra un usuario con todos sus datos, sin pedir contraseña: solo para herramientas del servidor (TFM-01, restaurar la cuenta de prueba). */
+  eraseUser: ReturnType<typeof createEraseUser>;
   requestPasswordReset: ReturnType<typeof createRequestPasswordReset>;
   resetPassword: ReturnType<typeof createResetPassword>;
   consentRepository: ConsentRepository;
@@ -300,6 +319,7 @@ export interface AppContext {
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
   getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
+  experienceRepository: ExperienceRepository;
   addExperience: ReturnType<typeof createAddExperience>;
   listExperiences: ReturnType<typeof createListExperiences>;
   deleteExperience: ReturnType<typeof createDeleteExperience>;
@@ -311,6 +331,8 @@ export interface AppContext {
   listRecommendations: ReturnType<typeof createListRecommendations>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
   aiIdeasAvailable: boolean;
+  /** SEC-02: tope de intentos de los controladores públicos (inicio de sesión, registro…). */
+  attemptLimiter: AttemptLimiter;
   setAiSuggestions: ReturnType<typeof createSetAiSuggestions>;
   suggestExperienceOptions: ReturnType<typeof createSuggestExperienceOptions>;
   personalizeRecommendation: ReturnType<typeof createPersonalizeRecommendation>;
@@ -366,7 +388,8 @@ export function createAppContext(environment: Environment = detectEnvironment())
       clock,
     }),
     exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -399,6 +422,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
     getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
     // RF-44: el diario de experiencias, separado de las evaluaciones.
+    experienceRepository,
     addExperience: createAddExperience({ experienceRepository, categoryRepository, clock }),
     listExperiences: createListExperiences(experienceRepository),
     deleteExperience: createDeleteExperience({ experienceRepository, assessmentRepository }),
@@ -410,6 +434,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
     aiIdeasAvailable: ideaProvider.writer !== undefined,
+    attemptLimiter: createAttemptLimiter(environment, clock),
     setAiSuggestions: createSetAiSuggestions({ profileRepository, clock }),
     suggestExperienceOptions: createSuggestExperienceOptions({
       experienceRepository,

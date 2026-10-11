@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { Category, CategoryStatus, CategoryType } from "../domain/Category.js";
 import type { CategoryRepository, CategoryTags } from "../domain/CategoryRepository.js";
 
@@ -56,7 +57,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
   }
 
   async findByUserId(userId: string): Promise<Category[]> {

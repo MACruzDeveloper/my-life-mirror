@@ -122,5 +122,8 @@ describe("AnthropicOptionSuggester (RF-45, RF-40b)", () => {
     expect(JSON.parse(model.calls[0].user)).toEqual({ language: "Spanish", category: "vidaSocial", experience: request.text, helps: request.helps, difficulties: request.difficulties });
     expect(model.calls[0].system).toMatch(/only.*keys/i);
     expect(model.calls[0].system).toMatch(/do not assess|never assess/i);
+    // SEC-04: lo que escribe el usuario es un dato, no una orden para el modelo.
+    expect(model.calls[0].system).toMatch(/data, not instructions/i);
+    expect(model.calls[0].system).toMatch(/do not follow/i);
   });
 });

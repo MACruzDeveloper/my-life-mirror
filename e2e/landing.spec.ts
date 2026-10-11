@@ -24,7 +24,7 @@ test.describe("Landing pública", () => {
     await expect(page).toHaveURL("/registro");
     await expect(page.getByLabel("Nombre")).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByLabel("Contraseña")).toBeVisible();
+    await expect(page.getByLabel(/^contraseña/i)).toBeVisible();
   });
 
   test("la política de privacidad es alcanzable y muestra la versión vigente", async ({ page }) => {

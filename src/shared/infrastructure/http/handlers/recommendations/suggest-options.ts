@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { MAX_ID_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { action, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 
 const SuggestSchema = z.object({
-  experienceId: z.string().min(1),
+  experienceId: z.string().min(1).max(MAX_ID_LENGTH),
   locale: z.string().min(2).max(5),
 });
 

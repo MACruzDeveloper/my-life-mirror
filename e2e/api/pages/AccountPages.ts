@@ -16,9 +16,23 @@ export class AccountPages {
     await this.page.goto("/registro");
     await this.page.getByLabel(/nombre/i).fill(user.name);
     await this.page.getByLabel(/email/i).fill(user.email);
-    await this.page.getByLabel(/contraseña/i).fill(user.password);
+    await this.passwordField().fill(user.password);
     await this.page.getByRole("button", { name: "Registrarse" }).click();
     await expect(this.page).toHaveURL(/\/inicio$/);
+  }
+
+  /** Rellena el registro y lo envía, sin esperar que salga bien (para probar los rechazos). */
+  async tryToRegister(user: TestUser) {
+    await this.page.goto("/registro");
+    await this.page.getByLabel(/nombre/i).fill(user.name);
+    await this.page.getByLabel(/email/i).fill(user.email);
+    await this.passwordField().fill(user.password);
+    await this.page.getByRole("button", { name: "Registrarse" }).click();
+  }
+
+  /** El campo, no el botón "Mostrar la contraseña" que lleva al lado. */
+  private passwordField() {
+    return this.page.getByLabel(/^contraseña/i);
   }
 
   async login(user: Pick<TestUser, "email" | "password">) {

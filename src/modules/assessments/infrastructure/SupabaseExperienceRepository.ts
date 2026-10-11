@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { Locale } from "#shared/domain/locales.js";
 import type { Experience, ExperienceRepository, SharedExperience } from "../domain/Experience.js";
 
@@ -37,7 +38,7 @@ export class SupabaseExperienceRepository implements ExperienceRepository {
   private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
   }
 
   async findByUserId(userId: string): Promise<Experience[]> {

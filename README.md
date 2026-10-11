@@ -10,14 +10,22 @@ Aplicación web para evaluar cómo va tu vida por áreas (economía, familia, de
 | Recurso | Dónde |
 |---|---|
 | Aplicación desplegada | https://my-life-mirror.vercel.app |
-| Usuario de prueba | ⏳ Pendiente de crear (ver [Usuario de prueba](#usuario-de-prueba)) |
+| Usuario de prueba | `demo@example.com` / `DemoUser123!` (ver [Usuario de prueba](#usuario-de-prueba)) |
 | Presentación (slides) | ⏳ Pendiente |
 | Vídeo explicativo | ⏳ Pendiente |
 | Código fuente | Este repositorio (público) |
 
-**Contenido:** [Funcionalidades](#funcionalidades-principales) · [Stack](#stack-tecnológico) · [Probarla en tu ordenador](#probarla-en-tu-ordenador-sin-cuentas) · [Usuario de prueba](#usuario-de-prueba) · [Estructura](#estructura-del-proyecto) · [Tests](#tests) · [Despliegue](#despliegue) · [Desarrollo con IA](#desarrollo-con-ia) · [Estado](#estado-del-proyecto) · [Documentación](#documentación)
+**Contenido:** [Así se ve](#así-se-ve) · [Funcionalidades](#funcionalidades-principales) · [Stack](#stack-tecnológico) · [Probarla en tu ordenador](#probarla-en-tu-ordenador-sin-cuentas) · [Usuario de prueba](#usuario-de-prueba) · [Estructura](#estructura-del-proyecto) · [Tests](#tests) · [Despliegue](#despliegue) · [Desarrollo con IA](#desarrollo-con-ia) · [Estado](#estado-del-proyecto) · [Licencia](#licencia) · [Documentación](#documentación)
 
 ---
+
+## Así se ve
+
+| Inicio: equilibrio y evolución | Ideas, también de otras personas | Entrevista en el móvil |
+|---|---|---|
+| [<img src="docs/images/inicio.png" alt="Inicio con el radar de equilibrio y la evolución de cada área" width="300">](docs/images/inicio.png) | [<img src="docs/images/ideas-otras-personas.png" alt="Ventana de ideas con las pestañas De la app, Con IA y De otras personas" width="300">](docs/images/ideas-otras-personas.png) | [<img src="docs/images/entrevista-movil.png" alt="Una pregunta de la entrevista en un móvil, con sus opciones y el diario" width="180">](docs/images/entrevista-movil.png) |
+
+Capturas de la cuenta de prueba (ver [Usuario de prueba](#usuario-de-prueba)).
 
 ## Funcionalidades principales
 
@@ -92,15 +100,25 @@ Español por defecto; el interruptor con las banderas, arriba a la derecha, camb
 
 ## Usuario de prueba
 
-⏳ **Pendiente de crear.** Habrá una cuenta en producción con un año de historial, ideas abiertas y experiencias en el diario, para ver la app con contenido sin tener que rellenarla:
+Una cuenta en producción que ya tiene contenido, para ver la app sin tener que rellenarla:
 
 | | |
 |---|---|
 | Dirección | https://my-life-mirror.vercel.app |
-| Email | *(pendiente)* |
-| Contraseña | *(pendiente)* |
+| Email | `demo@example.com` |
+| Contraseña | `DemoUser123!` |
 
-También puedes crear tu propia cuenta: el registro está abierto y no pide confirmar el email. La administración no se ofrece en producción (gestiona usuarios reales); se puede probar en local, como se explica arriba.
+**Qué trae:** seis áreas con un año de historial (el radar y la evolución), tres ideas abiertas, opciones marcadas en "¿Qué te ayuda?" y "¿Qué te lo pone difícil?", experiencias en el diario, la IA activada y experiencias compartidas por otra persona en la ventana de ideas.
+
+**Qué probar:**
+
+- *Inicio*: el equilibrio, la evolución y "Ideas para ti".
+- *Mi perfil → Entrevista*: abre "Ideas para Economía" y mira las pestañas "De la app", "Con IA" y "De otras personas".
+- En Aventura, pulsa "Sugerir opciones con IA" en la experiencia del diario.
+- En Familia (un 8), "Compartir de forma anónima" una experiencia.
+- *Mi perfil → Privacidad y datos*: descargar los datos.
+
+Puedes cambiar lo que quieras: la cuenta se restaura con `npm run demo:reset`. Lo único que no permite es eliminarla (es compartida); para probar el borrado, crea tu propia cuenta: el registro está abierto y no pide confirmar el email. La administración no se ofrece en producción porque gestiona usuarios reales; se puede probar en local, como se explica arriba.
 
 ---
 
@@ -158,7 +176,7 @@ npm run test:e2e:api -- --headed   # los navegadores se abren y la app se usa so
 npm run test:e2e:api -- --reporter=html && npx playwright show-report   # informe en el navegador
 ```
 
-En GitHub, cada PR a `main` ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**), y tras cada despliegue de producción se ejecuta una comprobación (`npm run smoke:prod`). Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (apartado 1.2).
+En GitHub, cada PR a `main` ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**), y tras cada despliegue de producción se ejecuta una comprobación (`npm run smoke:prod`). El workflow **Seguridad** audita las dependencias y analiza el código (CodeQL) en cada PR. Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (apartado 1.2).
 
 ---
 
@@ -179,8 +197,21 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 - **Dónde:** [Vercel](https://vercel.com) sirve la interfaz y las funciones de `api/` (región de Dublín); [Supabase](https://supabase.com) aloja la base de datos y las cuentas. Los dos en su plan gratuito.
 - **Cómo:** cada fusión en `main` despliega producción. Cada entrega es una versión con su etiqueta (`v1.2.1`…) y su sección en el [CHANGELOG](CHANGELOG.md).
 - **Variables de entorno** (en Vercel; los nombres están en [.env.example](.env.example)): la URL y la clave de servicio de Supabase, la URL de la app y, para la IA, el proveedor y la clave de Anthropic. Las claves solo se usan en el servidor, nunca llegan al navegador.
-- **Base de datos:** las migraciones de `supabase/migrations/` se ejecutan a mano, en orden, antes de desplegar el código que las necesita.
+- **Base de datos:** las migraciones de `supabase/migrations/` se ejecutan a mano, en orden, antes de desplegar el código que las necesita. El plan gratuito no guarda copias: `npm run backup:db` hace una en local.
 - **Límites del plan gratuito:** 12 funciones como máximo (de ahí una función por capacidad, hoy 11) y pausa de Supabase tras 7 días sin uso (un workflow la evita).
+
+---
+
+## Seguridad
+
+Revisada contra OWASP Top 10:2025, el OWASP Top 10 para aplicaciones con LLM y MITRE ATT&CK; el análisis, los hallazgos y lo aplicado están en el [plan de seguridad](docs/security/01_Plan_Seguridad.md). En resumen:
+
+- **Cuentas:** las contraseñas las guarda Supabase Auth, nunca la app. Las nuevas deben ser fuertes (12 caracteres o más, variadas, sin secuencias ni palabras comunes, sin el nombre ni el email) y el formulario explica qué falta. El inicio de sesión no da pistas y los intentos están contados por IP y por cuenta.
+- **Sesión:** cookie `HttpOnly`, `Secure` y `SameSite=Lax` de una hora; el usuario sale siempre de la sesión verificada en el servidor.
+- **Datos:** todas las tablas con seguridad por filas y sin políticas: solo el servidor accede. Entradas validadas con esquemas, con longitudes máximas.
+- **Navegador:** política de contenido (CSP) y demás cabeceras de seguridad; las acciones que cambian datos rechazan peticiones de otras webs.
+- **IA:** opcional, con salida cerrada y validada, tope de uso, y sin obedecer órdenes escritas en el texto del usuario.
+- **Código y dependencias:** secretos fuera del repositorio; `npm audit`, CodeQL y Dependabot en GitHub. Se probó además Snyk, que encontró un fallo sin corregir en una dependencia, ya mitigado.
 
 ---
 
@@ -198,13 +229,17 @@ El proyecto se ha construido con un asistente de IA (Claude Code) como compañer
 
 ## Estado del proyecto
 
-Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.2.1), con más de 700 tests. Entrega prevista del TFM: 20 de octubre de 2026.
+Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.2.1), con más de 700 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
 
 - **Pendiente:** activar en producción el modelo real de IA (RF-40b). Está implementado y evaluado ([resultados](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4); en local y en los tests se usa un proveedor simulado, para no gastar crédito.
-- **Para la entrega:** usuario de prueba, presentación y vídeo.
+- **Para la entrega:** presentación y vídeo.
 - **Límites conocidos:** validación con una sola participante; política de privacidad sin revisión legal; contenido de ideas y líneas de ayuda pendiente de una última revisión.
 
 El detalle, con las decisiones y la deuda técnica abiertas, está en el [tablero](docs/project-management/01_Backlog_MVP.md).
+
+## Licencia
+
+Todos los derechos reservados. El repositorio es público para que el código y la documentación puedan leerse, descargarse y evaluarse; no se permite copiarlos, modificarlos, distribuirlos ni reutilizarlos sin permiso del autor. Ver [LICENSE](LICENSE).
 
 ## Documentación
 

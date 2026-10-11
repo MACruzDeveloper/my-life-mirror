@@ -2,6 +2,11 @@ import { type Result, err, ok } from "#shared/domain/Result.js";
 import { AuthenticationError, ConflictError, DomainError, ValidationError } from "#shared/domain/DomainError.js";
 import { type EraseUserDependencies, createEraseUser } from "./EraseUser.js";
 
+/** TFM-01: la cuenta de demostración (su contraseña es pública) no se puede eliminar desde la app. */
+export class DemoAccountError extends DomainError {
+  readonly code = "DEMO_ACCOUNT";
+}
+
 export interface DeleteAccountInput {
   userId: string;
   /** Sale de la sesión verificada en el servidor, nunca del cliente. */
@@ -14,19 +19,22 @@ export interface DeleteAccountInput {
  * contraseña (una sesión abierta en un equipo ajeno no basta para destruir la
  * cuenta) y la comprueba contra Supabase Auth con el email de la sesión.
  * El único administrador no puede eliminarse (ConflictError): siempre debe
- * quedar uno. Orden del borrado: datos primero, cuenta de acceso la última — si algo
+ * quedar uno. Tampoco la cuenta de demostración de la entrega (TFM-01). Orden del borrado: datos primero, cuenta de acceso la última — si algo
  * falla por el camino el usuario sigue pudiendo entrar y repetirlo (todos los
  * pasos son repetibles); al revés quedarían datos huérfanos sin nadie que
  * pueda pedir su borrado. Los fakes en memoria no tienen `on delete cascade`,
  * así que no se delega en la cascada de la base de datos.
  * Ver docs/user-stories/RF-05-exportar-eliminar-datos.md.
  */
-export function createDeleteAccount(dependencies: EraseUserDependencies) {
+export function createDeleteAccount(dependencies: EraseUserDependencies & { /** Email de la cuenta de demostración, si la hay (`DEMO_USER_EMAIL`). */ protectedEmail?: string }) {
   const { authProvider } = dependencies;
   const eraseUser = createEraseUser(dependencies);
+  const protectedEmail = dependencies.protectedEmail?.trim().toLowerCase();
 
-  return async function deleteAccount(input: DeleteAccountInput): Promise<Result<void, ValidationError | AuthenticationError | ConflictError>> {
+  return async function deleteAccount(input: DeleteAccountInput): Promise<Result<void, ValidationError | AuthenticationError | ConflictError | DemoAccountError>> {
     if (input.password.length === 0) return err(new ValidationError("Password is required"));
+    // Antes de comprobar nada más: su contraseña la conoce cualquiera que lea el README.
+    if (protectedEmail && input.email.trim().toLowerCase() === protectedEmail) return err(new DemoAccountError("The demo account cannot be deleted"));
 
     // Siempre debe existir un administrador: el último no puede borrarse (antes de pedir la
     // contraseña — no es información sensible y así el usuario sabe qué hacer sin probar nada).
