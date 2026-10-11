@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import { DEFAULT_LOCALE, isSupportedLocale, type Locale } from "#shared/domain/locales.js";
 import type { CatalogCategory, CategoryText } from "../domain/CatalogCategory.js";
 import type { CategoryCatalogRepository } from "../domain/CategoryCatalogRepository.js";
@@ -29,7 +30,7 @@ export class SupabaseCategoryCatalogRepository implements CategoryCatalogReposit
   private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
   }
 
   async findAll(): Promise<CatalogCategory[]> {

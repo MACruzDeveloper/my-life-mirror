@@ -1,16 +1,26 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { RegisterForm } from "@modules/accounts/ui/RegisterForm";
 import { createTestClient, withClient } from "../../../helpers/queryClient";
 
-function fillAndSubmit() {
-  fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: "Ana" } });
+function fillAndSubmit(password = "Bici-Azul-Lluvia-47", name = "Ana") {
+  fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: name } });
   fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "ana@ejemplo.com" } });
-  fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: "12345678" } });
+  fireEvent.change(screen.getByLabelText(/^contraseña/i), { target: { value: password } });
   fireEvent.click(screen.getByRole("button", { name: /registrarse/i }));
+}
+
+function renderForm() {
+  return render(
+    withClient(
+      <MemoryRouter>
+        <RegisterForm />
+      </MemoryRouter>,
+    ),
+  );
 }
 
 describe("RegisterForm (RF-01)", () => {
@@ -37,7 +47,7 @@ describe("RegisterForm (RF-01)", () => {
 
     await waitFor(() => expect(screen.getByText("Página de inicio")).toBeInTheDocument());
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(body).toEqual({ name: "Ana", email: "ana@ejemplo.com", password: "12345678" });
+    expect(body).toEqual({ name: "Ana", email: "ana@ejemplo.com", password: "Bici-Azul-Lluvia-47" });
   });
 
   it("si la cuenta se crea pero la sesión no, confirma y ofrece iniciar sesión a mano", async () => {
@@ -57,25 +67,84 @@ describe("RegisterForm (RF-01)", () => {
     expect(screen.getByRole("link", { name: /iniciar sesión/i })).toHaveAttribute("href", "/login");
   });
 
-  it("muestra el mensaje de error que devuelve el servidor", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        json: async () => ({ error: "Ya existe una cuenta con ese email" }),
-      }),
-    );
+  describe("contraseña fuerte (SEC-01)", () => {
+    it("enseña los requisitos desde el principio, antes de escribir nada", () => {
+      renderForm();
 
-    render(
-      withClient(<MemoryRouter>
-        <RegisterForm />
-      </MemoryRouter>),
-    );
+      const requirements = within(screen.getByRole("list", { name: /tu contraseña necesita/i }));
+      expect(requirements.getAllByRole("listitem")).toHaveLength(5);
+      expect(requirements.getByText(/entre 12 y 72 caracteres/i)).toBeInTheDocument();
+      expect(requirements.getByText(/un símbolo/i)).toBeInTheDocument();
+    });
+
+    it("marca cada requisito según se va cumpliendo", () => {
+      renderForm();
+
+      fireEvent.change(screen.getByLabelText(/^contraseña/i), { target: { value: "bici" } });
+
+      expect(screen.getByText(/una letra minúscula/i).closest("li")).toHaveAttribute("data-state", "met");
+      expect(screen.getByText(/una letra mayúscula/i).closest("li")).toHaveAttribute("data-state", "pending");
+    });
+
+    it("con 'Test1234!' no envía nada y dice qué falla, también lo previsible", async () => {
+      const fetchMock = vi.fn();
+      vi.stubGlobal("fetch", fetchMock);
+      renderForm();
+
+      fillAndSubmit("Test1234!");
+
+      expect(await screen.findByText(/no cumple los requisitos/i)).toBeInTheDocument();
+      expect(screen.getByText(/entre 12 y 72 caracteres/i).closest("li")).toHaveAttribute("data-state", "missing");
+      expect(screen.getByText(/secuencias ni repeticiones/i)).toBeInTheDocument();
+      expect(screen.getByText(/contraseña muy común/i)).toBeInTheDocument();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it("avisa si la contraseña contiene el nombre de quien se registra", async () => {
+      vi.stubGlobal("fetch", vi.fn());
+      renderForm();
+
+      fillAndSubmit("Marina-Lluvia-2026!", "Marina");
+
+      expect(await screen.findByText(/tu nombre ni tu email/i)).toBeInTheDocument();
+    });
+
+    it("si el servidor la rechaza igualmente, enseña los requisitos que él indica", async () => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 400, json: async () => ({ error: "x", code: "WEAK_PASSWORD", rules: ["common"] }) }));
+      renderForm();
+
+      fillAndSubmit();
+
+      expect(await screen.findByText(/contraseña muy común/i)).toBeInTheDocument();
+    });
+
+    it("deja ver lo que se escribe, para no equivocarse con una contraseña larga", () => {
+      renderForm();
+      const field = screen.getByLabelText(/^contraseña/i);
+
+      fireEvent.click(screen.getByRole("button", { name: /mostrar la contraseña/i }));
+
+      expect(field).toHaveAttribute("type", "text");
+    });
+  });
+
+  it("si el email ya tiene cuenta, el mensaje no lo afirma (SEC-01)", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 400, json: async () => ({ error: "No se ha podido crear la cuenta con este email", code: "EMAIL_NOT_ACCEPTED" }) }));
+    renderForm();
+
     fillAndSubmit();
 
-    await waitFor(() => {
-      expect(screen.getByText(/ya existe una cuenta/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/no se ha podido crear la cuenta con este email/i)).toBeInTheDocument();
+    expect(screen.queryByText(/ya existe/i)).not.toBeInTheDocument();
+  });
+
+  it("si se superan los intentos, pide esperar (SEC-02)", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 429, json: async () => ({ error: "x", code: "RATE_LIMITED" }) }));
+    renderForm();
+
+    fillAndSubmit();
+
+    expect(await screen.findByText(/demasiados intentos/i)).toBeInTheDocument();
   });
 
   it("al registrarse con sesión iniciada vacía la caché de datos", async () => {

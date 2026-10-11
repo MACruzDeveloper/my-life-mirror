@@ -2,12 +2,12 @@
   "comun": {
     "email": "Email",
     "contrasena": "Password",
-    "contrasenaAyuda": "At least 8 characters",
     "errorServidor": "Could not reach the server",
     "reintentar": "Retry",
     "idioma": "Language",
     "abrirMenu": "Open menu",
-    "cargando": "Loading…"
+    "cargando": "Loading…",
+    "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again."
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -33,14 +33,38 @@
     "botonEnviando": "Creating account…",
     "exito": "Account created for {{email}}.",
     "irALogin": "Log in",
-    "errorGenerico": "Could not complete the registration"
+    "errorGenerico": "Could not complete the registration",
+    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password."
   },
   "login": {
     "titulo": "Log in",
     "boton": "Log in",
     "botonEnviando": "Logging in…",
     "olvideContrasena": "Forgot your password?",
-    "errorGenerico": "Could not log in"
+    "errorGenerico": "Could not log in",
+    "errorCredenciales": "Wrong email or password"
+  },
+  "contrasena": {
+    "requisitos": "Your password needs:",
+    "reglas": {
+      "length": "Between 12 and 72 characters",
+      "lowercase": "A lowercase letter",
+      "uppercase": "An uppercase letter",
+      "digit": "A number",
+      "symbol": "A symbol (for example - _ . ! ?)",
+      "sequence": "No sequences or repeats such as 1234, abcd, qwerty or aaa",
+      "common": "Not similar to a very common password (password, qwerty, the app's name…)",
+      "personal": "Without your name or your email in it"
+    },
+    "estado": {
+      "met": "Done",
+      "pending": "Pending",
+      "missing": "Missing"
+    },
+    "consejo": "One idea: join three or four unrelated words and add a number and a symbol.",
+    "mostrar": "Show password",
+    "ocultar": "Hide password",
+    "noCumple": "The password doesn't meet the requirements. See what's missing below the field."
   },
   "olvidePassword": {
     "titulo": "Forgot password",
@@ -109,7 +133,8 @@
     "iaSugerenciasTitulo": "AI suggestions from your experiences",
     "iaSugerenciasTexto": "This is also optional, separate from the above and off by default. If you turn it on in Privacy and data, each experience in your diary shows “Suggest options with AI”: pressing it sends to Anthropic, as data processor, only the experience you ask to analyse, together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you and doesn't assess how you are. Before sending it we remove emails, phone numbers, links and long numbers; names can't be removed reliably, so we ask you not to write other people's names if you don't want them sent. Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent. You can turn it off whenever you like; only the options you accept remain from the AI.",
     "compartidasTitulo": "Experiences shared with other people",
-    "compartidasTexto": "If your latest score in an area is 8 or more, you can anonymously share an experience from your diary to help other people. Only the one you choose is shared, after you see how it will look. Other people using the app only read the text, among the ideas for that area and in your same language: never your name, your email, the date or your score. Before publishing it we check that it has no contact details, health or money advice, or insults. Experiences from sensitive categories or Relationship are never shared. Bear in mind that if you tell very personal details, someone who knows you might recognise you. You can stop sharing it whenever you like, in your diary or in Privacy and data; if someone reports it, it's hidden. It's deleted when you delete the experience or your account."
+    "compartidasTexto": "If your latest score in an area is 8 or more, you can anonymously share an experience from your diary to help other people. Only the one you choose is shared, after you see how it will look. Other people using the app only read the text, among the ideas for that area and in your same language: never your name, your email, the date or your score. Before publishing it we check that it has no contact details, health or money advice, or insults. Experiences from sensitive categories or Relationship are never shared. Bear in mind that if you tell very personal details, someone who knows you might recognise you. You can stop sharing it whenever you like, in your diary or in Privacy and data; if someone reports it, it's hidden. It's deleted when you delete the experience or your account.",
+    "iaLimiteTexto": "To prevent abuse, we count how many times a day you use these AI features (only the number, not what you ask or what is answered), and there is a daily maximum per person. If you go over it, you'll see the app's original ideas until the next day. That counter is deleted with your account."
   },
   "entrevista": {
     "titulo": "Your interview",
@@ -211,7 +236,7 @@
     "sugeridoPorIa": "Suggested by AI",
     "aceptarSugerencia": "Mark “{{opcion}}”",
     "descartarSugerencia": "Dismiss “{{opcion}}”",
-    "sinSugerencias": "We didn't find any options in this experience.",
+    "sinSugerencias": "We didn't find any new options in this experience.",
     "sugiriendo": "Thinking of suggestions…",
     "experienciasPrivadasConIa": "Only you can see them. They're never shared; only the one you ask to analyse goes to the AI.",
     "sugerenciasPista": "Want the AI to suggest options from your experiences?",
@@ -239,7 +264,9 @@
       "category": "Experiences aren't shared in this area.",
       "reported": "This experience was removed after a report and can't be shared again.",
       "error": "We couldn't share it. Please try again."
-    }
+    },
+    "sugerenciasLimite": "You've reached today's maximum of AI uses. You can try again tomorrow.",
+    "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later."
   },
   "resultados": {
     "titulo": "Your results",
@@ -436,7 +463,8 @@
     "sugerenciasRevocable": "It's off by default and you can turn it off whenever you like. Only the options you accept remain from the AI.",
     "compartidasTitulo": "Shared experiences",
     "compartidasTexto": "The experiences from your diary that you've shared anonymously to help other people. They only see the text: not your name, the date or your score.",
-    "compartidasNinguna": "You don't have any shared experiences."
+    "compartidasNinguna": "You don't have any shared experiences.",
+    "errorCuentaDemo": "This is the project's demo account and it can't be deleted. If you'd like to try deleting an account, create your own: it is really deleted, with all its data."
   },
   "recomendaciones": {
     "ideaAnterior": "Previous idea",
@@ -527,7 +555,8 @@
     "reportar": "Report",
     "reportada": "Thank you. We've hidden it.",
     "errorReportar": "We couldn't report it. Please try again.",
-    "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it."
+    "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it.",
+    "limiteIa": "You've reached today's maximum of AI uses: this is the original idea. You can try again tomorrow."
   },
   "evolucion": {
     "titulo": "Your evolution",

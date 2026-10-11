@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { Locale } from "#shared/domain/locales.js";
 import type { PersonalizedIdea, PersonalizedIdeaRepository } from "../domain/PersonalizedIdea.js";
 
@@ -33,7 +34,7 @@ export class SupabasePersonalizedIdeaRepository implements PersonalizedIdeaRepos
   private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
   }
 
   async find(recommendationId: string, templateKey: string, locale: Locale): Promise<PersonalizedIdea | undefined> {

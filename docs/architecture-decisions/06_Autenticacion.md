@@ -41,6 +41,18 @@ Se añade `rol: "usuario" | "premium" | "admin"` a `AuthenticatedUser` (puerto `
 
   No existe todavía un flujo propio de gestión de roles (endpoint/UI) — es la vía razonable mientras el admin sea una sola persona (el propio equipo) y premium no tenga ventajas definidas (RN-11/RD-10). Importante: el cambio no se refleja en una sesión ya abierta hasta que el usuario vuelva a iniciar sesión (el `access_token` ya emitido lleva los metadatos de cuando se creó).
 
+### 1.2 Contraseñas, intentos y controladores públicos (SEC-01 a SEC-03, 11 oct. 2026)
+
+Supabase guarda y comprueba las contraseñas; **qué contraseña se acepta** lo decide el dominio de la app, porque Supabase solo sabe exigir longitud y tipos de caracteres.
+
+- **Política** (`accounts/domain/passwordPolicy.ts`, función pura): 12 a 72 caracteres; minúscula, mayúscula, número y símbolo; sin secuencias ni repeticiones; que no sea una palabra común aunque lleve números, símbolos o sustituciones (lista curada en `domain/catalog/commonPasswords.json`); que no contenga el nombre ni el email. La misma función la usan el Value Object `Password` (servidor) y los formularios (para explicar qué falta). **Alternativa descartada:** una sola expresión regular de tipos de caracteres, que acepta `Password1234!`.
+- **Dónde se aplica:** registro y cambio de contraseña. Nunca en el inicio de sesión, que responde siempre "email o contraseña incorrectos": las cuentas antiguas siguen entrando y no se da ninguna pista.
+- **Excepciones:** la contraseña temporal de la administración se genera cumpliendo la política (`generatePassword`). La cuenta de prueba se crea directamente en el proveedor: su contraseña es pública a propósito.
+- **Email ya registrado:** mensaje neutro. No cierra del todo la enumeración de cuentas; eso exigiría verificar el email (ver [SEC-01](../user-stories/SEC-01-contrasenas-fuertes.md), nota de límites).
+- **Límite de intentos** ([SEC-02](../user-stories/SEC-02-limite-de-intentos.md)): propio, por IP y por cuenta, contado en la base de datos (migración 0021). El de Supabase no sirve aquí: ve la IP de Vercel, no la de quien llama.
+- **Plantilla `publicHandler`:** los cuatro controladores sin sesión comparten método, origen, tamaño, validación, tope de intentos y traducción de errores (ADR-03, apartado 3.4, hace lo mismo con `sessionHandler` para los que tienen sesión).
+- **Cliente del servidor** (`createServiceClient`): sin sesión guardada; el inicio de sesión usa uno que se descarta, para que el compartido nunca actúe como la última persona que entró.
+
 ## 2. Bloqueo resuelto (13-14 sept. 2026)
 
 El proyecto de Supabase devolvía `PGRST125` ("Invalid path specified in request URL") en **todas** las rutas del gateway de API, confirmado con `curl` directo sin pasar por el SDK — la base de datos en sí funcionaba bien. Descartado por evidencia directa: elección de clave, código/SDK propios, reinicio del proyecto. **Causa real: `SUPABASE_URL` estaba mal** (a pesar de tener el formato correcto a simple vista). Corregido; registro y login verificados funcionando de extremo a extremo.
@@ -61,3 +73,4 @@ El proyecto de Supabase devolvía `PGRST125` ("Invalid path specified in request
 - **v2.8 (20 sept. 2026)** — ADM-03: el rol ya se puede cambiar desde la app (`/api/admin/user-role`, sustituye al SQL manual de apartado 1.1, con contraseña del admin y la regla del último administrador). Se añade la suspensión de cuentas (`ban_duration` de Supabase) y `verificarSesion` rechaza sesiones abiertas de cuentas suspendidas. `AuthProvider` gana `cambiarRol`, `actualizarEmail`, `suspender`, `reactivar` y `eliminarUsuario`.
 - **v2.9 (28 sept. 2026)** — numeración: los apartados "bis/ter" pasan a subapartados decimales del apartado anterior (convención del proyecto, AGENTS.md); referencias actualizadas en todo el repositorio. Sin cambios de contenido.
 - **v2.10 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v2.11 (11 oct. 2026)** — apartado 1.2: política de contraseñas en el dominio, límite de intentos propio, plantilla de los controladores públicos y cliente del servidor sin sesión guardada (SEC-01 a SEC-03).

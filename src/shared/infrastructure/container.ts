@@ -9,6 +9,7 @@ import { SupabaseAuthProvider } from "#modules/accounts/infrastructure/SupabaseA
 import { createRegisterUser } from "#modules/accounts/application/RegisterUser.js";
 import { createLogIn } from "#modules/accounts/application/LogIn.js";
 import { createDeleteAccount } from "#modules/accounts/application/DeleteAccount.js";
+import { createEraseUser } from "#modules/accounts/application/EraseUser.js";
 import { createExportUserData } from "#modules/accounts/application/ExportUserData.js";
 import { createGenerateRecommendations } from "#modules/recommendations/application/GenerateRecommendations.js";
 import { createListRecommendations } from "#modules/recommendations/application/ListRecommendations.js";
@@ -21,6 +22,14 @@ import type { IdeaReviewer, IdeaWriter } from "#modules/recommendations/domain/I
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infrastructure/FakeIdeaWriter.js";
 import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
+import { AnthropicIdeaReviewer, AnthropicIdeaWriter, AnthropicOptionSuggester } from "#modules/recommendations/infrastructure/anthropic/AnthropicIdeaProvider.js";
+import { createAnthropicModel } from "#modules/recommendations/infrastructure/anthropic/AnthropicStructuredModel.js";
+import type { AttemptLimiter } from "#shared/domain/AttemptLimiter.js";
+import { InMemoryAttemptLimiter, UnlimitedAttemptLimiter } from "#shared/infrastructure/InMemoryAttemptLimiter.js";
+import { SupabaseAttemptLimiter } from "#shared/infrastructure/SupabaseAttemptLimiter.js";
+import { InMemoryAiUsageLimiter } from "#modules/recommendations/infrastructure/InMemoryAiUsageLimiter.js";
+import { SupabaseAiUsageLimiter } from "#modules/recommendations/infrastructure/SupabaseAiUsageLimiter.js";
+import { type AiUsageLimiter, parseAiDailyLimit } from "#modules/recommendations/domain/AiUsageLimiter.js";
 import type { OptionSuggester } from "#modules/recommendations/domain/OptionSuggester.js";
 import { createSuggestExperienceOptions } from "#modules/recommendations/application/SuggestExperienceOptions.js";
 import { createSetAiSuggestions } from "#modules/accounts/application/SetAiSuggestions.js";
@@ -118,6 +127,19 @@ function createAuthProvider(environment: Environment): AuthProvider {
   return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
 }
 
+/**
+ * SEC-02: el contador de intentos vive en la base de datos (cada función
+ * serverless está aislada). Contra un Supabase local no hay tope: es la base
+ * de los E2E y de `dev:local`, donde una misma máquina registra decenas de
+ * cuentas en segundos, y no hay nada real que proteger.
+ */
+function createAttemptLimiter(environment: Environment, clock: Clock): AttemptLimiter {
+  if (environment === "test") return new InMemoryAttemptLimiter(clock);
+  const { url, serviceRoleKey } = supabaseCredentials();
+  if (["127.0.0.1", "localhost"].includes(new URL(url).hostname)) return new UnlimitedAttemptLimiter();
+  return new SupabaseAttemptLimiter(url, serviceRoleKey, clock);
+}
+
 function createExperienceRepository(environment: Environment): ExperienceRepository {
   if (environment === "test") {
     return new InMemoryExperienceRepository();
@@ -134,17 +156,42 @@ function createPersonalizedIdeaRepository(environment: Environment): Personalize
   return new SupabasePersonalizedIdeaRepository(url, serviceRoleKey);
 }
 
+interface IdeaProvider {
+  writer?: IdeaWriter;
+  reviewer: IdeaReviewer;
+  suggester?: OptionSuggester;
+  /** Solo con el proveedor real: el *Fake* no gasta nada, así que no se cuenta. */
+  usageLimiter?: AiUsageLimiter;
+}
+
 /**
- * RF-40: quién escribe las ideas personalizadas, según `AI_IDEAS_PROVIDER`.
- * - `fake`: escritor determinista (desarrollo local y E2E).
- * - sin valor: función apagada (producción hasta RF-40b); la opción ni se ofrece.
- * - `anthropic`: llegará con RF-40b; hasta entonces, apagada con un aviso en el log.
+ * RF-40 y RF-45: quién escribe las ideas personalizadas y propone opciones, según
+ * `AI_IDEAS_PROVIDER` (el mismo proveedor para las dos: disponibles o no a la vez).
+ * - sin valor: funciones apagadas; las opciones ni se ofrecen.
+ * - `fake`: proveedor determinista y gratuito (desarrollo local, E2E y tests).
+ * - `anthropic` (RF-40b): el modelo real, con `ANTHROPIC_API_KEY` y un tope diario
+ *   por usuario (`AI_DAILY_LIMIT`). Sin clave, apagado con un aviso en el log.
  */
-function createIdeaProvider(): { writer?: IdeaWriter; reviewer: IdeaReviewer; suggester?: OptionSuggester } {
+function createIdeaProvider(environment: Environment, clock: Clock): IdeaProvider {
   const provider = process.env.AI_IDEAS_PROVIDER?.trim();
-  // RF-45 usa el mismo proveedor que RF-40: disponible o no a la vez.
   if (provider === "fake") return { writer: new FakeIdeaWriter(), reviewer: new FakeIdeaReviewer(), suggester: new FakeOptionSuggester() };
-  if (provider) logger.warn("AI_IDEAS_PROVIDER desconocido o sin implementar: ideas con IA apagadas", { provider });
+  if (provider === "anthropic") {
+    const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+    if (apiKey) {
+      const model = createAnthropicModel(apiKey);
+      const limit = parseAiDailyLimit(process.env.AI_DAILY_LIMIT);
+      const { url, serviceRoleKey } = environment === "test" ? { url: "", serviceRoleKey: "" } : supabaseCredentials();
+      return {
+        writer: new AnthropicIdeaWriter(model),
+        reviewer: new AnthropicIdeaReviewer(model),
+        suggester: new AnthropicOptionSuggester(model),
+        usageLimiter: environment === "test" ? new InMemoryAiUsageLimiter(limit, clock) : new SupabaseAiUsageLimiter(url, serviceRoleKey, limit, clock),
+      };
+    }
+    logger.warn("AI_IDEAS_PROVIDER=anthropic sin ANTHROPIC_API_KEY: IA apagada");
+  } else if (provider) {
+    logger.warn("AI_IDEAS_PROVIDER desconocido: IA apagada", { provider });
+  }
   return { reviewer: new FakeIdeaReviewer() };
 }
 
@@ -247,6 +294,8 @@ export interface AppContext {
   adminUsers: ReturnType<typeof createAdminUserActions>;
   exportUserData: ReturnType<typeof createExportUserData>;
   deleteAccount: ReturnType<typeof createDeleteAccount>;
+  /** Borra un usuario con todos sus datos, sin pedir contraseña: solo para herramientas del servidor (TFM-01, restaurar la cuenta de prueba). */
+  eraseUser: ReturnType<typeof createEraseUser>;
   requestPasswordReset: ReturnType<typeof createRequestPasswordReset>;
   resetPassword: ReturnType<typeof createResetPassword>;
   consentRepository: ConsentRepository;
@@ -270,6 +319,7 @@ export interface AppContext {
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
   getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
+  experienceRepository: ExperienceRepository;
   addExperience: ReturnType<typeof createAddExperience>;
   listExperiences: ReturnType<typeof createListExperiences>;
   deleteExperience: ReturnType<typeof createDeleteExperience>;
@@ -281,6 +331,8 @@ export interface AppContext {
   listRecommendations: ReturnType<typeof createListRecommendations>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
   aiIdeasAvailable: boolean;
+  /** SEC-02: tope de intentos de los controladores públicos (inicio de sesión, registro…). */
+  attemptLimiter: AttemptLimiter;
   setAiSuggestions: ReturnType<typeof createSetAiSuggestions>;
   suggestExperienceOptions: ReturnType<typeof createSuggestExperienceOptions>;
   personalizeRecommendation: ReturnType<typeof createPersonalizeRecommendation>;
@@ -301,7 +353,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const recommendationRepository = createRecommendationRepository(environment);
   const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
-  const ideaProvider = createIdeaProvider();
+  const ideaProvider = createIdeaProvider(environment, clock);
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
   const generateRecommendations = createGenerateRecommendations({
     recommendationRepository,
@@ -336,7 +388,8 @@ export function createAppContext(environment: Environment = detectEnvironment())
       clock,
     }),
     exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -369,6 +422,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
     getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
     // RF-44: el diario de experiencias, separado de las evaluaciones.
+    experienceRepository,
     addExperience: createAddExperience({ experienceRepository, categoryRepository, clock }),
     listExperiences: createListExperiences(experienceRepository),
     deleteExperience: createDeleteExperience({ experienceRepository, assessmentRepository }),
@@ -380,6 +434,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
     aiIdeasAvailable: ideaProvider.writer !== undefined,
+    attemptLimiter: createAttemptLimiter(environment, clock),
     setAiSuggestions: createSetAiSuggestions({ profileRepository, clock }),
     suggestExperienceOptions: createSuggestExperienceOptions({
       experienceRepository,
@@ -388,6 +443,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
       profileRepository,
       ideaTexts: new JsonIdeaTexts(),
       suggester: ideaProvider.suggester,
+      usageLimiter: ideaProvider.usageLimiter,
       report: (reason, error) => logger.warn("Sin sugerencias de la IA (RF-45)", { reason, ...(error ? { error: String(error) } : {}) }),
     }),
     personalizeRecommendation: createPersonalizeRecommendation({
@@ -400,6 +456,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
       ideaTexts: new JsonIdeaTexts(),
       writer: ideaProvider.writer,
       reviewer: ideaProvider.reviewer,
+      usageLimiter: ideaProvider.usageLimiter,
       clock,
       report: (reason, error) => logger.warn("Idea personalizada descartada: se muestra el texto curado", { reason, ...(error ? { error: String(error) } : {}) }),
     }),

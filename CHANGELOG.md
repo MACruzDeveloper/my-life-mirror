@@ -5,6 +5,46 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.3.0] - 2026-10-11
+
+El modelo real de IA, la cuenta de prueba para la entrega del TFM y la primera revisión completa de seguridad. **Migraciones 0020 y 0021** (las dos ya ejecutadas en producción). Variables nuevas en Vercel: `AI_IDEAS_PROVIDER`, `ANTHROPIC_API_KEY` y `DEMO_USER_EMAIL`.
+
+### Seguridad (primera revisión completa: [plan de seguridad](docs/security/01_Plan_Seguridad.md))
+
+- **Contraseñas fuertes (SEC-01):** las nuevas necesitan de 12 a 72 caracteres, con minúscula, mayúscula, número y símbolo, sin secuencias (`1234`, `qwerty`), sin ser una palabra común aunque lleve sustituciones (`P4ssw0rd!2026`) y sin el nombre ni el email. Registro y cambio de contraseña enseñan los requisitos desde el principio y los van marcando; el inicio de sesión no da ninguna pista. Las cuentas que ya existen no cambian.
+- El registro ya no dice "ya existe una cuenta con ese email": mensaje neutro.
+- **Límite de intentos (SEC-02)** en inicio de sesión, registro y recuperación de contraseña, por IP y por cuenta, contado en la base de datos. **Migración 0021** (`attempt_counters` y su función): ejecutarla antes de desplegar. Sin ella el servidor deja pasar y lo anota.
+- **Cabeceras de seguridad (SEC-03):** política de contenido (CSP), `nosniff`, protección contra marcos, `Referrer-Policy` y `Permissions-Policy` en todas las respuestas; la API, sin caché. `npm run smoke:prod` las comprueba.
+- Las acciones que cambian datos rechazan las peticiones que vienen de otra web (403) y los cuerpos desmesurados (413); longitudes máximas en los campos de cuenta.
+- Los controladores públicos comparten una plantilla (`publicHandler`); el cliente de Supabase del servidor ya no guarda sesión.
+- **IA (SEC-04):** el prompt de "Sugerir opciones con IA" trata la experiencia como un dato y no sigue órdenes que contenga; la evaluación con el modelo incluye cinco intentos de inyección, los cinco resistidos.
+- Toda lista de entrada tiene longitud máxima: junto con el tope de tamaño, deja sin efecto un fallo de zod sin corregir (CVE-2023-54404) que permitía agotar la memoria de una función con una lista enorme. Lo encontró Snyk, probado como segunda herramienta.
+- **Dependencias:** corregidas 2 vulnerabilidades altas en paquetes de desarrollo. Dependabot (`.github/dependabot.yml`) y un workflow de seguridad (`npm audit` y CodeQL) en cada PR y cada lunes.
+- `npm run backup:db`: copia de seguridad de la base de datos en un archivo local (el plan gratuito de Supabase no guarda copias).
+
+### Añadido (TFM-01, cuenta de prueba para la entrega)
+
+- `npm run demo:reset`: crea o restaura la cuenta de prueba (seis áreas, un año de historial, ideas abiertas, opciones, diario, IA activada) y una segunda cuenta que comparte experiencias con ella. Borra solo esas dos cuentas; contra la base real pide `-- --yes`, y con `-- --local` usa el Supabase local. Contenido en `demoAccount.json`.
+- La cuenta de prueba no se puede eliminar desde la app si `DEMO_USER_EMAIL` está definida en el servidor: se explica que es de demostración.
+- README con capturas, licencia (todos los derechos reservados) y qué probar con la cuenta.
+
+### Corregido (herramientas)
+
+- Los E2E con `api/` ya no muestran `MaxListenersExceededWarning`: no era una fuga (0 oyentes al terminar, medido), sino hasta 30 peticiones a la vez contra un límite por defecto de 10. Se sube el límite de ese canal a 100.
+
+### Cambiado (documentación)
+
+- La entrega del TFM pasa a "hacia el 20 de octubre, como máximo el 26" en los documentos vivos (antes figuraba el 31). AGENTS.md: "Tareas clave" al día.
+
+### Añadido (RF-40b, el modelo real de IA)
+
+- Las ideas personalizadas (RF-40) y las sugerencias desde el diario (RF-45) pueden funcionar con el modelo real: Claude Haiku 5.5 por la API de Anthropic, con salida estructurada. Se activa con `AI_IDEAS_PROVIDER=anthropic` y `ANTHROPIC_API_KEY` (solo en el servidor); sin clave queda apagado. En local y en los tests sigue el proveedor simulado: desarrollar no gasta crédito.
+- Tope diario de usos de IA por usuario (`AI_DAILY_LIMIT`, 40 por defecto), contado en la base de datos. Superado, se ven las ideas originales. **Migración 0020** (`ai_usage` y su función): ejecutarla antes de activar el proveedor real.
+- El revisor recibe también lo que el usuario marcó en "¿Qué te ayuda?", para no tomar por inventado lo que el usuario dijo.
+- Evaluación con el modelo real (`npm run eval:ai`, solo a mano: gasta céntimos): 17 de 20 ideas llegan al usuario, el revisor para 23 de 23 borradores malos y las sugerencias no inventan ninguna clave (ADR-05, apartado 4.3.4).
+- La política de privacidad explica el contador de uso.
+- Mensajes claros cuando la IA no propone nada: "No hemos encontrado opciones nuevas" (ya están marcadas las que encajan o el texto no encaja con ninguna), tope diario agotado, o proveedor no disponible. Antes los tres casos daban el mismo texto. La ventana de ideas también avisa cuando enseña la idea original por el tope.
+
 ## [1.2.1] - 2026-10-07
 
 Correcciones de la revisión de código del Ciclo 2 y una plantilla común para los controladores. Sin migraciones.

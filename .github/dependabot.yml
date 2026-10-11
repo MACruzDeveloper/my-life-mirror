@@ -1,0 +1,24 @@
+# Dependabot: abre una PR cuando una dependencia tiene una versión nueva (y, con los
+# avisos de seguridad activados en GitHub, cuando una tiene una vulnerabilidad conocida).
+# Las PRs van a `develop`, como cualquier otro cambio, y pasan los mismos controles.
+# Ver docs/security/01_Plan_Seguridad.md, paso 2.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    # Una sola PR para las actualizaciones menores y de parche, en vez de una por paquete.
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  # Las acciones de los workflows también son dependencias.
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: monthly

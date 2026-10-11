@@ -2,7 +2,7 @@
 
 **Basado en:** [01_Requisitos_Fase1.md](01_Requisitos_Fase1.md) v0.3
 **Fecha:** 5 de septiembre de 2026
-**Alcance:** técnicas realistas para un TFM desarrollado por una persona, con fecha límite el 31 de octubre de 2026 (RES-01, RES-02). No se pretende cobertura exhaustiva tipo producto real, sino un conjunto mínimo defendible que genere evidencia real para la memoria.
+**Alcance:** técnicas realistas para un TFM desarrollado por una persona, con entrega hacia el 20 de octubre de 2026 y, como máximo, el 26 (RES-01, RES-02). No se pretende cobertura exhaustiva tipo producto real, sino un conjunto mínimo defendible que genere evidencia real para la memoria.
 
 ---
 
@@ -139,3 +139,4 @@ Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras f
 - **v1.6 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
 - **v1.6 (3 oct. 2026)** — apartado 1.2: segunda lección de los E2E (carrera tras `db reset`, resuelta esperando a que la API vea las tablas).
 - **v1.7 (4 oct. 2026)** — apartado 1.2: tercera lección (una intermitencia que era un fallo real de la caché, y `networkidle`, que no espera a las acciones posteriores).
+- **v1.8 (11 oct. 2026)** — fecha de entrega actualizada (hacia el 20 de octubre, como máximo el 26).

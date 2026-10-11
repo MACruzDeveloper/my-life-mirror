@@ -18,7 +18,7 @@ Para volver a acceder a mi cuenta sin contactar con soporte
    Then la respuesta es idéntica a la del caso 1 (mismo motivo: no revelar qué emails están registrados)
 
 3. Given un enlace de restablecimiento válido y no usado
-   When el usuario establece una contraseña nueva de al menos 8 caracteres
+   When el usuario establece una contraseña nueva que cumple la política (SEC-01)
    Then la contraseña se actualiza y puede iniciar sesión con ella
 
 ## Nota de diseño (por qué no se usa el SDK de Supabase en el navegador)
@@ -28,3 +28,4 @@ El flujo estándar de Supabase espera que el cliente JS del navegador complete e
 ## Historial de cambios
 
 - **v1.0 (14 sept. 2026)** — versión inicial.
+- **v1.1 (11 oct. 2026)** — la contraseña ya no es "al menos 8 caracteres": la política está en [SEC-01](SEC-01-contrasenas-fuertes.md); el inicio de sesión no da pistas y los intentos están contados ([SEC-02](SEC-02-limite-de-intentos.md)).

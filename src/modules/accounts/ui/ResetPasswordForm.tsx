@@ -2,12 +2,14 @@ import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 import { extractTokenFromHash } from "./extractTokenFromHash";
 import { PublicFormBox } from "@shared/ui/components/PublicFormBox";
+import { type PasswordRule, checkPassword } from "@modules/accounts/domain/passwordPolicy";
+import { authErrorMessage } from "./authErrors";
+import { NewPasswordField } from "./NewPasswordField";
 
 type FormState = { kind: "inicial" } | { kind: "enviando" } | { kind: "exito" } | { kind: "error"; message: string };
 
@@ -17,10 +19,19 @@ export function ResetPasswordForm() {
   const [token] = useState(() => extractTokenFromHash(window.location.hash));
   const [password, setPassword] = useState("");
   const [formState, setFormState] = useState<FormState>({ kind: "inicial" });
+  const [submitted, setSubmitted] = useState(false);
+  const [serverRules, setServerRules] = useState<PasswordRule[]>([]);
 
   async function handleSubmit(submitEvent: React.FormEvent) {
     submitEvent.preventDefault();
     if (!token) return;
+    setSubmitted(true);
+    setServerRules([]);
+    // SEC-01: la misma regla que el registro, explicada antes de enviar.
+    if (checkPassword(password).length > 0) {
+      setFormState({ kind: "error", message: t("contrasena.noCumple") });
+      return;
+    }
     setFormState({ kind: "enviando" });
 
     try {
@@ -32,7 +43,8 @@ export function ResetPasswordForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setFormState({ kind: "error", message: data.error ?? t("restablecerPassword.errorGenerico") });
+        if (data.code === "WEAK_PASSWORD") setServerRules(data.rules ?? []);
+        setFormState({ kind: "error", message: authErrorMessage(t, data, t("restablecerPassword.errorGenerico")) });
         return;
       }
 
@@ -82,15 +94,7 @@ export function ResetPasswordForm() {
         </Typography>
         <Stack spacing={2}>
           {formState.kind === "error" && <Alert severity="error">{formState.message}</Alert>}
-          <TextField
-            label={t("restablecerPassword.nuevaContrasena")}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            helperText={t("comun.contrasenaAyuda")}
-            required
-            fullWidth
-          />
+          <NewPasswordField label={t("restablecerPassword.nuevaContrasena")} value={password} onChange={setPassword} showErrors={submitted} serverRules={serverRules} />
           <Button type="submit" variant="contained" disabled={formState.kind === "enviando"} fullWidth>
             {formState.kind === "enviando" ? t("restablecerPassword.botonEnviando") : t("restablecerPassword.boton")}
           </Button>

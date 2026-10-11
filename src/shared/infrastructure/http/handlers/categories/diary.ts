@@ -1,17 +1,18 @@
 import { z } from "zod";
 import { type Result, ok } from "#shared/domain/Result.js";
 import type { Experience } from "#modules/assessments/domain/Experience.js";
+import { MAX_ID_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { action, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 
 const AddExperienceSchema = z.object({
-  categoryId: z.string().min(1),
+  categoryId: z.string().min(1).max(MAX_ID_LENGTH),
   text: z.string().max(2000),
 });
 
 /** RF-43: compartir (con el idioma en que se escribió) o dejar de compartir. */
 const ShareSchema = z.discriminatedUnion("shared", [
-  z.object({ id: z.string().min(1), shared: z.literal(true), locale: z.string().min(1) }),
-  z.object({ id: z.string().min(1), shared: z.literal(false) }),
+  z.object({ id: z.string().min(1).max(MAX_ID_LENGTH), shared: z.literal(true), locale: z.string().min(1).max(MAX_ID_LENGTH) }),
+  z.object({ id: z.string().min(1).max(MAX_ID_LENGTH), shared: z.literal(false) }),
 ]);
 
 /** Lo que ve su autor: si está compartida o retirada tras un reporte, sin los detalles internos. */

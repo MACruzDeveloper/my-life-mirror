@@ -73,4 +73,37 @@ test.describe("primer uso: registro → entrevista → panel", () => {
     await expect(page.getByRole("alert")).toContainText(/incorrectos/i);
     await expect(page).toHaveURL(/\/login$/);
   });
+
+  test("SEC-01: una contraseña débil no crea la cuenta y el formulario dice qué falta", async ({ page }) => {
+    const account = new AccountPages(page);
+    await page.goto("/registro");
+    await expect(page.getByRole("list", { name: /tu contraseña necesita/i })).toBeVisible();
+
+    await account.tryToRegister({ ...newUser(), password: "Test1234!" });
+
+    await expect(page.getByRole("alert")).toContainText(/no cumple los requisitos/i);
+    await expect(page.getByText(/contraseña muy común/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/registro$/);
+  });
+
+  test("SEC-01: el servidor rechaza una contraseña débil aunque no pase por el formulario, y un email repetido sin afirmar que existe", async ({ page, request }) => {
+    const user = newUser();
+
+    const weak = await request.post("/api/accounts/register", { data: { ...user, password: "Password1234!" } });
+    expect(weak.status()).toBe(400);
+    expect(await weak.json()).toMatchObject({ code: "WEAK_PASSWORD", rules: ["sequence", "common"] });
+
+    await new AccountPages(page).register(user);
+    const repeated = await request.post("/api/accounts/register", { data: user });
+    expect(repeated.status()).toBe(400);
+    const body = await repeated.json();
+    expect(body.code).toBe("EMAIL_NOT_ACCEPTED");
+    expect(body.error).not.toMatch(/ya existe/i);
+  });
+
+  test("SEC-03: una acción pedida desde otra web se rechaza", async ({ request }) => {
+    const response = await request.post("/api/accounts/login", { data: { email: "a@example.com", password: "x" }, headers: { Origin: "https://otra-web.example" } });
+
+    expect(response.status()).toBe(403);
+  });
 });

@@ -16,7 +16,7 @@ describe("RegisterUser (RF-01)", () => {
   it("registra un usuario nuevo", async () => {
     const { registerUser } = setup();
 
-    const result = await registerUser({ email: "ana@ejemplo.com", password: "12345678", name: "Ana" });
+    const result = await registerUser({ email: "ana@ejemplo.com", password: "Bici-Azul-Lluvia-47", name: "Ana" });
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -27,7 +27,7 @@ describe("RegisterUser (RF-01)", () => {
   it("guarda el nombre como perfil inicial (RF-03)", async () => {
     const { registerUser, profileRepository } = setup();
 
-    const result = await registerUser({ email: "ana@ejemplo.com", password: "12345678", name: "Ana" });
+    const result = await registerUser({ email: "ana@ejemplo.com", password: "Bici-Azul-Lluvia-47", name: "Ana" });
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -38,9 +38,9 @@ describe("RegisterUser (RF-01)", () => {
 
   it("rechaza el registro si el email ya existe", async () => {
     const { registerUser } = setup();
-    await registerUser({ email: "ana@ejemplo.com", password: "12345678", name: "Ana" });
+    await registerUser({ email: "ana@ejemplo.com", password: "Bici-Azul-Lluvia-47", name: "Ana" });
 
-    const result = await registerUser({ email: "ana@ejemplo.com", password: "otraClave123", name: "Ana" });
+    const result = await registerUser({ email: "ana@ejemplo.com", password: "Otra-Clave-Lluvia-47", name: "Ana" });
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -51,7 +51,7 @@ describe("RegisterUser (RF-01)", () => {
   it("rechaza un email con formato inválido sin llegar a tocar el proveedor de auth", async () => {
     const { registerUser } = setup();
 
-    const result = await registerUser({ email: "no-es-email", password: "12345678", name: "Ana" });
+    const result = await registerUser({ email: "no-es-email", password: "Bici-Azul-Lluvia-47", name: "Ana" });
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -59,14 +59,24 @@ describe("RegisterUser (RF-01)", () => {
     }
   });
 
-  it("rechaza una contraseña demasiado corta", async () => {
+  it("rechaza una contraseña débil y dice qué requisitos fallan (SEC-01)", async () => {
     const { registerUser } = setup();
 
-    const result = await registerUser({ email: "ana@ejemplo.com", password: "corta", name: "Ana" });
+    const result = await registerUser({ email: "ana@ejemplo.com", password: "Test1234!", name: "Ana" });
 
     expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe("VALIDATION_ERROR");
+    if (!result.ok) expect(result.error).toMatchObject({ code: "WEAK_PASSWORD", rules: ["length", "sequence", "common"] });
+  });
+
+  it("rechaza una contraseña que contiene el nombre o el email de quien se registra (SEC-01)", async () => {
+    const { registerUser } = setup();
+
+    const byName = await registerUser({ email: "ana@ejemplo.com", password: "Marina-Lluvia-2026!", name: "Marina López" });
+    const byEmail = await registerUser({ email: "marina.lopez@ejemplo.com", password: "Azul-Lopez-Lluvia-47", name: "M" });
+
+    for (const result of [byName, byEmail]) {
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toMatchObject({ code: "WEAK_PASSWORD", rules: ["personal"] });
     }
   });
 
@@ -85,7 +95,7 @@ describe("RegisterUser (RF-01)", () => {
     const updateProfile = createUpdateProfile(failingProfileRepository);
     const registerUser = createRegisterUser(authProvider, updateProfile);
 
-    const result = await registerUser({ email: "ana@ejemplo.com", password: "12345678", name: "Ana" });
+    const result = await registerUser({ email: "ana@ejemplo.com", password: "Bici-Azul-Lluvia-47", name: "Ana" });
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -96,7 +106,7 @@ describe("RegisterUser (RF-01)", () => {
   it("rechaza un nombre vacío", async () => {
     const { registerUser } = setup();
 
-    const result = await registerUser({ email: "ana@ejemplo.com", password: "12345678", name: "   " });
+    const result = await registerUser({ email: "ana@ejemplo.com", password: "Bici-Azul-Lluvia-47", name: "   " });
 
     expect(result.ok).toBe(false);
     if (!result.ok) {

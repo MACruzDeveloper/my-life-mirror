@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { AuthProvider, LoggedInSession, AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
 import { DEFAULT_ROLE, readRoleFromMetadata, type UserRole } from "../domain/UserRole.js";
 import { AuthenticationError, ConflictError, ValidationError } from "#shared/domain/DomainError.js";
@@ -15,9 +16,12 @@ function isSuspended(bannedUntil?: string): boolean {
 export class SupabaseAuthProvider implements AuthProvider {
   private readonly client: SupabaseClient;
   private readonly resetPasswordUrl: string;
+  /** Un cliente nuevo por inicio de sesión: ver `logIn`. */
+  private readonly createSignInClient: () => SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string, resetPasswordUrl: string) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
+    this.createSignInClient = () => createServiceClient(url, serviceRoleKey);
     this.resetPasswordUrl = resetPasswordUrl;
   }
 
@@ -42,7 +46,10 @@ export class SupabaseAuthProvider implements AuthProvider {
   }
 
   async logIn(email: string, password: string): Promise<LoggedInSession> {
-    const { data, error } = await this.client.auth.signInWithPassword({ email, password });
+    // En un cliente aparte que se descarta (SEC-03): iniciar sesión deja al cliente
+    // actuando como ese usuario, y el cliente compartido debe seguir siendo solo el
+    // del servidor, sin la sesión de la última persona que entró.
+    const { data, error } = await this.createSignInClient().auth.signInWithPassword({ email, password });
 
     if (error || !data.session || !data.user) {
       throw new AuthenticationError("Email o contraseña incorrectos");

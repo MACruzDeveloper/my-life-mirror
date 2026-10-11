@@ -32,6 +32,7 @@ import { InterviewSteps, type InterviewStep } from "./interview/InterviewSteps";
 import { CategoryQuestion, type CategorySaveStatus, type LastUpdate, type TagFeedback } from "./interview/CategoryQuestion";
 import { InterviewProgress, type ProgressStatus } from "./interview/InterviewProgress";
 import { SavedIdeaDialog } from "./interview/SavedIdeaDialog";
+import type { SuggestionsAnswer } from "./interview/ExperienceJournal";
 import {
   ASSESSMENTS_KEY,
   EXPERIENCES_KEY,
@@ -222,7 +223,7 @@ export function InterviewPage() {
   }
 
   /** RF-45: opciones que la IA propone para una experiencia; `null` si no se pudo (la interfaz lo trata como "sin sugerencias"). */
-  async function suggestOptions(experience: ExperienceDto): Promise<{ helps: string[]; difficulties: string[] } | null> {
+  async function suggestOptions(experience: ExperienceDto): Promise<SuggestionsAnswer | null> {
     try {
       const response = await fetch("/api/recommendations/suggest-options", {
         method: "POST",
@@ -230,7 +231,7 @@ export function InterviewPage() {
         body: JSON.stringify({ experienceId: experience.id, locale: i18n.language }),
       });
       if (!response.ok) return null;
-      return (await response.json()) as { helps: string[]; difficulties: string[] };
+      return (await response.json()) as SuggestionsAnswer;
     } catch {
       return null;
     }

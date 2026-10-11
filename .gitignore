@@ -17,6 +17,9 @@ dist-ssr
 .env.*
 !.env.example
 
+# Copias de seguridad de la base de datos (npm run backup:db): datos personales, nunca a Git
+/backups/
+
 # Vercel
 .vercel
 

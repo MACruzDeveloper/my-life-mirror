@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { clearedSessionCookie } from "#shared/infrastructure/cookies.js";
 import { action, reply, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
+import { MAX_PASSWORD_INPUT_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 
-const DeleteAccountSchema = z.object({ password: z.string() });
+const DeleteAccountSchema = z.object({ password: z.string().max(MAX_PASSWORD_INPUT_LENGTH) });
 
 /**
  * Controlador HTTP — RF-05. Elimina la cuenta y todos sus datos tras

@@ -5,7 +5,7 @@ import { InMemoryAuthProvider } from "@modules/accounts/infrastructure/InMemoryA
 describe("SolicitarRecuperacion (RF-38)", () => {
   it("responde ok tanto para un email existente como para uno inexistente", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await authProvider.register("ana@ejemplo.com", "12345678");
+    await authProvider.register("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
     const requestPasswordReset = createRequestPasswordReset(authProvider);
 
     const existingResult = await requestPasswordReset({ email: "ana@ejemplo.com" });

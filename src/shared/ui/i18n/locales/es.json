@@ -2,12 +2,12 @@
   "comun": {
     "email": "Email",
     "contrasena": "Contraseña",
-    "contrasenaAyuda": "Al menos 8 caracteres",
     "errorServidor": "No se pudo contactar con el servidor",
     "reintentar": "Reintentar",
     "idioma": "Idioma",
     "abrirMenu": "Abrir menú",
-    "cargando": "Cargando…"
+    "cargando": "Cargando…",
+    "demasiadosIntentos": "Demasiados intentos. Espera unos minutos y vuelve a probar."
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -33,14 +33,38 @@
     "botonEnviando": "Creando cuenta…",
     "exito": "Cuenta creada para {{email}}.",
     "irALogin": "Iniciar sesión",
-    "errorGenerico": "No se pudo completar el registro"
+    "errorGenerico": "No se pudo completar el registro",
+    "errorEmail": "No se ha podido crear la cuenta con este email. Si ya tienes una, inicia sesión o recupera tu contraseña."
   },
   "login": {
     "titulo": "Iniciar sesión",
     "boton": "Iniciar sesión",
     "botonEnviando": "Iniciando sesión…",
     "olvideContrasena": "¿Olvidaste tu contraseña?",
-    "errorGenerico": "No se pudo iniciar sesión"
+    "errorGenerico": "No se pudo iniciar sesión",
+    "errorCredenciales": "Email o contraseña incorrectos"
+  },
+  "contrasena": {
+    "requisitos": "Tu contraseña necesita:",
+    "reglas": {
+      "length": "Entre 12 y 72 caracteres",
+      "lowercase": "Una letra minúscula",
+      "uppercase": "Una letra mayúscula",
+      "digit": "Un número",
+      "symbol": "Un símbolo (por ejemplo - _ . ! ?)",
+      "sequence": "Sin secuencias ni repeticiones como 1234, abcd, qwerty o aaa",
+      "common": "Que no se parezca a una contraseña muy común (password, qwerty, el nombre de la app…)",
+      "personal": "Que no lleve tu nombre ni tu email"
+    },
+    "estado": {
+      "met": "Cumplido",
+      "pending": "Pendiente",
+      "missing": "Falta"
+    },
+    "consejo": "Una idea: une tres o cuatro palabras sin relación entre sí y añade un número y un símbolo.",
+    "mostrar": "Mostrar la contraseña",
+    "ocultar": "Ocultar la contraseña",
+    "noCumple": "La contraseña no cumple los requisitos. Mira lo que falta debajo del campo."
   },
   "olvidePassword": {
     "titulo": "Recuperar contraseña",
@@ -109,7 +133,8 @@
     "iaSugerenciasTitulo": "Sugerencias de la IA a partir de tus experiencias",
     "iaSugerenciasTexto": "También es opcional, aparte de lo anterior y desactivado por defecto. Si lo activas en Privacidad y datos, en cada experiencia de tu diario aparece «Sugerir opciones con IA»: al pulsarlo se envía a Anthropic, como encargado del tratamiento, solo la experiencia que tú le pidas analizar, junto con las opciones posibles de esa categoría, para que te proponga cuáles marcar en «¿Qué te ayuda?» o «¿Qué te lo pone difícil?». Tú aceptas o descartas cada propuesta; la IA no escribe nada sobre ti ni valora tu estado. Antes de enviarla quitamos emails, teléfonos, enlaces y números largos; los nombres no se pueden quitar con seguridad, así que te pedimos que no escribas nombres de otras personas si no quieres que se envíen. Nunca se envían tu nombre, tu email, tus puntuaciones ni las experiencias que no pidas analizar, y nunca se envían las categorías sensibles ni la de Pareja. Puedes desactivarlo cuando quieras; de la IA solo quedan las opciones que aceptes.",
     "compartidasTitulo": "Experiencias compartidas con otras personas",
-    "compartidasTexto": "Si tu última puntuación en un área es de 8 o más, puedes compartir de forma anónima una experiencia de tu diario para ayudar a otras personas. Solo se comparte la que tú elijas, después de ver cómo la verán. Las demás personas usuarias de la app leen solo el texto, entre las ideas de esa área y en tu mismo idioma: nunca tu nombre, tu email, la fecha ni tu puntuación. Antes de publicarla comprobamos que no lleve datos de contacto, consejos de salud o de dinero ni insultos. Nunca se comparten experiencias de las categorías sensibles ni de Pareja. Ten en cuenta que, si cuentas detalles muy personales, alguien que te conozca podría reconocerte. Puedes dejar de compartirla cuando quieras, en tu diario o en Privacidad y datos; si alguien la reporta, deja de verse. Se borra al borrar la experiencia o tu cuenta."
+    "compartidasTexto": "Si tu última puntuación en un área es de 8 o más, puedes compartir de forma anónima una experiencia de tu diario para ayudar a otras personas. Solo se comparte la que tú elijas, después de ver cómo la verán. Las demás personas usuarias de la app leen solo el texto, entre las ideas de esa área y en tu mismo idioma: nunca tu nombre, tu email, la fecha ni tu puntuación. Antes de publicarla comprobamos que no lleve datos de contacto, consejos de salud o de dinero ni insultos. Nunca se comparten experiencias de las categorías sensibles ni de Pareja. Ten en cuenta que, si cuentas detalles muy personales, alguien que te conozca podría reconocerte. Puedes dejar de compartirla cuando quieras, en tu diario o en Privacidad y datos; si alguien la reporta, deja de verse. Se borra al borrar la experiencia o tu cuenta.",
+    "iaLimiteTexto": "Para evitar abusos, contamos cuántas veces al día usas estas funciones de IA (solo el número, no lo que pides ni lo que se responde) y hay un máximo diario por persona. Si lo superas, verás las ideas originales de la app hasta el día siguiente. Ese contador se borra con tu cuenta."
   },
   "entrevista": {
     "titulo": "Tu entrevista",
@@ -211,7 +236,7 @@
     "sugeridoPorIa": "Sugerido por IA",
     "aceptarSugerencia": "Marcar «{{opcion}}»",
     "descartarSugerencia": "Descartar «{{opcion}}»",
-    "sinSugerencias": "No hemos encontrado opciones en esta experiencia.",
+    "sinSugerencias": "No hemos encontrado opciones nuevas en esta experiencia.",
     "sugiriendo": "Pensando sugerencias…",
     "experienciasPrivadasConIa": "Solo las ves tú. Nunca se comparten; a la IA solo va la que tú le pidas analizar.",
     "sugerenciasPista": "¿Quieres que la IA te sugiera opciones a partir de tus experiencias?",
@@ -239,7 +264,9 @@
       "category": "En esta área no se comparten experiencias.",
       "reported": "Esta experiencia se retiró tras un reporte y no se puede volver a compartir.",
       "error": "No se ha podido compartir. Inténtalo de nuevo."
-    }
+    },
+    "sugerenciasLimite": "Has llegado al máximo de usos de IA por hoy. Mañana puedes volver a probar.",
+    "sugerenciasNoDisponibles": "Ahora no se han podido pedir sugerencias. Prueba más tarde."
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -436,7 +463,8 @@
     "sugerenciasRevocable": "Está desactivado por defecto y puedes desactivarlo cuando quieras. De la IA solo quedan las opciones que aceptes.",
     "compartidasTitulo": "Experiencias compartidas",
     "compartidasTexto": "Las experiencias de tu diario que has compartido de forma anónima para ayudar a otras personas. Solo ven el texto: ni tu nombre, ni la fecha, ni tu puntuación.",
-    "compartidasNinguna": "No tienes ninguna experiencia compartida."
+    "compartidasNinguna": "No tienes ninguna experiencia compartida.",
+    "errorCuentaDemo": "Esta es la cuenta de demostración del proyecto y no se puede eliminar. Si quieres probar el borrado, crea una cuenta propia: se elimina de verdad, con todos sus datos."
   },
   "recomendaciones": {
     "ideaAnterior": "Idea anterior",
@@ -527,7 +555,8 @@
     "reportar": "Reportar",
     "reportada": "Gracias. La hemos ocultado.",
     "errorReportar": "No se ha podido reportar. Inténtalo de nuevo.",
-    "avisoOtros": "Experiencias de otras personas: no son consejo profesional. Si alguna no te parece adecuada, repórtala."
+    "avisoOtros": "Experiencias de otras personas: no son consejo profesional. Si alguna no te parece adecuada, repórtala.",
+    "limiteIa": "Has llegado al máximo de usos de IA por hoy: esta es la idea original. Mañana puedes volver a probar."
   },
   "evolucion": {
     "titulo": "Tu evolución",

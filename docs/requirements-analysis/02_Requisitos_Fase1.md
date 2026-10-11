@@ -4,7 +4,7 @@
 **Versión:** 0.9
 **Fecha:** Septiembre 2026 (última actualización: 5 de septiembre de 2026)
 **Estado:** Borrador para validación con tutor/stakeholders — pendiente de Fase 2 (verificación, consistencia, trazabilidad)
-**Fecha límite del proyecto (TFM):** 31 de octubre de 2026 — alcance incremental (MVP → fases adicionales según tiempo disponible).
+**Fecha límite del proyecto (TFM):** 26 de octubre de 2026, con la entrega prevista hacia el 20 (se planificó para el 31) — alcance incremental (MVP → fases adicionales según tiempo disponible).
 
 ---
 
@@ -168,7 +168,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 
 | ID | Tipo | Descripción |
 |---|---|---|
-| RES-01 | Tiempo | El desarrollo debe ajustarse al calendario académico del TFM: fecha límite el 31 de octubre de 2026 (no negociable). El alcance se abordará de forma incremental, desde un MVP hasta las fases adicionales que el tiempo permita. |
+| RES-01 | Tiempo | El desarrollo debe ajustarse al calendario académico del TFM: entrega hacia el 20 de octubre de 2026 y, como máximo, el 26 (se planificó con el 31 de octubre como límite). El alcance se abordará de forma incremental, desde un MVP hasta las fases adicionales que el tiempo permita. |
 | RES-02 | Equipo | Desarrollo por una única persona (o equipo reducido), lo que limita el alcance funcional realista para v1. |
 | RES-03 | Presupuesto | Sin presupuesto para infraestructura de pago significativa; se priorizarán servicios con capa gratuita (Firebase, Supabase, Vercel, etc.) o self-hosted. |
 | RES-04 | Legal | Las categorías "sexo" y "espiritualidad/religión" constituyen datos de categoría especial bajo el Art. 9 RGPD → requieren consentimiento explícito diferenciado y medidas de seguridad reforzadas. (Deporte lo fue hasta el 6 oct. 2026: habla de actividad física y no pide datos de salud.) |
@@ -217,3 +217,4 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 - **v0.13 (5 oct. 2026)** — RF-44 (diario de experiencias: varias, sin puntuar, eliminables; sustituye a la nota de RF-11) y RF-45 (la IA propone opciones de las listas cerradas a partir de una experiencia, voluntario y por experiencia, con salvaguardas); RF-41 recoge la excepción de RF-45. Confirmados por el autor.
 - **v0.14 (5 oct. 2026)** — RF-43 reescrito por el autor: en lugar de un agregado anónimo de opciones visible para quien ya va bien (al revés de lo que se buscaba), quien va bien comparte experiencias de forma altruista y quien busca ideas las lee junto a las de la app y las de la IA. Ver la [historia](../user-stories/RF-43-experiencias-compartidas.md).
 - **v0.15 (6 oct. 2026)** — Deporte deja de ser categoría sensible (RF-04, RES-04), por decisión del autor: habla de actividad física, no pide datos de salud, y cualquier área puede tocar algo personal; si llega feedback negativo, se puede volver atrás. Migración 0018.
+- **v0.16 (11 oct. 2026)** — RES-01: la entrega pasa a "hacia el 20 de octubre, como máximo el 26" (antes, 31 de octubre, "no negociable"). Aclarado por el autor: no hay sanción por entregar unos días después del 20, y el 26 es el máximo.

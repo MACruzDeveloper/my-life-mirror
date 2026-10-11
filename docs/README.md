@@ -1,5 +1,7 @@
 # Documentación de MyLifeMirror
 
+> **Este no es el README principal del proyecto.** Es el índice de la carpeta `docs/`. Para saber qué es la app, cómo probarla y qué se entrega, empieza por el [README del proyecto](../README.md).
+
 Mapa de todo lo que hay en `docs/`, una línea por documento, y por dónde empezar. El [README del proyecto](../README.md) explica cómo probar la app; [AGENTS.md](../AGENTS.md), las convenciones del código.
 
 ## Si tienes 20 minutos
@@ -32,20 +34,20 @@ Mapa de todo lo que hay en `docs/`, una línea por documento, y por dónde empez
 | [03 Arquitectura](architecture-decisions/03_Arquitectura_Software.md) | Monolito modular, Clean Architecture por módulo, funciones serverless y límites del plan gratuito. |
 | [04 Almacenamiento](architecture-decisions/04_Almacenamiento_Datos.md) | Supabase (Postgres), migraciones SQL, y por qué nada "en memoria" entre funciones. |
 | [05 Fundamentos de IA](architecture-decisions/05_Fundamentos_IA.md) | Dónde se usa IA y dónde no; RF-40 (ideas con IA ancladas al catálogo, con verificación). |
-| [06 Autenticación](architecture-decisions/06_Autenticacion.md) | Supabase Auth, sesión en cookie, roles. |
+| [06 Autenticación](architecture-decisions/06_Autenticacion.md) | Supabase Auth, sesión en cookie, roles, política de contraseñas y límite de intentos. |
 | [07 Interfaz](architecture-decisions/07_UI.md) | Material UI, móvil primero, caché de datos del servidor. |
 | [08 Observabilidad](architecture-decisions/08_Observabilidad.md) | Logs estructurados en JSON, sin servicios de pago. |
 | [09 Internacionalización](architecture-decisions/09_Internacionalizacion.md) | Español e inglés; traducciones de categorías por id. |
 
 ### Historias de usuario (`user-stories/`)
 
-Una por funcionalidad, con criterios Given/When/Then, antes de programarla: `RF-xx` (requisitos funcionales), `ADM-xx` (administración) y `UX-xx` (mejoras salidas de la validación). [Ver carpeta](user-stories/).
+Una por funcionalidad, con criterios Given/When/Then, antes de programarla: `RF-xx` (requisitos funcionales), `ADM-xx` (administración), `UX-xx` (mejoras salidas de la validación) y `SEC-xx` (seguridad, salidas del [plan de seguridad](security/01_Plan_Seguridad.md)). [Ver carpeta](user-stories/).
 
 ### Gestión del proyecto (`project-management/`)
 
 | Documento | Qué contiene |
 |---|---|
-| [00 Metodología](project-management/00_Metodologia_Lean.md) | Lean + Kanban con plazo fijo (31 oct.) y por qué no sprints. |
+| [00 Metodología](project-management/00_Metodologia_Lean.md) | Lean + Kanban con plazo fijo (entrega hacia el 20 oct., como máximo el 26) y por qué no sprints. |
 | [01 Tablero](project-management/01_Backlog_MVP.md) | **Lo que está en curso, lo siguiente y lo pendiente.** Es el único sitio con "próximos pasos". |
 | [02 Métricas DORA y Flow](project-management/02_Metricas_DORA_y_Flujo.md) | Plan y resultados: 11 PRs, fallos, tiempos, y los ajustes que salieron de ahí. |
 
@@ -57,6 +59,12 @@ Una por funcionalidad, con criterios Given/When/Then, antes de programarla: `RF-
 | [02 Resultados](validation/02_Resultados_Test_Usabilidad.md) | La sesión del 27 sept.: tareas, respuestas, problemas y qué se hizo con ellos. |
 | [03 Guion corto (EN)](validation/03_Short_Test_Script_EN.md) | El guion usado de verdad: 20 minutos, en inglés. |
 | [04 Guion de la demo](validation/04_Guion_Demo_Cierre.md) | Demo final para la revisión del proyecto, y la lista de la primera entrega a producción. |
+
+### Seguridad (`security/`)
+
+| Documento | Qué contiene |
+|---|---|
+| [01 Plan de seguridad](security/01_Plan_Seguridad.md) | Revisión del 11 oct. contra OWASP Top 10:2025, OWASP para LLM y MITRE ATT&CK: lo que ya protegía la app, los hallazgos, el plan por pasos y lo aplicado. |
 
 ### Otros
 
