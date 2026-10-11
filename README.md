@@ -195,7 +195,7 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 ## Despliegue
 
 - **Dónde:** [Vercel](https://vercel.com) sirve la interfaz y las funciones de `api/` (región de Dublín); [Supabase](https://supabase.com) aloja la base de datos y las cuentas. Los dos en su plan gratuito.
-- **Cómo:** cada fusión en `main` despliega producción. Cada entrega es una versión con su etiqueta (`v1.2.1`…) y su sección en el [CHANGELOG](CHANGELOG.md).
+- **Cómo:** cada fusión en `main` despliega producción. Cada entrega es una versión con su etiqueta (`v1.3.0`…) y su sección en el [CHANGELOG](CHANGELOG.md).
 - **Variables de entorno** (en Vercel; los nombres están en [.env.example](.env.example)): la URL y la clave de servicio de Supabase, la URL de la app y, para la IA, el proveedor y la clave de Anthropic. Las claves solo se usan en el servidor, nunca llegan al navegador.
 - **Base de datos:** las migraciones de `supabase/migrations/` se ejecutan a mano, en orden, antes de desplegar el código que las necesita. El plan gratuito no guarda copias: `npm run backup:db` hace una en local.
 - **Límites del plan gratuito:** 12 funciones como máximo (de ahí una función por capacidad, hoy 11) y pausa de Supabase tras 7 días sin uso (un workflow la evita).
@@ -229,9 +229,9 @@ El proyecto se ha construido con un asistente de IA (Claude Code) como compañer
 
 ## Estado del proyecto
 
-Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.2.1), con más de 700 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
+Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.3.0), con más de 800 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
 
-- **Pendiente:** activar en producción el modelo real de IA (RF-40b). Está implementado y evaluado ([resultados](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4); en local y en los tests se usa un proveedor simulado, para no gastar crédito.
+- **IA:** el modelo real (RF-40b) funciona en producción desde esta versión, con crédito de prepago y un tope diario por usuario ([evaluación](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4). En local y en los tests se usa un proveedor simulado, para no gastar crédito.
 - **Para la entrega:** presentación y vídeo.
 - **Límites conocidos:** validación con una sola participante; política de privacidad sin revisión legal; contenido de ideas y líneas de ayuda pendiente de una última revisión.
 

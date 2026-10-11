@@ -163,7 +163,7 @@ Ordenados por importancia. "Paso" remite al apartado 4. Estado a 11 de octubre.
   - [x] Regla "Proteger main" creada (11 oct.): cambios solo por PR, sin *force push* ni borrado de la rama.
   - [x] Avisos de Dependabot y escaneo de secretos con bloqueo al subir, activados en GitHub (confirmado por el autor, 11 oct.).
   - [ ] **Después de subir la rama**, cuando el workflow *Seguridad* haya corrido una vez: volver a la regla "Proteger main", marcar *Require status checks to pass* y añadir *Dependencias (npm audit)*, *Código (CodeQL)* y el de *E2E con api*. Antes no se puede: GitHub no ofrece un control que nunca se ha ejecutado, y exigir uno que no informa bloquea la PR.
-  - [ ] Después del primer push: revisar la pestaña **Security** (resultados de CodeQL y avisos de Dependabot) y anotar aquí lo que salga.
+  - [x] Primera ejecución del workflow *Seguridad* (11 oct., sobre `develop`): correcta. **CodeQL, con las reglas ampliadas: 0 avisos.** Dependabot muestra 2 avisos (`source-map-js`, alto; `brace-expansion`, medio): son los del paso 3, que GitHub sigue viendo en `main` porque la corrección está en `develop`; se cierran solos al publicar la v1.3.0.
 - [x] **Paso 3. Dependencias y análisis del código.**
   - [x] Las 2 vulnerabilidades, corregidas (`npm audit fix`, sin cambios de versión mayor). `npm run audit` da 0.
   - [x] **Snyk probado** (11 oct.): un aviso real en zod, ya mitigado (H16); el análisis de código, 70 avisos y ninguno real. Detalle y valoración en la guía 4.3.
@@ -278,3 +278,4 @@ Estas decisiones se revisan si la app pasa de ser un TFM a un producto con usuar
 - **v1.4 (11 oct. 2026)** — resultado de `snyk test`: aviso alto en zod (H16), medido y mitigado por el tope de tamaño del paso 6; longitud máxima en la lista que faltaba.
 - **v1.5 (11 oct. 2026)** — resultado de `snyk code test` (70 avisos, todos contraseñas de ejemplo en tests; ninguno en el código de producción) y valoración de la herramienta. Paso 3 cerrado.
 - **v1.6 (11 oct. 2026)** — paso 8 cerrado con la evaluación real (5 de 5 inyecciones resistidas); avisos y escaneo de GitHub confirmados; Snyk queda como prueba hecha, con el acceso retirado.
+- **v1.7 (11 oct. 2026)** — primera ejecución de CodeQL (0 avisos) y estado de los avisos de Dependabot.
