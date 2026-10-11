@@ -230,6 +230,29 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
     await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).rejects.toBeInstanceOf(AuthenticationError);
   });
 
+  describe("cuenta de demostración protegida (TFM-01)", () => {
+    it("no se puede eliminar, ni con su contraseña: se explica que es de demostración", async () => {
+      const { ana, profileRepository, ...ports } = await setup();
+      const deleteAccount = createDeleteAccount({ ...ports, profileRepository, protectedEmail: "Ana@Ejemplo.com " });
+
+      const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "12345678" });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.code).toBe("DEMO_ACCOUNT");
+      expect(await profileRepository.findByUserId(ana.id)).toBeDefined();
+    });
+
+    it("las demás cuentas se eliminan como siempre", async () => {
+      const { luis, authProvider, ...ports } = await setup();
+      const deleteAccount = createDeleteAccount({ ...ports, authProvider, protectedEmail: "ana@ejemplo.com" });
+
+      const result = await deleteAccount({ userId: luis.id, email: luis.email, password: "abcdefgh" });
+
+      expect(result.ok).toBe(true);
+      expect((await authProvider.listAllUsers()).map((user) => user.email)).toEqual(["ana@ejemplo.com"]);
+    });
+  });
+
   it("la protección del último administrador se aplica antes de pedir la contraseña", async () => {
     const { deleteAccount, ana, authProvider } = await setup();
     authProvider.assignRoleForTest("ana@ejemplo.com", "admin");

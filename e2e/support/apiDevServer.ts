@@ -67,6 +67,9 @@ async function readBody(req: IncomingMessage): Promise<unknown> {
   return (req.headers["content-type"] ?? "").includes("application/json") ? JSON.parse(text) : text;
 }
 
+/** Peticiones a `api/` que pueden estar en curso a la vez sin que Node sospeche de una fuga. */
+const MAX_CONCURRENT_RUNNERS = 100;
+
 export function vercelApiRoutes(apiDir: string): Plugin {
   return {
     name: "e2e-vercel-api-routes",
@@ -74,6 +77,14 @@ export function vercelApiRoutes(apiDir: string): Plugin {
     configureServer(server) {
       assertLocalSupabase(process.env.SUPABASE_URL);
       const routes = buildRoutes(readdirSync(apiDir, { recursive: true }).map(String));
+
+      // Cada petición crea su propio "runner" (ver más abajo) y, mientras dura, añade un oyente al canal
+      // interno de Vite. Con los tests en paralelo hay hasta ~30 a la vez (medido el 11 oct. 2026: 1.505
+      // peticiones, máximo 30 simultáneas, 0 al terminar: no es una fuga), y Node avisaba al pasar de 10
+      // ("MaxListenersExceededWarning"). Se sube el límite de ese canal, con holgura pero sin quitarlo:
+      // una fuga de verdad seguiría avisando.
+      const hotChannel = server.environments.ssr.hot as unknown as { api?: { outsideEmitter?: { setMaxListeners(count: number): void } } };
+      hotChannel.api?.outsideEmitter?.setMaxListeners(MAX_CONCURRENT_RUNNERS);
 
       server.middlewares.use(async (req, res: ServerResponse, next) => {
         if (!req.url?.startsWith("/api/")) return next();

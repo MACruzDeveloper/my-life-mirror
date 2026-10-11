@@ -1,0 +1,87 @@
+{
+  "_comentario": "TFM-01: contenido de la cuenta de prueba y de la cuenta 'otra persona'. pastScores: una puntuación al mes, de hace 12 meses a hace 1; current: la de hoy (por debajo de 5 abre una idea; 8 o más permite compartir). Las claves de helps y difficulties son las de los catálogos. Los textos de 'shared' tienen que pasar los filtros de compartir (sin contacto, salud, dinero ni insultos).",
+  "demo": {
+    "name": "Cuenta de prueba",
+    "categories": [
+      {
+        "key": "economia",
+        "pastScores": [6, 6, 5, 5, 5, 4, 4, 4, 3, 4, 3, 3],
+        "current": 3,
+        "helps": ["economia.presupuesto", "economia.apps"],
+        "difficulties": ["mirarMisCuentas"],
+        "experiences": [{ "daysAgo": 20, "text": "Este mes apunté todos los gastos y vi que se me va bastante en suscripciones que casi no uso." }]
+      },
+      {
+        "key": "vidaSocial",
+        "pastScores": [7, 6, 6, 5, 5, 5, 4, 5, 4, 4, 4, 4],
+        "current": 4,
+        "helps": ["vidaSocial.planesTranquilos", "vidaSocial.mensajesYLlamadas"],
+        "difficulties": ["sitiosConGente"],
+        "experiences": [{ "daysAgo": 9, "text": "Me agobian los sitios con mucha gente; estoy mucho mejor cuando quedo con dos o tres amigos." }]
+      },
+      {
+        "key": "deporte",
+        "pastScores": [3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6],
+        "current": 6,
+        "helps": ["deporte.caminar", "deporte.naturaleza"],
+        "difficulties": [],
+        "experiences": [{ "daysAgo": 14, "text": "Salir a caminar por el monte los sábados me despeja la cabeza para toda la semana." }]
+      },
+      {
+        "key": "familia",
+        "pastScores": [7, 7, 7, 8, 8, 7, 8, 8, 8, 8, 8, 8],
+        "current": 8,
+        "helps": ["familia.comidasJuntos"],
+        "difficulties": [],
+        "experiences": [{ "daysAgo": 5, "text": "Los domingos comemos todos juntos en casa de mis padres y es el mejor rato de la semana." }]
+      },
+      {
+        "key": "aventura",
+        "pastScores": [6, 5, 5, 4, 4, 5, 4, 4, 3, 4, 4, 4],
+        "current": 4,
+        "helps": ["aventura.escapadas"],
+        "difficulties": [],
+        "experiences": [{ "daysAgo": 30, "text": "Hace unos años viajé bastante de mochilero y lo echo de menos." }]
+      },
+      {
+        "key": "inversiones",
+        "pastScores": [5, 5, 5, 5, 6, 5, 5, 5, 5, 5, 5, 5],
+        "current": 5,
+        "helps": [],
+        "difficulties": [],
+        "experiences": []
+      }
+    ]
+  },
+  "donor": {
+    "email": "demo-otra-persona@example.com",
+    "name": "Otra persona",
+    "categories": [
+      {
+        "key": "economia",
+        "current": 9,
+        "shared": [
+          { "locale": "es", "text": "Apunto los gastos cada domingo en una libreta. Verlo escrito me quitó mucho agobio." },
+          { "locale": "es", "text": "Aparto un poco nada más cobrar, aunque sea poco: así ya no cuento con ese dinero." },
+          { "locale": "en", "text": "I write down what I spend every Sunday. Seeing it on paper made it feel manageable." }
+        ]
+      },
+      {
+        "key": "vidaSocial",
+        "current": 9,
+        "shared": [
+          { "locale": "es", "text": "Quedo con el mismo grupo pequeño una vez al mes. Al tener fecha fija, no se me pasa." },
+          { "locale": "en", "text": "A fixed monthly coffee with two friends works for me: no planning, it just happens." }
+        ]
+      },
+      {
+        "key": "aventura",
+        "current": 8,
+        "shared": [
+          { "locale": "es", "text": "Cada mes elijo un sitio cercano que no conozco y voy una mañana. No hace falta irse lejos." },
+          { "locale": "en", "text": "Once a month I pick a nearby place I have never been to and spend a morning there." }
+        ]
+      }
+    ]
+  }
+}

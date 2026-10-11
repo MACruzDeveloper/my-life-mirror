@@ -5,6 +5,20 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (TFM-01, cuenta de prueba para la entrega)
+
+- `npm run demo:reset`: crea o restaura la cuenta de prueba (seis áreas, un año de historial, ideas abiertas, opciones, diario, IA activada) y una segunda cuenta que comparte experiencias con ella. Borra solo esas dos cuentas; contra la base real pide `-- --yes`, y con `-- --local` usa el Supabase local. Contenido en `demoAccount.json`.
+- La cuenta de prueba no se puede eliminar desde la app si `DEMO_USER_EMAIL` está definida en el servidor: se explica que es de demostración.
+- README con capturas, licencia (todos los derechos reservados) y qué probar con la cuenta.
+
+### Corregido (herramientas)
+
+- Los E2E con `api/` ya no muestran `MaxListenersExceededWarning`: no era una fuga (0 oyentes al terminar, medido), sino hasta 30 peticiones a la vez contra un límite por defecto de 10. Se sube el límite de ese canal a 100.
+
+### Cambiado (documentación)
+
+- La entrega del TFM pasa a "hacia el 20 de octubre, como máximo el 26" en los documentos vivos (antes figuraba el 31). AGENTS.md: "Tareas clave" al día.
+
 ### Añadido (RF-40b, el modelo real de IA)
 
 - Las ideas personalizadas (RF-40) y las sugerencias desde el diario (RF-45) pueden funcionar con el modelo real: Claude Haiku 5.5 por la API de Anthropic, con salida estructurada. Se activa con `AI_IDEAS_PROVIDER=anthropic` y `ANTHROPIC_API_KEY` (solo en el servidor); sin clave queda apagado. En local y en los tests sigue el proveedor simulado: desarrollar no gasta crédito.

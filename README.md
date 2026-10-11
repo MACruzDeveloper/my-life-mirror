@@ -10,14 +10,22 @@ Aplicación web para evaluar cómo va tu vida por áreas (economía, familia, de
 | Recurso | Dónde |
 |---|---|
 | Aplicación desplegada | https://my-life-mirror.vercel.app |
-| Usuario de prueba | ⏳ Pendiente de crear (ver [Usuario de prueba](#usuario-de-prueba)) |
+| Usuario de prueba | `demo@example.com` / `DemoUser123!` (ver [Usuario de prueba](#usuario-de-prueba)) |
 | Presentación (slides) | ⏳ Pendiente |
 | Vídeo explicativo | ⏳ Pendiente |
 | Código fuente | Este repositorio (público) |
 
-**Contenido:** [Funcionalidades](#funcionalidades-principales) · [Stack](#stack-tecnológico) · [Probarla en tu ordenador](#probarla-en-tu-ordenador-sin-cuentas) · [Usuario de prueba](#usuario-de-prueba) · [Estructura](#estructura-del-proyecto) · [Tests](#tests) · [Despliegue](#despliegue) · [Desarrollo con IA](#desarrollo-con-ia) · [Estado](#estado-del-proyecto) · [Documentación](#documentación)
+**Contenido:** [Así se ve](#así-se-ve) · [Funcionalidades](#funcionalidades-principales) · [Stack](#stack-tecnológico) · [Probarla en tu ordenador](#probarla-en-tu-ordenador-sin-cuentas) · [Usuario de prueba](#usuario-de-prueba) · [Estructura](#estructura-del-proyecto) · [Tests](#tests) · [Despliegue](#despliegue) · [Desarrollo con IA](#desarrollo-con-ia) · [Estado](#estado-del-proyecto) · [Licencia](#licencia) · [Documentación](#documentación)
 
 ---
+
+## Así se ve
+
+| Inicio: equilibrio y evolución | Ideas, también de otras personas | Entrevista en el móvil |
+|---|---|---|
+| [<img src="docs/images/inicio.png" alt="Inicio con el radar de equilibrio y la evolución de cada área" width="300">](docs/images/inicio.png) | [<img src="docs/images/ideas-otras-personas.png" alt="Ventana de ideas con las pestañas De la app, Con IA y De otras personas" width="300">](docs/images/ideas-otras-personas.png) | [<img src="docs/images/entrevista-movil.png" alt="Una pregunta de la entrevista en un móvil, con sus opciones y el diario" width="180">](docs/images/entrevista-movil.png) |
+
+Capturas de la cuenta de prueba (ver [Usuario de prueba](#usuario-de-prueba)).
 
 ## Funcionalidades principales
 
@@ -92,15 +100,25 @@ Español por defecto; el interruptor con las banderas, arriba a la derecha, camb
 
 ## Usuario de prueba
 
-⏳ **Pendiente de crear.** Habrá una cuenta en producción con un año de historial, ideas abiertas y experiencias en el diario, para ver la app con contenido sin tener que rellenarla:
+Una cuenta en producción que ya tiene contenido, para ver la app sin tener que rellenarla:
 
 | | |
 |---|---|
 | Dirección | https://my-life-mirror.vercel.app |
-| Email | *(pendiente)* |
-| Contraseña | *(pendiente)* |
+| Email | `demo@example.com` |
+| Contraseña | `DemoUser123!` |
 
-También puedes crear tu propia cuenta: el registro está abierto y no pide confirmar el email. La administración no se ofrece en producción (gestiona usuarios reales); se puede probar en local, como se explica arriba.
+**Qué trae:** seis áreas con un año de historial (el radar y la evolución), tres ideas abiertas, opciones marcadas en "¿Qué te ayuda?" y "¿Qué te lo pone difícil?", experiencias en el diario, la IA activada y experiencias compartidas por otra persona en la ventana de ideas.
+
+**Qué probar:**
+
+- *Inicio*: el equilibrio, la evolución y "Ideas para ti".
+- *Mi perfil → Entrevista*: abre "Ideas para Economía" y mira las pestañas "De la app", "Con IA" y "De otras personas".
+- En Aventura, pulsa "Sugerir opciones con IA" en la experiencia del diario.
+- En Familia (un 8), "Compartir de forma anónima" una experiencia.
+- *Mi perfil → Privacidad y datos*: descargar los datos.
+
+Puedes cambiar lo que quieras: la cuenta se restaura con `npm run demo:reset`. Lo único que no permite es eliminarla (es compartida); para probar el borrado, crea tu propia cuenta: el registro está abierto y no pide confirmar el email. La administración no se ofrece en producción porque gestiona usuarios reales; se puede probar en local, como se explica arriba.
 
 ---
 
@@ -198,13 +216,17 @@ El proyecto se ha construido con un asistente de IA (Claude Code) como compañer
 
 ## Estado del proyecto
 
-Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.2.1), con más de 700 tests. Entrega prevista del TFM: 20 de octubre de 2026.
+Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.2.1), con más de 700 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
 
 - **Pendiente:** activar en producción el modelo real de IA (RF-40b). Está implementado y evaluado ([resultados](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4); en local y en los tests se usa un proveedor simulado, para no gastar crédito.
-- **Para la entrega:** usuario de prueba, presentación y vídeo.
+- **Para la entrega:** presentación y vídeo.
 - **Límites conocidos:** validación con una sola participante; política de privacidad sin revisión legal; contenido de ideas y líneas de ayuda pendiente de una última revisión.
 
 El detalle, con las decisiones y la deuda técnica abiertas, está en el [tablero](docs/project-management/01_Backlog_MVP.md).
+
+## Licencia
+
+Todos los derechos reservados. El repositorio es público para que el código y la documentación puedan leerse, descargarse y evaluarse; no se permite copiarlos, modificarlos, distribuirlos ni reutilizarlos sin permiso del autor. Ver [LICENSE](LICENSE).
 
 ## Documentación
 

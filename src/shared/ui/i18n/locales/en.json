@@ -439,7 +439,8 @@
     "sugerenciasRevocable": "It's off by default and you can turn it off whenever you like. Only the options you accept remain from the AI.",
     "compartidasTitulo": "Shared experiences",
     "compartidasTexto": "The experiences from your diary that you've shared anonymously to help other people. They only see the text: not your name, the date or your score.",
-    "compartidasNinguna": "You don't have any shared experiences."
+    "compartidasNinguna": "You don't have any shared experiences.",
+    "errorCuentaDemo": "This is the project's demo account and it can't be deleted. If you'd like to try deleting an account, create your own: it is really deleted, with all its data."
   },
   "recomendaciones": {
     "ideaAnterior": "Previous idea",

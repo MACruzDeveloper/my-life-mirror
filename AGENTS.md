@@ -17,7 +17,7 @@ Este documento da contexto general del proyecto a cualquier asistente de IA (o p
 * **`api/`**: subcarpetas por capacidad de negocio (`accounts/`, `categories/`, `consent/`...), reflejando `src/modules/`. Vercel soporta rutas anidadas de forma nativa (carpeta → segmento de URL) — no hay motivo para mantenerlo plano. Un archivo dentro de una subcarpeta usa una `../../` extra en sus imports relativos hacia `src/` (un nivel más de profundidad).
 * **Principios de código**: SOLID, DRY, KISS, YAGNI, y comprobar la alternativa nativa antes de aplicar un patrón de diseño ([ADR-02: Principios de Diseño](docs/architecture-decisions/02_Principios_Diseño.md)).
 * **Metodología de especificación**: cada historia de usuario se escribe primero en formato Nivel 2 (Spec Anchored) — Given/When/Then, referenciada a su RF/RD — antes de escribir código. Nivel 3 solo si el objetivo es muy claro y el desafío es de tamaño medio/complejo ([10_Enfoque_SDD.md](docs/requirements-analysis/10_Enfoque_SDD.md)).
-* **Metodología de trabajo**: Lean + Kanban con apetito fijo (31 oct.), no sprints — el tablero está en [01_Backlog_MVP.md](docs/project-management/01_Backlog_MVP.md) y el porqué en [00_Metodologia_Lean.md](docs/project-management/00_Metodologia_Lean.md). Se tira de arriba de "Listo" (WIP ≤ 2); si el tiempo no llega, se recorta por la línea de corte, nunca se estira el plazo. No reintroducir "Sprint N" en docs ni comentarios.
+* **Metodología de trabajo**: Lean + Kanban con apetito fijo (entrega hacia el 20 oct., como máximo el 26), no sprints — el tablero está en [01_Backlog_MVP.md](docs/project-management/01_Backlog_MVP.md) y el porqué en [00_Metodologia_Lean.md](docs/project-management/00_Metodologia_Lean.md). Se tira de arriba de "Listo" (WIP ≤ 2); si el tiempo no llega, se recorta por la línea de corte, nunca se estira el plazo. No reintroducir "Sprint N" en docs ni comentarios.
 * **Idioma**: la conversación con el usuario es en español (desde el 3 oct. 2026; antes, en inglés); todos los documentos `.md` entregables se escriben en español; el código (identificadores, nombres de archivo, mensajes de commit) en inglés.
 * **i18n de la interfaz** (RNF-10): ningún texto visible para el usuario se escribe a mano dentro de un componente — siempre `t("namespace.clave")` de `react-i18next`, con la clave añadida a la vez en `src/shared/ui/i18n/locales/es.json` y `en.json` ([ADR-09](docs/architecture-decisions/09_Internacionalizacion.md)). El idioma por defecto es español; el cambio es manual (selector en el `Header`), sin detección automática del navegador.
 * **Mobile-first** (RNF-06): todo `sx`/estilo nuevo se escribe primero para móvil (sin prefijo de breakpoint) y se adapta hacia arriba con `{ xs, sm, md, ... }` de MUI — nunca al revés ([07_UI.md](docs/architecture-decisions/07_UI.md) apartado 6). Toda pantalla protegida nueva usa `ProtectedLayout` (`shared/ui/`) en vez de montar `Header`/`Breadcrumbs` a mano.
@@ -60,11 +60,12 @@ No se escribe implementación antes que su test correspondiente.
 
 ## ✅ Tareas Clave
 
-* Redactar las historias de usuario del Ciclo 1 en formato Nivel 2 (Spec Anchored).
+* Redactar cada historia de usuario en formato Nivel 2 (Spec Anchored), o Nivel 3 si es compleja, antes de programarla.
 * Implementar cada historia como un Caso de Uso de la capa de Aplicación, con su Entidad/Value Object en Dominio y su adaptador en Infraestructura.
 * Empezar cada módulo con un adaptador de repositorio en memoria antes que la conexión real a Supabase, salvo el propio proveedor de autenticación, que usa Supabase real también en `dev` (sin sustituto en memoria razonable, ADR-06 apartado 1).
 * Generar boilerplate repetitivo (esquemas Zod, mapeadores Entidad↔documento, dobles de test/Fakes para los puertos) cuando se pida — siempre a revisar por el usuario antes de darse por bueno.
 * Mantener actualizados los documentos de `docs/requirements-analysis/` y `docs/architecture-decisions/` cuando una decisión cambie.
+* Preparar la entrega del TFM: README con lo que pide el máster, usuario de prueba, presentación y vídeo (tablero, "Entrega del TFM").
 
 ## 📖 Documentación y Control de Versiones
 
@@ -129,3 +130,4 @@ No se escribe implementación antes que su test correspondiente.
 - **v1.32 (3 oct. 2026)** — imports `#shared/…`/`#modules/…` (imports nativos de Node, `package.json`) en todo lo alcanzable desde `api/`, en lugar de rutas relativas largas; probado con un `vercel build` real antes de convertir 265 imports.
 - **v1.33 (5 oct. 2026)** — contenido curado como datos en `domain/catalog/` de cada módulo (CAT-01), en lugar de constantes en el código y sin archivo global de constantes.
 - **v1.34 (6 oct. 2026)** — CSS propio sin `!important` gracias a las capas CSS de MUI (`enableCssLayer`).
+- **v1.35 (11 oct. 2026)** — la entrega pasa a "hacia el 20 de octubre, como máximo el 26" (antes, 31 de octubre); "Tareas clave" deja de hablar solo del Ciclo 1 e incluye la entrega.

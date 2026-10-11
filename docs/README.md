@@ -47,7 +47,7 @@ Una por funcionalidad, con criterios Given/When/Then, antes de programarla: `RF-
 
 | Documento | Qué contiene |
 |---|---|
-| [00 Metodología](project-management/00_Metodologia_Lean.md) | Lean + Kanban con plazo fijo (31 oct.) y por qué no sprints. |
+| [00 Metodología](project-management/00_Metodologia_Lean.md) | Lean + Kanban con plazo fijo (entrega hacia el 20 oct., como máximo el 26) y por qué no sprints. |
 | [01 Tablero](project-management/01_Backlog_MVP.md) | **Lo que está en curso, lo siguiente y lo pendiente.** Es el único sitio con "próximos pasos". |
 | [02 Métricas DORA y Flow](project-management/02_Metricas_DORA_y_Flujo.md) | Plan y resultados: 11 PRs, fallos, tiempos, y los ajustes que salieron de ahí. |
 

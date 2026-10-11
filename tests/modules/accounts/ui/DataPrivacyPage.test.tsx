@@ -112,6 +112,18 @@ describe("DataPrivacyPage (RF-05)", () => {
     expect(within(dialog).getByRole("button", { name: /eliminar definitivamente/i })).toBeEnabled();
   });
 
+  it("TFM-01: la cuenta de demostración no se puede eliminar, y lo explica", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 400, json: async () => ({ error: "The demo account cannot be deleted", code: "DEMO_ACCOUNT" }) }));
+    renderPage();
+
+    const dialog = openDialog();
+    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "12345678" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
+
+    expect(await within(dialog).findByText(/cuenta de demostración/i)).toBeInTheDocument();
+    expect(screen.queryByText("Página pública")).not.toBeInTheDocument();
+  });
+
   it("si es el único administrador, explica por qué no puede y qué hacer (no un error genérico)", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 409, json: async () => ({ error: "Cannot delete the only administrator account", code: "CONFLICT" }) }));
     renderPage();

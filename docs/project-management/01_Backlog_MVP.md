@@ -2,7 +2,7 @@
 
 **Fecha:** 12 de septiembre de 2026 (reescrito el 19 de septiembre: de sprints semanales a Lean/Kanban)
 **Relacionado con:** [00_Metodologia_Lean.md](00_Metodologia_Lean.md) (cómo se trabaja y por qué), [01_Justificacion_Ciclo_Vida.md](../requirements-analysis/01_Justificacion_Ciclo_Vida.md) (alcance del Ciclo 1), [03_Arquitectura_Software.md](../architecture-decisions/03_Arquitectura_Software.md), [04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md), [10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md)
-**Plazo (apetito fijo):** 31 de octubre de 2026 (RES-01). El tiempo es fijo; lo que se ajusta es el alcance.
+**Plazo (apetito fijo):** entrega hacia el 20 de octubre de 2026 y, como máximo, el 26 (RES-01; se planificó para el 31). El tiempo es fijo; lo que se ajusta es el alcance.
 **Capacidad asumida:** 10-12 h/semana como base, con margen al alza. Es una referencia para decidir la línea de corte, no un compromiso repartido por semanas.
 
 Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored, en [docs/user-stories/](../user-stories/)) antes de implementarse, y se descompone en las capas de Clean Architecture (dominio → aplicación → infraestructura). Se empieza por el adaptador en memoria (tests) antes que Supabase real — salvo que el dato vaya a cruzar entre distintas funciones de `api/`, en cuyo caso Supabase real se construye ya (ver "Reglas de flujo").
@@ -12,7 +12,7 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 ## En curso (límite WIP: 2)
 
 - [ ] **RF-40b** el modelo real de IA (desde el 11 oct.; [historia RF-40](../user-stories/RF-40-ideas-personalizadas-ia.md), apartado RF-40b): adaptador de Anthropic (Claude Haiku 5.5) para las ideas y las sugerencias, tope diario por usuario y evaluación con el modelo (ADR-05, apartado 4.3.4). Hecho y evaluado; falta activarlo en producción (migración 0020 y variables en Vercel).
-- [ ] **Entrega del TFM** (20 oct.): README completo (hecho), usuario de prueba, slides y vídeo.
+- [ ] **Entrega del TFM** (hacia el 20 oct., como máximo el 26): README completo, con capturas y licencia (hecho); cuenta de prueba ([historia](../user-stories/TFM-01-cuenta-de-prueba.md): hecha y creada en producción el 11 oct.; la protección contra el borrado llega con el próximo despliegue); slides y vídeo.
 - [ ] **RF-30** líneas de ayuda siempre a mano (desde el 6 oct.; [historia](../user-stories/RF-30-lineas-ayuda.md)): pantalla pública `/ayuda` con el 024, el 112 y Find A Helpline; enlace "¿Necesitas ayuda ahora?" al pie de todas las pantallas, junto al diario y en la pestaña "De otras personas". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09).
 
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
@@ -98,7 +98,7 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **Se tira, no se empuja:** la siguiente tarea se elige de arriba de "Listo" solo cuando hay hueco en "En curso" (WIP ≤ 2, una sola persona).
 - **Orden por riesgo y dependencias, no por numeración de RF** (mismo criterio del espiral, [01_Justificacion_Ciclo_Vida.md](../requirements-analysis/01_Justificacion_Ciclo_Vida.md)): sin cuenta + consentimiento no se puede probar nada del resto de forma honesta.
 - **Datos que cruzan funciones de `api/`** → persistencia real (Supabase) desde el principio; los adaptadores en memoria solo valen para tests y para casos de uso sin endpoint propio. Cada archivo de `api/` es una función serverless aislada, sin memoria compartida ([04_Almacenamiento_Datos.md](../architecture-decisions/04_Almacenamiento_Datos.md) apartado 5.1).
-- **La línea de corte se revisa** cada vez que una tarea se cierra: ¿el tiempo restante hasta el 31 oct. cubre lo que queda por encima de la línea? Si no, se baja una tarea por debajo — nunca se estira el plazo.
+- **La línea de corte se revisa** cada vez que una tarea se cierra: ¿el tiempo restante hasta la entrega (hacia el 20 oct., como máximo el 26) cubre lo que queda por encima de la línea? Si no, se baja una tarea por debajo — nunca se estira el plazo.
 - **Una PR por historia** (como mucho dos, si dependen entre sí), **con commits por paso**: sin eso el plazo de entrega no se puede medir y el WIP real supera el límite ([métricas](02_Metricas_DORA_y_Flujo.md) apartado 7.6, 29 sept.).
 - **Un aviso del compilador o de la plataforma se corrige en su causa**, no se silencia cambiando la configuración; si hay que cambiarla, se añade a la vez un control que cubra lo que el aviso vigilaba ([métricas](02_Metricas_DORA_y_Flujo.md) apartado 7.2, 29 sept.).
 - **Trabajo transversal** (renombrados, reorganizaciones, herramientas) solo entra si desbloquea o abarata lo que hay en "Listo"; si no, va a "Decisiones y deuda".
@@ -163,3 +163,5 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.51 (6 oct. 2026)** — "Revisión antes de la entrega" en Listo (v1.2.0, revisión de código, prueba exploratoria, segundo test de usabilidad); también resumida en el README.
 - **v2.52 (7 oct. 2026)** — avance de la revisión antes de la entrega: v1.2.0 publicada, revisión de código con sus correcciones (v1.2.1) y guion de la demo al día.
 - **v2.53 (11 oct. 2026)** — RF-40b en curso (hecho y evaluado, falta activarlo) y "Entrega del TFM" con lo que pide el máster; la entrega pasa al 20 de octubre.
+- **v2.54 (11 oct. 2026)** — RF-40b fusionada (PR #32). Fechas: entrega hacia el 20 de octubre, como máximo el 26 (antes figuraba el 31).
+- **v2.55 (11 oct. 2026)** — cuenta de prueba (TFM-01): script de sembrado y restauración, protección contra el borrado, capturas y licencia en el README.

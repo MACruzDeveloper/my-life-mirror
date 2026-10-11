@@ -439,7 +439,8 @@
     "sugerenciasRevocable": "Está desactivado por defecto y puedes desactivarlo cuando quieras. De la IA solo quedan las opciones que aceptes.",
     "compartidasTitulo": "Experiencias compartidas",
     "compartidasTexto": "Las experiencias de tu diario que has compartido de forma anónima para ayudar a otras personas. Solo ven el texto: ni tu nombre, ni la fecha, ni tu puntuación.",
-    "compartidasNinguna": "No tienes ninguna experiencia compartida."
+    "compartidasNinguna": "No tienes ninguna experiencia compartida.",
+    "errorCuentaDemo": "Esta es la cuenta de demostración del proyecto y no se puede eliminar. Si quieres probar el borrado, crea una cuenta propia: se elimina de verdad, con todos sus datos."
   },
   "recomendaciones": {
     "ideaAnterior": "Idea anterior",

@@ -48,7 +48,7 @@ Alternativas vistas en clase, evaluadas contra este proyecto (una persona, plazo
 
 **Apetito fijo (de Shape Up)**
 
-- El **tiempo es fijo** (31 oct.); el **alcance es lo que se ajusta**. Sustituye al "Sprint 6 de colchón".
+- El **tiempo es fijo** (se planificó para el 31 oct.; la entrega será hacia el 20 oct. y, como máximo, el 26); el **alcance es lo que se ajusta**. Sustituye al "Sprint 6 de colchón".
 - Una **línea de corte** en "Listo" separa lo que se hará seguro de lo que se sacrifica si el tiempo no llega. Se revisa al cerrar cada tarea. Nunca se estira el plazo.
 - **Lo último en recortarse es la validación** (usability test, corrección, demo): es lo que convierte el TFM en evidencia, no solo en código.
 
@@ -62,5 +62,6 @@ Alternativas vistas en clase, evaluadas contra este proyecto (una persona, plazo
 
 ## Historial de cambios
 
+- **v1.2 (11 oct. 2026)** — la fecha fija pasa del 31 de octubre a "hacia el 20, como máximo el 26": el máster admite entregar en esa ventana y el alcance ya está cerrado.
 - **v1.1 (19 sept. 2026)** — enlace al plan de métricas DORA y Flow.
 - **v1.0 (19 sept. 2026)** — versión inicial: Lean + Kanban con apetito fijo, sustituyendo los sprints semanales del backlog original. El espiral se mantiene como modelo de ciclo de vida.

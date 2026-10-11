@@ -9,6 +9,7 @@ import { SupabaseAuthProvider } from "#modules/accounts/infrastructure/SupabaseA
 import { createRegisterUser } from "#modules/accounts/application/RegisterUser.js";
 import { createLogIn } from "#modules/accounts/application/LogIn.js";
 import { createDeleteAccount } from "#modules/accounts/application/DeleteAccount.js";
+import { createEraseUser } from "#modules/accounts/application/EraseUser.js";
 import { createExportUserData } from "#modules/accounts/application/ExportUserData.js";
 import { createGenerateRecommendations } from "#modules/recommendations/application/GenerateRecommendations.js";
 import { createListRecommendations } from "#modules/recommendations/application/ListRecommendations.js";
@@ -277,6 +278,8 @@ export interface AppContext {
   adminUsers: ReturnType<typeof createAdminUserActions>;
   exportUserData: ReturnType<typeof createExportUserData>;
   deleteAccount: ReturnType<typeof createDeleteAccount>;
+  /** Borra un usuario con todos sus datos, sin pedir contraseña: solo para herramientas del servidor (TFM-01, restaurar la cuenta de prueba). */
+  eraseUser: ReturnType<typeof createEraseUser>;
   requestPasswordReset: ReturnType<typeof createRequestPasswordReset>;
   resetPassword: ReturnType<typeof createResetPassword>;
   consentRepository: ConsentRepository;
@@ -300,6 +303,7 @@ export interface AppContext {
   recordAssessments: ReturnType<typeof createRecordAssessments>;
   getLatestScores: ReturnType<typeof createGetLatestScores>;
   getAssessmentHistory: ReturnType<typeof createGetAssessmentHistory>;
+  experienceRepository: ExperienceRepository;
   addExperience: ReturnType<typeof createAddExperience>;
   listExperiences: ReturnType<typeof createListExperiences>;
   deleteExperience: ReturnType<typeof createDeleteExperience>;
@@ -366,7 +370,8 @@ export function createAppContext(environment: Environment = detectEnvironment())
       clock,
     }),
     exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -399,6 +404,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     getLatestScores: createGetLatestScores(assessmentRepository, categoryRepository),
     getAssessmentHistory: createGetAssessmentHistory(assessmentRepository, categoryRepository),
     // RF-44: el diario de experiencias, separado de las evaluaciones.
+    experienceRepository,
     addExperience: createAddExperience({ experienceRepository, categoryRepository, clock }),
     listExperiences: createListExperiences(experienceRepository),
     deleteExperience: createDeleteExperience({ experienceRepository, assessmentRepository }),
