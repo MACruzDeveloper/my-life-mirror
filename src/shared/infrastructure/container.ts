@@ -6,6 +6,7 @@ import { SystemClock } from "./SystemClock.js";
 import type { AuthProvider } from "#modules/accounts/domain/AuthProvider.js";
 import { InMemoryAuthProvider } from "#modules/accounts/infrastructure/InMemoryAuthProvider.js";
 import { SupabaseAuthProvider } from "#modules/accounts/infrastructure/SupabaseAuthProvider.js";
+import { resetPasswordUrl } from "#modules/accounts/infrastructure/resetPasswordUrl.js";
 import { createRegisterUser } from "#modules/accounts/application/RegisterUser.js";
 import { createLogIn } from "#modules/accounts/application/LogIn.js";
 import { createDeleteAccount } from "#modules/accounts/application/DeleteAccount.js";
@@ -124,7 +125,7 @@ function createAuthProvider(environment: Environment): AuthProvider {
   if (!appUrl) {
     throw new Error("Falta APP_URL — ver .env.example");
   }
-  return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
+  return new SupabaseAuthProvider(url, serviceRoleKey, resetPasswordUrl(appUrl));
 }
 
 /**

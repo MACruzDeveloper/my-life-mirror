@@ -7,6 +7,9 @@ import Box, { type BoxProps } from "@mui/material/Box";
  * queda alineado con `Breadcrumbs`, que usa la misma anchura y el mismo
  * margen; desde `sm`, algo más de aire arriba.
  */
+/** Ancho de las pantallas públicas de cuenta: cabe el rastro más largo ("Inicio / Iniciar sesión / Recuperar contraseña") en una línea. En móvil no aplica: ocupan el ancho disponible. */
+export const PUBLIC_FORM_MAX_WIDTH = 440;
+
 export function PublicFormBox({ sx, ...props }: BoxProps) {
-  return <Box {...props} sx={[{ maxWidth: 360, mx: "auto", mt: { xs: 3, sm: 5 }, px: 2 }, ...(Array.isArray(sx) ? sx : [sx])]} />;
+  return <Box {...props} sx={[{ maxWidth: PUBLIC_FORM_MAX_WIDTH, mx: "auto", mt: { xs: 3, sm: 5 }, px: 2 }, ...(Array.isArray(sx) ? sx : [sx])]} />;
 }

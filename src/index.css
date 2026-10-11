@@ -6,9 +6,11 @@
   font-family: system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
+/* Sin `* { box-sizing: border-box }`: ya lo pone el `CssBaseline` de MUI, dentro
+   de su capa. Aquí, sin capa, ganaba a todo, también al `content-box` que MUI
+   necesita en sus campos de texto, que quedaban en 33 px de alto con la
+   etiqueta descolocada (fallo real en producción, 11 oct.). Regla general: en
+   el CSS sin capa, nunca un selector universal. */
 
 body {
   margin: 0;

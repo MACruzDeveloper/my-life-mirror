@@ -3,12 +3,18 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
-import { Link as RouterLink } from "react-router";
+import { Navigate, Link as RouterLink } from "react-router";
+import { isRecoveryHash } from "@modules/accounts/ui/extractTokenFromHash";
 import { HowItWorks } from "@shared/ui/components/HowItWorks";
 
 /** RF-39. Página pública — sin lógica de dominio, solo introducción + CTAs, y cómo funciona (UX-01). */
 export function Landing() {
   const { t } = useTranslation();
+
+  // RF-38: un enlace de recuperación que acaba aquí sigue hasta su pantalla, con su token (o su error).
+  if (isRecoveryHash(window.location.hash)) {
+    return <Navigate to={{ pathname: "/restablecer-password", hash: window.location.hash }} replace />;
+  }
 
   return (
     <Box sx={{ maxWidth: 480, mx: "auto", mt: { xs: 4, sm: 8 }, textAlign: "center", px: 2 }}>
