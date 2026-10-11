@@ -1,9 +1,10 @@
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { type Result, err, ok } from "#shared/domain/Result.js";
 import { requireAdmin } from "#shared/domain/Actor.js";
 import type { Clock } from "#shared/domain/Clock.js";
 import { AuthenticationError, ConflictError, DomainError, ForbiddenError, NotFoundError, ValidationError } from "#shared/domain/DomainError.js";
 import { Email } from "../domain/Email.js";
+import { WeakPasswordError, generatePassword } from "../domain/Password.js";
 import type { AdminAuditEntry } from "../domain/AdminAuditEntry.js";
 import type { AdminAuditRepository } from "../domain/AdminAuditRepository.js";
 import type { AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
@@ -185,9 +186,10 @@ export function createAdminUserActions(dependencies: Dependencies) {
       const permission = requireAdmin(input.actor);
       if (!permission.ok) return permission;
 
-      const temporaryPassword = randomBytes(12).toString("base64url");
+      const temporaryPassword = generatePassword({ email: input.email, name: input.name });
       const result = await registerUser({ email: input.email, password: temporaryPassword, name: input.name });
-      if (!result.ok) return result;
+      // La generada cumple la política; si aun así se rechazara, es un fallo nuestro, no un dato que corregir.
+      if (!result.ok) return err(result.error instanceof WeakPasswordError ? new ValidationError("No se pudo generar la contraseña temporal") : result.error);
 
       await record(input.actor, "user.created", result.value.id);
       return ok({ id: result.value.id, email: result.value.email, temporaryPassword });

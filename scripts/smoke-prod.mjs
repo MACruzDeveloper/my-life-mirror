@@ -30,6 +30,24 @@ const checks = [
     // 401 = la función arrancó, leyó sus variables y Supabase respondió. 500 = algo de eso falla.
     return res.status === 401 || `HTTP ${res.status}`;
   }],
+  // Cabeceras de seguridad (vercel.json, SEC-03): si un cambio de configuración las quita, que se note.
+  ["cabeceras de seguridad", async () => {
+    const res = await fetch(`${base}/`);
+    const expected = {
+      "content-security-policy": "default-src 'self'",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "permissions-policy": "camera=()",
+      "strict-transport-security": "max-age=",
+    };
+    const missing = Object.entries(expected).filter(([name, value]) => !(res.headers.get(name) ?? "").includes(value)).map(([name]) => name);
+    return missing.length === 0 || `faltan: ${missing.join(", ")}`;
+  }],
+  ["api: respuestas sin caché", async () => {
+    const res = await fetch(`${base}/api/accounts/session`);
+    return (res.headers.get("cache-control") ?? "").includes("no-store") || `Cache-Control: ${res.headers.get("cache-control")}`;
+  }],
   ["api: ruta inexistente", async () => {
     const res = await fetch(`${base}/api/no-existe`);
     return res.status === 404 || `HTTP ${res.status} (debería ser 404, no la app)`;

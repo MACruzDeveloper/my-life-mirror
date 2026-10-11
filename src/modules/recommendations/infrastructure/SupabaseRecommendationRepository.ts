@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { Recommendation, RecommendationStatus } from "../domain/Recommendation.js";
 import type { RecommendationRepository } from "../domain/RecommendationRepository.js";
 
@@ -19,7 +20,7 @@ export class SupabaseRecommendationRepository implements RecommendationRepositor
   private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
   }
 
   async findByUserId(userId: string): Promise<Recommendation[]> {

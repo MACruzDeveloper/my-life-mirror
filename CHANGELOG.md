@@ -5,6 +5,19 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Seguridad (primera revisión completa: [plan de seguridad](docs/security/01_Plan_Seguridad.md))
+
+- **Contraseñas fuertes (SEC-01):** las nuevas necesitan de 12 a 72 caracteres, con minúscula, mayúscula, número y símbolo, sin secuencias (`1234`, `qwerty`), sin ser una palabra común aunque lleve sustituciones (`P4ssw0rd!2026`) y sin el nombre ni el email. Registro y cambio de contraseña enseñan los requisitos desde el principio y los van marcando; el inicio de sesión no da ninguna pista. Las cuentas que ya existen no cambian.
+- El registro ya no dice "ya existe una cuenta con ese email": mensaje neutro.
+- **Límite de intentos (SEC-02)** en inicio de sesión, registro y recuperación de contraseña, por IP y por cuenta, contado en la base de datos. **Migración 0021** (`attempt_counters` y su función): ejecutarla antes de desplegar. Sin ella el servidor deja pasar y lo anota.
+- **Cabeceras de seguridad (SEC-03):** política de contenido (CSP), `nosniff`, protección contra marcos, `Referrer-Policy` y `Permissions-Policy` en todas las respuestas; la API, sin caché. `npm run smoke:prod` las comprueba.
+- Las acciones que cambian datos rechazan las peticiones que vienen de otra web (403) y los cuerpos desmesurados (413); longitudes máximas en los campos de cuenta.
+- Los controladores públicos comparten una plantilla (`publicHandler`); el cliente de Supabase del servidor ya no guarda sesión.
+- **IA (SEC-04):** el prompt de "Sugerir opciones con IA" trata la experiencia como un dato y no sigue órdenes que contenga; la evaluación con el modelo incluye cinco intentos de inyección, los cinco resistidos.
+- Toda lista de entrada tiene longitud máxima: junto con el tope de tamaño, deja sin efecto un fallo de zod sin corregir (CVE-2023-54404) que permitía agotar la memoria de una función con una lista enorme. Lo encontró Snyk, probado como segunda herramienta.
+- **Dependencias:** corregidas 2 vulnerabilidades altas en paquetes de desarrollo. Dependabot (`.github/dependabot.yml`) y un workflow de seguridad (`npm audit` y CodeQL) en cada PR y cada lunes.
+- `npm run backup:db`: copia de seguridad de la base de datos en un archivo local (el plan gratuito de Supabase no guarda copias).
+
 ### Añadido (TFM-01, cuenta de prueba para la entrega)
 
 - `npm run demo:reset`: crea o restaura la cuenta de prueba (seis áreas, un año de historial, ideas abiertas, opciones, diario, IA activada) y una segunda cuenta que comparte experiencias con ella. Borra solo esas dos cuentas; contra la base real pide `-- --yes`, y con `-- --local` usa el Supabase local. Contenido en `demoAccount.json`.

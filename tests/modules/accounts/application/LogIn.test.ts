@@ -7,10 +7,10 @@ import { InMemoryAuthProvider } from "@modules/accounts/infrastructure/InMemoryA
 describe("IniciarSesion (RF-01)", () => {
   it("inicia sesión con credenciales correctas y devuelve un token", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await authProvider.register("ana@ejemplo.com", "12345678");
+    await authProvider.register("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
     const logIn = createLogIn(authProvider);
 
-    const result = await logIn({ email: "ana@ejemplo.com", password: "12345678" });
+    const result = await logIn({ email: "ana@ejemplo.com", password: "Bici-Azul-Lluvia-47" });
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -21,7 +21,7 @@ describe("IniciarSesion (RF-01)", () => {
 
   it("rechaza credenciales incorrectas", async () => {
     const authProvider = new InMemoryAuthProvider();
-    await authProvider.register("ana@ejemplo.com", "12345678");
+    await authProvider.register("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
     const logIn = createLogIn(authProvider);
 
     const result = await logIn({ email: "ana@ejemplo.com", password: "incorrecta" });
@@ -35,7 +35,7 @@ describe("IniciarSesion (RF-01)", () => {
   it("rechaza un email con formato inválido sin llegar a tocar el proveedor de auth", async () => {
     const logIn = createLogIn(new InMemoryAuthProvider());
 
-    const result = await logIn({ email: "no-es-email", password: "12345678" });
+    const result = await logIn({ email: "no-es-email", password: "Bici-Azul-Lluvia-47" });
 
     expect(result.ok).toBe(false);
     if (!result.ok) {

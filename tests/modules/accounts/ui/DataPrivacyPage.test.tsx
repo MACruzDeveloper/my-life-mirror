@@ -90,12 +90,12 @@ describe("DataPrivacyPage (RF-05)", () => {
     renderPage(client);
 
     const dialog = openDialog();
-    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "12345678" } });
+    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "Bici-Azul-Lluvia-47" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
 
     await waitFor(() => expect(screen.getByText("Página pública")).toBeInTheDocument());
     const [[, init]] = deleteCalls(fetchMock);
-    expect(JSON.parse(init.body)).toEqual({ password: "12345678" });
+    expect(JSON.parse(init.body)).toEqual({ password: "Bici-Azul-Lluvia-47" });
     expect(client.getQueryData(["categories"])).toBeUndefined();
   });
 
@@ -117,7 +117,7 @@ describe("DataPrivacyPage (RF-05)", () => {
     renderPage();
 
     const dialog = openDialog();
-    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "12345678" } });
+    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "Bici-Azul-Lluvia-47" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
 
     expect(await within(dialog).findByText(/cuenta de demostración/i)).toBeInTheDocument();
@@ -129,7 +129,7 @@ describe("DataPrivacyPage (RF-05)", () => {
     renderPage();
 
     const dialog = openDialog();
-    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "12345678" } });
+    fireEvent.change(within(dialog).getByLabelText(/contraseña/i), { target: { value: "Bici-Azul-Lluvia-47" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /eliminar definitivamente/i }));
 
     expect(await within(dialog).findByText(/único administrador/i)).toBeInTheDocument();

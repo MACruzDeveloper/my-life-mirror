@@ -13,6 +13,8 @@
     "dev:full": "(sleep 2 && open http://localhost:3000) & npx -y vercel dev",
     "dev:local": "node scripts/dev-local.mjs",
     "demo:reset": "node scripts/demo-reset.mjs",
+    "backup:db": "node scripts/backup-db.mjs",
+    "audit": "npm audit --audit-level=high",
     "build": "tsc -b && vite build",
     "check:api": "node scripts/check-api-types.mjs",
     "lint": "eslint .",

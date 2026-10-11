@@ -35,7 +35,8 @@ export function LoginForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setFormState({ kind: "error", message: data.error ?? t("login.errorGenerico") });
+        // SEC-01: un único mensaje, sin pistas sobre qué ha fallado; salvo el aviso de esperar (SEC-02).
+        setFormState({ kind: "error", message: data.code === "RATE_LIMITED" ? t("comun.demasiadosIntentos") : response.status === 401 ? t("login.errorCredenciales") : t("login.errorGenerico") });
         return;
       }
 

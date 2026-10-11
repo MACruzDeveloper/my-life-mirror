@@ -2,12 +2,12 @@
   "comun": {
     "email": "Email",
     "contrasena": "Password",
-    "contrasenaAyuda": "At least 8 characters",
     "errorServidor": "Could not reach the server",
     "reintentar": "Retry",
     "idioma": "Language",
     "abrirMenu": "Open menu",
-    "cargando": "Loading…"
+    "cargando": "Loading…",
+    "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again."
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -33,14 +33,38 @@
     "botonEnviando": "Creating account…",
     "exito": "Account created for {{email}}.",
     "irALogin": "Log in",
-    "errorGenerico": "Could not complete the registration"
+    "errorGenerico": "Could not complete the registration",
+    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password."
   },
   "login": {
     "titulo": "Log in",
     "boton": "Log in",
     "botonEnviando": "Logging in…",
     "olvideContrasena": "Forgot your password?",
-    "errorGenerico": "Could not log in"
+    "errorGenerico": "Could not log in",
+    "errorCredenciales": "Wrong email or password"
+  },
+  "contrasena": {
+    "requisitos": "Your password needs:",
+    "reglas": {
+      "length": "Between 12 and 72 characters",
+      "lowercase": "A lowercase letter",
+      "uppercase": "An uppercase letter",
+      "digit": "A number",
+      "symbol": "A symbol (for example - _ . ! ?)",
+      "sequence": "No sequences or repeats such as 1234, abcd, qwerty or aaa",
+      "common": "Not similar to a very common password (password, qwerty, the app's name…)",
+      "personal": "Without your name or your email in it"
+    },
+    "estado": {
+      "met": "Done",
+      "pending": "Pending",
+      "missing": "Missing"
+    },
+    "consejo": "One idea: join three or four unrelated words and add a number and a symbol.",
+    "mostrar": "Show password",
+    "ocultar": "Hide password",
+    "noCumple": "The password doesn't meet the requirements. See what's missing below the field."
   },
   "olvidePassword": {
     "titulo": "Forgot password",

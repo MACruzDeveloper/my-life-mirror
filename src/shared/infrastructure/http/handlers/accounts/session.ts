@@ -17,7 +17,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const result = await verifySession(token);
 
     if (!result.ok) {
-      res.writeHead(200, { "Content-Type": "application/json" });
+      res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
       res.end(JSON.stringify({ autenticado: false }));
       return;
     }
@@ -37,11 +37,11 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       });
     }
 
-    res.writeHead(200, { "Content-Type": "application/json" });
+    res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
     res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, rol: result.value.rol, aiIdeasAvailable }));
   } catch (error) {
     logger.error("Error inesperado en /api/accounts/session", error, { route: "/api/accounts/session" });
-    res.writeHead(500, { "Content-Type": "application/json" });
+    res.writeHead(500, { "Content-Type": "application/json", "Cache-Control": "no-store" });
     res.end(JSON.stringify({ error: "Error interno del servidor" }));
   }
 }

@@ -1,3 +1,4 @@
+import { checkPassword } from "@modules/accounts/domain/passwordPolicy";
 import { describe, expect, it } from "vitest";
 import { InMemoryPersonalizedIdeaRepository } from "@modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository";
 import { InMemoryExperienceRepository } from "@modules/assessments/infrastructure/InMemoryExperienceRepository";
@@ -28,7 +29,7 @@ async function setup() {
 
   const admin = { ...(await authProvider.register("admin@ejemplo.com", "adminpass1")), rol: "admin" as const };
   authProvider.assignRoleForTest("admin@ejemplo.com", "admin");
-  const ana = await authProvider.register("ana@ejemplo.com", "12345678");
+  const ana = await authProvider.register("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
   await updateProfile({ userId: ana.id, name: "Ana" });
   await assessmentRepository.saveMany([{ id: "a1", userId: ana.id, categoryId: "c1", score: 5, recordedAt: new Date() }]);
 
@@ -60,11 +61,11 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
       const noAdmin = { ...ana, rol: "usuario" as const };
 
       const results = [
-        await actions.changeRole({ actor: noAdmin, userId: admin.id, rol: "usuario", password: "12345678" }),
-        await actions.suspendUser({ actor: noAdmin, userId: admin.id, password: "12345678" }),
+        await actions.changeRole({ actor: noAdmin, userId: admin.id, rol: "usuario", password: "Bici-Azul-Lluvia-47" }),
+        await actions.suspendUser({ actor: noAdmin, userId: admin.id, password: "Bici-Azul-Lluvia-47" }),
         await actions.reactivateUser({ actor: noAdmin, userId: ana.id }),
-        await actions.deleteUser({ actor: noAdmin, userId: admin.id, password: "12345678" }),
-        await actions.updateEmail({ actor: noAdmin, userId: admin.id, email: "x@y.zz", password: "12345678" }),
+        await actions.deleteUser({ actor: noAdmin, userId: admin.id, password: "Bici-Azul-Lluvia-47" }),
+        await actions.updateEmail({ actor: noAdmin, userId: admin.id, email: "x@y.zz", password: "Bici-Azul-Lluvia-47" }),
         await actions.updateName({ actor: noAdmin, userId: admin.id, name: "X" }),
         await actions.createUser({ actor: noAdmin, email: "nuevo@ejemplo.com", name: "N" }),
         await actions.sendRecoveryLink({ actor: noAdmin, userId: admin.id }),
@@ -155,18 +156,18 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
   describe("suspender y reactivar", () => {
     it("suspender bloquea el inicio de sesión y la sesión abierta; reactivar lo devuelve todo", async () => {
       const { actions, admin, ana, authProvider } = await setup();
-      const session = await authProvider.logIn("ana@ejemplo.com", "12345678");
+      const session = await authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
 
       const suspended = await actions.suspendUser({ actor: admin, userId: ana.id, password: "adminpass1" });
 
       expect(suspended.ok).toBe(true);
-      await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).rejects.toBeInstanceOf(AuthenticationError);
+      await expect(authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47")).rejects.toBeInstanceOf(AuthenticationError);
       await expect(authProvider.verifySession(session.token)).rejects.toBeInstanceOf(AuthenticationError);
 
       const reactivated = await actions.reactivateUser({ actor: admin, userId: ana.id });
 
       expect(reactivated.ok).toBe(true);
-      await expect(authProvider.logIn("ana@ejemplo.com", "12345678")).resolves.toBeDefined();
+      await expect(authProvider.logIn("ana@ejemplo.com", "Bici-Azul-Lluvia-47")).resolves.toBeDefined();
     });
 
     it("no se puede suspender a un administrador ni a uno mismo", async () => {
@@ -222,7 +223,8 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
       expect(r.ok).toBe(true);
       if (!r.ok) return;
       expect(r.value.email).toBe("nuevo@ejemplo.com");
-      expect(r.value.temporaryPassword.length).toBeGreaterThanOrEqual(12);
+      // SEC-01: la contraseña temporal cumple la misma política que la de cualquier registro.
+      expect(checkPassword(r.value.temporaryPassword)).toEqual([]);
       expect((await profileRepository.findByUserId(r.value.id))?.name).toBe("Nuria");
       expect((await authProvider.listAllUsers()).find((u) => u.id === r.value.id)?.rol).toBe("usuario");
       await expect(authProvider.logIn("nuevo@ejemplo.com", r.value.temporaryPassword)).resolves.toBeDefined();
@@ -267,7 +269,7 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
       const r = await actions.updateEmail({ actor: admin, userId: ana.id, email: "ana.nueva@ejemplo.com", password: "adminpass1" });
 
       expect(r.ok).toBe(true);
-      await expect(authProvider.logIn("ana.nueva@ejemplo.com", "12345678")).resolves.toBeDefined();
+      await expect(authProvider.logIn("ana.nueva@ejemplo.com", "Bici-Azul-Lluvia-47")).resolves.toBeDefined();
       const [entry] = await auditRepository.findRecent(1);
       expect(entry.action).toBe("user.email.changed");
       expect(JSON.stringify(entry)).not.toContain("ejemplo.com");

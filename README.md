@@ -176,7 +176,7 @@ npm run test:e2e:api -- --headed   # los navegadores se abren y la app se usa so
 npm run test:e2e:api -- --reporter=html && npx playwright show-report   # informe en el navegador
 ```
 
-En GitHub, cada PR a `main` ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**), y tras cada despliegue de producción se ejecuta una comprobación (`npm run smoke:prod`). Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (apartado 1.2).
+En GitHub, cada PR a `main` ejecuta `test:e2e:api` automáticamente (workflow **E2E con api**), y tras cada despliegue de producción se ejecuta una comprobación (`npm run smoke:prod`). El workflow **Seguridad** audita las dependencias y analiza el código (CodeQL) en cada PR. Más detalle en el [plan de verificación](docs/requirements-analysis/04_Plan_Verificacion_Validacion.md) (apartado 1.2).
 
 ---
 
@@ -197,8 +197,21 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 - **Dónde:** [Vercel](https://vercel.com) sirve la interfaz y las funciones de `api/` (región de Dublín); [Supabase](https://supabase.com) aloja la base de datos y las cuentas. Los dos en su plan gratuito.
 - **Cómo:** cada fusión en `main` despliega producción. Cada entrega es una versión con su etiqueta (`v1.2.1`…) y su sección en el [CHANGELOG](CHANGELOG.md).
 - **Variables de entorno** (en Vercel; los nombres están en [.env.example](.env.example)): la URL y la clave de servicio de Supabase, la URL de la app y, para la IA, el proveedor y la clave de Anthropic. Las claves solo se usan en el servidor, nunca llegan al navegador.
-- **Base de datos:** las migraciones de `supabase/migrations/` se ejecutan a mano, en orden, antes de desplegar el código que las necesita.
+- **Base de datos:** las migraciones de `supabase/migrations/` se ejecutan a mano, en orden, antes de desplegar el código que las necesita. El plan gratuito no guarda copias: `npm run backup:db` hace una en local.
 - **Límites del plan gratuito:** 12 funciones como máximo (de ahí una función por capacidad, hoy 11) y pausa de Supabase tras 7 días sin uso (un workflow la evita).
+
+---
+
+## Seguridad
+
+Revisada contra OWASP Top 10:2025, el OWASP Top 10 para aplicaciones con LLM y MITRE ATT&CK; el análisis, los hallazgos y lo aplicado están en el [plan de seguridad](docs/security/01_Plan_Seguridad.md). En resumen:
+
+- **Cuentas:** las contraseñas las guarda Supabase Auth, nunca la app. Las nuevas deben ser fuertes (12 caracteres o más, variadas, sin secuencias ni palabras comunes, sin el nombre ni el email) y el formulario explica qué falta. El inicio de sesión no da pistas y los intentos están contados por IP y por cuenta.
+- **Sesión:** cookie `HttpOnly`, `Secure` y `SameSite=Lax` de una hora; el usuario sale siempre de la sesión verificada en el servidor.
+- **Datos:** todas las tablas con seguridad por filas y sin políticas: solo el servidor accede. Entradas validadas con esquemas, con longitudes máximas.
+- **Navegador:** política de contenido (CSP) y demás cabeceras de seguridad; las acciones que cambian datos rechazan peticiones de otras webs.
+- **IA:** opcional, con salida cerrada y validada, tope de uso, y sin obedecer órdenes escritas en el texto del usuario.
+- **Código y dependencias:** secretos fuera del repositorio; `npm audit`, CodeQL y Dependabot en GitHub. Se probó además Snyk, que encontró un fallo sin corregir en una dependencia, ya mitigado.
 
 ---
 

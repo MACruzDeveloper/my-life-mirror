@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { Assessment } from "../domain/Assessment.js";
 import type { AssessmentRepository } from "../domain/AssessmentRepository.js";
 
@@ -32,7 +33,7 @@ export class SupabaseAssessmentRepository implements AssessmentRepository {
   private readonly client: SupabaseClient;
 
   constructor(url: string, serviceRoleKey: string) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
   }
 
   async saveMany(assessments: Assessment[]): Promise<void> {

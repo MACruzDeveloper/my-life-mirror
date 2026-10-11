@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { USER_ROLES } from "#modules/accounts/domain/UserRole.js";
 import { adminHandler } from "./adminHandler.js";
+import { MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_PASSWORD_INPUT_LENGTH, MAX_TOKEN_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 
-const userId = z.string().min(1);
-const password = z.string();
+const userId = z.string().min(1).max(MAX_TOKEN_LENGTH);
+const password = z.string().max(MAX_PASSWORD_INPUT_LENGTH);
 
 /** Acciones POST de ADM-03 sobre cuentas de otros usuarios. Cada una delega en `AdminUserActions`. */
 export const changeRole = adminHandler({
@@ -37,21 +38,21 @@ export const deleteUser = adminHandler({
 export const updateEmail = adminHandler({
   route: "/api/admin/user-email",
   method: "POST",
-  schema: z.object({ userId, email: z.string(), password }),
+  schema: z.object({ userId, email: z.string().max(MAX_EMAIL_LENGTH), password }),
   execute: (c, actor, body) => c.adminUsers.updateEmail({ actor, ...body }),
 });
 
 export const updateName = adminHandler({
   route: "/api/admin/user-name",
   method: "POST",
-  schema: z.object({ userId, name: z.string() }),
+  schema: z.object({ userId, name: z.string().max(MAX_NAME_LENGTH) }),
   execute: (c, actor, body) => c.adminUsers.updateName({ actor, ...body }),
 });
 
 export const createUser = adminHandler({
   route: "/api/admin/user-create",
   method: "POST",
-  schema: z.object({ email: z.string(), name: z.string() }),
+  schema: z.object({ email: z.string().max(MAX_EMAIL_LENGTH), name: z.string().max(MAX_NAME_LENGTH) }),
   execute: (c, actor, body) => c.adminUsers.createUser({ actor, ...body }),
 });
 

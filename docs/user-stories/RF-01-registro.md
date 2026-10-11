@@ -9,7 +9,7 @@ Para poder empezar a usar la app
 
 ## Criterios de aceptación
 
-1. Given un email no registrado y una contraseña de al menos 8 caracteres
+1. Given un email no registrado y una contraseña que cumple la política (SEC-01)
    When el usuario envía el formulario de registro
    Then se crea la cuenta y la contraseña se guarda como hash, nunca en texto plano
 
@@ -17,7 +17,7 @@ Para poder empezar a usar la app
    When el usuario intenta registrarse con ese email
    Then el sistema rechaza el registro sin revelar más detalle que "email ya registrado"
 
-3. Given un email con formato inválido, o una contraseña de menos de 8 caracteres
+3. Given un email con formato inválido, o una contraseña que no cumple la política (SEC-01)
    When el usuario envía el formulario
    Then el sistema rechaza el registro con un mensaje específico del campo inválido
 
@@ -29,3 +29,4 @@ El login (con sesión JWT) es una historia aparte. **Excepción de flujo:** al r
 
 - **v1.0 (13 sept. 2026)** — versión inicial.
 - **v1.1 (19 sept. 2026)** — el registro deja la sesión iniciada y lleva a `/inicio`.
+- **v1.2 (11 oct. 2026)** — la contraseña ya no es "al menos 8 caracteres": la política está en [SEC-01](SEC-01-contrasenas-fuertes.md); el inicio de sesión no da pistas y los intentos están contados ([SEC-02](SEC-02-limite-de-intentos.md)).

@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { Clock } from "#shared/domain/Clock.js";
 import type { AiUsageLimiter } from "../domain/AiUsageLimiter.js";
 
@@ -14,7 +15,7 @@ export class SupabaseAiUsageLimiter implements AiUsageLimiter {
   private readonly clock: Clock;
 
   constructor(url: string, serviceRoleKey: string, limit: number, clock: Clock) {
-    this.client = createClient(url, serviceRoleKey);
+    this.client = createServiceClient(url, serviceRoleKey);
     this.limit = limit;
     this.clock = clock;
   }

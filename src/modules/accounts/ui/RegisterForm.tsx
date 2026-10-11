@@ -10,6 +10,9 @@ import { useTranslation } from "react-i18next";
 import { PublicFormBox } from "@shared/ui/components/PublicFormBox";
 import { Link as RouterLink, useNavigate } from "react-router";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
+import { type PasswordRule, checkPassword } from "@modules/accounts/domain/passwordPolicy";
+import { authErrorMessage } from "./authErrors";
+import { NewPasswordField } from "./NewPasswordField";
 
 type FormState =
   | { kind: "inicial" }
@@ -21,6 +24,10 @@ type FormState =
  * Vista de RF-01. Llama a /api/register — nunca importa infraestructura
  * directamente (AGENTS.md). Tras registrarse la sesión ya está iniciada. Incluye el nombre desde este primer paso
  * (RF-03): así el Header nunca tiene que mostrar el email en bruto.
+ *
+ * SEC-01: la contraseña se comprueba aquí con la misma regla que en el
+ * servidor, para explicar qué falta antes de enviar; el servidor la vuelve a
+ * comprobar (lo del navegador es comodidad, no seguridad).
  */
 export function RegisterForm() {
   const { t } = useTranslation();
@@ -30,9 +37,18 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formState, setFormState] = useState<FormState>({ kind: "inicial" });
+  const [submitted, setSubmitted] = useState(false);
+  const [serverRules, setServerRules] = useState<PasswordRule[]>([]);
+  const passwordContext = { email, name };
 
   async function handleSubmit(submitEvent: React.FormEvent) {
     submitEvent.preventDefault();
+    setSubmitted(true);
+    setServerRules([]);
+    if (checkPassword(password, passwordContext).length > 0) {
+      setFormState({ kind: "error", message: t("contrasena.noCumple") });
+      return;
+    }
     setFormState({ kind: "enviando" });
 
     try {
@@ -44,7 +60,8 @@ export function RegisterForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setFormState({ kind: "error", message: data.error ?? t("registro.errorGenerico") });
+        if (data.code === "WEAK_PASSWORD") setServerRules(data.rules ?? []);
+        setFormState({ kind: "error", message: authErrorMessage(t, data, t("registro.errorGenerico")) });
         return;
       }
 
@@ -107,15 +124,7 @@ export function RegisterForm() {
             required
             fullWidth
           />
-          <TextField
-            label={t("comun.contrasena")}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            helperText={t("comun.contrasenaAyuda")}
-            required
-            fullWidth
-          />
+          <NewPasswordField label={t("comun.contrasena")} value={password} onChange={setPassword} context={passwordContext} showErrors={submitted} serverRules={serverRules} />
           <Button type="submit" variant="contained" disabled={formState.kind === "enviando"} fullWidth>
             {formState.kind === "enviando" ? t("registro.botonEnviando") : t("registro.boton")}
           </Button>

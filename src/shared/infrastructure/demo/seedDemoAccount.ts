@@ -69,7 +69,11 @@ export async function seedDemoAccount(context: AppContext, credentials: DemoCred
   let sharedExperiences = 0;
 
   async function seedUser(userEmail: string, password: string, name: string, categories: CategorySeed[]): Promise<string> {
-    const user = ensure(await context.registerUser({ email: userEmail, password, name }), `registrar ${userEmail}`);
+    // Directo al proveedor, sin la política de contraseñas del registro (SEC-01): la de
+    // la cuenta de prueba es pública a propósito (está en el README), así que exigirle
+    // que sea difícil de adivinar no protege nada. Nadie más se registra por aquí.
+    const user = await context.authProvider.register(userEmail, password);
+    ensure(await context.updateProfile({ userId: user.id, name }), `guardar el perfil de ${userEmail}`);
     const own = ensure(await context.listCategories(user.id), "listar las categorías");
     const catalog = await context.categoryCatalogRepository.findAll();
     const categoryOf = (key: string) => {

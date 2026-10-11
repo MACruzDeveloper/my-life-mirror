@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { ok } from "#shared/domain/Result.js";
+import { MAX_ID_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { action, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 
-const ReportSchema = z.object({ id: z.string().min(1) });
+const ReportSchema = z.object({ id: z.string().min(1).max(MAX_ID_LENGTH) });
 
 /**
  * Controlador HTTP — RF-43, lo que comparten otras personas (`/api/categories/shared`):

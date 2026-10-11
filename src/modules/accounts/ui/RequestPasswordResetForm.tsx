@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Breadcrumbs } from "@shared/ui/components/Breadcrumbs";
 import { PublicFormBox } from "@shared/ui/components/PublicFormBox";
+import { authErrorMessage } from "./authErrors";
 
 type FormState = { kind: "inicial" } | { kind: "enviando" } | { kind: "enviado" } | { kind: "error"; message: string };
 
@@ -29,7 +30,7 @@ export function RequestPasswordResetForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setFormState({ kind: "error", message: data.error ?? t("olvidePassword.errorGenerico") });
+        setFormState({ kind: "error", message: authErrorMessage(t, data, t("olvidePassword.errorGenerico")) });
         return;
       }
 

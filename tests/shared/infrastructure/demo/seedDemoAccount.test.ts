@@ -73,7 +73,7 @@ describe("seedDemoAccount (TFM-01): la cuenta de prueba de la entrega", () => {
 
   it("volver a ejecutarlo deja las dos cuentas como al principio, sin duplicados, y no toca a nadie más", async () => {
     const context = createAppContext("test");
-    const other = await context.registerUser({ email: "real@ejemplo.com", password: "12345678", name: "Persona real" });
+    const other = await context.registerUser({ email: "real@ejemplo.com", password: "Bici-Azul-Lluvia-47", name: "Persona real" });
     const first = await seedDemoAccount(context, DEMO);
     const categories = await context.listCategories(first.demoUserId);
     const anyCategory = categories.ok ? categories.value.find((category) => category.status === "active")! : undefined;

@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { MAX_ID_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { action, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 
 const PersonalizeSchema = z.object({
-  recommendationId: z.string().min(1),
+  recommendationId: z.string().min(1).max(MAX_ID_LENGTH),
   /** La idea del carrusel que se está viendo (UX-05); sin ella, la de la recomendación. */
   templateKey: z.string().min(1).max(60).optional(),
   locale: z.string().min(2).max(5),

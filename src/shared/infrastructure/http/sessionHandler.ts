@@ -6,6 +6,7 @@ import { type AppContext, getAppContext } from "#shared/infrastructure/container
 import { readCookie } from "#shared/infrastructure/cookies.js";
 import { logger } from "#shared/infrastructure/logger.js";
 import type { HttpHandler, HttpRequest } from "./router.js";
+import { isBodyTooLarge, isCrossOrigin } from "./requestChecks.js";
 
 /** Un error de dominio (o con su misma forma): `code` decide el estado HTTP. */
 interface ErrorWithCode {
@@ -13,6 +14,8 @@ interface ErrorWithCode {
   message: string;
   /** RF-43: por qué no se puede compartir; la interfaz lo traduce. */
   reason?: string;
+  /** SEC-01: qué requisitos de la contraseña fallan; la interfaz los traduce. */
+  rules?: readonly string[];
 }
 
 /** Una respuesta a medida, cuando el Result no basta (cabeceras propias, un 409 previo…). */
@@ -33,7 +36,7 @@ export class Reply {
 
 export const reply = (status: number, body: unknown, headers?: Record<string, string>, format?: { pretty?: boolean }) => new Reply(status, body, headers, format);
 
-type Outcome = Result<unknown, ErrorWithCode> | Reply;
+export type Outcome = Result<unknown, ErrorWithCode> | Reply;
 
 export interface ActionInput<B> {
   context: AppContext;
@@ -70,11 +73,14 @@ const STATUS_BY_CODE: Record<string, number> = {
   NOT_SHAREABLE: 422,
 };
 
+/** Estado y cuerpo de un error de dominio: una sola tabla para todos los controladores. */
+export function errorResponse(error: ErrorWithCode): [number, Record<string, unknown>] {
+  return [STATUS_BY_CODE[error.code] ?? 400, { error: error.message, code: error.code, ...(error.reason && { reason: error.reason }), ...(error.rules && { rules: error.rules }) }];
+}
+
 interface SessionHandlerOptions extends Partial<Record<Method, SessionAction>> {
   /** Para el log de errores inesperados. */
   route: string;
-  /** Datos de administración: que ninguna caché intermedia los conserve. */
-  noStore?: boolean;
   /** Un intento sin permiso (FORBIDDEN), para el log operativo (OWASP A09). */
   onDenied?: (userId: string) => void;
   /** Para los tests; por defecto, el contexto del proceso. */
@@ -86,13 +92,15 @@ interface SessionHandlerOptions extends Partial<Record<Method, SessionAction>> {
  * con zod (400), caso de uso con el usuario de la sesión, y traducción del
  * Result a un estado HTTP con una sola tabla (404, 409, 403, 422…). Un error
  * inesperado es un 500 genérico y queda en el log. Sustituye a la misma
- * secuencia copiada en cada controlador.
+ * secuencia copiada en cada controlador. Además (SEC-03): nada se guarda en
+ * caché (son datos de una persona) y una acción que cambia datos pedida desde
+ * otra web se rechaza (403).
  */
 export function sessionHandler(options: SessionHandlerOptions): HttpHandler {
   const getContext = options.getContext ?? getAppContext;
 
   function send(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}, pretty = false) {
-    res.writeHead(status, { "Content-Type": "application/json", ...(options.noStore && { "Cache-Control": "no-store" }), ...headers });
+    res.writeHead(status, { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers });
     res.end(pretty ? JSON.stringify(body, null, 2) : JSON.stringify(body));
   }
 
@@ -101,6 +109,7 @@ export function sessionHandler(options: SessionHandlerOptions): HttpHandler {
       const method = METHODS.find((candidate) => candidate === req.method);
       const handlerAction = method ? options[method] : undefined;
       if (!handlerAction) return send(res, 405, { error: "Método no permitido" });
+      if (method !== "GET" && isCrossOrigin(req)) return send(res, 403, { error: "Origen no permitido" });
 
       const context = getContext();
       const session = await context.verifySession(readCookie(req.headers.cookie, "sesion"));
@@ -108,6 +117,7 @@ export function sessionHandler(options: SessionHandlerOptions): HttpHandler {
 
       let body: unknown = undefined;
       if (handlerAction.schema && method !== "GET") {
+        if (isBodyTooLarge(req.body)) return send(res, 413, { error: "Petición demasiado grande" });
         const data = handlerAction.schema.safeParse(req.body);
         if (!data.success) return send(res, 400, { error: "Petición mal formada" });
         body = data.data;
@@ -121,7 +131,7 @@ export function sessionHandler(options: SessionHandlerOptions): HttpHandler {
 
       const error = outcome.error;
       if (error.code === "FORBIDDEN") options.onDenied?.(session.value.id);
-      send(res, STATUS_BY_CODE[error.code] ?? 400, { error: error.message, code: error.code, ...(error.reason && { reason: error.reason }) });
+      send(res, ...errorResponse(error));
     } catch (error) {
       logger.error(`Error inesperado en ${options.route}`, error, { route: options.route });
       send(res, 500, { error: "Error interno del servidor" });

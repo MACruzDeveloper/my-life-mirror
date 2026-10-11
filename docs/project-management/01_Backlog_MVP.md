@@ -15,6 +15,8 @@ Cada tarea se especifica primero como historia de usuario Nivel 2 (Spec Anchored
 - [ ] **Entrega del TFM** (hacia el 20 oct., como máximo el 26): README completo, con capturas y licencia (hecho); cuenta de prueba ([historia](../user-stories/TFM-01-cuenta-de-prueba.md): hecha y creada en producción el 11 oct.; la protección contra el borrado llega con el próximo despliegue); slides y vídeo.
 - [ ] **RF-30** líneas de ayuda siempre a mano (desde el 6 oct.; [historia](../user-stories/RF-30-lineas-ayuda.md)): pantalla pública `/ayuda` con el 024, el 112 y Find A Helpline; enlace "¿Necesitas ayuda ahora?" al pie de todas las pantallas, junto al diario y en la pestaña "De otras personas". La respuesta ética a "¿y si alguien escribe que no puede más?": ayuda ofrecida a todos, sin detectar nada (RES-09).
 
+- [ ] **Revisión de seguridad** (desde el 11 oct.; [plan](../security/01_Plan_Seguridad.md)): primera revisión completa (OWASP Top 10:2025, OWASP para LLM, MITRE ATT&CK). Hecho en código: contraseñas fuertes ([SEC-01](../user-stories/SEC-01-contrasenas-fuertes.md)), límite de intentos ([SEC-02](../user-stories/SEC-02-limite-de-intentos.md)), cabeceras y peticiones más estrictas ([SEC-03](../user-stories/SEC-03-cabeceras-y-peticiones.md)), inyección de instrucciones ([SEC-04](../user-stories/SEC-04-ia-inyeccion-de-instrucciones.md)), dependencias y copia de seguridad. Falta, del autor: token de GitHub (paso 1; el segundo factor en las cuentas queda para después de la entrega), tras subir la rama, exigir los controles en la regla de `main` y revisar la pestaña Security (paso 2), y decidir la verificación del email (paso 9). Hecho por el autor el 11 oct.: migración 0021 en producción, regla de `main`, avisos y escaneo de secretos en GitHub, token *fine-grained*, prueba de Snyk.
+
 ## Listo (ordenado por riesgo y dependencias — se tira de arriba)
 
 Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
@@ -165,3 +167,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.53 (11 oct. 2026)** — RF-40b en curso (hecho y evaluado, falta activarlo) y "Entrega del TFM" con lo que pide el máster; la entrega pasa al 20 de octubre.
 - **v2.54 (11 oct. 2026)** — RF-40b fusionada (PR #32). Fechas: entrega hacia el 20 de octubre, como máximo el 26 (antes figuraba el 31).
 - **v2.55 (11 oct. 2026)** — cuenta de prueba (TFM-01): script de sembrado y restauración, protección contra el borrado, capturas y licencia en el README.
+- **v2.56 (11 oct. 2026)** — revisión de seguridad en curso: plan, cuatro historias SEC y lo que queda del lado del autor.

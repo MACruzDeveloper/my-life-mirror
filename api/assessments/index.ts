@@ -1,16 +1,19 @@
 import { z } from "zod";
 import { bestEffort } from "#shared/infrastructure/http/bestEffort.js";
 import { logger } from "#shared/infrastructure/logger.js";
+import { MAX_ID_LENGTH, MAX_LIST_LENGTH, MAX_TEXT_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { action, reply, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 
 const RecordAssessmentsSchema = z.object({
   entries: z.array(
     z.object({
-      categoryId: z.string(),
+      categoryId: z.string().max(MAX_ID_LENGTH),
       score: z.number(),
-      note: z.string().optional(),
+      note: z.string().max(MAX_TEXT_LENGTH).optional(),
     }),
-  ),
+  // Una entrevista tiene, como mucho, una entrada por categoría. Toda lista de entrada lleva
+  // tope: zod anota un error por cada elemento que no encaja, sin límite (CVE-2023-54404).
+  ).max(MAX_LIST_LENGTH),
 });
 
 /**
