@@ -28,6 +28,8 @@ import { PENDING_COLORS } from "./pendingColors";
 import { SHARE_MIN_SCORE } from "../../domain/Experience";
 import type { ExperienceDto, ShareOutcome } from "../queries";
 import { ExperienceJournal, type ExperienceSharing, type ExperienceSuggestions, type SuggestionsAnswer } from "./ExperienceJournal";
+import { avatarSrc } from "@shared/ui/components/UserAvatar";
+import { useOptionalSession } from "@shared/ui/context/SessionContext";
 import { ToggleRow } from "./ToggleRow";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -122,6 +124,8 @@ export function CategoryQuestion({
   onUnshareExperience,
 }: CategoryQuestionProps) {
   const { t, i18n } = useTranslation();
+  // RF-26: si la persona eligió un avatar, es el suyo el que habla; si no, el dibujo genérico.
+  const chosenAvatarKey = useOptionalSession()?.avatarKey;
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [helpsOpen, setHelpsOpen] = useState(false);
   const [difficultiesOpen, setDifficultiesOpen] = useState(false);
@@ -220,7 +224,7 @@ export function CategoryQuestion({
           </Box>
         )}
       </Bubble>
-      <Bubble side="right" avatar={userAvatar} alt={t("entrevista.tu")} band={isUnanswered ? undefined : scoreBand(score)}>
+      <Bubble side="right" avatar={chosenAvatarKey ? avatarSrc(chosenAvatarKey) : userAvatar} alt={t("entrevista.tu")} band={isUnanswered ? undefined : scoreBand(score)}>
         {/* UX-05: el "Guardar" de la categoría, a la derecha de su puntuación (debajo si no cabe). */}
         <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 2, rowGap: 1 }}>
           <Box role="group" aria-label={t("entrevista.puntuacionDe", { categoria: label.name })} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

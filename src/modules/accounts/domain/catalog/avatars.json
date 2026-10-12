@@ -1,0 +1,63 @@
+[
+  {
+    "key": "roundGlasses",
+    "description": "short curly black hair, round glasses, dark brown skin, mustard yellow sweater",
+    "published": true
+  },
+  {
+    "key": "tealScarf",
+    "description": "chin-length silver grey hair, light skin with freckles, teal scarf around the neck",
+    "published": true
+  },
+  {
+    "key": "longBraids",
+    "description": "long braids, dark brown skin, coral t-shirt",
+    "published": true
+  },
+  {
+    "key": "highBun",
+    "description": "straight black hair in a low ponytail, light tan skin, lavender shirt",
+    "published": true
+  },
+  {
+    "key": "pinkWrap",
+    "description": "short dyed pink hair, tan skin, one small earring, black t-shirt",
+    "published": true
+  },
+  {
+    "key": "woolBeanie",
+    "description": "knitted wool beanie with dark blond hair showing, light skin, orange jacket",
+    "published": true
+  },
+  {
+    "key": "stripedShirt",
+    "description": "short brown hair with a visible hearing aid, medium skin, striped shirt",
+    "published": true
+  },
+  {
+    "key": "longWaves",
+    "description": "light skin, long straight blond hair, small hoop earrings, sky blue blouse",
+    "published": true
+  },
+  {
+    "key": "blondBeard",
+    "description": "light skin, short blond hair, short blond beard, dark green polo shirt",
+    "published": true
+  },
+  {
+    "key": "headphones",
+    "description": "dark brown skin, rounded afro hair, headphones around the neck, yellow t-shirt",
+    "published": true
+  },
+  {
+    "key": "shavedHead",
+    "description": "medium brown skin, completely bald shaved head, clean-shaven face, grey crew-neck t-shirt",
+    "avoid": "hair, beard, moustache, glasses, hat",
+    "published": true
+  },
+  {
+    "key": "topKnotBeard",
+    "description": "dark brown skin, shaved head, short black beard, green hoodie",
+    "published": true
+  }
+]

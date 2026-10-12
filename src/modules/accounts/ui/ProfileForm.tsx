@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import type { Gender } from "@modules/accounts/domain/Profile";
 import { PROFILE_KEY, useProfile, type ProfileResponse } from "./queries";
 import { useSession } from "@shared/ui/context/SessionContext";
+import { AvatarPicker } from "./AvatarPicker";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
 const DETECTED_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -31,7 +32,7 @@ type FormState =
  * type="date"`) — sin librería de calendario, misma disciplina de
  * "alternativa nativa primero" que ya se usó para la zona horaria.
  */
-export function ProfileForm() {
+export function ProfileForm({ avatarKeys }: { /** Para los tests; por defecto, los avatares publicados. */ avatarKeys?: readonly string[] } = {}) {
   const { t } = useTranslation();
   // `null` = el usuario todavía no tiene perfil (react-query no admite `undefined` como dato).
   const { data, isPending, isError } = useProfile();
@@ -45,10 +46,10 @@ export function ProfileForm() {
   }
 
   // El formulario se monta ya con los datos: sus campos arrancan de ahí, sin efectos que los copien.
-  return <ProfileFields initial={data ?? undefined} loadError={isError ? t("perfil.errorCarga") : undefined} />;
+  return <ProfileFields initial={data ?? undefined} loadError={isError ? t("perfil.errorCarga") : undefined} avatarKeys={avatarKeys} />;
 }
 
-function ProfileFields({ initial: inicial, loadError: errorCarga }: { initial?: ProfileResponse; loadError?: string }) {
+function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: { initial?: ProfileResponse; loadError?: string; avatarKeys?: readonly string[] }) {
   const { t } = useTranslation();
   const { refresh } = useSession();
   const queryClient = useQueryClient();
@@ -56,6 +57,7 @@ function ProfileFields({ initial: inicial, loadError: errorCarga }: { initial?: 
   const [birthDate, setBirthDate] = useState(inicial?.birthDate ?? "");
   const [gender, setGender] = useState<Gender | "">(inicial?.gender ?? "");
   const [timeZone, setTimeZone] = useState(inicial?.timeZone ?? DETECTED_TIME_ZONE);
+  const [avatarKey, setAvatarKey] = useState(inicial?.avatarKey);
   const [formState, setFormState] = useState<FormState>(errorCarga ? { kind: "error", message: errorCarga } : { kind: "listo" });
 
   async function handleSubmit(submitEvent: React.FormEvent) {
@@ -71,6 +73,8 @@ function ProfileFields({ initial: inicial, loadError: errorCarga }: { initial?: 
           ...(birthDate ? { birthDate } : {}),
           ...(gender ? { gender } : {}),
           timeZone,
+          // RF-26: `null` quita el avatar.
+          avatarKey: avatarKey ?? null,
         }),
       });
       const data = await response.json();
@@ -81,13 +85,9 @@ function ProfileFields({ initial: inicial, loadError: errorCarga }: { initial?: 
       }
 
       // La caché refleja lo guardado: al volver a esta pantalla no hace falta pedirlo otra vez.
-      const saved: ProfileResponse = {
-        name,
-        ...(birthDate ? { birthDate } : {}),
-        ...(gender ? { gender } : {}),
-        timeZone,
-      };
-      queryClient.setQueryData<ProfileResponse | null>(PROFILE_KEY, saved);
+      // Se guarda el perfil que devuelve el servidor, entero: construirlo aquí con los campos
+      // del formulario borraba de la caché lo que este formulario no toca (la elección de IA).
+      queryClient.setQueryData<ProfileResponse | null>(PROFILE_KEY, data as ProfileResponse);
       setFormState({ kind: "guardado" });
       // El Header lee name/email de SessionContext, no de este formulario —
       // sin esto seguiría mostrando lo de antes hasta navegar fuera y volver.
@@ -140,6 +140,7 @@ function ProfileFields({ initial: inicial, loadError: errorCarga }: { initial?: 
           disableClearable
           renderInput={(params) => <TextField {...params} label={t("perfil.zonaHoraria")} required />}
         />
+        <AvatarPicker value={avatarKey} onChange={setAvatarKey} keys={avatarKeys} />
         <Button type="submit" variant="contained" disabled={formState.kind === "guardando"} fullWidth>
           {formState.kind === "guardando" ? t("perfil.botonEnviando") : t("perfil.boton")}
         </Button>

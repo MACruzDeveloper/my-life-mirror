@@ -223,6 +223,7 @@ El proyecto se ha construido con un asistente de IA (Claude Code) como compañer
 - **Especificación antes que código:** cada funcionalidad empieza por una historia de usuario con criterios Given/When/Then ([docs/user-stories/](docs/user-stories/)), y cada pieza por su test (TDD).
 - **Decisiones trazables:** [docs/Historial_Prompts.md](docs/Historial_Prompts.md) registra los prompts que fijaron una decisión de diseño, proceso o alcance, y qué se decidió.
 - **Controles automáticos:** nada se da por bueno sin lint, tipos, tests con umbral de cobertura, build y E2E (`npm run verify`), ni sin revisión de código.
+- **IA generativa de imagen, con revisión:** los avatares salen de un modelo ejecutado en local, tras un filtro de palabras, un paso de razonamiento contra estereotipos y la revisión del autor imagen a imagen. Por el camino apareció un sesgo real del modelo (dibujaba a todos con piel clara), documentado con sus pruebas en [ADR-05](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.1.1.
 - **Límites éticos de la IA dentro de la app:** [ADR-05](docs/architecture-decisions/05_Fundamentos_IA.md) explica dónde se usa IA, dónde no y por qué (sin detección de riesgo, sin consejo generado libremente).
 
 ---

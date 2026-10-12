@@ -25,7 +25,7 @@ export interface ProtectedLayoutProps {
  * puede invalidarlo con `refresh()` tras guardar).
  */
 export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps) {
-  const { email, name, rol } = useSession();
+  const { email, name, rol, avatarKey } = useSession();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -36,7 +36,7 @@ export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps)
   return (
     <>
       {/* name (RF-03) tiene prioridad sobre el email en cuanto existe — ver api/sesion.ts. */}
-      <Header displayName={name ?? email} onLogout={handleLogout} isAdmin={rol === "admin"} />
+      <Header displayName={name ?? email} avatarKey={avatarKey} onLogout={handleLogout} isAdmin={rol === "admin"} />
       {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" /> : null}
       {children}
       {/* RF-30: en toda pantalla protegida, igual para todo el mundo. */}

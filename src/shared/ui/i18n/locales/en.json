@@ -718,5 +718,25 @@
         "disponibilidad": "international directory of verified helplines: choose your country."
       }
     }
+  },
+  "avatares": {
+    "titulo": "Your avatar",
+    "ayuda": "Pick the one you like best. You can change or remove it at any time.",
+    "quitar": "No avatar",
+    "generadosConIA": "Illustrations generated with AI and reviewed one by one.",
+    "descripciones": {
+      "roundGlasses": "Person with short dark curly hair, round glasses and a mustard sweater",
+      "tealScarf": "Person with white hair and a teal scarf over the head and shoulders",
+      "longBraids": "Person with dark skin, two long braids and a coral t-shirt",
+      "highBun": "Person with long black hair in a high bun and a lavender shirt",
+      "pinkWrap": "Person with straight black hair and a pink wrap tied on the head",
+      "woolBeanie": "Person wearing a wool beanie with a pompom and an orange jacket",
+      "stripedShirt": "Person with short brown hair, glasses and a striped shirt",
+      "longWaves": "Person with long, wavy, light-coloured hair and a blue blouse",
+      "blondBeard": "Person with short blond hair, a short beard and a green polo shirt",
+      "headphones": "Person with dark skin and short hair, wearing headphones and a yellow jacket",
+      "shavedHead": "Person with a shaved head, no beard, and a grey t-shirt",
+      "topKnotBeard": "Person with dark skin, hair tied up and a short beard, wearing a green hoodie"
+    }
   }
 }

@@ -31,6 +31,13 @@ Plan del Ciclo 2 acordado el 29 sept. (una PR por historia):
 - [ ] Más ideas del Ciclo 2 que salen de la validación (27 sept.), pendientes de convertirse en RF (la pregunta por categoría ya es RF-41 y las sugerencias, RF-40):
   - **Perfil ampliado** tras el registro: aficiones, estado civil, hijos (y sus edades o necesidades especiales), ubicación, peso/altura, salud, religión… Hoy RF-03 solo tiene nombre, fecha de nacimiento, género y zona horaria. **Salud y religión son datos de categoría especial (RGPD art. 9):** solo con consentimiento explícito (como las categorías sensibles), cada campo opcional y ligado a un uso concreto (minimización). Su uso con IA sigue sujeto a RD-09 y RES-09.
 
+## Fase de mejoras (abierta el 11 oct., decisión del autor)
+
+Con el MVP y el Ciclo 2 en producción (v1.3.0), una fase nueva para mejoras que no cambian lo que la app hace, sino cómo se presenta. Mismas reglas: historia antes que código, una PR por tarea, y si el tiempo no llega antes de la entrega, se quedan aquí.
+
+- [ ] **RF-26** avatares generados con IA, de un catálogo revisado (desde el 11 oct.; [historia](../user-stories/RF-26-avatares.md)). Hecho: catálogo de 12 descripciones con su filtro de palabras, script de generación con el paso de razonamiento previo (`scripts/avatars/`), y el servidor (avatar en el perfil, migración 0022). Confirmado el 11 oct.: se elige en el perfil; las 12 descripciones valen; migración 0022 ejecutada en producción. Se generan en local (SDXL base; la API de HuggingFace resultó de pago y el modelo rápido tenía un sesgo de tono de piel: ADR-05, apartado 4.1.1). Pantalla hecha (selector en el perfil, cabecera y entrevista). Doce avatares revisados y publicados por el autor el 12 oct. Falta: ejecutar el E2E nuevo con Docker abierto, y publicar la versión.
+- [ ] **Vídeo corto de presentación en la portada** (idea, 11 oct.): 5 a 10 segundos generados con IA, con la estética del espejo y de los indicadores de vida. Todavía no es un requisito: se convierte en uno (con su historia) cuando el autor decida hacerlo. Condiciones ya habladas: nada reconocible de Black Mirror ni de Los Sims (marcas y derechos de autor), tono amable y no distópico ("un espejo, no un examen"), sin sonido y en bucle, imagen fija para quien pide menos movimiento, archivo pequeño servido por la propia app (la política de contenido no admite vídeo de otros dominios) y una nota de que está generado con IA. Serviría también como apertura del vídeo explicativo de la entrega.
+
 ## Decisiones y deuda pendientes (no son tareas todavía; se convierten en una si duelen)
 
 - **RF-19 (hecha / descartada / pospuesta)** — natural siguiente paso de RF-18 (Should): el estado ya está en el modelo y en la base de datos, solo falta la acción del usuario y su interfaz. Hoy una recomendación se oculta sola cuando la puntuación mejora, pero no se puede descartar. Decidir junto con el umbral configurable desde la interfaz (RF-18 lo lee de una variable de entorno) y RF-20.
@@ -171,3 +178,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.56 (11 oct. 2026)** — revisión de seguridad en curso: plan, cuatro historias SEC y lo que queda del lado del autor.
 - **v2.57 (11 oct. 2026)** — v1.3.0 desplegada con la revisión de seguridad; lo que queda de ella es del autor y para después de la entrega.
 - **v2.58 (11 oct. 2026)** — límite del correo de Supabase y comprobación pendiente del enlace de recuperación; corrección de la altura de los campos, pendiente de publicar.
+- **v2.59 (11 oct. 2026)** — se abre la fase de mejoras: RF-26 (avatares) en curso y el vídeo de portada como idea.

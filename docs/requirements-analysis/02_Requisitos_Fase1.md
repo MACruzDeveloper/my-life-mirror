@@ -61,7 +61,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-03 | El sistema debe permitir al usuario configurar su perfil (nombre, edad, género opcional, zona horaria). | Must |
 | RF-04 | El sistema debe solicitar consentimiento explícito y granular antes de activar categorías sensibles (sexo, espiritualidad/religión). | Must |
 | RF-05 | El sistema debe permitir al usuario exportar y eliminar completamente sus datos ("derecho al olvido"). | Must |
-| RF-26 | El sistema debe ofrecer al usuario, durante el registro, un catálogo cerrado de avatares predefinidos generados con IA y revisados editorialmente por el equipo (el usuario elige entre las opciones existentes, no genera avatares nuevos), evitando estereotipos culturales, de género o de apariencia. Relacionado con RF-25. | Should |
+| RF-26 | El sistema debe ofrecer al usuario, en su perfil, un catálogo cerrado de avatares predefinidos generados con IA y revisados editorialmente por el equipo (el usuario elige entre las opciones existentes, no genera avatares nuevos), evitando estereotipos culturales, de género o de apariencia. Relacionado con RF-25. | Should |
 | RF-38 | El sistema debe permitir a un usuario recuperar el acceso a su cuenta mediante un enlace de restablecimiento de contraseña enviado a su email, sin necesidad de contactar con soporte. | Should |
 | RF-39 | El sistema debe mostrar una página de inicio (landing) pública con una introducción al proyecto, accesible sin necesidad de autenticarse. | Should |
 
@@ -218,3 +218,4 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 - **v0.14 (5 oct. 2026)** — RF-43 reescrito por el autor: en lugar de un agregado anónimo de opciones visible para quien ya va bien (al revés de lo que se buscaba), quien va bien comparte experiencias de forma altruista y quien busca ideas las lee junto a las de la app y las de la IA. Ver la [historia](../user-stories/RF-43-experiencias-compartidas.md).
 - **v0.15 (6 oct. 2026)** — Deporte deja de ser categoría sensible (RF-04, RES-04), por decisión del autor: habla de actividad física, no pide datos de salud, y cualquier área puede tocar algo personal; si llega feedback negativo, se puede volver atrás. Migración 0018.
 - **v0.16 (11 oct. 2026)** — RES-01: la entrega pasa a "hacia el 20 de octubre, como máximo el 26" (antes, 31 de octubre, "no negociable"). Aclarado por el autor: no hay sanción por entregar unos días después del 20, y el 26 es el máximo.
+- **v0.17 (11 oct. 2026)** — RF-26: el avatar se elige en el perfil, no durante el registro (decisión del autor: el registro ya pide nombre, email y una contraseña con sus requisitos, y el avatar no hace falta para empezar).

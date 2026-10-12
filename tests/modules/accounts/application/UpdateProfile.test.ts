@@ -138,4 +138,43 @@ describe("UpdateProfile (RF-03/RF-01)", () => {
     expect(await repo.findByUserId("u1")).toBeUndefined();
     expect(await repo.findByUserId("u2")).toBeDefined();
   });
+
+  describe("avatar del catálogo (RF-26)", () => {
+    const isAvatarKey = (key: string) => ["roundGlasses", "longBraids"].includes(key);
+
+    async function setup() {
+      const repo = new InMemoryProfileRepository();
+      const updateProfile = createUpdateProfile(repo, { isAvatarKey });
+      await updateProfile({ userId: "u1", name: "Ana", timeZone: VALID_TIME_ZONE });
+      return updateProfile;
+    }
+
+    it("guarda el avatar elegido sin tocar el resto del perfil", async () => {
+      const updateProfile = await setup();
+
+      const result = await updateProfile({ userId: "u1", avatarKey: "roundGlasses" });
+
+      expect(result).toEqual({ ok: true, value: { userId: "u1", name: "Ana", timeZone: VALID_TIME_ZONE, avatarKey: "roundGlasses" } });
+    });
+
+    it("rechaza un avatar que no está publicado en el catálogo", async () => {
+      const updateProfile = await setup();
+
+      const result = await updateProfile({ userId: "u1", avatarKey: "inventado" });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+    });
+
+    it("con null lo quita; y cambiar otro campo después lo conserva", async () => {
+      const updateProfile = await setup();
+      await updateProfile({ userId: "u1", avatarKey: "longBraids" });
+
+      const renamed = await updateProfile({ userId: "u1", name: "Ana María" });
+      expect(renamed.ok && renamed.value.avatarKey).toBe("longBraids");
+
+      const removed = await updateProfile({ userId: "u1", avatarKey: null });
+      expect(removed).toEqual({ ok: true, value: { userId: "u1", name: "Ana María", timeZone: VALID_TIME_ZONE } });
+    });
+  });
 });

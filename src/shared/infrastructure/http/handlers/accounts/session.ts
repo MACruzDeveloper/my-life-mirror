@@ -28,9 +28,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     // que en RegisterUser (ver su nota de diseño): se degrada a "sin
     // nombre todavía", nunca a "no sé si hay sesión".
     let name: string | undefined;
+    // RF-26: el avatar elegido, para la cabecera (misma lógica que el nombre: si falla, sin él).
+    let avatarKey: string | undefined;
     try {
       const profile = await getProfile(result.value.id);
       name = profile.ok ? profile.value?.name : undefined;
+      avatarKey = profile.ok ? profile.value?.avatarKey : undefined;
     } catch (error) {
       logger.error("No se pudo obtener el perfil en /api/accounts/session (se ignora, no es crítico)", error, {
         route: "/api/accounts/session",
@@ -38,7 +41,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-    res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, rol: result.value.rol, aiIdeasAvailable }));
+    res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, avatarKey, rol: result.value.rol, aiIdeasAvailable }));
   } catch (error) {
     logger.error("Error inesperado en /api/accounts/session", error, { route: "/api/accounts/session" });
     res.writeHead(500, { "Content-Type": "application/json", "Cache-Control": "no-store" });
