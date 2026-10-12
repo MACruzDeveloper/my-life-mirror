@@ -16,8 +16,8 @@ export interface RadarChartOptionInput {
   formatTooltip: (axes: RadarAxis[]) => string;
 }
 
-const SECONDARY_INK = "#6B7672";
-const GRID_LINE = "#E4E8E6";
+const SECONDARY_INK = "#72828C";
+const GRID_LINE = "#DCDFE1";
 
 /**
  * Opción de ECharts de la plantilla `RadarChart`: un único polígono sobre ejes

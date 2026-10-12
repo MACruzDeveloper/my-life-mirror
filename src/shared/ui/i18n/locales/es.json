@@ -7,7 +7,10 @@
     "idioma": "Idioma",
     "abrirMenu": "Abrir menú",
     "cargando": "Cargando…",
-    "demasiadosIntentos": "Demasiados intentos. Espera unos minutos y vuelve a probar."
+    "demasiadosIntentos": "Demasiados intentos. Espera unos minutos y vuelve a probar.",
+    "seleccionaIdioma": "Selecciona idioma",
+    "paginas": "Páginas",
+    "miCuenta": "Mi cuenta"
   },
   "breadcrumbs": {
     "inicio": "Inicio",
@@ -25,7 +28,9 @@
     "titulo": "MyLifeMirror",
     "descripcion": "Evalúa cómo va tu vida por categorías, a tu ritmo, y recibe sugerencias concretas para lo que tú decidas mejorar — sin juicios, sin comparaciones con nadie. Un espejo honesto, no un examen.",
     "crearCuenta": "Crear cuenta",
-    "iniciarSesion": "Iniciar sesión"
+    "iniciarSesion": "Iniciar sesión",
+    "imagenIA": "Imagen generada con IA",
+    "verComoFunciona": "Ver cómo funciona"
   },
   "registro": {
     "titulo": "Crear cuenta",

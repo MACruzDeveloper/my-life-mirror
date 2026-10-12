@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import Box from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { useEChart } from "../useEChart";
+import { CHART_ACCENT } from "@shared/ui/theme";
 import { buildTimeLineChartOption, type TimePoint } from "./timeLineChartOption";
 
 export interface TimeLineChartProps {
@@ -14,7 +14,7 @@ export interface TimeLineChartProps {
   /** Descripción textual para lectores de pantalla (el gráfico en sí no lo es). */
   ariaLabel: string;
   formatTooltip: (point: TimePoint) => string;
-  /** Por defecto, el color principal del tema. */
+  /** Por defecto, el color de los gráficos de la app (`CHART_ACCENT`). */
   color?: string;
   height?: number | { xs: number; sm: number };
 }
@@ -27,9 +27,8 @@ export interface TimeLineChartProps {
  */
 export function TimeLineChart({ points, window, yAxis, ariaLabel, formatTooltip, color, height = { xs: 170, sm: 190 } }: TimeLineChartProps) {
   const { i18n } = useTranslation();
-  const theme = useTheme();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const lineColor = color ?? theme.palette.primary.main;
+  const lineColor = color ?? CHART_ACCENT;
   const start = window.start.getTime();
   const end = window.end.getTime();
 

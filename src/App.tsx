@@ -26,8 +26,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Páginas públicas: selector de idioma disponible antes de tener cuenta (RNF-10). */}
-        <Route element={<PublicLayout />}>
+        {/* UX-08: la portada ocupa toda la pantalla; el selector de idioma va sobre la imagen. */}
+        <Route element={<PublicLayout overlay />}>
           <Route path="/" element={<Landing />} />
+        </Route>
+        <Route element={<PublicLayout />}>
           <Route path="/registro" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/olvide-password" element={<RequestPasswordResetForm />} />

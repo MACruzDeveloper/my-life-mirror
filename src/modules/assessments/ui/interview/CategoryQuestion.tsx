@@ -214,7 +214,7 @@ export function CategoryQuestion({
         )}
         {/* UX-05: lo último que se guardó de esta categoría (el historial completo está en Resultados). */}
         {lastUpdate && (
-          <Box data-last-update sx={{ mt: 1, pt: 1, borderTop: "1px dashed #D5DEDB" }}>
+          <Box data-last-update sx={{ mt: 1, pt: 1, borderTop: "1px dashed #CBD2D6" }}>
             <Typography variant="caption" color="text.secondary" component="p">
               {t("entrevista.ultimaActualizacion", {
                 fecha: formatDate(lastUpdate.recordedAt),

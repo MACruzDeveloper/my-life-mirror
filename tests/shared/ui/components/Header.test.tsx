@@ -156,5 +156,23 @@ describe("Header", () => {
     renderHeader({ displayName: "Ana" });
     expect(screen.queryByRole("img", { name: /dos trenzas largas/i })).not.toBeInTheDocument();
   });
-});
 
+  it("en escritorio separa tres grupos: páginas, cuenta (avatar, nombre y salir juntos) e idioma", () => {
+    renderHeader({ displayName: "Ana", avatarKey: "longBraids" });
+
+    const pages = screen.getByRole("navigation", { name: "Páginas" });
+    expect(within(pages).getByRole("link", { name: "Inicio" })).toBeInTheDocument();
+    expect(within(pages).getByRole("link", { name: "Mi perfil" })).toBeInTheDocument();
+    expect(within(pages).queryByText("Ana")).not.toBeInTheDocument();
+
+    const account = screen.getByRole("group", { name: "Mi cuenta" });
+    expect(within(account).getByText("Ana")).toBeInTheDocument();
+    expect(within(account).getByRole("img", { name: /dos trenzas largas/i })).toBeInTheDocument();
+    expect(within(account).getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
+    expect(within(account).queryByRole("switch", { name: "English" })).not.toBeInTheDocument();
+
+    // El idioma va después de la cuenta, fuera de ella.
+    const toggle = screen.getByRole("switch", { name: "English" });
+    expect(account.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});

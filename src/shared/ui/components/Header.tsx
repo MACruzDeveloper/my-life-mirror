@@ -111,30 +111,35 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
             </Menu>
           </Box>
         ) : (
+          // Tres grupos, separados a la vista: páginas, cuenta (avatar, nombre y salir) e idioma.
           <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 2 }}>
-            <Button size="small" component={RouterLink} to="/inicio">
-              {t("breadcrumbs.inicio")}
-            </Button>
-            {isAdmin ? (
-              <Button size="small" component={RouterLink} to="/admin">
-                {t("breadcrumbs.administracion")}
+            <Box component="nav" aria-label={t("comun.paginas")} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Button size="small" component={RouterLink} to="/inicio">
+                {t("breadcrumbs.inicio")}
               </Button>
-            ) : null}
-            <Button size="small" component={RouterLink} to="/perfil">
-              {t("breadcrumbs.miPerfil")}
-            </Button>
-            {avatarKey ? <UserAvatar avatarKey={avatarKey} size={32} /> : null}
-            {displayName ? (
-              <Typography variant="body2" color="text.secondary">
-                {displayName}
-              </Typography>
-            ) : null}
+              {isAdmin ? (
+                <Button size="small" component={RouterLink} to="/admin">
+                  {t("breadcrumbs.administracion")}
+                </Button>
+              ) : null}
+              <Button size="small" component={RouterLink} to="/perfil">
+                {t("breadcrumbs.miPerfil")}
+              </Button>
+            </Box>
+            <Box role="group" aria-label={t("comun.miCuenta")} sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, borderLeft: 1, borderRight: 1, borderColor: "rgba(242, 242, 242, 0.28)" }}>
+              {avatarKey ? <UserAvatar avatarKey={avatarKey} size={32} /> : null}
+              {displayName ? (
+                <Typography variant="body2" color="text.secondary">
+                  {displayName}
+                </Typography>
+              ) : null}
+              <Tooltip title={t("panel.cerrarSesion")}>
+                <IconButton size="small" aria-label={t("panel.cerrarSesion")} onClick={onLogout}>
+                  <LogoutIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
             <LanguageSwitcher />
-            <Tooltip title={t("panel.cerrarSesion")}>
-              <IconButton size="small" aria-label={t("panel.cerrarSesion")} onClick={onLogout}>
-                <LogoutIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
           </Box>
         )}
       </Toolbar>

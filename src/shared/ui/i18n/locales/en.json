@@ -7,7 +7,10 @@
     "idioma": "Language",
     "abrirMenu": "Open menu",
     "cargando": "Loading…",
-    "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again."
+    "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again.",
+    "seleccionaIdioma": "Select language",
+    "paginas": "Pages",
+    "miCuenta": "My account"
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -25,7 +28,9 @@
     "titulo": "MyLifeMirror",
     "descripcion": "Assess how your life is going by category, at your own pace, and get concrete suggestions for whatever you choose to improve — no judgment, no comparisons with anyone. An honest mirror, not an exam.",
     "crearCuenta": "Create account",
-    "iniciarSesion": "Log in"
+    "iniciarSesion": "Log in",
+    "imagenIA": "AI-generated image",
+    "verComoFunciona": "See how it works"
   },
   "registro": {
     "titulo": "Create account",

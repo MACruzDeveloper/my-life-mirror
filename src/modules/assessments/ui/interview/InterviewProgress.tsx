@@ -19,7 +19,7 @@ export interface ProgressItem {
 }
 
 /** Color del punto de cada estado: lila para lo pendiente (como "Sin responder", RN-04), ámbar suave sin guardar, verde guardado. */
-const STATUS_COLORS: Record<ProgressStatus["kind"], string> = { unanswered: PENDING_COLORS.border, unsaved: "#E8B54D", savedToday: "#3E9B7A", saved: "#9CC9B8" };
+const STATUS_COLORS: Record<ProgressStatus["kind"], string> = { unanswered: PENDING_COLORS.border, unsaved: "#E8B54D", savedToday: "#183140", saved: "#72828C" };
 
 /**
  * UX-05: progreso de la entrevista en la columna derecha (escritorio): cuántas
@@ -41,7 +41,7 @@ export function InterviewProgress({ items, onSelect }: { items: ProgressItem[]; 
 
   return (
     <Box component="aside" aria-labelledby={titleId}>
-    <Accordion defaultExpanded disableGutters elevation={0} sx={{ bgcolor: "#F5F7F6", borderRadius: 3, "&::before": { display: "none" }, overflow: "hidden" }}>
+    <Accordion defaultExpanded disableGutters elevation={0} sx={{ bgcolor: "#F2F2F2", borderRadius: 3, "&::before": { display: "none" }, overflow: "hidden" }}>
       {/* El resumen (cuántas respondidas y la barra) va en la cabecera: se ve también plegado. */}
       <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ "& .MuiAccordionSummary-content": { flexDirection: "column", mr: 1 } }}>
         <Typography id={titleId} variant="subtitle1" component="span">
@@ -58,7 +58,7 @@ export function InterviewProgress({ items, onSelect }: { items: ProgressItem[]; 
           <Box component="li" key={item.categoryId}>
             <ButtonBase
               onClick={() => onSelect(item.categoryId)}
-              sx={{ width: "100%", justifyContent: "flex-start", textAlign: "left", gap: 1, px: 1, py: 0.75, borderRadius: 2, "&:hover, &:focus-visible": { bgcolor: "#F5F7F6" } }}
+              sx={{ width: "100%", justifyContent: "flex-start", textAlign: "left", gap: 1, px: 1, py: 0.75, borderRadius: 2, "&:hover, &:focus-visible": { bgcolor: "#F2F2F2" } }}
             >
               <Box component="span" aria-hidden sx={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, bgcolor: STATUS_COLORS[item.status.kind] }} />
               <Box component="span" sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>

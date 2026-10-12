@@ -5,6 +5,20 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (paleta de la app)
+
+- La línea de los gráficos usa un verde azulado vivo propio, en lugar del color de marca.
+- Cabecera de escritorio en tres grupos separados: páginas, cuenta (avatar, nombre y salir) e idioma.
+- Colores nuevos en toda la app, a partir de cinco tonos elegidos por el autor (azul noche, gris azulado, gris muy claro, plata y casi negro), definidos en un solo sitio. Los colores con significado (puntuaciones, errores, avisos, ideas destacadas) no cambian.
+
+### Añadido (UX-08, portada con imagen)
+
+- La portada lleva de fondo una imagen generada con IA (una persona frente a su reflejo), con una capa oscura para que el título, la descripción y los botones se lean. Dos tamaños en WebP: el móvil descarga solo el suyo. La propia portada dice que la imagen está generada con IA.
+- La primera vista de la portada ocupa toda la pantalla; al bajar, "Cómo funciona" sube sobre una segunda imagen de fondo que no se mueve. Con "reducir movimiento" activado, la página se desplaza de forma normal. El texto va en la parte baja, para que la imagen se vea.
+- Al cerrar sesión se vuelve a la portada, no al formulario de inicio de sesión.
+- En la portada, selector de idioma de texto ("ES | EN") y una flecha que baja a "Cómo funciona".
+- Skill del proyecto para generar imágenes con el proceso de revisión (`.claude/skills/imagenes-con-ia/`).
+
 ### Añadido (RF-26, avatares; en curso)
 
 - Catálogo de 12 avatares definido por descripciones de rasgos visibles, con un test que impide palabras de género, origen, religión, edad o valoración del aspecto.

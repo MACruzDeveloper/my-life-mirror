@@ -554,7 +554,7 @@ export function InterviewPage() {
     <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", lg: showQuestions ? "minmax(0, 1fr) 280px" : "minmax(0, 1fr)" }, alignItems: "start" }}>
     {/* Dos bloques con fondo distinto (UX-06): la introducción y, debajo, las preguntas. */}
     <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 2, sm: 3 }, minWidth: 0 }}>
-    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: "#E6F2EE", scrollMarginTop: 72 }}>
+    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: "#E6EBEE", scrollMarginTop: 72 }}>
       {/* La entrevista es la primera vez; con respuestas guardadas, la misma pantalla se presenta como "actualizarlas". */}
       <Typography id="entrevista-titulo" variant="h5" component="h1">
         {isFirstInterview ? t("entrevista.titulo") : t("entrevista.tituloActualizar")}
@@ -639,7 +639,7 @@ export function InterviewPage() {
     </Box>
 
     {showQuestions && (
-    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "#F5F7F6" }}>
+    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "#F2F2F2" }}>
       {activeCategories.length > 0 && (
         <Typography id="entrevista-preguntas" variant="h6" component="h2">
           {t("entrevista.preguntasTitulo")}
@@ -668,7 +668,7 @@ export function InterviewPage() {
                   py: 0.5,
                   borderRadius: 999,
                   border: "1px solid",
-                  borderColor: isUnanswered ? PENDING_COLORS.border : "#DDE3E1",
+                  borderColor: isUnanswered ? PENDING_COLORS.border : "#D5DBDF",
                   bgcolor: isUnanswered ? PENDING_COLORS.bg : "#FFFFFF",
                   color: isUnanswered ? PENDING_COLORS.fg : "text.primary",
                   fontSize: "0.875rem",
