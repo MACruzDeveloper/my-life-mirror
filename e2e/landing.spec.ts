@@ -35,12 +35,53 @@ test.describe("Landing pública", () => {
   });
 });
 
+test.describe("UX-08: portada con imagen", () => {
+  for (const [name, viewport, size, otherSize] of [
+    ["móvil", { width: 390, height: 844 }, "828", "1672"],
+    ["escritorio", { width: 1280, height: 800 }, "1672", "828"],
+  ] as const) {
+    test(`en ${name}, la primera vista es la imagen a pantalla completa; al bajar aparecen la segunda imagen y "Cómo funciona"`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      const images: string[] = [];
+      // Solo las descargas de imagen: en desarrollo, Vite sirve además cada import como un módulo.
+      page.on("response", (response) => /portada-[ab]-/.test(response.url()) && (response.headers()["content-type"] ?? "").startsWith("image/") && images.push(response.url()));
+      await page.goto("/");
+
+      // Primera vista: la imagen ocupa exactamente la pantalla, desde arriba del todo.
+      const hero = page.getByRole("region", { name: "MyLifeMirror" });
+      const box = (await hero.boundingBox())!;
+      expect(box.y).toBe(0);
+      expect(box.width).toBe(viewport.width);
+      expect(box.height).toBe(viewport.height);
+      await expect(hero.getByRole("heading", { level: 1 })).toBeInViewport();
+      await expect(hero.getByRole("link", { name: "Crear cuenta" })).toBeInViewport();
+      await expect(page.getByRole("button", { name: "English" })).toBeInViewport();
+      const howItWorks = page.getByRole("heading", { name: "Cómo funciona" });
+      await expect(howItWorks).not.toBeInViewport();
+
+      // La flecha lleva a la segunda parte, que sube sobre su propia imagen de fondo.
+      await hero.getByRole("link", { name: "Ver cómo funciona" }).click();
+      await expect(howItWorks).toBeInViewport();
+      await expect(page.getByText("Imagen generada con IA").first()).toBeAttached();
+
+      // Las dos imágenes, cada una en el tamaño de esta pantalla y no en el otro.
+      await expect.poll(() => images.length).toBe(2);
+      for (const url of images) {
+        expect(url).toContain(`-${size}`);
+        expect(url).not.toContain(`-${otherSize}`);
+      }
+      // Nada se sale de la pantalla a lo ancho.
+      expect(await page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")).toBe(true);
+    });
+  }
+});
+
 test.describe("Idioma en las páginas públicas (RNF-10)", () => {
   test("se puede pasar la portada a inglés antes de tener cuenta, y la elección se recuerda", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "es");
 
-    await page.getByRole("switch", { name: "English" }).click();
+    await page.getByRole("button", { name: "English" }).click();
 
     await expect(page.getByRole("link", { name: "Create account" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");

@@ -22,8 +22,8 @@ interface CategorySelectionProps {
 
 // El color va después de `border` (la abreviatura lo pondría en negro).
 const GROUP_STYLES = {
-  regular: { bgcolor: "#FFFFFF", borderColor: "#E4EAE8" },
-  sensitive: { bgcolor: "#FBF8FF", borderColor: "#E2DAF3" },
+  regular: { bgcolor: "#FFFFFF", borderColor: "#DCDFE1" },
+  sensitive: { bgcolor: "#F7F8F9", borderColor: "#D5DBDF" },
 };
 
 /**
@@ -85,7 +85,7 @@ export function CategorySelection({ categories, categoryLabel, pendingCategoryId
   const accordion = (titleId: string, title: string, list: CategoryDto[], content: React.ReactNode, styles: (typeof GROUP_STYLES)["regular"]) => (
     // Sin borde ni sombra: el fondo basta para separar cada acordeón (el de las libres, gris claro
     // en vez de blanco, para que se distinga sobre la página).
-    <Accordion disableGutters elevation={0} sx={{ bgcolor: styles === GROUP_STYLES.regular ? "#F5F7F6" : styles.bgcolor, borderRadius: 3, "&::before": { display: "none" }, overflow: "hidden" }}>
+    <Accordion disableGutters elevation={0} sx={{ bgcolor: styles === GROUP_STYLES.regular ? "#F2F2F2" : styles.bgcolor, borderRadius: 3, "&::before": { display: "none" }, overflow: "hidden" }}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Box>
           <Typography id={titleId} variant="subtitle1" component="span" sx={{ display: "block" }}>

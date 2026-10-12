@@ -12,16 +12,20 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
  * inglés antes de tener cuenta. Las pantallas protegidas lo tienen en su
  * cabecera (`Header`). Al pie, el enlace a las líneas de ayuda (RF-30).
  */
-export function PublicLayout({ children }: { children?: ReactNode }) {
+export function PublicLayout({ children, overlay = false }: { children?: ReactNode; /** UX-08: la página ocupa toda la pantalla (la portada); el selector va encima de ella y el pie lo pone la propia página. */ overlay?: boolean }) {
   const { t } = useTranslation();
 
   return (
     <>
-      <Box component="nav" aria-label={t("comun.idioma")} sx={{ display: "flex", justifyContent: "flex-end", px: 2, pt: 1 }}>
-        <LanguageSwitcher />
+      <Box
+        component="nav"
+        aria-label={t("comun.idioma")}
+        sx={[{ display: "flex", justifyContent: "flex-end", px: 2, pt: 1 }, overlay && { position: "absolute", top: 0, right: 0, zIndex: 1, pt: 1.5, color: "common.white" }]}
+      >
+        <LanguageSwitcher variant={overlay ? "text" : "flags"} />
       </Box>
       {children ?? <Outlet />}
-      <HelpFooter />
+      {overlay ? null : <HelpFooter />}
     </>
   );
 }

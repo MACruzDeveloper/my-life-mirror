@@ -27,9 +27,9 @@ export function Bubble({ children, side, avatar, alt, band }: { children: React.
         sx={{
           position: "relative",
           overflow: "hidden",
-          bgcolor: isLeft ? "#FFFFFF" : "#F3EFFB",
+          bgcolor: isLeft ? "#FFFFFF" : "#EDF0F2",
           border: "1px solid",
-          borderColor: isLeft ? "#D9ECE8" : "#E2DAF3",
+          borderColor: isLeft ? "#DCE3E7" : "#D5DBDF",
           borderRadius: isLeft ? "4px 20px 20px 20px" : "20px 4px 20px 20px",
           px: 2,
           py: 1.5,

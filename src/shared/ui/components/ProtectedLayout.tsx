@@ -30,7 +30,8 @@ export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps)
 
   async function handleLogout() {
     await fetch("/api/accounts/logout", { method: "POST" });
-    navigate("/login", { replace: true });
+    // A la portada, no al formulario de inicio de sesión: quien sale no tiene por qué querer volver a entrar.
+    navigate("/", { replace: true });
   }
 
   return (

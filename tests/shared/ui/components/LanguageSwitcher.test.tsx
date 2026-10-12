@@ -40,4 +40,28 @@ describe("LanguageSwitcher (RNF-10)", () => {
     fireEvent.click(spanishFlag);
     expect(i18n.language).toBe("es");
   });
+
+  describe("variante de texto, para la portada (UX-08)", () => {
+    it("dos botones ES y EN con su nombre completo para lectores de pantalla, una etiqueta pequeña y sin banderas", () => {
+      const { container } = render(<LanguageSwitcher variant="text" />);
+
+      expect(screen.getByText("Selecciona idioma")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Español" })).toHaveAttribute("aria-pressed", "true");
+      expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "false");
+      expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("lang", "en");
+      expect(container.querySelectorAll("img")).toHaveLength(0);
+    });
+
+    it("pulsar EN pasa a inglés y la etiqueta también; ES vuelve", async () => {
+      render(<LanguageSwitcher variant="text" />);
+
+      fireEvent.click(screen.getByRole("button", { name: "English" }));
+      expect(i18n.language).toBe("en");
+      expect(await screen.findByText("Select language")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true");
+
+      fireEvent.click(screen.getByRole("button", { name: "Español" }));
+      expect(i18n.language).toBe("es");
+    });
+  });
 });

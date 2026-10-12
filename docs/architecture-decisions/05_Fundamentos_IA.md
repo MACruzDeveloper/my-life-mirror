@@ -74,6 +74,26 @@ El paso 3 usa un modelo de lenguaje por la API (menos de un céntimo por las doc
 
 **Límites que se asumen.** Doce avatares fijos no representan a todo el mundo: siempre habrá quien no se vea en ninguno. Lo que cubriría de verdad ese objetivo es un avatar componible (elegir por separado piel, pelo, gafas y ropa, como en Los Sims), hecho con dibujos por piezas y no con IA generativa; queda fuera de este proyecto. Y un modelo generativo no garantiza un resultado, ni gratis ni de pago: lo que lo garantiza es el proceso, con una persona al final.
 
+#### 4.1.2 La imagen de la portada: dónde el modelo local no llegó (12 oct. 2026)
+
+Para la portada ([UX-08](../user-stories/UX-08-portada-con-imagen.md)) se buscaba una escena concreta: una persona frente a su reflejo, con una línea de luz en medio, un lado en sombra fría y el otro en luz cálida. Se intentó primero con el mismo modelo local de los avatares, en cinco tandas:
+
+| Intento | Qué se pidió | Qué salió |
+|---|---|---|
+| 1. La escena entera en un texto | Dos figuras iguales frente a frente | Dos personas distintas, o tres, o una. El texto era largo y el modelo lo cortó por la mitad sin avisar (lee 77 unidades por lector) |
+| 2. Por composición | Una figura; su copia volteada y redibujada en cálido; la línea de luz, añadida por programa | Una sala vacía: el escenario iba en el lector de texto que más pesa y tapó a la persona |
+| 3. Lo mismo, con el sujeto en ese lector | — | La misma persona a los dos lados, por fin; pero de frente, o de espaldas una a la otra |
+| 4. Volteando las mitades y cambiando el fondo por programa | Marco de espejo y fondo oscuro | Correcto técnicamente; al autor no le convenció el resultado |
+| 5. Con el estilo de una prueba anterior que sí gustaba | Siluetas en un espacio de columnas | Ilustraciones cuidadas, sin llegar a la escena |
+
+Lo que funcionó fue **dividir el trabajo**: el modelo dibuja una figura, que es lo que hace bien, y un programa pequeño hace lo que el modelo no sabe (que sean la misma persona, que se miren, la simetría, la línea de luz). Lo que no se consiguió fue la calidad de una escena realista con dos figuras y gesto.
+
+**Decisión.** La imagen de la portada la generó el autor con el generador de imágenes de ChatGPT, que resolvió la escena a la primera. Es una herramienta de pago, externa al proyecto, y así consta. El modelo local se queda para lo que hace bien: los avatares.
+
+Dos cuidados que no dependen de la herramienta. La primera versión llevaba un pequeño dispositivo luminoso en la sien de las figuras, tomado de la imagen de referencia: es iconografía de una serie de televisión, y se quitó. Y la portada dice que la imagen está generada con IA.
+
+El vídeo corto que se planteó queda sin hacer: las herramientas de imagen a vídeo probadas no tienen opción gratuita.
+
 ### 4.2 Chain-of-Thought + test-time compute en RF-37 (asistente de redacción)
 Este es el ejemplo más completo, porque cierra el círculo con una decisión ya tomada: RF-32 nació precisamente de rechazar un diseño que sonaba a "alarde" (ver el historial de decisiones de RN-08). RF-37 usa un paso de razonamiento estructurado que comprueba explícitamente, antes de mostrar cualquier borrador al usuario emisor: (1) ¿contiene lenguaje diagnóstico o clínico? (RES-09), (2) ¿suena a alarde en vez de a apoyo? (el motivo original del rediseño de RF-32). Aquí es donde el **test-time compute** gana su sitio, y no en todas partes: al ser una comprobación de seguridad con consecuencias reales si falla, repetir el juicio más de una vez (autoconsistencia) o usar un modelo con más capacidad de razonamiento específicamente en este punto está justificado — no como política general del proyecto, sino en el único checkpoint donde un falso negativo importa de verdad.
 
@@ -200,3 +220,4 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 - **v1.13 (11 oct. 2026)** — apartado 4.4.1: resultado de la evaluación con el modelo real (5 de 5 inyecciones resistidas).
 - **v1.14 (11 oct. 2026)** — apartado 4.1: cómo se implementó el razonamiento previo de RF-26 y su lugar entre el filtro de palabras y la revisión humana.
 - **v1.15 (12 oct. 2026)** — apartado 4.1.1: cómo se generan los avatares en la práctica (modelo de imagen en local en vez de la API de HuggingFace), el sesgo de tono de piel del modelo rápido y su comprobación, el proceso en cinco pasos y los límites asumidos.
+- **v1.16 (12 oct. 2026)** — apartado 4.1.2: los cinco intentos de generar la imagen de la portada con el modelo local, lo que funcionó (componer por partes) y por qué se usó al final una herramienta externa.
