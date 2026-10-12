@@ -6,6 +6,8 @@ export interface SessionState {
   email?: string;
   /** `undefined` mientras carga o si el usuario todavía no configuró su perfil (RF-03). */
   name?: string;
+  /** RF-26: clave del avatar elegido, si lo hay. */
+  avatarKey?: string;
   /** Rol de la sesión. Solo sirve para adaptar la interfaz: la autorización real la hace el servidor (ADM-01). */
   rol?: "usuario" | "premium" | "admin";
   /** RF-40: si este despliegue tiene un proveedor de IA (sin él, la opción ni se ofrece). */
@@ -46,7 +48,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       .then((response) => response.json())
       .then((data) => {
         if (mounted.current) {
-          setFormState({ loading: false, authenticated: !!data.autenticado, email: data.email, name: data.name, rol: data.autenticado ? (data.rol ?? "usuario") : undefined, aiIdeasAvailable: data.aiIdeasAvailable === true });
+          setFormState({ loading: false, authenticated: !!data.autenticado, email: data.email, name: data.name, avatarKey: data.avatarKey, rol: data.autenticado ? (data.rol ?? "usuario") : undefined, aiIdeasAvailable: data.aiIdeasAvailable === true });
         }
       })
       .catch(() => {

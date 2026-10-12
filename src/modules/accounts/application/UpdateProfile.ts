@@ -2,6 +2,7 @@ import { type Result, err, ok } from "#shared/domain/Result.js";
 import { ValidationError } from "#shared/domain/DomainError.js";
 import { GENDERS, type Gender, type Profile } from "../domain/Profile.js";
 import type { ProfileRepository } from "../domain/ProfileRepository.js";
+import { isAvatarKey as isPublishedAvatarKey } from "../domain/avatars.js";
 
 
 const MIN_AGE = 0;
@@ -13,6 +14,8 @@ export interface UpdateProfileInput {
   birthDate?: string; // ISO "YYYY-MM-DD"
   gender?: Gender;
   timeZone?: string;
+  /** RF-26: la clave de un avatar publicado; `null` lo quita. */
+  avatarKey?: string | null;
 }
 
 function isValidTimeZone(value: string): boolean {
@@ -45,13 +48,13 @@ function isValidBirthDate(value: string): boolean {
  * Sin política de edad mínima — solo sanidad de datos (ver
  * docs/user-stories/RF-03-configurar-perfil.md).
  */
-export function createUpdateProfile(repository: ProfileRepository) {
+export function createUpdateProfile(repository: ProfileRepository, { isAvatarKey = isPublishedAvatarKey }: { isAvatarKey?: (key: string) => boolean } = {}) {
   return async function updateProfile(input: UpdateProfileInput): Promise<Result<Profile, ValidationError>> {
     const userId = input.userId.trim();
     if (userId.length === 0) return err(new ValidationError("User is required"));
 
     const hasAnyField =
-      input.name !== undefined || input.birthDate !== undefined || input.gender !== undefined || input.timeZone !== undefined;
+      input.name !== undefined || input.birthDate !== undefined || input.gender !== undefined || input.timeZone !== undefined || input.avatarKey !== undefined;
     if (!hasAnyField) return err(new ValidationError("At least one field must be provided"));
 
     let name: string | undefined;
@@ -72,19 +75,27 @@ export function createUpdateProfile(repository: ProfileRepository) {
       return err(new ValidationError("Time zone is not a valid identifier"));
     }
 
+    // RF-26: solo un avatar del catálogo, ya revisado y publicado.
+    if (typeof input.avatarKey === "string" && !isAvatarKey(input.avatarKey)) {
+      return err(new ValidationError("Avatar is not in the catalogue"));
+    }
+
     const existing = await repository.findByUserId(userId);
     if (!existing && name === undefined) {
       return err(new ValidationError("A name is required to create a profile"));
     }
 
     // Se parte del perfil existente: lo que este caso de uso no toca (p. ej. la elección de RF-40) se conserva.
+    const { avatarKey: currentAvatarKey, ...existingWithoutAvatar } = existing ?? {};
+    const avatarKey = input.avatarKey === undefined ? currentAvatarKey : (input.avatarKey ?? undefined);
     const profile: Profile = {
-      ...existing,
+      ...existingWithoutAvatar,
       userId,
       name: name ?? existing!.name,
       ...(input.birthDate !== undefined ? { birthDate: input.birthDate } : existing?.birthDate !== undefined ? { birthDate: existing.birthDate } : {}),
       ...(input.gender !== undefined ? { gender: input.gender } : existing?.gender !== undefined ? { gender: existing.gender } : {}),
       ...(input.timeZone !== undefined ? { timeZone: input.timeZone } : existing?.timeZone !== undefined ? { timeZone: existing.timeZone } : {}),
+      ...(avatarKey !== undefined ? { avatarKey } : {}),
     };
     await repository.save(profile);
     return ok(profile);

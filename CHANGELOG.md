@@ -5,6 +5,17 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-26, avatares; en curso)
+
+- Catálogo de 12 avatares definido por descripciones de rasgos visibles, con un test que impide palabras de género, origen, religión, edad o valoración del aspecto.
+- `scripts/avatars/generate_avatars.py` (herramienta offline, Python): Claude Haiku razona si cada descripción cae en algún estereotipo antes de generar, un modelo de imagen de HuggingFace (SDXL base) ejecutado en local genera las candidatas, y el autor publica solo las que revisa. Por qué en local y qué sesgo se encontró por el camino: ADR-05, apartado 4.1.1.
+- El perfil admite un avatar del catálogo (solo los publicados; `null` lo quita). **Migración 0022** (`profiles.avatar_key`).
+- Selector de avatar en "Mi perfil"; el elegido se ve en la cabecera y en la entrevista. Sin avatares publicados, la app no cambia.
+
+### Corregido (perfil)
+
+- Al guardar el perfil, la caché perdía la elección de IA del usuario (ideas personalizadas y sugerencias) hasta recargar: ahora conserva el perfil tal como lo devuelve el servidor.
+
 ### Corregido (RF-38, recuperar la contraseña)
 
 - El enlace del correo de recuperación podía dejar a la persona en la portada, sin explicación, en vez de en "Elegir nueva contraseña". La portada reconoce ahora un enlace de recuperación (o el aviso de que está caducado) y lleva a su pantalla; y la dirección de vuelta se construye tolerando una barra final o espacios en `APP_URL`.

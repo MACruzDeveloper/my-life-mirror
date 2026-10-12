@@ -17,7 +17,8 @@ function stubFetch(profile: unknown) {
     if (url === "/api/accounts/session") {
       return Promise.resolve({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com" }) });
     }
-    void init;
+    // Como el servidor de verdad: al guardar devuelve el perfil ya actualizado.
+    if (init?.method === "POST") return Promise.resolve({ ok: true, json: async () => ({ ...(profile as object), ...JSON.parse(init.body as string) }) });
     return Promise.resolve({ ok: true, json: async () => profile });
   });
   vi.stubGlobal("fetch", fetchMock);
@@ -121,4 +122,30 @@ describe("ProfileForm (RF-03)", () => {
     expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana María");
     expect(fetchMock.mock.calls.filter(([u, i]) => u === "/api/accounts/profile" && !i?.method)).toHaveLength(1);
   });
+
+  it("RF-26: guarda el avatar elegido junto al resto, y la caché conserva lo que el formulario no toca (la elección de IA)", async () => {
+    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+      if (url === "/api/accounts/session") return Promise.resolve({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com" }) });
+      if (init?.method === "POST") return Promise.resolve({ ok: true, json: async () => ({ userId: "u1", name: "Ana", timeZone: "Europe/Madrid", avatarKey: "longBraids", aiIdeasEnabled: true }) });
+      return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", timeZone: "Europe/Madrid", aiIdeasEnabled: true }) });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const client = createTestClient();
+    render(
+      withClient(
+        <SessionProvider>
+          <ProfileForm avatarKeys={["roundGlasses", "longBraids"]} />
+        </SessionProvider>,
+        client,
+      ),
+    );
+
+    fireEvent.click(await screen.findByRole("radio", { name: /dos trenzas largas/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
+
+    await waitFor(() => expect(client.getQueryData(["profile"])).toMatchObject({ avatarKey: "longBraids", aiIdeasEnabled: true }));
+    const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST")!;
+    expect(JSON.parse(post[1]!.body as string)).toMatchObject({ name: "Ana", avatarKey: "longBraids" });
+  });
 });
+

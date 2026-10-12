@@ -147,4 +147,14 @@ describe("Header", () => {
       expect(header).toHaveAttribute("data-compact", "false");
     });
   });
+
+  it("RF-26: con avatar elegido lo enseña junto al nombre; sin él, solo el nombre", () => {
+    const { unmount } = renderHeader({ displayName: "Ana", avatarKey: "longBraids" });
+    expect(screen.getByRole("img", { name: /dos trenzas largas/i })).toHaveAttribute("src", "/avatars/longBraids.webp");
+    unmount();
+
+    renderHeader({ displayName: "Ana" });
+    expect(screen.queryByRole("img", { name: /dos trenzas largas/i })).not.toBeInTheDocument();
+  });
 });
+

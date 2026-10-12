@@ -9,6 +9,8 @@ const UpdateProfileSchema = z.object({
   birthDate: z.string().max(MAX_ID_LENGTH).optional(),
   gender: z.enum(GENDERS).optional(),
   timeZone: z.string().max(MAX_ID_LENGTH).optional(),
+  // RF-26: la clave de un avatar del catálogo; `null` lo quita. El caso de uso comprueba que esté publicado.
+  avatarKey: z.string().max(MAX_ID_LENGTH).nullable().optional(),
 });
 
 /**

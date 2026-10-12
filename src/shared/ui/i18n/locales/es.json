@@ -718,5 +718,25 @@
         "disponibilidad": "directorio internacional de líneas de ayuda verificadas: elige tu país."
       }
     }
+  },
+  "avatares": {
+    "titulo": "Tu avatar",
+    "ayuda": "Elige el que más te guste. Puedes cambiarlo o quitarlo cuando quieras.",
+    "quitar": "Sin avatar",
+    "generadosConIA": "Ilustraciones generadas con IA y revisadas una a una.",
+    "descripciones": {
+      "roundGlasses": "Persona de pelo oscuro, corto y rizado, con gafas redondas y jersey mostaza",
+      "tealScarf": "Persona de pelo blanco, con un pañuelo verde azulado sobre la cabeza y los hombros",
+      "longBraids": "Persona de piel oscura con dos trenzas largas y camiseta coral",
+      "highBun": "Persona de pelo negro largo recogido en un moño alto, con camisa lavanda",
+      "pinkWrap": "Persona de melena negra lisa con un pañuelo rosa anudado en la cabeza",
+      "woolBeanie": "Persona con gorro de lana con pompón y chaqueta naranja",
+      "stripedShirt": "Persona de pelo castaño corto, con gafas y camisa de rayas",
+      "longWaves": "Persona de melena larga y ondulada, de color claro, con blusa azul",
+      "blondBeard": "Persona de pelo rubio corto y barba corta, con polo verde",
+      "headphones": "Persona de piel oscura y pelo corto, con auriculares puestos y chaqueta amarilla",
+      "shavedHead": "Persona de cabeza rapada, sin barba, con camiseta gris",
+      "topKnotBeard": "Persona de piel oscura con el pelo recogido arriba y barba corta, con sudadera verde"
+    }
   }
 }

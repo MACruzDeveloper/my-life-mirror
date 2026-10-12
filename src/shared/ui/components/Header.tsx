@@ -18,11 +18,14 @@ import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { headerTheme } from "../theme";
+import { UserAvatar } from "./UserAvatar";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export interface HeaderProps {
   /** Nombre del usuario con sesión activa (RF-03), o el email si aún no tiene perfil. Ausente mientras useSesion carga. */
   displayName?: string;
+  /** RF-26: el avatar elegido, junto al nombre. */
+  avatarKey?: string;
   onLogout: () => void;
   /** Solo muestra el enlace: la protección real de /admin está en el servidor (ADM-01). */
   isAdmin?: boolean;
@@ -38,7 +41,7 @@ export interface HeaderProps {
  * cerrar sesión; desde `sm`, todo en línea. UX-06: oscura y fija arriba; al
  * bajar se compacta (menos altura y letra más pequeña) con una transición breve.
  */
-export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
+export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"), { noSsr: true });
@@ -120,6 +123,7 @@ export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
             <Button size="small" component={RouterLink} to="/perfil">
               {t("breadcrumbs.miPerfil")}
             </Button>
+            {avatarKey ? <UserAvatar avatarKey={avatarKey} size={32} /> : null}
             {displayName ? (
               <Typography variant="body2" color="text.secondary">
                 {displayName}
