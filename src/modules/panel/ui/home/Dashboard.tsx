@@ -11,8 +11,10 @@ import type { LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
+import { CheckInReminder } from "./CheckInReminder";
 import { DashboardGuide } from "./DashboardGuide";
 import { IdeasSummary } from "./IdeasSummary";
+import { SavedIdeas } from "./SavedIdeas";
 import { useAiIdeasActive } from "@modules/accounts/ui/queries";
 
 /**
@@ -60,6 +62,8 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
         </Button>
       </Box>
       <DashboardGuide />
+      <SavedIdeas categoryNames={Object.fromEntries(displayedScores.map((latestScore) => [latestScore.categoryId, latestScore.categoryName]))} />
+      <CheckInReminder latestScores={displayedScores} />
       <IdeasSummary
         personalize={personalize}
         ideas={recommendations.map((recommendation) => ({

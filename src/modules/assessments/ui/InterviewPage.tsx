@@ -44,6 +44,8 @@ import {
   useLatestScores,
   type ExperienceDto,
 } from "./queries";
+import { ScoreFeedbackToast, type ScoreFeedbackMessage } from "./interview/ScoreFeedbackToast";
+import { scoreFeedback } from "./scoreFeedback";
 import type { LatestScoreDto } from "./ScoreCards";
 
 /** Lleva a la pregunta de una categoría; sin animación si el usuario prefiere menos movimiento. */
@@ -128,6 +130,7 @@ export function InterviewPage() {
   const [saveStatuses, setSaveStatuses] = useState<Record<string, CategorySaveStatus>>({});
   // UX-05: la idea nueva que ha abierto el último guardado (abre "Cambios guardados").
   const [newIdea, setNewIdea] = useState<RecommendationDto | null>(null);
+  const [highScoreFeedback, setHighScoreFeedback] = useState<ScoreFeedbackMessage | undefined>(undefined);
   const historyQuery = useAssessmentHistory();
   const recommendations = useRecommendations().data ?? [];
   const experiences = useExperiences().data ?? [];
@@ -499,6 +502,14 @@ export function InterviewPage() {
         (recommendation) => recommendation.categoryId === categoryId && isOpenRecommendation(recommendation) && !openBefore.has(recommendation.id),
       );
       if (idea) setNewIdea(idea);
+      // UX-09: con una puntuación alta, un mensaje breve que reconoce el momento (y, donde toca, felicita).
+      const savedCategory = categories.find((category) => category.id === categoryId);
+      if (savedCategory && score !== undefined) {
+        const label = categoryLabel(savedCategory.catalogId);
+        const isSensitive = savedCategory.isSensitiveData === true;
+        const feedback = scoreFeedback({ score, isSensitive, canShare: !isSensitive && !label.aiExcluded });
+        setHighScoreFeedback(feedback ? { ...feedback, categoryName: label.name, score } : undefined);
+      }
       return true;
     } catch {
       setSaveStatus(categoryId, { kind: "error", message: t("comun.errorServidor") });
@@ -735,6 +746,7 @@ export function InterviewPage() {
       onClose={() => setNewIdea(null)}
     />
 
+    <ScoreFeedbackToast feedback={highScoreFeedback} onClose={() => setHighScoreFeedback(undefined)} />
     <Dialog open={categoryAwaitingConsent !== null} onClose={() => setCategoryAwaitingConsent(null)}>
       <DialogTitle>{t("categorias.modalTitulo")}</DialogTitle>
       <DialogContent>

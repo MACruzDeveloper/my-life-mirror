@@ -4,9 +4,10 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import CancelIcon from "@mui/icons-material/Cancel";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useTranslation } from "react-i18next";
@@ -18,7 +19,9 @@ const ALWAYS_SHOWN: readonly PasswordRule[] = ["length", "lowercase", "uppercase
 type RequirementState = "met" | "pending" | "missing";
 
 const STATE_COLOR: Record<RequirementState, string> = { met: "success.main", pending: "text.secondary", missing: "error.main" };
-const STATE_ICON = { met: CheckCircleIcon, pending: RadioButtonUncheckedIcon, missing: CancelIcon } as const;
+const STATE_ICON = { met: CheckIcon, pending: FiberManualRecordIcon, missing: CloseIcon } as const;
+/** Marcas pequeñas, del tamaño del texto: lo pendiente, un punto. */
+const STATE_ICON_SIZE: Record<RequirementState, number> = { met: 14, pending: 6, missing: 14 };
 
 interface NewPasswordFieldProps {
   label: string;
@@ -33,9 +36,10 @@ interface NewPasswordFieldProps {
 }
 
 /**
- * Campo para una contraseña NUEVA (registro y cambio, SEC-01): enseña los
- * requisitos desde el principio y los va marcando, para que nadie tenga que
- * adivinar qué se le pide. Usa la misma función que el servidor
+ * Campo para una contraseña NUEVA (registro y cambio, SEC-01): los requisitos
+ * están plegados tras un botón de información (ocupaban medio formulario) y se
+ * van marcando al escribir; si se intenta enviar una que no cumple, se abren
+ * solos para decir qué falta. Usa la misma función que el servidor
  * (`checkPassword`). Nunca en el inicio de sesión: ahí no se dan pistas.
  */
 export function NewPasswordField({ label, value, onChange, context, showErrors, serverRules = [] }: NewPasswordFieldProps) {
@@ -43,6 +47,9 @@ export function NewPasswordField({ label, value, onChange, context, showErrors, 
   const requirementsId = useId();
   const [visible, setVisible] = useState(false);
   const failed = new Set<PasswordRule>([...checkPassword(value, context), ...serverRules]);
+  // Lo que elige la persona manda; mientras no elija, se abren solo si hay algo que corregir.
+  const [chosenOpen, setChosenOpen] = useState<boolean>();
+  const open = chosenOpen ?? (showErrors && failed.size > 0);
 
   const stateOf = (rule: PasswordRule): RequirementState => {
     if (!failed.has(rule)) return "met";
@@ -62,10 +69,13 @@ export function NewPasswordField({ label, value, onChange, context, showErrors, 
         fullWidth
         autoComplete="new-password"
         slotProps={{
-          htmlInput: { "aria-describedby": requirementsId },
+          htmlInput: { "aria-describedby": open ? requirementsId : undefined },
           input: {
             endAdornment: (
               <InputAdornment position="end">
+                <IconButton onClick={() => setChosenOpen(!open)} aria-label={t("contrasena.verRequisitos")} aria-expanded={open} aria-controls={open ? requirementsId : undefined}>
+                  <InfoOutlinedIcon />
+                </IconButton>
                 <IconButton onClick={() => setVisible((current) => !current)} edge="end" aria-label={t(visible ? "contrasena.ocultar" : "contrasena.mostrar")}>
                   {visible ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
@@ -74,26 +84,32 @@ export function NewPasswordField({ label, value, onChange, context, showErrors, 
           },
         }}
       />
-      <Typography id={`${requirementsId}-title`} variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
-        {t("contrasena.requisitos")}
-      </Typography>
-      <Box component="ul" id={requirementsId} aria-labelledby={`${requirementsId}-title`} sx={{ listStyle: "none", m: 0, mt: 0.5, p: 0 }}>
-        {shownRules.map((rule) => {
-          const state = stateOf(rule);
-          const Icon = STATE_ICON[state];
-          return (
-            <Box component="li" key={rule} data-state={state} sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, py: 0.25, color: STATE_COLOR[state] }}>
-              <Icon fontSize="small" titleAccess={t(`contrasena.estado.${state}`)} sx={{ flexShrink: 0, mt: "1px" }} />
-              <Typography variant="body2" component="span" sx={{ color: state === "pending" ? "text.secondary" : "inherit" }}>
-                {t(`contrasena.reglas.${rule}`)}
-              </Typography>
-            </Box>
-          );
-        })}
-      </Box>
-      <Typography variant="caption" component="p" sx={{ mt: 0.5, color: "text.secondary" }}>
-        {t("contrasena.consejo")}
-      </Typography>
+      {open && (
+        <Box sx={{ mt: 1 }}>
+          <Typography id={`${requirementsId}-title`} variant="caption" component="p" sx={{ color: "text.secondary" }}>
+            {t("contrasena.requisitos")}
+          </Typography>
+          <Box component="ul" id={requirementsId} aria-labelledby={`${requirementsId}-title`} sx={{ listStyle: "none", m: 0, mt: 0.25, p: 0 }}>
+            {shownRules.map((rule) => {
+              const state = stateOf(rule);
+              const Icon = STATE_ICON[state];
+              return (
+                <Box component="li" key={rule} data-state={state} sx={{ display: "flex", alignItems: "center", gap: 0.75, color: STATE_COLOR[state] }}>
+                  <Box component="span" sx={{ display: "inline-flex", justifyContent: "center", width: 14, flexShrink: 0 }}>
+                    <Icon titleAccess={t(`contrasena.estado.${state}`)} sx={{ fontSize: STATE_ICON_SIZE[state] }} />
+                  </Box>
+                  <Typography variant="caption" component="span" sx={{ color: state === "pending" ? "text.secondary" : "inherit" }}>
+                    {t(`contrasena.reglas.${rule}`)}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+          <Typography variant="caption" component="p" sx={{ mt: 0.5, color: "text.secondary" }}>
+            {t("contrasena.consejo")}
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 }

@@ -30,7 +30,7 @@ export function SavedIdeaDialog({ recommendation, categoryName, categoryKey, per
   const titleId = useId();
 
   return (
-    <Dialog open={recommendation !== null} onClose={onClose} aria-labelledby={titleId} fullWidth maxWidth="xs">
+    <Dialog open={recommendation !== null} onClose={onClose} aria-labelledby={titleId} fullWidth maxWidth="sm">
       <DialogTitle id={titleId}>{t("entrevista.guardadoTitulo")}</DialogTitle>
       {recommendation && (
         <DialogContent>

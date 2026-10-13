@@ -2,6 +2,7 @@ import { type Result, ok } from "#shared/domain/Result.js";
 import type { Clock } from "#shared/domain/Clock.js";
 import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
+import type { IdeaReactionRepository } from "#modules/recommendations/domain/IdeaReaction.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import type { ExperienceRepository } from "#modules/assessments/domain/Experience.js";
 import type { RecommendationRepository } from "#modules/recommendations/domain/RecommendationRepository.js";
@@ -22,6 +23,8 @@ export interface UserDataExport {
   /** RF-45: si tiene activadas las sugerencias a partir de sus experiencias, y desde cuándo. */
   aiSuggestions: { enabled: boolean; enabledAt?: string };
   personalizedIdeas: { category: string; locale: string; templateKey: string; text: string; model: string; createdAt: string }[];
+  /** RF-19: lo que decidió sobre cada idea: guardada, hecha o descartada. */
+  ideaReactions: { category: string; templateKey: string; reaction: string; reactedAt: string }[];
   /** RF-44: el diario de experiencias, de la más antigua a la más reciente. */
   experiences: { category: string; text: string; createdAt: string; sharedAt?: string; reportedAt?: string }[];
 }
@@ -34,6 +37,7 @@ interface Dependencies {
   recommendationRepository: RecommendationRepository;
   personalizedIdeaRepository: PersonalizedIdeaRepository;
   experienceRepository: ExperienceRepository;
+  ideaReactionRepository: IdeaReactionRepository;
   clock: Clock;
 }
 
@@ -45,9 +49,9 @@ interface Dependencies {
  * que `ActivateCategory` con el consentimiento.
  * Ver docs/user-stories/RF-05-exportar-eliminar-datos.md.
  */
-export function createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }: Dependencies) {
+export function createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, ideaReactionRepository, personalizedIdeaRepository, experienceRepository, clock }: Dependencies) {
   return async function exportUserData(user: { id: string; email: string }): Promise<Result<UserDataExport, never>> {
-    const [profile, categories, consents, assessments, recommendations, personalizedIdeas, experiences] = await Promise.all([
+    const [profile, categories, consents, assessments, recommendations, personalizedIdeas, experiences, ideaReactions] = await Promise.all([
       profileRepository.findByUserId(user.id),
       categoryRepository.findByUserId(user.id),
       consentRepository.findByUser(user.id),
@@ -55,6 +59,7 @@ export function createExportUserData({ profileRepository, categoryRepository, co
       recommendationRepository.findByUserId(user.id),
       personalizedIdeaRepository.findByUserId(user.id),
       experienceRepository.findByUserId(user.id),
+      ideaReactionRepository.findByUserId(user.id),
     ]);
     const names = new Map(categories.map((c) => [c.id, c.name]));
 
@@ -79,6 +84,9 @@ export function createExportUserData({ profileRepository, categoryRepository, co
         const categoryId = recommendations.find((r) => r.id === idea.recommendationId)?.categoryId;
         return { category: (categoryId && names.get(categoryId)) || "", locale: idea.locale, templateKey: idea.templateKey, text: idea.text, model: idea.model, createdAt: idea.createdAt.toISOString() };
       }),
+      ideaReactions: [...ideaReactions]
+        .sort((a, b) => a.reactedAt.getTime() - b.reactedAt.getTime())
+        .map((reaction) => ({ category: names.get(reaction.categoryId) ?? "", templateKey: reaction.templateKey, reaction: reaction.reaction, reactedAt: reaction.reactedAt.toISOString() })),
       experiences: [...experiences]
         .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
         .map((experience) => ({

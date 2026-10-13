@@ -42,7 +42,7 @@ describe("RecommendationButton (RF-18)", () => {
   it("todas las plantillas del catálogo tienen texto en español e inglés (nunca se muestra una clave a pelo)", () => {
     // Por clave de categoría (antes se pasaban nombres y solo se comprobaban las generales).
     const keys = [...new Set([...STANDARD_CATEGORIES.flatMap(({ key }) => templateKeysFor(key)), ...GENERAL_TEMPLATE_KEYS])];
-    expect(keys.length).toBe(9 * 5 + GENERAL_TEMPLATE_KEYS.length);
+    expect(keys.length).toBe(STANDARD_CATEGORIES.length * 5 + GENERAL_TEMPLATE_KEYS.length);
     for (const language of ["es", "en"]) {
       for (const key of keys) {
         const text = i18n.t(`recomendaciones.plantillas.${key}`, { lng: language, categoria: "X" });
@@ -150,6 +150,57 @@ describe("RecommendationButton (RF-18)", () => {
 
       expect(within(dialog).getByText("Idea 1 de 5")).toBeInTheDocument();
       expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+    });
+  });
+
+  describe("me gusta / no me gusta (RF-19)", () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    function openWithReactions(difficultyTags: string[] = []) {
+      const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<unknown>>(() => Promise.resolve({ ok: true, json: async () => [] }));
+      vi.stubGlobal("fetch", fetchMock);
+      const client = createTestClient();
+      client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false, difficultyTags }]);
+      client.setQueryData(["idea-reactions"], []);
+      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      const reactionBodies = () => fetchMock.mock.calls.filter(([url, init]) => url === "/api/recommendations/reactions" && init?.method === "POST").map(([, init]) => JSON.parse(init?.body as string));
+      return { dialog: screen.getByRole("dialog"), reactionBodies };
+    }
+
+    it("'Me gusta' guarda la idea y lo dice con un mensaje", async () => {
+      const { dialog, reactionBodies } = openWithReactions();
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "Me gusta" }));
+
+      expect(await within(dialog).findByText(/se ha guardado la idea/i)).toBeInTheDocument();
+      expect(within(dialog).getByRole("button", { name: "Me gusta" })).toHaveAttribute("aria-pressed", "true");
+      expect(reactionBodies()).toEqual([{ categoryId: "c1", templateKey: "economia.1", reaction: "saved" }]);
+    });
+
+    it("'No me gusta' la quita del carrusel, dice cuántas hay apartadas y deja recuperarlas", async () => {
+      const { dialog } = openWithReactions();
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "No me gusta" }));
+
+      expect(await within(dialog).findByText("Idea 1 de 4")).toBeInTheDocument();
+      expect(within(dialog).getByText(/has apartado 1 idea\./i)).toBeInTheDocument();
+      fireEvent.click(within(dialog).getByRole("button", { name: "Volver a verlas" }));
+      expect(await within(dialog).findByText("Idea 1 de 5")).toBeInTheDocument();
+    });
+
+    it("si faltan ideas por lo marcado como difícil, la ventana lo explica", () => {
+      const { dialog } = openWithReactions(["apuntarYRegistrar"]);
+
+      expect(within(dialog).getByText("Idea 1 de 3")).toBeInTheDocument();
+      expect(within(dialog).getByText(/hay 2 ideas más que no se muestran/i)).toBeInTheDocument();
+    });
+
+    it("una idea suelta, sin categoría detrás, no ofrece reacciones", () => {
+      render(<RecommendationButton templateKey="economia.1" categoryName="Economía" />);
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+
+      expect(within(screen.getByRole("dialog")).queryByRole("button", { name: "Me gusta" })).not.toBeInTheDocument();
     });
   });
 

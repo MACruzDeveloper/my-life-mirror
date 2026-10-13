@@ -5,7 +5,7 @@ import { newUser } from "./pages/users";
 
 // PERF-01: el guardado devuelve las últimas puntuaciones y las recomendaciones; solo se vuelve a pedir el historial.
 test.describe("PERF-01: menos llamadas al guardar en la entrevista", () => {
-  test("guardar una categoría hace 2 peticiones (más la de la pestaña de otras personas, RF-43) y la idea nueva sale igual en el modal", async ({ page }) => {
+  test("guardar una categoría hace 2 peticiones (más las 2 de la ventana de ideas, RF-43 y RF-19) y la idea nueva sale igual en el modal", async ({ page }) => {
     await new AccountPages(page).register(newUser());
     const interview = new InterviewPage(page);
     await interview.open();
@@ -32,7 +32,8 @@ test.describe("PERF-01: menos llamadas al guardar en la entrevista", () => {
     await historyAfterSaving;
     await page.waitForTimeout(500); // margen por si saliera alguna petición más, que haría fallar el test
 
-    // El guardado sigue siendo 2 peticiones; la tercera es de la ventana: lo que comparten otras personas (RF-43).
-    expect([...requests.values()].sort()).toEqual(["GET /api/assessments/history", "GET /api/categories/shared", "POST /api/assessments"]);
+    // El guardado sigue siendo 2 peticiones; las otras dos son de la ventana de ideas, una sola vez cada una (luego, de
+    // la caché): lo que comparten otras personas (RF-43) y lo que la persona decidió sobre sus ideas (RF-19).
+    expect([...requests.values()].sort()).toEqual(["GET /api/assessments/history", "GET /api/categories/shared", "GET /api/recommendations/reactions", "POST /api/assessments"]);
   });
 });

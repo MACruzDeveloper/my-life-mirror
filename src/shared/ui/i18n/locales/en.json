@@ -10,7 +10,8 @@
     "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again.",
     "seleccionaIdioma": "Select language",
     "paginas": "Pages",
-    "miCuenta": "My account"
+    "miCuenta": "My account",
+    "cerrar": "Close"
   },
   "breadcrumbs": {
     "inicio": "Home",
@@ -50,6 +51,7 @@
     "errorCredenciales": "Wrong email or password"
   },
   "contrasena": {
+    "verRequisitos": "Password requirements",
     "requisitos": "Your password needs:",
     "reglas": {
       "length": "Between 12 and 72 characters",
@@ -134,11 +136,11 @@
     "contactoTitulo": "Contact",
     "contactoTexto": "This is an academic project (master's thesis) — for any question about your data, contact the project's developer directly.",
     "iaTitulo": "AI-personalised ideas",
-    "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive area, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\" and the app's ideas for that category. For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted.",
+    "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive category, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\" and the app's ideas for that category. For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted.",
     "iaSugerenciasTitulo": "AI suggestions from your experiences",
     "iaSugerenciasTexto": "This is also optional, separate from the above and off by default. If you turn it on in Privacy and data, each experience in your diary shows “Suggest options with AI”: pressing it sends to Anthropic, as data processor, only the experience you ask to analyse, together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you and doesn't assess how you are. Before sending it we remove emails, phone numbers, links and long numbers; names can't be removed reliably, so we ask you not to write other people's names if you don't want them sent. Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent. You can turn it off whenever you like; only the options you accept remain from the AI.",
     "compartidasTitulo": "Experiences shared with other people",
-    "compartidasTexto": "If your latest score in an area is 8 or more, you can anonymously share an experience from your diary to help other people. Only the one you choose is shared, after you see how it will look. Other people using the app only read the text, among the ideas for that area and in your same language: never your name, your email, the date or your score. Before publishing it we check that it has no contact details, health or money advice, or insults. Experiences from sensitive categories or Relationship are never shared. Bear in mind that if you tell very personal details, someone who knows you might recognise you. You can stop sharing it whenever you like, in your diary or in Privacy and data; if someone reports it, it's hidden. It's deleted when you delete the experience or your account.",
+    "compartidasTexto": "If your latest score in a category is 8 or more, you can anonymously share an experience from your diary to help other people. Only the one you choose is shared, after you see how it will look. Other people using the app only read the text, among the ideas for that category and in your same language: never your name, your email, the date or your score. Before publishing it we check that it has no contact details, health or money advice, or insults. Experiences from sensitive categories or Relationship are never shared. Bear in mind that if you tell very personal details, someone who knows you might recognise you. You can stop sharing it whenever you like, in your diary or in Privacy and data; if someone reports it, it's hidden. It's deleted when you delete the experience or your account.",
     "iaLimiteTexto": "To prevent abuse, we count how many times a day you use these AI features (only the number, not what you ask or what is answered), and there is a daily maximum per person. If you go over it, you'll see the app's original ideas until the next day. That counter is deleted with your account."
   },
   "entrevista": {
@@ -206,7 +208,7 @@
     "irAPreguntas": "Go to the questions",
     "atras": "Back",
     "queHablarTitulo": "What would you like to talk about?",
-    "queHablarTexto": "Choose the areas of your life you want to review. You can change them whenever you like.",
+    "queHablarTexto": "Choose the categories of your life you want to review. You can change them whenever you like.",
     "elegirTodas": "Choose all",
     "quitarTodas": "Remove all",
     "eligeUna": "Choose at least one to continue.",
@@ -249,8 +251,8 @@
     "avisoOfensivo": "This experience has words we'd rather not send to the AI. You can delete it and write it another way, or send it anyway.",
     "enviarIgualmente": "Send anyway",
     "compartir": "Share anonymously",
-    "compartirOferta": "You're doing well in this area: you can share an experience anonymously to help other people.",
-    "compartirVistaPrevia": "This is how other people who find this area harder will see it:",
+    "compartirOferta": "You're doing well in this category: you can share an experience anonymously to help other people.",
+    "compartirVistaPrevia": "This is how other people who find this category harder will see it:",
     "compartirAnonima": "Without your name, the date or your score.",
     "compartirRetirable": "You can stop sharing it whenever you like.",
     "compartirReportable": "Other people can report it; if they do, it's hidden.",
@@ -265,13 +267,19 @@
       "contact": "To share it, it can't contain emails, phone numbers, links or long numbers. Delete it and write another one without them.",
       "health": "To share it, it can't talk about health, medication, therapy or money (investments, loans…): the app doesn't pass on that kind of advice between people. Delete it and write another one without them.",
       "offensive": "To share it, it can't contain insults or offensive words. Delete it and write another one without them.",
-      "score": "You can only share with a score of 8 or more in this area.",
-      "category": "Experiences aren't shared in this area.",
+      "score": "You can only share with a score of 8 or more in this category.",
+      "category": "Experiences aren't shared in this category.",
       "reported": "This experience was removed after a report and can't be shared again.",
       "error": "We couldn't share it. Please try again."
     },
     "sugerenciasLimite": "You've reached today's maximum of AI uses. You can try again tomorrow.",
-    "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later."
+    "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later.",
+    "puntuacionAlta": {
+      "recognizeCompartir": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary or share it anonymously.",
+      "recognize": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary.",
+      "congratulateCompartir": "Well done: a {{puntuacion}} in {{categoria}}. What is helping? You can note it in your diary or share it anonymously.",
+      "congratulate": "Well done: a {{puntuacion}} in {{categoria}}. What is helping? You can note it in your diary."
+    }
   },
   "resultados": {
     "titulo": "Your results",
@@ -341,6 +349,11 @@
       "Do you have investments or a long-term plan?",
       "Do you know how much you would need to retire?",
       "Do you understand where your money is?"
+    ],
+    "salud": [
+      "How are your energy levels day to day?",
+      "Do you get the rest you need?",
+      "Are you comfortable with how you look after yourself?"
     ]
   },
   "admin": {
@@ -457,7 +470,7 @@
     "errorUltimoAdmin": "You are the only administrator and there must always be one: you can't delete your account until you create another administrator (by granting the role to another account).",
     "iaTitulo": "AI-personalised ideas",
     "iaActivar": "AI-personalised ideas",
-    "iaQueSeEnvia": "If you turn this on, when you open an idea for an area, an AI service (Anthropic) is asked to rewrite the app's idea you're looking at based on your score, whether it's going up or down, and the options you ticked in \"What helps you?\".",
+    "iaQueSeEnvia": "If you turn this on, when you open an idea for a category, an AI service (Anthropic) is asked to rewrite the app's idea you're looking at based on your score, whether it's going up or down, and the options you ticked in \"What helps you?\".",
     "iaQueNunca": "For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent.",
     "iaRevocable": "It's off by default. You can turn it off at any time: personalised ideas are deleted and you see the usual ideas again.",
     "iaError": "The change could not be saved",
@@ -545,12 +558,19 @@
         "1": "Pick one small action related to {{categoria}} that you can do this week and write it down.",
         "2": "Think about what weighs on you most in {{categoria}} and which small change would ease it.",
         "3": "Ask yourself what would help most right now in {{categoria}} and take a first step, however small."
+      },
+      "salud": {
+        "1": "This week, go to bed half an hour earlier one night and notice how you wake up.",
+        "2": "Step outside for ten minutes of daylight, unhurried and without your phone.",
+        "3": "Keep a bottle of water in sight in the place where you spend most of your time.",
+        "4": "For every hour you spend sitting, stand up and stretch for a minute.",
+        "5": "For three days, write down in a single word how you feel when you wake up."
       }
     },
     "dialogoTitulo": "An idea for {{categoria}}",
     "cerrar": "Close",
     "resumenTitulo": "Ideas for you",
-    "resumenTexto": "For the areas with the lowest scores. You decide whether they help.",
+    "resumenTexto": "For the categories with the lowest scores. You decide whether they help.",
     "ideaPara": "Idea for {{categoria}}",
     "personalizando": "Personalising your idea…",
     "personalizadaConIa": "Personalised with AI",
@@ -561,7 +581,17 @@
     "reportada": "Thank you. We've hidden it.",
     "errorReportar": "We couldn't report it. Please try again.",
     "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it.",
-    "limiteIa": "You've reached today's maximum of AI uses: this is the original idea. You can try again tomorrow."
+    "limiteIa": "You've reached today's maximum of AI uses: this is the original idea. You can try again tomorrow.",
+    "meGusta": "I like it",
+    "noMeGusta": "Not for me",
+    "ideaGuardada": "The idea has been saved. You'll find it on Home.",
+    "apartadas_one": "You've set aside {{count}} idea.",
+    "apartadas_other": "You've set aside {{count}} ideas.",
+    "ocultasPorSituacion_one": "There is {{count}} more idea that isn't shown because of what you marked as hard in this category.",
+    "ocultasPorSituacion_other": "There are {{count}} more ideas that aren't shown because of what you marked as hard in this category.",
+    "sinIdeas": "You've set aside every idea for this category.",
+    "recuperar": "Show them again",
+    "errorReaccion": "We couldn't save that change. Please try again."
   },
   "evolucion": {
     "titulo": "Your evolution",
@@ -601,15 +631,16 @@
   "guia": {
     "comoFunciona": "How it works",
     "pasos": [
-      "Choose the areas of your life you want to look at.",
+      "Choose the categories of your life you want to look at.",
       "Rate each one from 1 to 10: it takes about two minutes, and you can leave some for another day.",
-      "See your balance, how it changes over time, and ideas for the areas you want to improve."
+      "See your balance, how it changes over time, and ideas for the categories you want to improve.",
+      "If a category is going well, you can anonymously share what works for you, and read what works for other people."
     ],
     "panelTitulo": "How to read this page",
     "panelPuntos": [
-      "“{{equilibrio}}”: your latest score in each area, all together on the same scale.",
-      "“{{evolucion}}”: how each area has changed every time you updated your answers.",
-      "“{{idea}}” appears on areas with a low score: tap it to see a suggestion.",
+      "“{{equilibrio}}”: your latest score in each category, all together on the same scale.",
+      "“{{evolucion}}”: how each category has changed every time you updated your answers.",
+      "“{{idea}}” appears on categories with a low score: tap it to see a suggestion.",
       "When something changes in your life, use “{{actualizar}}”."
     ],
     "entendido": "Got it"
@@ -685,6 +716,14 @@
       "consultarProfesional": "Asking a professional",
       "pocoAPoco": "Investing little by little",
       "revisarDeVezEnCuando": "Checking now and then"
+    },
+    "salud": {
+      "dormir": "Sleeping well",
+      "luzDelDia": "Daylight and fresh air",
+      "moverme": "Moving every day",
+      "comerConCalma": "Eating without rushing",
+      "descansos": "Taking breaks",
+      "rutinas": "Having routines"
     }
   },
   "situaciones": {
@@ -743,5 +782,18 @@
       "shavedHead": "Person with a shaved head, no beard, and a grey t-shirt",
       "topKnotBeard": "Person with dark skin, hair tied up and a short beard, wearing a green hoodie"
     }
+  },
+  "recordatorio": {
+    "titulo": "You haven't looked at these in a while",
+    "item_one": "{{categoria}}: {{count}} week ago",
+    "item_other": "{{categoria}}: {{count}} weeks ago",
+    "pregunta_one": "Is it still the same? Take another look whenever you like.",
+    "pregunta_other": "Are they still the same? Take another look whenever you like."
+  },
+  "ideasGuardadas": {
+    "titulo": "Your saved ideas",
+    "hecha": "Done",
+    "quitar": "Remove",
+    "error": "We couldn't save that change. Please try again."
   }
 }

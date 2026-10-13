@@ -20,6 +20,10 @@ import { InMemoryRecommendationRepository } from "#modules/recommendations/infra
 import { SupabaseRecommendationRepository } from "#modules/recommendations/infrastructure/SupabaseRecommendationRepository.js";
 import { createPersonalizeRecommendation } from "#modules/recommendations/application/PersonalizeRecommendation.js";
 import type { IdeaReviewer, IdeaWriter } from "#modules/recommendations/domain/IdeaWriter.js";
+import type { IdeaReactionRepository } from "#modules/recommendations/domain/IdeaReaction.js";
+import { createListIdeaReactions, createSetIdeaReaction } from "#modules/recommendations/application/IdeaReactions.js";
+import { InMemoryIdeaReactionRepository } from "#modules/recommendations/infrastructure/InMemoryIdeaReactionRepository.js";
+import { SupabaseIdeaReactionRepository } from "#modules/recommendations/infrastructure/SupabaseIdeaReactionRepository.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infrastructure/FakeIdeaWriter.js";
 import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
@@ -147,6 +151,13 @@ function createExperienceRepository(environment: Environment): ExperienceReposit
   }
   const { url, serviceRoleKey } = supabaseCredentials();
   return new SupabaseExperienceRepository(url, serviceRoleKey);
+}
+
+/** RF-19: se escribe desde la ventana de ideas y se lee en Inicio (funciones distintas): base de datos real fuera de los tests. */
+function createIdeaReactionRepository(environment: Environment): IdeaReactionRepository {
+  if (environment === "test") return new InMemoryIdeaReactionRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseIdeaReactionRepository(url, serviceRoleKey);
 }
 
 function createPersonalizedIdeaRepository(environment: Environment): PersonalizedIdeaRepository {
@@ -330,6 +341,9 @@ export interface AppContext {
   reportSharedExperience: ReturnType<typeof createReportSharedExperience>;
   recommendationRepository: RecommendationRepository;
   listRecommendations: ReturnType<typeof createListRecommendations>;
+  /** RF-19: guardar una idea, darla por hecha o descartarla. */
+  setIdeaReaction: ReturnType<typeof createSetIdeaReaction>;
+  listIdeaReactions: ReturnType<typeof createListIdeaReactions>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
   aiIdeasAvailable: boolean;
   /** SEC-02: tope de intentos de los controladores públicos (inicio de sesión, registro…). */
@@ -353,6 +367,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const registerUser = createRegisterUser(authProvider, updateProfile);
   const recommendationRepository = createRecommendationRepository(environment);
   const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
+  const ideaReactionRepository = createIdeaReactionRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider(environment, clock);
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
@@ -382,15 +397,16 @@ export function createAppContext(environment: Environment = detectEnvironment())
       assessmentRepository,
       recommendationRepository,
       personalizedIdeaRepository,
+      ideaReactionRepository,
       experienceRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
-    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -434,6 +450,8 @@ export function createAppContext(environment: Environment = detectEnvironment())
     reportSharedExperience: createReportSharedExperience({ experienceRepository, clock }),
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
+    setIdeaReaction: createSetIdeaReaction({ ideaReactionRepository, categoryRepository, catalog: categoryCatalogRepository, clock }),
+    listIdeaReactions: createListIdeaReactions(ideaReactionRepository),
     aiIdeasAvailable: ideaProvider.writer !== undefined,
     attemptLimiter: createAttemptLimiter(environment, clock),
     setAiSuggestions: createSetAiSuggestions({ profileRepository, clock }),

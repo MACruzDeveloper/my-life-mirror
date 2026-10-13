@@ -7,6 +7,9 @@ import { publishedAvatarKeys } from "@modules/accounts/domain/avatars";
 import { UserAvatar } from "@shared/ui/components/UserAvatar";
 
 const AVATAR_SIZE = 56;
+/** Cuánto crece un avatar al señalarlo, y en cuánto tiempo (decisión del autor tras la segunda prueba con una usuaria). */
+const ZOOM_SCALE = 2;
+const ZOOM_SECONDS = 2;
 
 interface AvatarPickerProps {
   /** La clave elegida; sin valor, "Sin avatar". */
@@ -35,7 +38,19 @@ export function AvatarPicker({ value, onChange, keys = publishedAvatarKeys() }: 
         aria-checked={selected}
         aria-label={label}
         onClick={() => onChange(avatarKey)}
-        sx={{ borderRadius: "50%", p: 0.5, border: 2, borderColor: selected ? "primary.main" : "transparent", "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 2 } }}
+        sx={{
+          borderRadius: "50%",
+          p: 0.5,
+          border: 2,
+          borderColor: selected ? "primary.main" : "transparent",
+          // A 56 px los avatares se distinguen mal: al pasar el ratón (o al llegar con el teclado)
+          // crecen despacio, por encima de sus vecinos. Sin animación para quien pide menos movimiento.
+          position: "relative",
+          transition: `transform ${ZOOM_SECONDS}s ease-in-out`,
+          "&:hover, &:focus-visible": { transform: `scale(${ZOOM_SCALE})`, zIndex: 1 },
+          "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 2 },
+          "@media (prefers-reduced-motion: reduce)": { transition: "none" },
+        }}
       >
         {content}
       </ButtonBase>

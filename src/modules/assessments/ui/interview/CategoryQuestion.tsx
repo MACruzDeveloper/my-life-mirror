@@ -145,7 +145,7 @@ export function CategoryQuestion({
   const sharing: ExperienceSharing | undefined =
     onShareExperience && onUnshareExperience
       ? {
-          canShare: !category.isSensitiveData && !label.aiExcluded && Boolean(label.key) && savedScore !== undefined && savedScore >= SHARE_MIN_SCORE,
+          canShare: !category.isSensitiveData && !label.aiExcluded && savedScore !== undefined && savedScore >= SHARE_MIN_SCORE,
           onShare: onShareExperience,
           onUnshare: onUnshareExperience,
         }

@@ -12,6 +12,7 @@ import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastru
 import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/InMemoryCategoryRepository";
 import { createGrantConsent } from "@modules/consent/application/GrantConsent";
 import { InMemoryConsentRepository } from "@modules/consent/infrastructure/InMemoryConsentRepository";
+import { InMemoryIdeaReactionRepository } from "@modules/recommendations/infrastructure/InMemoryIdeaReactionRepository";
 import { InMemoryPersonalizedIdeaRepository } from "@modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository";
 import { InMemoryRecommendationRepository } from "@modules/recommendations/infrastructure/InMemoryRecommendationRepository";
 import { AuthenticationError, ConflictError, ValidationError } from "@shared/domain/DomainError";
@@ -28,7 +29,8 @@ async function setup() {
   const recommendationRepository = new InMemoryRecommendationRepository();
   const personalizedIdeaRepository = new InMemoryPersonalizedIdeaRepository();
   const experienceRepository = new InMemoryExperienceRepository();
-  const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository };
+  const ideaReactionRepository = new InMemoryIdeaReactionRepository();
+  const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository };
 
   const ana = await authProvider.register("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
   const luis = await authProvider.register("luis@ejemplo.com", "abcdefgh");
@@ -52,6 +54,8 @@ async function setup() {
     { id: "r-luis", userId: luis.id, categoryId: categoriesLuis[0].id, templateKey: "general.1", threshold: 5, status: "pending", createdAt: clock.now() },
   ]);
   await personalizedIdeaRepository.save({ recommendationId: "r-ana", userId: ana.id, locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", experienceTags: [], model: "fake", createdAt: clock.now() });
+  await ideaReactionRepository.save({ userId: ana.id, categoryId: financesAna.id, templateKey: "economia.2", reaction: "saved", reactedAt: new Date("2026-10-12T10:00:00Z") });
+  await ideaReactionRepository.save({ userId: luis.id, categoryId: categoriesLuis[0].id, templateKey: "general.1", reaction: "discarded", reactedAt: new Date("2026-10-12T10:00:00Z") });
   await experienceRepository.save({ id: "e-ana", userId: ana.id, categoryId: financesAna.id, text: "Este mes he ahorrado un poco", createdAt: new Date("2026-09-21T10:00:00.000Z") });
   await profileRepository.save({ ...(await profileRepository.findByUserId(ana.id))!, aiIdeasEnabled: true, aiIdeasEnabledAt: "2026-09-20T10:00:00.000Z", aiSuggestionsEnabled: true, aiSuggestionsEnabledAt: "2026-10-05T10:00:00.000Z" });
   await createGrantConsent(consentRepository, clock)({ userId: ana.id, categoryId: sexAna.id, policyVersion: "2026-09" });
@@ -92,6 +96,8 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     expect(data.aiSuggestions).toEqual({ enabled: true, enabledAt: "2026-10-05T10:00:00.000Z" });
     expect(data.experiences).toEqual([{ category: "Economía", text: "Este mes he ahorrado un poco", createdAt: "2026-09-21T10:00:00.000Z" }]);
     expect(data.personalizedIdeas).toEqual([{ category: "Economía", locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: "2026-09-20T10:00:00.000Z" }]);
+    // RF-19: lo que decidió sobre cada idea.
+    expect(data.ideaReactions).toEqual([{ category: "Economía", templateKey: "economia.2", reaction: "saved", reactedAt: "2026-10-12T10:00:00.000Z" }]);
   });
 
   it("RF-43: dice qué experiencias están compartidas y cuáles se retiraron tras un reporte", async () => {
@@ -133,13 +139,16 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
 
 describe("DeleteAccount (RF-05, derecho al olvido)", () => {
   it("con la contraseña correcta borra evaluaciones, categorías, consentimientos, perfil y la cuenta de acceso", async () => {
-    const { deleteAccount, ana, authProvider, assessmentRepository, categoryRepository, consentRepository, profileRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository } = await setup();
+    const { deleteAccount, ana, authProvider, assessmentRepository, categoryRepository, consentRepository, profileRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, luis } = await setup();
 
     const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
 
     expect(result.ok).toBe(true);
     expect(await recommendationRepository.findByUserId(ana.id)).toEqual([]);
     expect(await personalizedIdeaRepository.findByUserId(ana.id)).toEqual([]);
+    // RF-19: sus reacciones a las ideas se borran; las de otra persona, no.
+    expect(await ideaReactionRepository.findByUserId(ana.id)).toEqual([]);
+    expect(await ideaReactionRepository.findByUserId(luis.id)).toHaveLength(1);
     expect(await experienceRepository.findByUserId(ana.id)).toEqual([]);
     expect(await assessmentRepository.findByUserId(ana.id)).toEqual([]);
     expect(await categoryRepository.findByUserId(ana.id)).toEqual([]);

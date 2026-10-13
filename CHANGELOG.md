@@ -5,6 +5,35 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-19, guardar ideas)
+
+- En la ventana de ideas, cada idea lleva **"Me gusta"** (la guarda y lo dice) y **"No me gusta"** (deja de salir en esa categoría; se pueden recuperar). La ventana es más ancha, con la misma altura en todas las pestañas, y pestañas y flechas con aspecto de botón; explica cuántas ideas no se ven y por qué.
+- En Inicio, **"Tus ideas guardadas"**, con "Hecha" y "Quitar".
+- Las reacciones entran en la exportación de datos y se borran con la cuenta. **Migración 0024** (`idea_reactions`): ejecutarla antes de desplegar.
+
+### Cambiado
+
+- **Requisitos de la contraseña plegados:** en el registro y el cambio de contraseña se ven al pulsar un botón de información, con marcas pequeñas; se abren solos si la contraseña no cumple al enviar.
+
+### Añadido (categoría Salud)
+
+- Nueva categoría **Salud**, sensible: pide consentimiento y queda fuera de la IA y de las experiencias compartidas. Con cinco ideas genéricas y nada clínicas, seis opciones de "¿Qué te ayuda?" y sus ejemplos. **Migración 0023**: ejecutarla antes de desplegar.
+
+### Añadido (segunda prueba con una usuaria: UX-09 y UX-10)
+
+- Un mensaje al guardar una puntuación de 8 o más, en un aviso que se cierra solo a los 5 segundos: reconoce el momento e invita a anotar o compartir qué está ayudando; con 9 o 10 en una categoría no sensible, felicita con sobriedad.
+- "Cómo funciona" explica en un cuarto paso que se puede compartir de forma anónima lo que funciona. "Compartir de forma anónima" pasa a ser un botón.
+- En Inicio, una invitación a volver a mirar las categorías que llevan más de un mes sin actualizarse.
+- Los avatares del perfil crecen al señalarlos.
+
+### Corregido (RF-43, compartir experiencias)
+
+- Las categorías añadidas desde administración (como "Idiomas") no se podían compartir: no tienen clave de catálogo y la app las dejaba fuera sin avisar. Ahora cualquier categoría no sensible se puede compartir.
+
+### Cambiado (textos)
+
+- "Categorías" en toda la interfaz, en lugar de mezclarlo con "áreas".
+
 ### Cambiado (paleta de la app)
 
 - La línea de los gráficos usa un verde azulado vivo propio, en lugar del color de marca.
