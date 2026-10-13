@@ -8,6 +8,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Tooltip from "@mui/material/Tooltip";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
@@ -26,6 +27,7 @@ const SECTIONS: { path: string; labelKey: string; Icon: ComponentType<{ fontSize
   { path: "/perfil", labelKey: "cuenta.perfil", Icon: PersonOutlinedIcon },
   { path: "/perfil/entrevista", labelKey: "cuenta.entrevista", Icon: ForumOutlinedIcon },
   { path: "/perfil/resultados", labelKey: "cuenta.resultados", Icon: InsightsOutlinedIcon },
+  { path: "/perfil/calendario", labelKey: "cuenta.calendario", Icon: CalendarMonthOutlinedIcon },
   { path: "/perfil/datos", labelKey: "cuenta.datos", Icon: ShieldOutlinedIcon },
 ];
 
@@ -47,7 +49,7 @@ function saveCollapsed(collapsed: boolean) {
 
 /**
  * Concentrador de "Mi perfil" con menú lateral: todo lo que el usuario hace
- * sobre sí mismo — perfil, entrevista, resultados y privacidad/datos (RF-05) —
+ * sobre sí mismo — perfil, entrevista, resultados, calendario (RF-48) y privacidad/datos (RF-05) —
  * vive aquí. UX-06: el menú es un `Drawer`. En escritorio (md+) está fijo y se
  * puede plegar a solo iconos (se recuerda en este navegador); en móvil se abre
  * con un botón y se cierra al elegir. Rutas anidadas de verdad para que cada

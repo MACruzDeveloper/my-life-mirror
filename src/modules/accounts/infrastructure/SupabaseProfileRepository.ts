@@ -10,6 +10,8 @@ interface ProfileRow {
   gender: string | null;
   time_zone: string | null;
   avatar_key: string | null;
+  occupation: string | null;
+  hobbies: string[] | null;
   ai_ideas_enabled: boolean | null;
   ai_ideas_enabled_at: string | null;
   ai_suggestions_enabled: boolean | null;
@@ -24,6 +26,8 @@ function profileFromRow(row: ProfileRow): Profile {
     ...(row.gender ? { gender: row.gender as Gender } : {}),
     ...(row.time_zone ? { timeZone: row.time_zone } : {}),
     ...(row.avatar_key ? { avatarKey: row.avatar_key } : {}),
+    ...(row.occupation ? { occupation: row.occupation } : {}),
+    ...(row.hobbies && row.hobbies.length > 0 ? { hobbies: row.hobbies } : {}),
     aiIdeasEnabled: row.ai_ideas_enabled === true,
     ...(row.ai_ideas_enabled_at ? { aiIdeasEnabledAt: new Date(row.ai_ideas_enabled_at).toISOString() } : {}),
     aiSuggestionsEnabled: row.ai_suggestions_enabled === true,
@@ -53,6 +57,8 @@ export class SupabaseProfileRepository implements ProfileRepository {
       gender: profile.gender ?? null,
       time_zone: profile.timeZone ?? null,
       avatar_key: profile.avatarKey ?? null,
+      occupation: profile.occupation ?? null,
+      hobbies: [...(profile.hobbies ?? [])],
       ai_ideas_enabled: profile.aiIdeasEnabled === true,
       ai_ideas_enabled_at: profile.aiIdeasEnabledAt ?? null,
       ai_suggestions_enabled: profile.aiSuggestionsEnabled === true,
@@ -68,7 +74,7 @@ export class SupabaseProfileRepository implements ProfileRepository {
   async findByUserId(userId: string): Promise<Profile | undefined> {
     const { data, error } = await this.client
       .from("profiles")
-      .select("user_id, name, birth_date, gender, time_zone, avatar_key, ai_ideas_enabled, ai_ideas_enabled_at, ai_suggestions_enabled, ai_suggestions_enabled_at")
+      .select("user_id, name, birth_date, gender, time_zone, avatar_key, occupation, hobbies, ai_ideas_enabled, ai_ideas_enabled_at, ai_suggestions_enabled, ai_suggestions_enabled_at")
       .eq("user_id", userId)
       .maybeSingle();
 

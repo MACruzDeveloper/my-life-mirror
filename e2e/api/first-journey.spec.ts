@@ -77,9 +77,12 @@ test.describe("primer uso: registro → entrevista → panel", () => {
   test("SEC-01: una contraseña débil no crea la cuenta y el formulario dice qué falta", async ({ page }) => {
     const account = new AccountPages(page);
     await page.goto("/registro");
-    await expect(page.getByRole("list", { name: /tu contraseña necesita/i })).toBeVisible();
+    // Plegados hasta que hacen falta (o se pulsa el botón de información).
+    await expect(page.getByRole("list", { name: /tu contraseña necesita/i })).toHaveCount(0);
 
     await account.tryToRegister({ ...newUser(), password: "Test1234!" });
+
+    await expect(page.getByRole("list", { name: /tu contraseña necesita/i })).toBeVisible();
 
     await expect(page.getByRole("alert")).toContainText(/no cumple los requisitos/i);
     await expect(page.getByText(/contraseña muy común/i)).toBeVisible();

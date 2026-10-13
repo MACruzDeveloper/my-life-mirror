@@ -6,7 +6,7 @@ import type { CategoryText } from "./CatalogCategory.js";
  * (`category_catalog` + `category_translations`, migraciones 0005 y 0009, que
  * repiten estos textos); esta lista alimenta el fake en memoria de los tests y
  * documenta la semilla. Sensibles (RNF-04/RES-04, categoría especial RGPD
- * Art. 9 — sexo/orientación, religión): sexo y espiritualidad. Deporte lo fue
+ * Art. 9 — sexo/orientación, religión, salud): sexo, espiritualidad y salud. Deporte lo fue
  * hasta el 6 oct. 2026 (migración 0018): habla de actividad física, no pide datos
  * de salud, y cualquier área puede tocar algo personal (decisión del autor).
  *
@@ -94,6 +94,16 @@ export const STANDARD_CATEGORIES: readonly StandardCategoryTemplate[] = [
     translations: {
       es: { name: "Inversiones", description: "Inversión y planificación financiera a largo plazo." },
       en: { name: "Investments", description: "Investing and long-term financial planning." },
+    },
+  },
+  {
+    // Añadida el 12 oct. 2026, tras la segunda prueba con una usuaria. Sensible (salud es categoría
+    // especial del RGPD): pide consentimiento y queda fuera de la IA y de las experiencias compartidas.
+    key: "salud",
+    isSensitiveData: true,
+    translations: {
+      es: { name: "Salud", description: "Cómo te encuentras: descanso, energía y cuidado de ti." },
+      en: { name: "Health", description: "How you feel: rest, energy and looking after yourself." },
     },
   },
 ];

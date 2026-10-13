@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { ProfileForm } from "@modules/accounts/ui/ProfileForm";
 import { SessionProvider } from "@shared/ui/context/SessionContext";
@@ -147,5 +147,36 @@ describe("ProfileForm (RF-03)", () => {
     const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST")!;
     expect(JSON.parse(post[1]!.body as string)).toMatchObject({ name: "Ana", avatarKey: "longBraids" });
   });
-});
 
+  it("RF-46: precarga profesión y aficiones, y guarda lo que se elige; la profesión es un desplegable, no texto libre", async () => {
+    const fetchMock = stubFetch({ name: "Ana", occupation: "docencia", hobbies: ["lectura"] });
+    renderProfileForm();
+    await waitFor(() => expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana"));
+
+    expect(screen.getByRole("combobox", { name: /profesión/i })).toHaveTextContent("Docencia y educación");
+    const hobbies = within(screen.getByRole("group", { name: /aficiones/i }));
+    expect(hobbies.getByRole("button", { name: "Lectura" })).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: /profesión/i }));
+    fireEvent.click(await screen.findByRole("option", { name: "Desarrollo web" }));
+    fireEvent.click(hobbies.getByRole("button", { name: "Montaña" }));
+    fireEvent.click(hobbies.getByRole("button", { name: "Lectura" }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
+
+    await waitFor(() => expect(screen.getByText(/perfil guardado/i)).toBeInTheDocument());
+    const [, init] = fetchMock.mock.calls.find(([url, request]) => url === "/api/accounts/profile" && request?.method === "POST")!;
+    expect(JSON.parse(init!.body as string)).toMatchObject({ occupation: "desarrolloWeb", hobbies: ["montana"] });
+  });
+
+  it("RF-46: sin profesión ni aficiones, se envían vacías (así se pueden quitar)", async () => {
+    const fetchMock = stubFetch({ name: "Ana" });
+    renderProfileForm();
+    await waitFor(() => expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana"));
+
+    fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
+
+    await waitFor(() => expect(screen.getByText(/perfil guardado/i)).toBeInTheDocument());
+    const [, init] = fetchMock.mock.calls.find(([url, request]) => url === "/api/accounts/profile" && request?.method === "POST")!;
+    expect(JSON.parse(init!.body as string)).toMatchObject({ occupation: null, hobbies: [] });
+  });
+});

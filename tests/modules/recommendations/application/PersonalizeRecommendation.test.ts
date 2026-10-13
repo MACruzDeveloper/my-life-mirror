@@ -31,7 +31,7 @@ class ScriptedWriter implements IdeaWriter {
 
 const approve: IdeaReviewer = { review: async () => ({ approved: true, reasons: [] }) };
 
-async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; aiIdeasEnabled?: boolean; available?: boolean; dailyLimit?: number } = {}) {
+async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; aiIdeasEnabled?: boolean; available?: boolean; dailyLimit?: number; occupation?: string; hobbies?: string[] } = {}) {
   const categoryRepository = new InMemoryCategoryRepository();
   const catalog = new InMemoryCategoryCatalogRepository();
   const listed = await createListCategories(categoryRepository, catalog)("u1");
@@ -49,7 +49,7 @@ async function setup(options: { writer?: IdeaWriter; reviewer?: IdeaReviewer; ai
   await categoryRepository.save({ ...spirituality, status: "active" });
 
   const profileRepository = new InMemoryProfileRepository();
-  await profileRepository.save({ userId: "u1", name: "Ana", aiIdeasEnabled: options.aiIdeasEnabled ?? true });
+  await profileRepository.save({ userId: "u1", name: "Ana", aiIdeasEnabled: options.aiIdeasEnabled ?? true, ...(options.occupation ? { occupation: options.occupation } : {}), ...(options.hobbies ? { hobbies: options.hobbies } : {}) });
 
   const assessmentRepository = new InMemoryAssessmentRepository();
   await assessmentRepository.saveMany([
@@ -112,6 +112,25 @@ describe("PersonalizeRecommendation (RF-40)", () => {
     expect(request).toMatchObject({ locale: "es", categoryKey: "economia", score: 3, trend: "down", helpfulThings: ["Llevar un presupuesto"] });
     expect(request.candidates.map((candidate) => candidate.templateKey)).toEqual(["economia.1"]);
     expect(JSON.stringify(request)).not.toMatch(/texto privado|Ana|u1|r-finances/);
+  });
+
+  it("RF-46: con profesión y aficiones en el perfil, le llegan como datos, con el texto de la lista", async () => {
+    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Como llevar un presupuesto te ayuda, prueba a anotar tus gastos una semana, sin juzgarte." }));
+    const { personalize } = await setup({ writer, occupation: "desarrolloWeb", hobbies: ["montana", "viajar", "inventada"] });
+
+    await personalize({ userId: "u1", recommendationId: "r-finances", locale: "es" });
+
+    expect(writer.calls[0]).toMatchObject({ occupation: "Desarrollo web", hobbies: ["Montaña", "Viajar"] });
+  });
+
+  it("RF-46: sin profesión ni aficiones, la petición no las lleva", async () => {
+    const writer = new ScriptedWriter(async (request) => ({ templateKey: request.candidates[0].templateKey, text: "Como llevar un presupuesto te ayuda, prueba a anotar tus gastos una semana, sin juzgarte." }));
+    const { personalize } = await setup({ writer });
+
+    await personalize({ userId: "u1", recommendationId: "r-finances", locale: "es" });
+
+    expect(writer.calls[0].occupation).toBeUndefined();
+    expect(writer.calls[0].hobbies).toEqual([]);
   });
 
   it("la segunda vez lee la idea guardada sin volver a llamar al escritor", async () => {

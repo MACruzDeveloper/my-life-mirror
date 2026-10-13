@@ -21,13 +21,18 @@ interface CategoryLookup {
   catalog: CategoryCatalogRepository;
 }
 
-/** La clave del catálogo de una categoría del usuario, si se puede compartir en ella; si no, `undefined`. */
+/**
+ * La clave con la que se agrupan las experiencias compartidas de una categoría, si se puede
+ * compartir en ella; si no, `undefined`. Las nueve categorías originales tienen clave propia
+ * (`economia`); las añadidas después desde administración no, y se agrupan por su identificador
+ * del catálogo. Antes quedaban fuera de compartir sin avisar (fallo real, 12 oct.).
+ */
 async function shareableCategoryKey({ categoryRepository, catalog }: CategoryLookup, userId: string, categoryId: string): Promise<string | undefined> {
   const category = await categoryRepository.findById(userId, categoryId);
   if (!category || category.type !== "standard") return undefined;
   const catalogEntry = (await catalog.findAll()).find((entry) => entry.id === category.catalogId);
-  if (!catalogEntry?.key || isExcludedFromSharing(category.isSensitiveData, catalogEntry)) return undefined;
-  return catalogEntry.key;
+  if (!catalogEntry || isExcludedFromSharing(category.isSensitiveData, catalogEntry)) return undefined;
+  return catalogEntry.key ?? `catalogo:${catalogEntry.id}`;
 }
 
 async function findOwn(experienceRepository: ExperienceRepository, userId: string, experienceId: string): Promise<Experience | undefined> {

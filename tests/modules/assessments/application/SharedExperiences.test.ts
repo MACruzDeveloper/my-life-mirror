@@ -11,13 +11,15 @@ import { InMemoryExperienceRepository } from "@modules/assessments/infrastructur
 import { createListCategories } from "@modules/categories/application/ListCategories";
 import { InMemoryCategoryCatalogRepository } from "@modules/categories/infrastructure/InMemoryCategoryCatalogRepository";
 import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/InMemoryCategoryRepository";
+import type { CatalogCategory } from "@modules/categories/domain/CatalogCategory";
 import type { Clock } from "@shared/domain/Clock";
 
-async function setup() {
+async function setup({ extraCatalogCategory }: { extraCatalogCategory?: CatalogCategory } = {}) {
   let now = new Date("2026-10-05T10:00:00Z");
   const clock: Clock = { now: () => now };
   const categoryRepository = new InMemoryCategoryRepository();
   const catalog = new InMemoryCategoryCatalogRepository();
+  if (extraCatalogCategory) await catalog.save(extraCatalogCategory);
   const listCategories = createListCategories(categoryRepository, catalog);
   for (const userId of ["autora", "lectora", "otra"]) await listCategories(userId);
   const categoryOf = async (userId: string, name: string) => (await categoryRepository.findByUserId(userId)).find((category) => category.name === name)!;
@@ -107,6 +109,33 @@ describe("compartir una experiencia (RF-43)", () => {
     const result = await share({ userId: "autora", experienceId: saved.id, locale: "es" });
 
     expect(result.ok && result.value.sharedCategoryKey).toBe("deporte");
+  });
+
+  // Fallo real (12 oct.): "Idiomas", añadida desde administración, no tiene clave de catálogo, y la
+  // app la dejaba fuera de compartir sin decir nada. Con 8 no aparecía ni el aviso ni el botón.
+  it("una categoría añadida desde administración (sin clave) también se puede compartir, y otra persona la lee", async () => {
+    const languages: CatalogCategory = { id: "catalogo-idiomas", translations: { es: { name: "Idiomas", description: "Aprender y practicar idiomas." } }, isSensitiveData: false };
+    const { share, listShared, experience, categoryOf } = await setup({ extraCatalogCategory: languages });
+    const saved = await experience("autora", "Idiomas", "Veo series en versión original con subtítulos", 8);
+
+    const result = await share({ userId: "autora", experienceId: saved.id, locale: "es" });
+
+    expect(result.ok).toBe(true);
+    const read = await listShared({ userId: "lectora", categoryId: (await categoryOf("lectora", "Idiomas")).id, locale: "es" });
+    expect(read).toEqual({ ok: true, value: [{ id: saved.id, text: "Veo series en versión original con subtítulos" }] });
+    // Y no se mezcla con las de otra categoría.
+    const other = await listShared({ userId: "lectora", categoryId: (await categoryOf("lectora", "Economía")).id, locale: "es" });
+    expect(other).toEqual({ ok: true, value: [] });
+  });
+
+  it("una categoría sensible añadida desde administración sigue sin poder compartirse", async () => {
+    const health: CatalogCategory = { id: "catalogo-salud", translations: { es: { name: "Salud", description: "Cómo te encuentras." } }, isSensitiveData: true };
+    const { share, experience } = await setup({ extraCatalogCategory: health });
+    const saved = await experience("autora", "Salud", "Duermo mejor desde que ceno pronto", 9);
+
+    const result = await share({ userId: "autora", experienceId: saved.id, locale: "es" });
+
+    expect(!result.ok && result.error).toMatchObject({ code: "NOT_SHAREABLE", reason: "category" });
   });
 
   it("una experiencia reportada no se puede volver a compartir", async () => {

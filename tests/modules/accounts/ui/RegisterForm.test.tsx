@@ -68,17 +68,27 @@ describe("RegisterForm (RF-01)", () => {
   });
 
   describe("contraseña fuerte (SEC-01)", () => {
-    it("enseña los requisitos desde el principio, antes de escribir nada", () => {
+    it("los requisitos están plegados: se ven al pulsar el botón de información y se vuelven a ocultar", () => {
       renderForm();
+      expect(screen.queryByRole("list", { name: /tu contraseña necesita/i })).not.toBeInTheDocument();
+
+      const infoButton = screen.getByRole("button", { name: "Requisitos de la contraseña" });
+      expect(infoButton).toHaveAttribute("aria-expanded", "false");
+      fireEvent.click(infoButton);
 
       const requirements = within(screen.getByRole("list", { name: /tu contraseña necesita/i }));
       expect(requirements.getAllByRole("listitem")).toHaveLength(5);
       expect(requirements.getByText(/entre 12 y 72 caracteres/i)).toBeInTheDocument();
       expect(requirements.getByText(/un símbolo/i)).toBeInTheDocument();
+      expect(infoButton).toHaveAttribute("aria-expanded", "true");
+
+      fireEvent.click(infoButton);
+      expect(screen.queryByRole("list", { name: /tu contraseña necesita/i })).not.toBeInTheDocument();
     });
 
-    it("marca cada requisito según se va cumpliendo", () => {
+    it("abiertos, marca cada requisito según se va cumpliendo", () => {
       renderForm();
+      fireEvent.click(screen.getByRole("button", { name: "Requisitos de la contraseña" }));
 
       fireEvent.change(screen.getByLabelText(/^contraseña/i), { target: { value: "bici" } });
 
@@ -86,7 +96,7 @@ describe("RegisterForm (RF-01)", () => {
       expect(screen.getByText(/una letra mayúscula/i).closest("li")).toHaveAttribute("data-state", "pending");
     });
 
-    it("con 'Test1234!' no envía nada y dice qué falla, también lo previsible", async () => {
+    it("con 'Test1234!' no envía nada, abre los requisitos y dice qué falla, también lo previsible", async () => {
       const fetchMock = vi.fn();
       vi.stubGlobal("fetch", fetchMock);
       renderForm();

@@ -19,6 +19,10 @@ export interface Profile {
   readonly timeZone?: string;
   /** RF-26: clave de un avatar publicado del catálogo; sin valor, el dibujo genérico. */
   readonly avatarKey?: string;
+  /** RF-46: clave de una profesión de la lista cerrada (`profileInterests.ts`). */
+  readonly occupation?: string;
+  /** RF-46: claves de aficiones de la lista cerrada; sin valor si no marcó ninguna. */
+  readonly hobbies?: readonly string[];
   /** RF-40: ideas personalizadas con IA, activadas por el propio usuario (desactivadas por defecto). */
   readonly aiIdeasEnabled?: boolean;
   /** Cuándo las activó (ISO), como constancia del consentimiento; sin valor si están desactivadas. */

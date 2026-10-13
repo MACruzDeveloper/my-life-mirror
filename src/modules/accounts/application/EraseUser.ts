@@ -1,6 +1,8 @@
 import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
+import type { EventRepository } from "#modules/agenda/domain/UserEvent.js";
+import type { IdeaReactionRepository } from "#modules/recommendations/domain/IdeaReaction.js";
 import type { ExperienceRepository } from "#modules/assessments/domain/Experience.js";
 import type { RecommendationRepository } from "#modules/recommendations/domain/RecommendationRepository.js";
 import type { ConsentRepository } from "#modules/consent/domain/ConsentRepository.js";
@@ -17,6 +19,10 @@ export interface EraseUserDependencies {
   /** RF-40: las ideas personalizadas (en la base también caen en cascada; aquí se borran explícitamente, como el resto). */
   personalizedIdeaRepository: PersonalizedIdeaRepository;
   experienceRepository: ExperienceRepository;
+  /** RF-19: lo que decidió sobre cada idea (guardada, hecha, descartada). */
+  ideaReactionRepository: IdeaReactionRepository;
+  /** RF-48: sus eventos del calendario. */
+  eventRepository: EventRepository;
 }
 
 /**
@@ -27,9 +33,11 @@ export interface EraseUserDependencies {
  * camino se puede repetir (todos los pasos son repetibles) y nunca quedan
  * datos huérfanos sin una cuenta que pueda pedir su borrado.
  */
-export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }: EraseUserDependencies) {
+export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository }: EraseUserDependencies) {
   return async function eraseUser(userId: string): Promise<void> {
     await personalizedIdeaRepository.deleteByUserId(userId);
+    await ideaReactionRepository.deleteByUserId(userId);
+    await eventRepository.deleteByUserId(userId);
     await experienceRepository.deleteByUserId(userId);
     await recommendationRepository.deleteByUserId(userId);
     await assessmentRepository.deleteByUserId(userId);

@@ -10,6 +10,9 @@ export interface ProfileResponse {
   timeZone?: string;
   /** RF-26: clave del avatar elegido del catálogo. */
   avatarKey?: string;
+  /** RF-46: claves de la profesión y las aficiones, de las listas cerradas. */
+  occupation?: string;
+  hobbies?: string[];
   /** RF-40: ideas personalizadas con IA activadas por el usuario. */
   aiIdeasEnabled?: boolean;
   /** RF-45: sugerencias de la IA a partir de las experiencias, activadas por el usuario. */
