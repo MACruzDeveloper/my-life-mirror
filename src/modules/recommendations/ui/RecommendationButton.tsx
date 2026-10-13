@@ -32,6 +32,7 @@ import type { IdeaReactionKind } from "../domain/IdeaReaction";
 import { allowedTemplateKeys } from "../domain/ideaSituations";
 import { templateKeysFor } from "../domain/recommendationCatalog";
 import { type IdeaReactionDto, useIdeaReactions, useSetIdeaReaction, visibleIdeaKeys } from "./ideaReactions";
+import { IdeaPlan } from "./IdeaPlan";
 import { usePersonalizedIdea } from "./queries";
 
 /** Tono "idea" amarillo suave: destaca sin sonar a aviso ni a error (RN-04, RES-07). */
@@ -190,7 +191,10 @@ function IdeaCarouselForCategory(props: IdeaContentProps & { categoryId: string 
   }
   const categories = categoriesQuery.data;
   const difficultyTags = (Array.isArray(categories) ? categories.find((category) => category.id === props.categoryId)?.difficultyTags : undefined) ?? [];
-  const reactions: IdeaReactions = { list: Array.isArray(reactionsQuery.data) ? reactionsQuery.data : [], set: (templateKey, reaction) => setIdeaReaction(props.categoryId, templateKey, reaction) };
+  // Los botones salen con las reacciones ya cargadas: un "Me gusta" pulsado antes lo pisaba la respuesta de esa carga (fallo visto en el E2E de móvil).
+  const reactions: IdeaReactions | undefined = reactionsQuery.isPending
+    ? undefined
+    : { list: Array.isArray(reactionsQuery.data) ? reactionsQuery.data : [], set: (templateKey, reaction, plannedFor) => setIdeaReaction(props.categoryId, templateKey, reaction, plannedFor) };
   return <IdeaCarousel {...props} difficultyTags={difficultyTags} shared={Array.isArray(sharedQuery.data) ? sharedQuery.data : []} reactions={reactions} />;
 }
 
@@ -199,7 +203,7 @@ type IdeaTab = "app" | "ai" | "others";
 /** RF-19: las reacciones del usuario y cómo cambiar la de una idea. Solo cuando el carrusel es de una categoría suya. */
 interface IdeaReactions {
   list: readonly IdeaReactionDto[];
-  set: (templateKey: string, reaction: IdeaReactionKind | null) => Promise<boolean>;
+  set: (templateKey: string, reaction: IdeaReactionKind | null, plannedFor?: string | null) => Promise<boolean>;
 }
 
 function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId, categoryKey, personalize = false, difficultyTags, shared, reactions }: IdeaContentProps & { difficultyTags: readonly string[]; shared: SharedExperienceDto[]; reactions?: IdeaReactions }) {
@@ -225,11 +229,12 @@ function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId,
   const hiddenBySituations = Math.max(templateKeysFor(catalogKeyOf(templateKey, categoryKey)).length - allKeys.length, 0);
   const discardedCount = allKeys.length - keys.length;
   const [savedNotice, setSavedNotice] = useState<string>();
-  const isSaved = ownReactions.some((reaction) => reaction.categoryId === categoryId && reaction.templateKey === currentKey && reaction.reaction === "saved");
+  const savedReaction = ownReactions.find((reaction) => reaction.categoryId === categoryId && reaction.templateKey === currentKey && reaction.reaction === "saved");
+  const isSaved = savedReaction !== undefined;
 
-  async function react(key: string, reaction: IdeaReactionKind | null) {
+  async function react(key: string, reaction: IdeaReactionKind | null, plannedFor?: string | null) {
     if (!reactions) return;
-    setReactionFailed(!(await reactions.set(key, reaction)));
+    setReactionFailed(!(await reactions.set(key, reaction, plannedFor)));
   }
 
   async function like() {
@@ -268,6 +273,8 @@ function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId,
       ) : (
         isSaved && savedNotice === currentKey && <Typography variant="body2">{t("recomendaciones.ideaGuardada")}</Typography>
       )}
+      {/* RF-47: una fecha orientativa para la guardada; recién guardada, la pregunta sale abierta. */}
+      {isSaved && <IdeaPlan key={`${currentKey}-${savedNotice === currentKey}`} plannedFor={savedReaction.plannedFor} defaultOpen={savedNotice === currentKey && !savedReaction.plannedFor} onChange={(plannedFor) => void react(currentKey, "saved", plannedFor)} />}
     </Box>
   );
 

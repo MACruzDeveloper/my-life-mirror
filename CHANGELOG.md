@@ -5,6 +5,19 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-46, RF-47 y RF-48: perfil, fecha para una idea y calendario)
+
+- **Profesión y aficiones en "Mi perfil" (RF-46):** opcionales y de listas cerradas, nunca texto libre. Con las ideas con IA activadas, se usan para adaptar la redacción; nunca en categorías sensibles. Al cambiarlas, las ideas ya personalizadas se rehacen. **Migración 0025.**
+- **Una fecha orientativa para una idea guardada (RF-47):** al pulsar "Me gusta" la app pregunta "¿Cuándo te apetece probarla?" (en una semana, en un mes, otra fecha o sin fecha). En Inicio, las ideas guardadas salen por fecha. Sin avisos fuera de la app. **Migración 0026** (después de la 0024).
+- **Eventos propios y calendario (RF-48):** pantalla "Calendario" en Mi perfil, con la vista de un mes, los días con eventos o ideas con fecha marcados y un formulario para añadir eventos (título, día y, si se quiere, varias categorías). En Inicio, "Próximamente" y, desde el día de un evento con categorías, una invitación a revisar la nota (la puntuación nunca cambia sola; el formulario lo explica). **Migraciones 0027 y 0028.**
+- Eventos y fechas entran en la exportación de datos y se borran con la cuenta.
+- `api/agenda/[action].ts` es la **duodécima función**: el plan Hobby no admite más.
+
+### Corregido
+
+- Dos peticiones simultáneas de una cuenta recién creada podían chocar al crearle sus categorías y una acababa en error: la escritura se repite cuando pasa.
+- Un "Me gusta" pulsado nada más abrirse la ventana de ideas podía perderse en pantalla (lo pisaba la carga de las reacciones): los botones salen ya con las reacciones cargadas.
+
 ### Añadido (RF-19, guardar ideas)
 
 - En la ventana de ideas, cada idea lleva **"Me gusta"** (la guarda y lo dice) y **"No me gusta"** (deja de salir en esa categoría; se pueden recuperar). La ventana es más ancha, con la misma altura en todas las pestañas, y pestañas y flechas con aspecto de botón; explica cuántas ideas no se ven y por qué.

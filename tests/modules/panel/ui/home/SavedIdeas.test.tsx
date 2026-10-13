@@ -62,6 +62,47 @@ describe("Tus ideas guardadas (RF-19)", () => {
 
     await waitFor(() => expect(container).toBeEmptyDOMElement());
   });
+
+  describe("fecha orientativa (RF-47)", () => {
+    it("salen por fecha, las que no tienen al final, y cada una enseña la suya", async () => {
+      stubReactions([reaction("c1", "economia.2", "saved"), { ...reaction("c2", "familia.1", "saved"), plannedFor: "2026-11-20" }, { ...reaction("c1", "economia.3", "saved"), plannedFor: "2026-10-20" }]);
+
+      render(withClient(<SavedIdeas categoryNames={NAMES} />));
+
+      const items = within(await screen.findByRole("region", { name: /tus ideas guardadas/i })).getAllByRole("listitem");
+      expect(items.map((item) => item.querySelector("[data-planned-for]")?.getAttribute("data-planned-for") ?? null)).toEqual(["2026-10-20", "2026-11-20", null]);
+      expect(items[0]).toHaveTextContent(/para el 20 de octubre/i);
+    });
+
+    it("se le puede poner fecha desde aquí: 'En una semana' la envía con la idea guardada", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date(2026, 9, 13, 12));
+      const fetchMock = stubReactions([reaction("c1", "economia.2", "saved")]);
+      render(withClient(<SavedIdeas categoryNames={NAMES} />));
+
+      fireEvent.click(await screen.findByRole("button", { name: /poner fecha/i }));
+      fireEvent.click(screen.getByRole("button", { name: "En una semana" }));
+
+      await waitFor(() => expect(fetchMock.mock.calls.some(([, init]) => init?.method === "POST")).toBe(true));
+      const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST")!;
+      expect(JSON.parse(post[1]!.body as string)).toEqual({ categoryId: "c1", templateKey: "economia.2", reaction: "saved", plannedFor: "2026-10-20" });
+      expect(await screen.findByText(/para el 20 de octubre/i)).toBeInTheDocument();
+      vi.useRealTimers();
+    });
+
+    it("'Sin fecha' la quita y la idea sigue guardada", async () => {
+      const fetchMock = stubReactions([{ ...reaction("c1", "economia.2", "saved"), plannedFor: "2026-10-20" }]);
+      render(withClient(<SavedIdeas categoryNames={NAMES} />));
+
+      fireEvent.click(await screen.findByRole("button", { name: /cambiar fecha/i }));
+      fireEvent.click(screen.getByRole("button", { name: "Sin fecha" }));
+
+      await waitFor(() => expect(screen.queryByText(/para el 20 de octubre/i)).not.toBeInTheDocument());
+      const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST")!;
+      expect(JSON.parse(post[1]!.body as string)).toEqual({ categoryId: "c1", templateKey: "economia.2", reaction: "saved", plannedFor: null });
+      expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    });
+  });
 });
 
 describe("ideas del carrusel sin las descartadas (RF-19)", () => {

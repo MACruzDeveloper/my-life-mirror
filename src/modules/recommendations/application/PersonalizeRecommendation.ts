@@ -113,6 +113,8 @@ export function createPersonalizeRecommendation(deps: Dependencies) {
       score: scores[0],
       trend: trendOf(scores),
       helpfulThings: ideaTexts.experienceLabels(experienceTags, locale),
+      // RF-46: lo que dijo de sí en el perfil, con el texto de la lista cerrada.
+      ...ideaTexts.profileLabels(profile, locale),
       candidates,
     };
 

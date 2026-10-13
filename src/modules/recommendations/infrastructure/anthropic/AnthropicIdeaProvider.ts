@@ -8,6 +8,11 @@ const DraftSchema = z.object({ text: z.string() });
 const ReviewSchema = z.object({ approved: z.boolean(), reasons: z.array(z.string()) });
 const SuggestionSchema = z.object({ helps: z.array(z.string()), difficulties: z.array(z.string()) });
 
+/** RF-46: profesión y aficiones del perfil, solo si las indicó. Vienen de listas cerradas, no de texto suyo. */
+function aboutUser(request: IdeaRequest): { occupation?: string; hobbies?: string[] } {
+  return { ...(request.occupation ? { occupation: request.occupation } : {}), ...(request.hobbies && request.hobbies.length > 0 ? { hobbies: request.hobbies } : {}) };
+}
+
 /**
  * RF-40b: el escritor real. Reescribe la idea candidata (una: la que el usuario
  * está viendo). La clave de la idea no la decide el modelo: es la de la
@@ -34,6 +39,7 @@ export class AnthropicIdeaWriter implements IdeaWriter {
         score: request.score,
         trend: request.trend,
         helpfulThings: request.helpfulThings,
+        ...aboutUser(request),
         idea: candidate.text,
       }),
       schema: DraftSchema,
@@ -55,7 +61,7 @@ export class AnthropicIdeaReviewer implements IdeaReviewer {
     return this.llm.ask({
       system: REVIEWER_SYSTEM,
       // Con lo que le ayuda: sin ello, el revisor tomaba "ya que caminar te sienta bien" por un dato inventado (evaluación del 11 oct.).
-      user: JSON.stringify({ language: LANGUAGE_NAMES[request.locale], originalIdea: original?.text ?? "", helpfulThings: request.helpfulThings, draft: draft.text }),
+      user: JSON.stringify({ language: LANGUAGE_NAMES[request.locale], originalIdea: original?.text ?? "", helpfulThings: request.helpfulThings, ...aboutUser(request), draft: draft.text }),
       schema: ReviewSchema,
     });
   }

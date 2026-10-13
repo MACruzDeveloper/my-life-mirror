@@ -3,7 +3,8 @@ import type { Locale } from "#shared/domain/locales.js";
 /**
  * RF-40. Contratos de la personalización de ideas (ver la historia RF-40, Nivel 3).
  * La petición lleva solo lo necesario: nunca nombre, email, ids, notas ni la
- * experiencia privada del usuario, ni nada de categorías sensibles.
+ * experiencia privada del usuario, ni nada de categorías sensibles. Todo lo que
+ * describe a la persona sale de listas cerradas (RF-41, RF-46), nunca de texto suyo.
  */
 export const IDEA_TRENDS = ["first", "up", "down", "steady"] as const;
 export type IdeaTrend = (typeof IDEA_TRENDS)[number];
@@ -21,6 +22,10 @@ export interface IdeaRequest {
   trend: IdeaTrend;
   /** Textos de las opciones de RF-41 marcadas, ya en `locale`. */
   helpfulThings: string[];
+  /** RF-46: su profesión, de la lista cerrada del perfil, ya en `locale`; sin valor si no la indicó. */
+  occupation?: string;
+  /** RF-46: sus aficiones, de la lista cerrada del perfil, ya en `locale`. */
+  hobbies?: string[];
   /** Ideas del catálogo curado de la categoría, en `locale`: la IA solo puede elegir y reescribir una. */
   candidates: IdeaCandidate[];
 }

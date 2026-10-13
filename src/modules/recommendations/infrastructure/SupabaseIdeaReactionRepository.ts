@@ -8,10 +8,11 @@ interface IdeaReactionRow {
   template_key: string;
   reaction: string;
   reacted_at: string;
+  planned_for: string | null;
 }
 
 /**
- * Adaptador real (migración 0024). Sin test propio: solo mapea filas, como el
+ * Adaptador real (migraciones 0024 y 0026). Sin test propio: solo mapea filas, como el
  * resto de adaptadores Supabase.
  */
 export class SupabaseIdeaReactionRepository implements IdeaReactionRepository {
@@ -22,15 +23,15 @@ export class SupabaseIdeaReactionRepository implements IdeaReactionRepository {
   }
 
   async findByUserId(userId: string): Promise<IdeaReaction[]> {
-    const { data, error } = await this.client.from("idea_reactions").select("user_id, category_id, template_key, reaction, reacted_at").eq("user_id", userId);
+    const { data, error } = await this.client.from("idea_reactions").select("user_id, category_id, template_key, reaction, reacted_at, planned_for").eq("user_id", userId);
     if (error) throw new Error(`No se pudieron leer las reacciones a las ideas: ${error.message}`);
-    return (data as IdeaReactionRow[]).map((row) => ({ userId: row.user_id, categoryId: row.category_id, templateKey: row.template_key, reaction: row.reaction as IdeaReactionKind, reactedAt: new Date(row.reacted_at) }));
+    return (data as IdeaReactionRow[]).map((row) => ({ userId: row.user_id, categoryId: row.category_id, templateKey: row.template_key, reaction: row.reaction as IdeaReactionKind, reactedAt: new Date(row.reacted_at), ...(row.planned_for ? { plannedFor: row.planned_for } : {}) }));
   }
 
   async save(reaction: IdeaReaction): Promise<void> {
     const { error } = await this.client
       .from("idea_reactions")
-      .upsert({ user_id: reaction.userId, category_id: reaction.categoryId, template_key: reaction.templateKey, reaction: reaction.reaction, reacted_at: reaction.reactedAt.toISOString() });
+      .upsert({ user_id: reaction.userId, category_id: reaction.categoryId, template_key: reaction.templateKey, reaction: reaction.reaction, reacted_at: reaction.reactedAt.toISOString(), planned_for: reaction.plannedFor ?? null });
     if (error) throw new Error(`No se pudo guardar la reacción a la idea: ${error.message}`);
   }
 

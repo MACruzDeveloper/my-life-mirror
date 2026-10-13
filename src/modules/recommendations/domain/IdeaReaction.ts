@@ -1,3 +1,5 @@
+import { isIsoDay, isoDayFrom } from "#shared/domain/isoDay.js";
+
 /**
  * RF-19: lo que una persona decide sobre una idea del carrusel. Son las tres
  * salidas del requisito, aplicadas a cada idea: guardarla para después
@@ -17,6 +19,19 @@ export interface IdeaReaction {
   readonly templateKey: string;
   readonly reaction: IdeaReactionKind;
   readonly reactedAt: Date;
+  /** RF-47: día orientativo ("AAAA-MM-DD") para probar una idea guardada; nunca un plazo. */
+  readonly plannedFor?: string;
+}
+
+/** Hasta cuándo se puede fechar una idea: un año vista. */
+const MAX_PLAN_DAYS_AHEAD = 366;
+
+/**
+ * RF-47: una fecha vale si es un día real, de hoy a un año. "Hoy" admite un
+ * día de margen: el servidor cuenta en UTC y la persona, en su zona horaria.
+ */
+export function isValidPlanDate(value: string, now: Date): boolean {
+  return isIsoDay(value) && value >= isoDayFrom(now, -1) && value <= isoDayFrom(now, MAX_PLAN_DAYS_AHEAD);
 }
 
 /** Puerto — ADR-03 apartado 3.3. */

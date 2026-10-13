@@ -13,7 +13,10 @@ export class FakeIdeaWriter implements IdeaWriter {
     // Todas las opciones marcadas: así se nota cuando cambian y la idea se reescribe (RF-40 v1.1).
     const helpful = request.helpfulThings.map((thing) => (request.locale === "es" ? `«${thing.toLowerCase()}»` : `"${thing.toLowerCase()}"`)).join(", ");
     const lead = helpful ? (request.locale === "es" ? `Ya que te ayuda ${helpful}: ` : `Since ${helpful} helps you: `) : "";
-    return { templateKey: candidate.templateKey, text: `${lead}${candidate.text}` };
+    // RF-46: y lo que dijo en su perfil, para que en local se vea que llega.
+    const about = [request.occupation, ...(request.hobbies ?? [])].filter((value) => value !== undefined).map((value) => value.toLowerCase()).join(", ");
+    const tail = about ? (request.locale === "es" ? ` (Pensada para tu perfil: ${about}.)` : ` (With your profile in mind: ${about}.)`) : "";
+    return { templateKey: candidate.templateKey, text: `${lead}${candidate.text}${tail}` };
   }
 }
 

@@ -11,6 +11,7 @@ import type { LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
+import { AgendaSummary } from "./AgendaSummary";
 import { CheckInReminder } from "./CheckInReminder";
 import { DashboardGuide } from "./DashboardGuide";
 import { IdeasSummary } from "./IdeasSummary";
@@ -50,6 +51,7 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
   const displayedScores = latestScores.map((latestScore) => ({ ...latestScore, categoryName: categoryLabel(latestScore.catalogId).name }));
 
   if (labelsPending) return <ChartsFallback />;
+  const categoryNames = Object.fromEntries(displayedScores.map((latestScore) => [latestScore.categoryId, latestScore.categoryName]));
 
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", mt: 3, px: 2, display: "flex", flexDirection: "column", gap: 2 }}>
@@ -57,12 +59,18 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
         <Typography variant="h5" component="h1">
           {t("panel.bienvenida")}
         </Typography>
-        <Button component={RouterLink} to="/perfil/entrevista" variant="contained">
-          {t("entrevista.actualizarRespuestas")}
-        </Button>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+          <Button component={RouterLink} to="/perfil/calendario" variant="outlined">
+            {t("cuenta.calendario")}
+          </Button>
+          <Button component={RouterLink} to="/perfil/entrevista" variant="contained">
+            {t("entrevista.actualizarRespuestas")}
+          </Button>
+        </Box>
       </Box>
       <DashboardGuide />
-      <SavedIdeas categoryNames={Object.fromEntries(displayedScores.map((latestScore) => [latestScore.categoryId, latestScore.categoryName]))} />
+      <AgendaSummary categoryNames={categoryNames} />
+      <SavedIdeas categoryNames={categoryNames} />
       <CheckInReminder latestScores={displayedScores} />
       <IdeasSummary
         personalize={personalize}

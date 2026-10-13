@@ -178,6 +178,20 @@ describe("RecommendationButton (RF-18)", () => {
       expect(reactionBodies()).toEqual([{ categoryId: "c1", templateKey: "economia.1", reaction: "saved" }]);
     });
 
+    it("RF-47: tras 'Me gusta' pregunta cuándo apetece probarla, y elegir una opción guarda la fecha", async () => {
+      const { dialog, reactionBodies } = openWithReactions();
+      expect(within(dialog).queryByText(/cuándo te apetece probarla/i)).not.toBeInTheDocument();
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "Me gusta" }));
+      expect(await within(dialog).findByText(/cuándo te apetece probarla/i)).toBeInTheDocument();
+      fireEvent.click(within(dialog).getByRole("button", { name: "En un mes" }));
+
+      await waitFor(() => expect(reactionBodies()).toHaveLength(2));
+      expect(reactionBodies()[1]).toMatchObject({ categoryId: "c1", templateKey: "economia.1", reaction: "saved" });
+      expect(reactionBodies()[1].plannedFor).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(await within(dialog).findByText(/^para el /i)).toBeInTheDocument();
+    });
+
     it("'No me gusta' la quita del carrusel, dice cuántas hay apartadas y deja recuperarlas", async () => {
       const { dialog } = openWithReactions();
 
@@ -194,6 +208,25 @@ describe("RecommendationButton (RF-18)", () => {
 
       expect(within(dialog).getByText("Idea 1 de 3")).toBeInTheDocument();
       expect(within(dialog).getByText(/hay 2 ideas más que no se muestran/i)).toBeInTheDocument();
+    });
+
+    it("los botones no salen hasta tener las reacciones: una pulsación temprana no la puede pisar la carga", async () => {
+      let deliver: () => void = () => {};
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) => (url === "/api/recommendations/reactions" ? new Promise((resolve) => (deliver = () => resolve({ ok: true, json: async () => [] }))) : Promise.resolve({ ok: true, json: async () => [] }))),
+      );
+      const client = createTestClient();
+      client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false }]);
+      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
+      const dialog = screen.getByRole("dialog");
+
+      expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
+      expect(within(dialog).queryByRole("button", { name: "Me gusta" })).not.toBeInTheDocument();
+      deliver();
+
+      expect(await within(dialog).findByRole("button", { name: "Me gusta" })).toBeInTheDocument();
     });
 
     it("una idea suelta, sin categoría detrás, no ofrece reacciones", () => {

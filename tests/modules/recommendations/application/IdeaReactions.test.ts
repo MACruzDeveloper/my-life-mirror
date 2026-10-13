@@ -88,4 +88,64 @@ describe("reacciones a una idea: guardar, hecha, descartar (RF-19)", () => {
 
     expect(listed.ok && listed.value.map((reaction) => reaction.templateKey)).toEqual(["familia.3", "economia.1"]);
   });
+
+  describe("una fecha orientativa para una idea guardada (RF-47)", () => {
+    it("se guarda con la idea y sale en la lista", async () => {
+      const { setReaction, listReactions, categoryOf } = await setup();
+      const economy = await categoryOf("ana", "Economía");
+
+      const result = await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved", plannedFor: "2026-10-19" });
+
+      expect(result.ok).toBe(true);
+      const listed = await listReactions("ana");
+      expect(listed.ok && listed.value).toEqual([{ categoryId: economy.id, templateKey: "economia.2", reaction: "saved", reactedAt: new Date("2026-10-12T10:00:00Z"), plannedFor: "2026-10-19" }]);
+    });
+
+    it("ponerle fecha a una ya guardada no cambia cuándo se guardó; `null` quita la fecha y la idea sigue guardada", async () => {
+      const { setReaction, listReactions, categoryOf, advance } = await setup();
+      const economy = await categoryOf("ana", "Economía");
+      await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved" });
+      advance(new Date("2026-10-13T10:00:00Z"));
+
+      await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved", plannedFor: "2026-11-01" });
+      let listed = await listReactions("ana");
+      expect(listed.ok && listed.value[0]).toMatchObject({ reactedAt: new Date("2026-10-12T10:00:00Z"), plannedFor: "2026-11-01" });
+
+      await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved", plannedFor: null });
+      listed = await listReactions("ana");
+      expect(listed.ok && listed.value).toEqual([{ categoryId: economy.id, templateKey: "economia.2", reaction: "saved", reactedAt: new Date("2026-10-12T10:00:00Z") }]);
+    });
+
+    it("volver a guardarla sin decir nada de la fecha la conserva", async () => {
+      const { setReaction, listReactions, categoryOf } = await setup();
+      const economy = await categoryOf("ana", "Economía");
+      await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved", plannedFor: "2026-10-19" });
+
+      await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved" });
+
+      const listed = await listReactions("ana");
+      expect(listed.ok && listed.value[0].plannedFor).toBe("2026-10-19");
+    });
+
+    it("rechaza una fecha pasada, de más de un año o mal escrita; hoy vale", async () => {
+      const { setReaction, categoryOf } = await setup();
+      const economy = await categoryOf("ana", "Economía");
+      const withDate = (plannedFor: string) => setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved", plannedFor });
+
+      for (const invalid of ["2026-10-01", "2027-10-20", "19/10/2026", "2026-02-30", "mañana"]) expect((await withDate(invalid)).ok, invalid).toBe(false);
+      expect((await withDate("2026-10-12")).ok).toBe(true);
+    });
+
+    it("la fecha es de una idea guardada: con 'hecha' o 'descartada' se rechaza, y al marcarla hecha la fecha desaparece", async () => {
+      const { setReaction, listReactions, categoryOf } = await setup();
+      const economy = await categoryOf("ana", "Economía");
+
+      expect((await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.1", reaction: "discarded", plannedFor: "2026-10-19" })).ok).toBe(false);
+
+      await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "saved", plannedFor: "2026-10-19" });
+      await setReaction({ userId: "ana", categoryId: economy.id, templateKey: "economia.2", reaction: "done" });
+      const listed = await listReactions("ana");
+      expect(listed.ok && listed.value[0].plannedFor).toBeUndefined();
+    });
+  });
 });

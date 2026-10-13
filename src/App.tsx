@@ -13,6 +13,7 @@ import { ProtectedRoute } from '@modules/accounts/ui/ProtectedRoute'
 import { Home } from '@modules/panel/ui/home/Home'
 import { InterviewPage } from '@modules/assessments/ui/InterviewPage'
 import { ResultsPage } from '@modules/assessments/ui/ResultsPage'
+import { CalendarPage } from '@modules/agenda/ui/CalendarPage'
 import { AdminPage } from '@modules/admin/ui/AdminPage'
 import { HelpRoute } from '@modules/wellbeing/ui/HelpPage'
 import { AdminRoute } from '@modules/admin/ui/AdminRoute'
@@ -66,6 +67,7 @@ function App() {
             <Route index element={<ProfileForm />} />
             <Route path="entrevista" element={<InterviewPage />} />
             <Route path="resultados" element={<ResultsPage />} />
+            <Route path="calendario" element={<CalendarPage />} />
             <Route path="datos" element={<DataPrivacyPage />} />
           </Route>
           <Route

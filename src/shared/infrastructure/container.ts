@@ -29,6 +29,10 @@ import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infra
 import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
 import { AnthropicIdeaReviewer, AnthropicIdeaWriter, AnthropicOptionSuggester } from "#modules/recommendations/infrastructure/anthropic/AnthropicIdeaProvider.js";
 import { createAnthropicModel } from "#modules/recommendations/infrastructure/anthropic/AnthropicStructuredModel.js";
+import type { EventRepository } from "#modules/agenda/domain/UserEvent.js";
+import { createAddEvent, createDeleteEvent, createListEvents } from "#modules/agenda/application/Events.js";
+import { InMemoryEventRepository } from "#modules/agenda/infrastructure/InMemoryEventRepository.js";
+import { SupabaseEventRepository } from "#modules/agenda/infrastructure/SupabaseEventRepository.js";
 import type { AttemptLimiter } from "#shared/domain/AttemptLimiter.js";
 import { InMemoryAttemptLimiter, UnlimitedAttemptLimiter } from "#shared/infrastructure/InMemoryAttemptLimiter.js";
 import { SupabaseAttemptLimiter } from "#shared/infrastructure/SupabaseAttemptLimiter.js";
@@ -154,6 +158,12 @@ function createExperienceRepository(environment: Environment): ExperienceReposit
 }
 
 /** RF-19: se escribe desde la ventana de ideas y se lee en Inicio (funciones distintas): base de datos real fuera de los tests. */
+function createEventRepository(environment: Environment): EventRepository {
+  if (environment === "test") return new InMemoryEventRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseEventRepository(url, serviceRoleKey);
+}
+
 function createIdeaReactionRepository(environment: Environment): IdeaReactionRepository {
   if (environment === "test") return new InMemoryIdeaReactionRepository();
   const { url, serviceRoleKey } = supabaseCredentials();
@@ -342,6 +352,9 @@ export interface AppContext {
   recommendationRepository: RecommendationRepository;
   listRecommendations: ReturnType<typeof createListRecommendations>;
   /** RF-19: guardar una idea, darla por hecha o descartarla. */
+  addEvent: ReturnType<typeof createAddEvent>;
+  listEvents: ReturnType<typeof createListEvents>;
+  deleteEvent: ReturnType<typeof createDeleteEvent>;
   setIdeaReaction: ReturnType<typeof createSetIdeaReaction>;
   listIdeaReactions: ReturnType<typeof createListIdeaReactions>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
@@ -359,15 +372,17 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const clock = new SystemClock();
   const consentRepository = createConsentRepository(environment);
   const profileRepository = createProfileRepository(environment);
-  const updateProfile = createUpdateProfile(profileRepository);
   const categoryRepository = createCategoryRepository(environment);
   const categoryCatalogRepository = createCategoryCatalogRepository(environment);
   const checkConsent = createCheckConsent(consentRepository);
   const assessmentRepository = createAssessmentRepository(environment);
-  const registerUser = createRegisterUser(authProvider, updateProfile);
   const recommendationRepository = createRecommendationRepository(environment);
   const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
+  // RF-46: si cambian la profesión o las aficiones, las ideas ya escritas con IA se rehacen.
+  const updateProfile = createUpdateProfile(profileRepository, { onInterestsChanged: (userId) => personalizedIdeaRepository.deleteByUserId(userId) });
+  const registerUser = createRegisterUser(authProvider, updateProfile);
   const ideaReactionRepository = createIdeaReactionRepository(environment);
+  const eventRepository = createEventRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider(environment, clock);
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
@@ -398,15 +413,16 @@ export function createAppContext(environment: Environment = detectEnvironment())
       recommendationRepository,
       personalizedIdeaRepository,
       ideaReactionRepository,
+      eventRepository,
       experienceRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
-    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -450,6 +466,9 @@ export function createAppContext(environment: Environment = detectEnvironment())
     reportSharedExperience: createReportSharedExperience({ experienceRepository, clock }),
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
+    addEvent: createAddEvent({ eventRepository, categoryRepository, clock }),
+    listEvents: createListEvents(eventRepository),
+    deleteEvent: createDeleteEvent(eventRepository),
     setIdeaReaction: createSetIdeaReaction({ ideaReactionRepository, categoryRepository, catalog: categoryCatalogRepository, clock }),
     listIdeaReactions: createListIdeaReactions(ideaReactionRepository),
     aiIdeasAvailable: ideaProvider.writer !== undefined,

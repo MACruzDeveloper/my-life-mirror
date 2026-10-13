@@ -64,6 +64,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-26 | El sistema debe ofrecer al usuario, en su perfil, un catálogo cerrado de avatares predefinidos generados con IA y revisados editorialmente por el equipo (el usuario elige entre las opciones existentes, no genera avatares nuevos), evitando estereotipos culturales, de género o de apariencia. Relacionado con RF-25. | Should |
 | RF-38 | El sistema debe permitir a un usuario recuperar el acceso a su cuenta mediante un enlace de restablecimiento de contraseña enviado a su email, sin necesidad de contactar con soporte. | Should |
 | RF-39 | El sistema debe mostrar una página de inicio (landing) pública con una introducción al proyecto, accesible sin necesidad de autenticarse. | Should |
+| RF-46 | El usuario podrá indicar en su perfil, de forma opcional, su profesión y sus aficiones, eligiéndolas de listas cerradas (nunca texto libre). Si tiene activadas las ideas con IA (RF-40), se usarán para adaptar la redacción de las ideas; nunca en categorías sensibles. | Could |
 
 ### 2.2 Configuración de categorías de vida
 | ID | Descripción | Prioridad |
@@ -103,6 +104,8 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-20 | El sistema debe adaptar las recomendaciones futuras en función de qué recomendaciones ha aceptado o descartado el usuario previamente (personalización básica). | Could |
 | RF-21 | El sistema debe permitir al usuario pedir una recomendación alternativa si la propuesta no le convence. | Could |
 | RF-34 | El sistema debe permitir al usuario consultar el historial completo de sus recomendaciones (en cualquier estado: pendiente de respuesta, hecha, descartada, pospuesta), con filtros por estado, categoría y rango de fechas. | Should |
+| RF-47 | Al guardar una idea (RF-19), el usuario podrá ponerle, de forma opcional, una fecha orientativa para probarla, cambiarla o quitarla. La app la muestra sin presión: sin avisos fuera de la app y sin reproche si la fecha pasa. | Could |
+| RF-48 | El usuario podrá anotar eventos propios (un título, una fecha y, opcionalmente, una categoría) y verlos junto a sus ideas con fecha en un calendario. Pasado un evento con categoría, la app le invitará a revisar su puntuación; nunca la cambiará por él. | Could |
 
 ### 2.6 Notificaciones
 | ID | Descripción | Prioridad |
@@ -220,3 +223,4 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 - **v0.16 (11 oct. 2026)** — RES-01: la entrega pasa a "hacia el 20 de octubre, como máximo el 26" (antes, 31 de octubre, "no negociable"). Aclarado por el autor: no hay sanción por entregar unos días después del 20, y el 26 es el máximo.
 - **v0.17 (11 oct. 2026)** — RF-26: el avatar se elige en el perfil, no durante el registro (decisión del autor: el registro ya pide nombre, email y una contraseña con sus requisitos, y el avatar no hace falta para empezar).
 - **v0.18 (12 oct. 2026)** — RF-19 implementado, aplicado a cada idea del carrusel y no a la recomendación entera: guardar (pospuesta), hecha y "no me sirve" (descartada); ver su [historia](../user-stories/RF-19-guardar-ideas.md). Nueva categoría estándar Salud, sensible (RES-04): se suma a Sexo y Espiritualidad.
+- **v0.19 (13 oct. 2026)** — alcance nuevo, pedido y confirmado por el autor: RF-46 (profesión y aficiones en el perfil, de listas cerradas, para las ideas con IA), RF-47 (fecha orientativa para una idea guardada) y RF-48 (eventos propios y calendario). En RF-48 la puntuación no cambia sola por un evento: la app invita a revisarla (RN-04: la nota la pone la persona).

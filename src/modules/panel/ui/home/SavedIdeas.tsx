@@ -4,13 +4,21 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { useTranslation } from "react-i18next";
-import { useIdeaReactions, useSetIdeaReaction } from "@modules/recommendations/ui/ideaReactions";
+import { IdeaPlan } from "@modules/recommendations/ui/IdeaPlan";
+import { type IdeaReactionDto, useIdeaReactions, useSetIdeaReaction } from "@modules/recommendations/ui/ideaReactions";
+
+/** RF-47: primero las que tienen fecha, de la más próxima a la más lejana; las que no, después, como estaban. */
+function byPlanDate(a: IdeaReactionDto, b: IdeaReactionDto): number {
+  if (a.plannedFor && b.plannedFor) return a.plannedFor.localeCompare(b.plannedFor);
+  return a.plannedFor ? -1 : b.plannedFor ? 1 : 0;
+}
 
 /**
  * RF-19: las ideas que la persona guardó para no olvidarlas, en Inicio. Cada
  * una con su categoría y dos salidas: "Hecha" o "Quitar". Se muestra la idea
  * original del catálogo, en el idioma de la interfaz. Sin ideas guardadas no
- * se pinta nada.
+ * se pinta nada. RF-47: cada una puede llevar una fecha orientativa, y salen
+ * ordenadas por ella.
  */
 export function SavedIdeas({ categoryNames }: { categoryNames: Record<string, string> }) {
   const { t } = useTranslation();
@@ -18,11 +26,11 @@ export function SavedIdeas({ categoryNames }: { categoryNames: Record<string, st
   const reactions = useIdeaReactions().data;
   const setIdeaReaction = useSetIdeaReaction();
   const [failed, setFailed] = useState(false);
-  const saved = (Array.isArray(reactions) ? reactions : []).filter((reaction) => reaction.reaction === "saved");
+  const saved = (Array.isArray(reactions) ? reactions : []).filter((reaction) => reaction.reaction === "saved").sort(byPlanDate);
   if (saved.length === 0) return null;
 
-  async function react(categoryId: string, templateKey: string, reaction: "done" | null) {
-    setFailed(!(await setIdeaReaction(categoryId, templateKey, reaction)));
+  async function react(categoryId: string, templateKey: string, reaction: "saved" | "done" | null, plannedFor?: string | null) {
+    setFailed(!(await setIdeaReaction(categoryId, templateKey, reaction, plannedFor)));
   }
 
   return (
@@ -42,6 +50,7 @@ export function SavedIdeas({ categoryNames }: { categoryNames: Record<string, st
                 {categoryName}
               </Typography>
               <Typography variant="body1">{t(`recomendaciones.plantillas.${idea.templateKey}`, { categoria: categoryName })}</Typography>
+              <IdeaPlan plannedFor={idea.plannedFor} onChange={(plannedFor) => void react(idea.categoryId, idea.templateKey, "saved", plannedFor)} />
               <Box sx={{ display: "flex", gap: 1, mt: 0.75 }}>
                 <Button size="small" variant="outlined" onClick={() => void react(idea.categoryId, idea.templateKey, "done")}>
                   {t("ideasGuardadas.hecha")}

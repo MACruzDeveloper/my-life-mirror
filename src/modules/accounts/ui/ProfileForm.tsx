@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import type { Gender } from "@modules/accounts/domain/Profile";
+import { HOBBIES, MAX_HOBBIES, OCCUPATIONS } from "@modules/accounts/domain/profileInterests";
+import { PERSONALIZED_IDEAS_KEY } from "@modules/recommendations/ui/queries";
 import { PROFILE_KEY, useProfile, type ProfileResponse } from "./queries";
 import { useSession } from "@shared/ui/context/SessionContext";
 import { AvatarPicker } from "./AvatarPicker";
@@ -58,6 +61,13 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
   const [gender, setGender] = useState<Gender | "">(inicial?.gender ?? "");
   const [timeZone, setTimeZone] = useState(inicial?.timeZone ?? DETECTED_TIME_ZONE);
   const [avatarKey, setAvatarKey] = useState(inicial?.avatarKey);
+  const [occupation, setOccupation] = useState(inicial?.occupation ?? "");
+  const [hobbies, setHobbies] = useState<string[]>(inicial?.hobbies ?? []);
+  const hobbiesTitleId = useId();
+
+  function toggleHobby(hobby: string) {
+    setHobbies((current) => (current.includes(hobby) ? current.filter((key) => key !== hobby) : current.length < MAX_HOBBIES ? [...current, hobby] : current));
+  }
   const [formState, setFormState] = useState<FormState>(errorCarga ? { kind: "error", message: errorCarga } : { kind: "listo" });
 
   async function handleSubmit(submitEvent: React.FormEvent) {
@@ -75,6 +85,9 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
           timeZone,
           // RF-26: `null` quita el avatar.
           avatarKey: avatarKey ?? null,
+          // RF-46: `null` quita la profesión; la lista vacía, las aficiones.
+          occupation: occupation || null,
+          hobbies,
         }),
       });
       const data = await response.json();
@@ -88,6 +101,8 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
       // Se guarda el perfil que devuelve el servidor, entero: construirlo aquí con los campos
       // del formulario borraba de la caché lo que este formulario no toca (la elección de IA).
       queryClient.setQueryData<ProfileResponse | null>(PROFILE_KEY, data as ProfileResponse);
+      // RF-46: el servidor borra las ideas escritas con el perfil anterior; aquí, las de la caché.
+      queryClient.removeQueries({ queryKey: PERSONALIZED_IDEAS_KEY });
       setFormState({ kind: "guardado" });
       // El Header lee name/email de SessionContext, no de este formulario —
       // sin esto seguiría mostrando lo de antes hasta navegar fuera y volver.
@@ -140,6 +155,40 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
           disableClearable
           renderInput={(params) => <TextField {...params} label={t("perfil.zonaHoraria")} required />}
         />
+        <TextField select label={t("perfil.profesion")} value={occupation} onChange={(e) => setOccupation(e.target.value)} fullWidth>
+          <MenuItem value="">{t("perfil.profesionSinEspecificar")}</MenuItem>
+          {OCCUPATIONS.map((key) => (
+            <MenuItem key={key} value={key}>
+              {t(`perfil.ocupaciones.${key}`)}
+            </MenuItem>
+          ))}
+        </TextField>
+        <Box role="group" aria-labelledby={hobbiesTitleId}>
+          <Typography id={hobbiesTitleId} variant="subtitle2" component="h2">
+            {t("perfil.aficionesTitulo")}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" component="p" sx={{ mb: 1 }}>
+            {t("perfil.aficionesAyuda", { max: MAX_HOBBIES })}
+          </Typography>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {HOBBIES.map((key) => {
+              const selected = hobbies.includes(key);
+              return (
+                <Chip
+                  key={key}
+                  label={t(`perfil.aficiones.${key}`)}
+                  component="button"
+                  type="button"
+                  aria-pressed={selected}
+                  disabled={!selected && hobbies.length >= MAX_HOBBIES}
+                  color={selected ? "primary" : "default"}
+                  variant={selected ? "filled" : "outlined"}
+                  onClick={() => toggleHobby(key)}
+                />
+              );
+            })}
+          </Box>
+        </Box>
         <AvatarPicker value={avatarKey} onChange={setAvatarKey} keys={avatarKeys} />
         <Button type="submit" variant="contained" disabled={formState.kind === "guardando"} fullWidth>
           {formState.kind === "guardando" ? t("perfil.botonEnviando") : t("perfil.boton")}

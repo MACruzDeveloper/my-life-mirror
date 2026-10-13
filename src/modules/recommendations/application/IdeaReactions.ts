@@ -3,7 +3,7 @@ import type { Clock } from "#shared/domain/Clock.js";
 import { NotFoundError, ValidationError } from "#shared/domain/DomainError.js";
 import type { CategoryCatalogRepository } from "#modules/categories/domain/CategoryCatalogRepository.js";
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
-import { IDEA_REACTIONS, type IdeaReaction, type IdeaReactionKind, type IdeaReactionRepository } from "../domain/IdeaReaction.js";
+import { IDEA_REACTIONS, type IdeaReaction, type IdeaReactionKind, type IdeaReactionRepository, isValidPlanDate } from "../domain/IdeaReaction.js";
 import { templateKeysFor } from "../domain/recommendationCatalog.js";
 
 export interface SetIdeaReactionInput {
@@ -12,6 +12,8 @@ export interface SetIdeaReactionInput {
   templateKey: string;
   /** `null` quita la reacción (dejar de guardar, o recuperar una descartada). */
   reaction: IdeaReactionKind | null;
+  /** RF-47: día orientativo para una idea guardada; `null` lo quita; sin indicar, se conserva el que hubiera. */
+  plannedFor?: string | null;
 }
 
 /** Lo que ve la interfaz: sin el usuario, que ya se sabe. */
@@ -29,6 +31,8 @@ interface SetIdeaReactionDependencies {
  * quitar esa reacción. Solo sobre una categoría propia, y solo con ideas del
  * catálogo que correspondan a esa categoría (las suyas o, si no tiene, las
  * generales): la clave llega del navegador y no se guarda nada que no exista.
+ * RF-47: una idea guardada puede llevar un día orientativo; volver a guardarla
+ * (para ponerle, cambiarle o quitarle la fecha) no cambia cuándo se guardó.
  */
 export function createSetIdeaReaction({ ideaReactionRepository, categoryRepository, catalog, clock }: SetIdeaReactionDependencies) {
   return async function setIdeaReaction(input: SetIdeaReactionInput): Promise<Result<void, NotFoundError | ValidationError>> {
@@ -46,7 +50,17 @@ export function createSetIdeaReaction({ ideaReactionRepository, categoryReposito
     }
     if (!(IDEA_REACTIONS as readonly string[]).includes(input.reaction)) return err(new ValidationError("Reaction is not valid"));
 
-    await ideaReactionRepository.save({ userId, categoryId: category.id, templateKey, reaction: input.reaction, reactedAt: clock.now() });
+    const now = clock.now();
+    if (input.reaction !== "saved") {
+      if (typeof input.plannedFor === "string") return err(new ValidationError("Only a saved idea can have a date"));
+      await ideaReactionRepository.save({ userId, categoryId: category.id, templateKey, reaction: input.reaction, reactedAt: now });
+      return ok(undefined);
+    }
+    if (typeof input.plannedFor === "string" && !isValidPlanDate(input.plannedFor, now)) return err(new ValidationError("Date must be a real day between today and a year from now"));
+
+    const current = (await ideaReactionRepository.findByUserId(userId)).find((reaction) => reaction.categoryId === category.id && reaction.templateKey === templateKey && reaction.reaction === "saved");
+    const plannedFor = input.plannedFor === undefined ? current?.plannedFor : (input.plannedFor ?? undefined);
+    await ideaReactionRepository.save({ userId, categoryId: category.id, templateKey, reaction: "saved", reactedAt: current?.reactedAt ?? now, ...(plannedFor ? { plannedFor } : {}) });
     return ok(undefined);
   };
 }
@@ -58,7 +72,7 @@ export function createListIdeaReactions(ideaReactionRepository: IdeaReactionRepo
     return ok(
       [...reactions]
         .sort((a, b) => b.reactedAt.getTime() - a.reactedAt.getTime())
-        .map(({ categoryId, templateKey, reaction, reactedAt }) => ({ categoryId, templateKey, reaction, reactedAt })),
+        .map(({ categoryId, templateKey, reaction, reactedAt, plannedFor }) => ({ categoryId, templateKey, reaction, reactedAt, ...(plannedFor ? { plannedFor } : {}) })),
     );
   };
 }

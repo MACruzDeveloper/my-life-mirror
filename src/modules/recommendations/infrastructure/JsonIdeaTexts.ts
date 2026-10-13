@@ -36,6 +36,15 @@ export class JsonIdeaTexts implements IdeaTexts {
     });
   }
 
+  profileLabels(profile: { occupation?: string; hobbies?: readonly string[] }, locale: Locale): { occupation?: string; hobbies: string[] } {
+    const occupation = profile.occupation ? lookup(RESOURCES[locale], `perfil.ocupaciones.${profile.occupation}`) : undefined;
+    const hobbies = (profile.hobbies ?? []).flatMap((hobby) => {
+      const label = lookup(RESOURCES[locale], `perfil.aficiones.${hobby}`);
+      return label ? [label] : [];
+    });
+    return { ...(occupation ? { occupation } : {}), hobbies };
+  }
+
   experienceLabels(tags: readonly string[], locale: Locale): string[] {
     return tags.flatMap((tag) => {
       const label = lookup(RESOURCES[locale], `experiencias.${tag}`);
