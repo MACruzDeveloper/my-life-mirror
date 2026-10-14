@@ -102,10 +102,24 @@ export function AccountPage({ breadcrumbs = [] }: { /** Van sobre el contenido (
   );
 
   return (
-    <Box sx={{ display: "flex", alignItems: "flex-start", gap: { md: 5 }, px: 2, mt: 2, maxWidth: WIDE_PAGE_MAX_WIDTH, mx: "auto" }}>
+    // En rejilla: arriba, las migas sobre el contenido; debajo, el menú y el contenido empezando a la misma altura.
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "auto minmax(0, 1fr)" },
+        gridTemplateAreas: { xs: '"crumbs" "content"', md: '". crumbs" "menu content"' },
+        columnGap: { md: 5 },
+        alignItems: "start",
+        px: 2,
+        mt: 2,
+        maxWidth: WIDE_PAGE_MAX_WIDTH,
+        mx: "auto",
+      }}
+    >
       <Drawer
         variant="permanent"
         sx={{
+          gridArea: "menu",
           display: { xs: "none", md: "block" },
           flexShrink: 0,
           // Dentro del flujo de la página (no fijo a la ventana) y, al desplazarse, por debajo de la
@@ -123,8 +137,8 @@ export function AccountPage({ breadcrumbs = [] }: { /** Van sobre el contenido (
       <Drawer open={isMobileOpen} onClose={() => setIsMobileOpen(false)} sx={{ display: { md: "none" } }}>
         {menu(false)}
       </Drawer>
-      <Box sx={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
-        {breadcrumbs.length > 0 && <Breadcrumbs items={breadcrumbs} align="inline" />}
+      <Box sx={{ gridArea: "crumbs", minWidth: 0 }}>{breadcrumbs.length > 0 && <Breadcrumbs items={breadcrumbs} align="inline" />}</Box>
+      <Box sx={{ gridArea: "content", minWidth: 0, maxWidth: 1180 }}>
         <Box sx={{ bgcolor: "background.paper", border: 1, borderColor: "divider", p: { xs: 2, md: 4 }, minHeight: 360 }}>
         {/* Con el nombre de la sección actual: no se confunde con el menú de la cabecera. */}
         <Button

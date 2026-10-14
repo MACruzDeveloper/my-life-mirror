@@ -380,23 +380,28 @@ function IdeaSlides({ keys, index, move, curatedText, personalized, actions, fee
         {personalized ? (
           <PersonalizedIdea key={currentKey} recommendationId={personalized.recommendationId} templateKey={currentKey} categoryId={personalized.categoryId} curatedText={curatedText} />
         ) : (
-          <DialogContentText sx={IDEA_TEXT_SX}>{curatedText}</DialogContentText>
+          <DialogContentText sx={IDEA_TEXT_SX}>
+            {curatedText}
+            <CloseQuote />
+          </DialogContentText>
         )}
-        <QuoteMark closing />
       </Box>
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: actions ? "space-between" : "center", gap: 2, mb: 1 }}>
         {actions}
         {keys.length > 1 && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <IconButton size="small" aria-label={t("recomendaciones.ideaAnterior")} onClick={() => move(-1)} sx={ARROW_SX}>
-              <ChevronLeftIcon />
-            </IconButton>
+            {/* La posición, delante de las flechas (no entre ellas). */}
             <Typography variant="body2" color="text.secondary">
               {t("recomendaciones.ideaPosicion", { actual: index + 1, total: keys.length })}
             </Typography>
-            <IconButton size="small" aria-label={t("recomendaciones.ideaSiguiente")} onClick={() => move(1)} sx={ARROW_SX}>
-              <ChevronRightIcon />
-            </IconButton>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <IconButton size="small" aria-label={t("recomendaciones.ideaAnterior")} onClick={() => move(-1)} sx={ARROW_SX}>
+                <ChevronLeftIcon />
+              </IconButton>
+              <IconButton size="small" aria-label={t("recomendaciones.ideaSiguiente")} onClick={() => move(1)} sx={ARROW_SX}>
+                <ChevronRightIcon />
+              </IconButton>
+            </Box>
           </Box>
         )}
       </Box>
@@ -429,12 +434,20 @@ const IDEA_BOX_SX = {
   bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, 0.05),
 } as const;
 
-/** Las comillas, decorativas (el lector de pantalla no las anuncia): de apertura arriba a la izquierda y de cierre abajo a la derecha. */
-function QuoteMark({ closing = false }: { closing?: boolean }) {
-  const position = closing ? { bottom: { xs: -18, sm: -26 }, right: { xs: 12, sm: 18 } } : { top: { xs: 4, sm: 8 }, left: { xs: 12, sm: 18 } };
+/** Las comillas de apertura, decorativas (el lector de pantalla no las anuncia), arriba a la izquierda del bloque. */
+function QuoteMark() {
   return (
-    <Box component="span" aria-hidden sx={{ position: "absolute", ...position, fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "3.5rem", sm: "4.5rem" }, lineHeight: 1, color: "secondary.main", userSelect: "none" }}>
-      {closing ? "”" : "“"}
+    <Box component="span" aria-hidden sx={{ position: "absolute", top: { xs: 4, sm: 8 }, left: { xs: 12, sm: 18 }, fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "3.5rem", sm: "4.5rem" }, lineHeight: 1, color: "secondary.main", userSelect: "none" }}>
+      “
+    </Box>
+  );
+}
+
+/** Las comillas de cierre, justo detrás de la última palabra (no en la esquina del bloque). */
+function CloseQuote() {
+  return (
+    <Box component="span" aria-hidden sx={{ ml: 0.5, fontSize: "2.4em", lineHeight: 0, verticalAlign: "-0.42em", color: "secondary.main", userSelect: "none" }}>
+      ”
     </Box>
   );
 }
@@ -474,7 +487,10 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, curatedTe
   if (data?.source !== "ai") {
     return (
       <>
-        <DialogContentText sx={IDEA_TEXT_SX}>{curatedText}</DialogContentText>
+        <DialogContentText sx={IDEA_TEXT_SX}>
+          {curatedText}
+          <CloseQuote />
+        </DialogContentText>
         {/* RF-40b: si es por el tope diario, se dice; ante un fallo del proveedor, solo la idea original. */}
         {data?.notice === "limit" && (
           <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1.5 }}>
@@ -487,11 +503,12 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, curatedTe
 
   return (
     <Box>
-      {/* A la derecha: a la izquierda están las comillas. */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-        <Chip icon={<AutoAwesomeOutlinedIcon fontSize="small" />} label={t("recomendaciones.personalizadaConIa")} size="small" variant="outlined" />
-      </Box>
-      <DialogContentText sx={IDEA_TEXT_SX}>{data.text}</DialogContentText>
+      {/* Arriba a la derecha del bloque, apartada del texto (a la izquierda están las comillas). */}
+      <Chip icon={<AutoAwesomeOutlinedIcon fontSize="small" />} label={t("recomendaciones.personalizadaConIa")} size="small" variant="outlined" sx={{ position: "absolute", top: 20, right: 20 }} />
+      <DialogContentText sx={{ ...IDEA_TEXT_SX, mt: 4 }}>
+        {data.text}
+        <CloseQuote />
+      </DialogContentText>
     </Box>
   );
 }
@@ -535,8 +552,8 @@ function SharedExperiencesList({ experiences, categoryId, reported, onReported }
               <QuoteMark />
               <Typography sx={{ ...IDEA_TEXT_SX, whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
                 {experience.text}
+                <CloseQuote />
               </Typography>
-              <QuoteMark closing />
             </Box>
             {/* Fuera del bloque de la cita: no es parte de lo que escribió la otra persona. */}
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>

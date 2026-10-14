@@ -36,6 +36,11 @@ test.describe("RF-49: Categorías y viajes en Aventura", () => {
     await expect(map.locator("path.leaflet-interactive").first()).toBeAttached();
     await expect(map.locator(VISITED_FILL)).toHaveCount(0);
 
+    // La rueda sola no hace zoom (desplaza la página) y dice cómo hacerlo: el mapa no atrapa el desplazamiento.
+    await map.hover();
+    await page.mouse.wheel(0, 200);
+    await expect(trips.getByText(/Ctrl \+ rueda/).first()).toBeVisible();
+
     await trips.getByRole("combobox", { name: "País" }).fill("Myan");
     await page.getByRole("option", { name: /Myanmar/ }).click();
     await trips.getByRole("combobox", { name: "Año" }).click();

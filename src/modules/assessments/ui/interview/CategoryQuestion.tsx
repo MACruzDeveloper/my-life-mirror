@@ -1,3 +1,6 @@
+import Tooltip from "@mui/material/Tooltip";
+import { Link as RouterLink } from "react-router";
+import { hasCategoryPage } from "@modules/categories/ui/categoryPages";
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -12,6 +15,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlineOutlin
 import TerrainOutlinedIcon from "@mui/icons-material/TerrainOutlined";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { useTranslation } from "react-i18next";
 import interviewerAvatar from "../../../../assets/avatars/interviewer.svg";
 import userAvatar from "../../../../assets/avatars/user.svg";
@@ -196,6 +200,14 @@ export function CategoryQuestion({
             <IconButton size="small" aria-label={t("entrevista.verEjemplos", { categoria: label.name })} aria-expanded={examplesOpen} onClick={() => setExamplesOpen((open) => !open)}>
               <InfoOutlinedIcon fontSize="small" />
             </IconButton>
+          )}
+          {/* RF-49: si la categoría tiene su propia página (Aventura), un acceso a ella. */}
+          {hasCategoryPage(label.key) && (
+            <Tooltip title={t("entrevista.verPagina", { categoria: label.name })}>
+              <IconButton size="small" component={RouterLink} to={`/categorias/${label.key}`} aria-label={t("entrevista.verPagina", { categoria: label.name })} color="secondary">
+                <ArrowOutwardIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           )}
         </Box>
         {label.key && (

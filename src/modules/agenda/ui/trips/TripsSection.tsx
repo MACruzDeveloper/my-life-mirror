@@ -16,6 +16,7 @@ import { CHART_ACCENT } from "@shared/ui/theme";
 import { type TripDto, useTripActions, useTrips } from "../tripQueries";
 import { countryName, countryOptions, monthNames, tripDate } from "./countryNames";
 import { preloadTripsMap } from "./preloadTripsMap";
+import { MAP_HEIGHT } from "./mapSize";
 import Skeleton from "@mui/material/Skeleton";
 
 /** Leaflet y las formas de los países solo se descargan al abrir la página que los usa (como los gráficos en Inicio). */
@@ -25,7 +26,6 @@ const FIRST_YEAR = 1900;
 /** Los mismos dos años vista que admite el servidor (un viaje que se está planeando). */
 const YEARS_AHEAD = 2;
 
-const MAP_HEIGHT = { xs: 320, md: 480 };
 /** El ancho del contenido de la página (el mapa, en cambio, va de lado a lado). */
 const CONTAINER_WIDTH = PAGE_MAX_WIDTH;
 
@@ -67,7 +67,7 @@ export function TripsSection() {
   }
 
   return (
-    <Box component="section" aria-labelledby={titleId} sx={{ mt: 4, mb: 2 }}>
+    <Box component="section" aria-labelledby={titleId} sx={{ mt: { xs: 5, md: 7 }, mb: { xs: 4, md: 6 } }}>
       <Box sx={{ maxWidth: CONTAINER_WIDTH, mx: "auto", px: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <FlightTakeoffOutlinedIcon color="primary" />

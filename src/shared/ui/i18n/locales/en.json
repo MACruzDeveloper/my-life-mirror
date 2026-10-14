@@ -218,6 +218,7 @@
     "errorGenerico": "Could not save the interview",
     "entrevistador": "Interviewer",
     "tu": "You",
+    "verPagina": "See your {{categoria}} page",
     "verEjemplos": "See examples for {{categoria}}",
     "ejemplosTitulo": "To help you think:",
     "errorActivar": "Could not activate the category",
@@ -912,7 +913,7 @@
     "intro": "The countries you have visited, or are planning to visit, from any year. A map of your memories and of what you still want to see.",
     "mapaNoCarga": "The map couldn't be loaded. Your trips are still below; try reloading the page.",
     "mapa": "Map of your trips",
-    "comoUsarMapa": "Visited countries are shown filled in. Hover to see when you went, click one to choose it below and zoom with the mouse wheel or with + and −.",
+    "comoUsarMapa": "Visited countries are shown filled in. Hover to see when you went and click one to choose it below. Zoom with Ctrl + scroll (⌘ on Mac), by pinching or with + and −.",
     "anadirTitulo": "Add a trip",
     "pais": "Country",
     "sinPaises": "No country with that name",
@@ -925,7 +926,9 @@
     "ninguno": "You haven't added any trips yet.",
     "borrar": "Delete the trip to {{pais}} ({{fecha}})",
     "error": "We couldn't save that change. Please try again.",
-    "noCambianNota": "Your trips are only yours: they don't change your score, they are not sent to the AI and they are not shared."
+    "noCambianNota": "Your trips are only yours: they don't change your score, they are not sent to the AI and they are not shared.",
+    "avisoRueda": "Use Ctrl + scroll (⌘ + scroll on Mac) to zoom the map",
+    "avisoDosDedos": "Use two fingers to move the map"
   },
   "avisos": {
     "titulo": "Notifications",

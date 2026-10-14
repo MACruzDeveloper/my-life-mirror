@@ -11,6 +11,14 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 - **Página de Aventura:** descripción, tu última nota, tus experiencias del diario y **Tus viajes**: un mapa a todo lo ancho (Leaflet) con los países visitados pintados, zoom con la rueda del ratón, y debajo el formulario y la lista. Un viaje es un país de una lista con búsqueda (o pulsado en el mapa) y un año, con el mes opcional; sin texto libre. Puede ser de cualquier año o un plan. No cambia ninguna nota y no va a la IA. **Migraciones 0029 y 0030.**
 - El mapa no usa recursos externos: las formas de los países (Natural Earth) van dentro de la app y la política de contenido no cambia.
 
+### Cambiado (séptima ronda de ajustes)
+
+- **Portada:** el selector de idioma y el aviso "Imagen generada con IA" se quedan fijos al bajar; el aviso sale una sola vez, no en cada imagen.
+- **Mapa de viajes:** más bajo y con más aire alrededor; la rueda sola desplaza la página y avisa de cómo hacer zoom (Ctrl/⌘ + rueda o pellizcando); en móvil se mueve con dos dedos. Zoom limitado: como mucho, el mundo entero; como poco, un país mediano.
+- **Ventana de ideas:** "Personalizada con IA" arriba a la derecha, "Idea 1 de 5" delante de las flechas y las comillas de cierre justo detrás del texto.
+- **Mi perfil:** el menú empieza a la altura del contenido, no de las migas.
+- **Entrevista:** la pregunta de Aventura enlaza a su página.
+
 ### Cambiado (sexta ronda de ajustes)
 
 - **Paleta nueva, "Black Mirror"** (Midnight Black, Anti-Flash White, Loblolly, Country Blue y Rich Black): la cabecera y los botones principales en Rich Black, el fondo en Anti-Flash White y el acento en Country Blue (oscurecido donde lleva texto blanco, para el contraste AA). Un test comprueba los contrastes.

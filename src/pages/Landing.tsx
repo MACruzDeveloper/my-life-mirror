@@ -73,7 +73,6 @@ export function Landing() {
             <KeyboardArrowDownIcon />
           </IconButton>
         </Box>
-        <AiNote />
       </Box>
       {/* Al bajar, esta parte sube sobre su propia imagen, que no se mueve: la primera queda tapada como por una cortina. */}
       <Box id={HOW_IT_WORKS_ID} sx={[SECTION, { minHeight: "100svh", alignItems: "flex-end", py: { xs: 6, sm: 8 } }]}>
@@ -82,8 +81,9 @@ export function Landing() {
           <HowItWorks />
           <HelpFooter />
         </Box>
-        <AiNote />
       </Box>
+      {/* Uno solo para las dos imágenes, fijo en la esquina: no se repite en cada parte. */}
+      <AiNote />
     </>
   );
 }
@@ -116,7 +116,7 @@ const SECTION = {
 function AiNote() {
   const { t } = useTranslation();
   return (
-    <Typography variant="caption" sx={{ position: "absolute", right: 12, bottom: 8, color: "common.white", opacity: 0.75 }}>
+    <Typography variant="caption" sx={{ position: "fixed", right: 12, bottom: 8, zIndex: 2, color: "common.white", opacity: 0.75, pointerEvents: "none" }}>
       {t("landing.imagenIA")}
     </Typography>
   );

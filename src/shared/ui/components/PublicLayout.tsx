@@ -20,7 +20,7 @@ export function PublicLayout({ children, overlay = false }: { children?: ReactNo
       <Box
         component="nav"
         aria-label={t("comun.idioma")}
-        sx={[{ display: "flex", justifyContent: "flex-end", px: 2, pt: 1 }, overlay && { position: "absolute", top: 0, right: 0, zIndex: 1, pt: 1.5, color: "common.white" }]}
+        sx={[{ display: "flex", justifyContent: "flex-end", px: 2, pt: 1 }, overlay && { position: "fixed", top: 0, right: 0, zIndex: 2, pt: 1.5, color: "common.white" }]}
       >
         <LanguageSwitcher variant={overlay ? "text" : "flags"} />
       </Box>

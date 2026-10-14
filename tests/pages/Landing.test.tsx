@@ -27,7 +27,8 @@ describe("Landing (RF-39)", () => {
     const hero = screen.getByRole("region", { name: "MyLifeMirror" });
     expect(within(hero).getByRole("heading", { level: 1, name: "MyLifeMirror" })).toBeInTheDocument();
     expect(within(hero).getByRole("link", { name: /crear cuenta/i })).toBeInTheDocument();
-    expect(within(hero).getByText(/imagen generada con ia/i)).toBeInTheDocument();
+    // El aviso de imagen generada con IA, una sola vez (fijo sobre las dos imágenes), no repetido en cada una.
+    expect(screen.getAllByText(/imagen generada con ia/i)).toHaveLength(1);
     // La flecha es un enlace a la parte siguiente: funciona también sin JavaScript y con el teclado.
     expect(within(hero).getByRole("link", { name: "Ver cómo funciona" })).toHaveAttribute("href", "#como-funciona");
     // Decorativa: es un fondo, no una imagen con texto alternativo.
