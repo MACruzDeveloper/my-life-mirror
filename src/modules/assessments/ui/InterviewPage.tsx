@@ -1,3 +1,4 @@
+import { PALE_TINT } from "@shared/ui/theme";
 import { ScrollToTopButton } from "@shared/ui/components/ScrollToTopButton";
 import { prefersReducedMotion } from "@shared/ui/motion";
 import { useRef, useState } from "react";
@@ -572,7 +573,7 @@ export function InterviewPage() {
     <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", lg: showQuestions ? "minmax(0, 1fr) 280px" : "minmax(0, 1fr)" }, alignItems: "start" }}>
     {/* Dos bloques con fondo distinto (UX-06): la introducción y, debajo, las preguntas. */}
     <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 1.5, sm: 2 }, minWidth: 0 }}>
-    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: "#E6EBEE", scrollMarginTop: 72 }}>
+    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: PALE_TINT, scrollMarginTop: 72 }}>
       {/* La entrevista es la primera vez; con respuestas guardadas, la misma pantalla se presenta como "actualizarlas". */}
       <Typography id="entrevista-titulo" variant="h5" component="h1">
         {isFirstInterview ? t("entrevista.titulo") : t("entrevista.tituloActualizar")}
@@ -657,7 +658,7 @@ export function InterviewPage() {
     </Box>
 
     {showQuestions && (
-    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "#F2F2F2", pt: { xs: 1, sm: 1.5 } }}>
+    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "background.default", pt: { xs: 1, sm: 1.5 } }}>
       {activeCategories.length > 0 && (
         <Typography id="entrevista-preguntas" variant="h6" component="h2">
           {t("entrevista.preguntasTitulo")}

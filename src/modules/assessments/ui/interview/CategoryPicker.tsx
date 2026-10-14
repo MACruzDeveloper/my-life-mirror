@@ -82,7 +82,7 @@ export function CategoryPicker({ categories, categoryLabel, pendingCategoryIds, 
         </Box>
         {optionsGrid(regularCategories)}
       </Box>
-      <Box sx={{ bgcolor: "#F7F8F9", borderRadius: 0, p: { xs: 1.5, sm: 2 } }}>
+      <Box sx={{ bgcolor: "#F8F7F9", borderRadius: 0, p: { xs: 1.5, sm: 2 } }}>
         <Typography variant="subtitle1" component="h3">
           {t("entrevista.sensiblesTitulo")}
         </Typography>

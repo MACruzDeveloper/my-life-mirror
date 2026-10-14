@@ -1,3 +1,4 @@
+import { PALE_TINT } from "@shared/ui/theme";
 import { useId, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -53,7 +54,7 @@ export function DashboardGuide() {
   }) as string[];
 
   return (
-    <Box component="section" aria-labelledby={headingId} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 0, bgcolor: "#E9EEF1" }}>
+    <Box component="section" aria-labelledby={headingId} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 0, bgcolor: PALE_TINT }}>
       <Typography id={headingId} variant="subtitle1" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
         {t("guia.panelTitulo")}
       </Typography>

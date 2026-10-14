@@ -245,6 +245,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **14 oct. 2026** — *"No sé si necesitamos más colores. Si usamos los naranja, amarillo, verde, etc que ya estás usando? O necesitas nuevos?… en la página de Categoría dale algo de color, por ejemplo prueba naranja al score o a los botones… Añade el usuario después de Bienvenido"*
 → Los colores con significado no se usan como decoración: el naranja es la banda "casi bajo", y pintar de naranja un 9 diría lo contrario. Para dar vida se usa **un solo color de acento**, el verde azulado de los gráficos oscurecido para el contraste AA con texto blanco (botones, mapa, línea de la cabecera); la nota de Aventura lleva **el color de su propia banda**. El saludo usa el género solo si la persona lo indicó; si no, una forma neutra.
 
+**14 oct. 2026** — *"el verde turquesa no me convence, prueba esta nueva paleta para toda la app: The Black Mirror Color Scheme… Midnight Black (#00020C), Anti-Flash White (#F3F1F4), Loblolly (#BBC9D2), Country Blue (#6B9EA8) and Rich Black (#001312)"*
+→ Paleta nueva en el tema: Rich Black para cabecera y botones principales, Anti-Flash White de fondo, Midnight Black para el texto, Loblolly para bordes y tierras del mapa y Country Blue como acento. Country Blue tal cual no llega al contraste con texto blanco (2,9:1): para botones se usa oscurecido (#4A7C86, 4,6:1) y para gráficos y mapa, un punto más oscuro (#5F929C, 3:1). Un test vigila los contrastes.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

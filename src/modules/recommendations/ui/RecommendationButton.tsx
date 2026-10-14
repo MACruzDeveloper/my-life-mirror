@@ -113,7 +113,7 @@ export function RecommendationButton({ templateKey, categoryName, label, recomme
         {label ?? t("recomendaciones.titulo")}
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby={titleId} fullWidth maxWidth="sm">
-        <DialogTitle id={titleId} sx={{ pr: 7 }}>
+        <DialogTitle id={titleId} sx={{ pr: 7, pt: { xs: 3, sm: 4 }, fontWeight: 700 }}>
           {t("recomendaciones.dialogoTitulo", { categoria: categoryName })}
         </DialogTitle>
         {/* Cerrar, arriba a la derecha (como en cualquier ventana), en lugar de un botón al pie. */}
@@ -317,7 +317,7 @@ function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId,
             // Pestañas de verdad: subrayado azul marino bajo la elegida, que además lleva un fondo suave de la marca.
             "& .MuiTabs-indicator": { height: 3, bgcolor: "primary.main" },
             "& .MuiTab-root": { minHeight: 48, px: 1, textTransform: "none", fontSize: "0.95rem", lineHeight: 1.3, color: "text.secondary" },
-            "& .MuiTab-root.Mui-selected": { color: "primary.main", fontWeight: 600, bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06) },
+            "& .MuiTab-root.Mui-selected": { color: "primary.main", bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06) },
           }}
         >
           {tabs.map((value) => (
@@ -382,6 +382,7 @@ function IdeaSlides({ keys, index, move, curatedText, personalized, actions, fee
         ) : (
           <DialogContentText sx={IDEA_TEXT_SX}>{curatedText}</DialogContentText>
         )}
+        <QuoteMark closing />
       </Box>
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: actions ? "space-between" : "center", gap: 2, mb: 1 }}>
         {actions}
@@ -415,7 +416,7 @@ function IdeaSlides({ keys, index, move, curatedText, personalized, actions, fee
  * la ventana. Fuentes del sistema (Georgia o equivalente): no se descarga
  * ninguna fuente de fuera.
  */
-const IDEA_TEXT_SX = { color: "primary.main", fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "1.15rem", sm: "1.3rem" }, lineHeight: 1.55 };
+const IDEA_TEXT_SX = { color: "primary.main", fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "1.15rem", sm: "1.3rem" }, lineHeight: 1.35 };
 
 /** El bloque de la idea: fondo suave de la marca y sitio a la izquierda para las comillas. Crece hasta llenar la pestaña. */
 const IDEA_BOX_SX = {
@@ -424,16 +425,16 @@ const IDEA_BOX_SX = {
   minHeight: 120,
   mb: 2,
   py: { xs: 2.5, sm: 3 },
-  pr: { xs: 2, sm: 3 },
-  pl: { xs: 5.5, sm: 7 },
+  px: { xs: 5.5, sm: 7 },
   bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, 0.05),
 } as const;
 
-/** Las comillas de apertura, decorativas (el lector de pantalla no las anuncia). */
-function QuoteMark() {
+/** Las comillas, decorativas (el lector de pantalla no las anuncia): de apertura arriba a la izquierda y de cierre abajo a la derecha. */
+function QuoteMark({ closing = false }: { closing?: boolean }) {
+  const position = closing ? { bottom: { xs: -18, sm: -26 }, right: { xs: 12, sm: 18 } } : { top: { xs: 4, sm: 8 }, left: { xs: 12, sm: 18 } };
   return (
-    <Box component="span" aria-hidden sx={{ position: "absolute", top: { xs: 4, sm: 8 }, left: { xs: 12, sm: 18 }, fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "3.5rem", sm: "4.5rem" }, lineHeight: 1, color: "secondary.main", userSelect: "none" }}>
-      “
+    <Box component="span" aria-hidden sx={{ position: "absolute", ...position, fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "3.5rem", sm: "4.5rem" }, lineHeight: 1, color: "secondary.main", userSelect: "none" }}>
+      {closing ? "”" : "“"}
     </Box>
   );
 }
@@ -486,7 +487,10 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, curatedTe
 
   return (
     <Box>
-      <Chip icon={<AutoAwesomeOutlinedIcon fontSize="small" />} label={t("recomendaciones.personalizadaConIa")} size="small" variant="outlined" sx={{ mb: 1.5 }} />
+      {/* A la derecha: a la izquierda están las comillas. */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+        <Chip icon={<AutoAwesomeOutlinedIcon fontSize="small" />} label={t("recomendaciones.personalizadaConIa")} size="small" variant="outlined" />
+      </Box>
       <DialogContentText sx={IDEA_TEXT_SX}>{data.text}</DialogContentText>
     </Box>
   );
@@ -526,12 +530,16 @@ function SharedExperiencesList({ experiences, categoryId, reported, onReported }
     <>
       <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
         {experiences.map((experience) => (
-          <Box component="li" key={experience.id} sx={IDEA_BOX_SX}>
-            <QuoteMark />
-            <Typography sx={{ ...IDEA_TEXT_SX, whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
-              {experience.text}
-            </Typography>
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Box component="li" key={experience.id}>
+            <Box sx={IDEA_BOX_SX}>
+              <QuoteMark />
+              <Typography sx={{ ...IDEA_TEXT_SX, whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
+                {experience.text}
+              </Typography>
+              <QuoteMark closing />
+            </Box>
+            {/* Fuera del bloque de la cita: no es parte de lo que escribió la otra persona. */}
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>
               <Button size="small" color="inherit" startIcon={<FlagOutlinedIcon fontSize="small" />} onClick={() => void report(experience)} sx={{ textTransform: "none", color: "text.secondary" }}>
                 {t("recomendaciones.reportar")}
               </Button>
@@ -553,6 +561,9 @@ function SharedExperiencesList({ experiences, categoryId, reported, onReported }
       </Box>
       <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1.5 }}>
         {t("recomendaciones.avisoOtros")}
+      </Typography>
+      <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.5 }}>
+        {t("recomendaciones.reportarAyuda")}
       </Typography>
       {/* RF-30: junto a lo que escriben otras personas. */}
       <Box sx={{ mt: 0.5 }}>

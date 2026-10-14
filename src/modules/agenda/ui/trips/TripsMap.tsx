@@ -7,7 +7,7 @@ import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-50m.json";
 import { COUNTRIES } from "@modules/agenda/domain/countries";
-import { CHART_ACCENT, PALETTE } from "@shared/ui/theme";
+import { CHART_ACCENT, PALE_TINT, PALETTE } from "@shared/ui/theme";
 import type { TripDto } from "../tripQueries";
 import { countryName, tripDate } from "./countryNames";
 
@@ -55,11 +55,11 @@ function codeOf(shape: CountryFeature): string | undefined {
   return (shape.id !== undefined ? CODE_BY_NUMERIC.get(String(shape.id)) : undefined) ?? CODE_BY_MAP_NAME.get(shape.properties.name);
 }
 
-/** El mar en gris claro, la tierra en blanco y lo visitado en el verde azulado de acento: se ve vivo sobre lo demás. */
-const SEA = PALETTE.mist;
-const LAND: L.PathOptions = { color: PALETTE.silver, weight: 0.6, fillColor: "#FFFFFF", fillOpacity: 1 };
+/** El mar en un tinte claro de Loblolly, la tierra en blanco y lo visitado en el azul de acento (Country Blue): se ve vivo sobre lo demás. */
+const SEA = PALE_TINT;
+const LAND: L.PathOptions = { color: PALETTE.loblolly, weight: 0.6, fillColor: "#FFFFFF", fillOpacity: 1 };
 const VISITED: L.PathOptions = { color: "#FFFFFF", weight: 0.8, fillColor: CHART_ACCENT, fillOpacity: 1 };
-const HOVER: L.PathOptions = { fillColor: PALETTE.slate };
+const HOVER: L.PathOptions = { fillColor: PALETTE.loblolly };
 
 /**
  * RF-49: el mapa de los viajes, con Leaflet directamente (licencia BSD; sin
@@ -86,6 +86,9 @@ export function TripsMap({ trips, onCountryClick }: TripsMapProps) {
     if (!containerRef.current) return;
     const map = L.map(containerRef.current, { center: [20, 10], zoom: 1.5, zoomSnap: 0.5, minZoom: 0, maxZoom: 7, scrollWheelZoom: true, worldCopyJump: false, maxBounds: [[-85, -220], [85, 380]], maxBoundsViscosity: 0.8 });
     map.attributionControl.setPrefix(false).addAttribution("Natural Earth");
+    // El CSS de Leaflet pone un fondo gris al mapa y, al no ir en una capa, gana al `sx` (MUI va en la capa "mui"):
+    // el color del mar se fija en el propio elemento.
+    containerRef.current.style.backgroundColor = SEA;
     const layer = L.geoJSON(COUNTRY_SHAPES, {
       style: () => LAND,
       onEachFeature: (shape: CountryFeature, path) => {
@@ -140,5 +143,5 @@ export function TripsMap({ trips, onCountryClick }: TripsMapProps) {
     }
   }, [trips, i18n.language]);
 
-  return <Box ref={containerRef} role="group" aria-label={t("viajes.mapa")} sx={{ height: { xs: 300, md: 440 }, width: "100%", borderRadius: 2, overflow: "hidden", border: 1, borderColor: "divider", bgcolor: SEA, "& .leaflet-container": { bgcolor: SEA } }} />;
+  return <Box ref={containerRef} role="group" aria-label={t("viajes.mapa")} sx={{ height: { xs: 320, md: 480 }, width: "100%", overflow: "hidden", bgcolor: SEA }} />;
 }

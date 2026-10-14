@@ -20,11 +20,12 @@ export interface BreadcrumbItem {
  * Breadcrumbs reutilizable para todo el proyecto (navegación "volver a" + orientación).
  * El último elemento sin `ruta` se pinta como texto — es la página actual.
  * `align`: centrado (por defecto) para alinearse con los formularios públicos (`PublicFormBox`, mismo ancho);
- * "start" en las pantallas protegidas: dentro del contenedor de la página, alineadas con su contenido.
+ * "start" en las pantallas protegidas: dentro del contenedor de la página, alineadas con su contenido;
+ * "inline", dentro de una columna (Mi perfil: sobre el contenido, a la derecha del menú).
  */
-export function Breadcrumbs({ items, align = "center", maxWidth = PAGE_MAX_WIDTH }: { items: BreadcrumbItem[]; align?: "center" | "start"; /** Ancho del contenedor de la página ("start"). */ maxWidth?: number }) {
+export function Breadcrumbs({ items, align = "center", maxWidth = PAGE_MAX_WIDTH }: { items: BreadcrumbItem[]; align?: "center" | "start" | "inline"; /** Ancho del contenedor de la página ("start"). */ maxWidth?: number }) {
   return (
-    <MuiBreadcrumbs aria-label="breadcrumb" sx={[{ mt: 2, px: 2 }, align === "center" ? { maxWidth: PUBLIC_FORM_MAX_WIDTH, mx: "auto" } : { maxWidth, mx: "auto" }]}>
+    <MuiBreadcrumbs aria-label="breadcrumb" sx={[{ mt: 2, px: 2 }, align === "center" ? { maxWidth: PUBLIC_FORM_MAX_WIDTH, mx: "auto" } : align === "inline" ? { mt: 0, mb: 1.5, px: 0 } : { maxWidth, mx: "auto" }]}>
       {items.map((item) =>
         item.path ? (
           <Link key={item.label} component={RouterLink} to={item.path} underline="hover" color="inherit">

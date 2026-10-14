@@ -59,7 +59,7 @@ export function AvatarPicker({ value, onChange, keys = publishedAvatarKeys() }: 
 
   return (
     <Box>
-      <Typography id="avatar-picker-label" variant="subtitle1" component="h2">
+      <Typography id="avatar-picker-label" variant="subtitle1" component="h2" sx={{ fontWeight: 700 }}>
         {t("avatares.titulo")}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>

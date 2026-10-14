@@ -56,14 +56,8 @@ function App() {
           <Route
             path="/perfil"
             element={
-              <ProtectedLayout
-                wide
-                breadcrumbs={[
-                  { label: t('breadcrumbs.inicio'), path: '/inicio' },
-                  { label: t('breadcrumbs.miPerfil') },
-                ]}
-              >
-                <AccountPage />
+              <ProtectedLayout wide>
+                <AccountPage breadcrumbs={[{ label: t('breadcrumbs.inicio'), path: '/inicio' }, { label: t('breadcrumbs.miPerfil') }]} />
               </ProtectedLayout>
             }
           >

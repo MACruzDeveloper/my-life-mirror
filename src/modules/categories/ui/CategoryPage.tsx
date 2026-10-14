@@ -6,7 +6,6 @@ import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, useParams } from "react-router";
 import { useExperiences, useLatestScores } from "@modules/assessments/ui/queries";
-import { BAND_COLORS, BAND_LABEL_KEYS, scoreBand } from "@modules/assessments/ui/scoreBand";
 import { TripsSection } from "@modules/agenda/ui/trips/TripsSection";
 import { ProtectedLayout } from "@shared/ui/components/ProtectedLayout";
 import { useCategoryLabel } from "./categoryLabels";
@@ -69,6 +68,7 @@ export function CategoryPage() {
 
   const label = categoryLabel(entry.catalogId);
   return (
+    <>
     <Box sx={{ maxWidth: 1100, mx: "auto", mt: 3, px: 2, display: "flex", flexDirection: "column", gap: 2 }}>
       <Box>
         <Typography variant="h4" component="h1" gutterBottom>
@@ -82,8 +82,10 @@ export function CategoryPage() {
         <LatestScore catalogId={entry.catalogId} categoryName={label.name} />
         <DiaryEntries catalogId={entry.catalogId} />
       </Box>
-      {key === "aventura" && <TripsSection />}
     </Box>
+    {/* Lo propio de cada categoría, a todo lo ancho de la página. */}
+    {key === "aventura" && <TripsSection />}
+    </>
   );
 }
 
@@ -92,20 +94,19 @@ function LatestScore({ catalogId, categoryName }: { catalogId: string; categoryN
   const latest = (useLatestScores().data ?? []).find((score) => score.catalogId === catalogId && score.score !== undefined);
   return (
     <Box component="section" aria-label={t("paginasCategoria.tuNota")} sx={SECTION_SX}>
-      <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>
-        {t("paginasCategoria.tuNota")}
-      </Typography>
+      {/* El título y, a su derecha, la nota en grande. */}
+      <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2 }}>
+        <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700 }}>
+          {t("paginasCategoria.tuNota")}
+        </Typography>
+        {latest && (
+          <Typography variant="h2" component="p" sx={{ fontWeight: 700, lineHeight: 1, color: "secondary.main" }}>
+            {latest.score}
+          </Typography>
+        )}
+      </Box>
       {latest ? (
         <>
-          {/* Con el color de su banda y su texto (el color nunca es lo único que informa), como en Resultados. */}
-          <Box data-band={scoreBand(latest.score!)} sx={{ display: "inline-flex", alignItems: "baseline", gap: 1.5, my: 1, px: 2, py: 1, bgcolor: BAND_COLORS[scoreBand(latest.score!)].bg, color: BAND_COLORS[scoreBand(latest.score!)].fg, border: 1, borderColor: BAND_COLORS[scoreBand(latest.score!)].border }}>
-            <Typography variant="h3" component="p" sx={{ fontWeight: 700, color: "inherit" }}>
-              {latest.score}
-            </Typography>
-            <Typography variant="body2" component="span" sx={{ fontWeight: 600, color: "inherit" }}>
-              {t(BAND_LABEL_KEYS[scoreBand(latest.score!)])}
-            </Typography>
-          </Box>
           {latest.recordedAt && (
             <Typography variant="body2" color="text.secondary" gutterBottom>
               {t("paginasCategoria.puntuadaEl", { fecha: new Date(latest.recordedAt).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" }) })}

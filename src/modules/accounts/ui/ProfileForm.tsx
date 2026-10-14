@@ -168,7 +168,7 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
         </TextField>
         </Box>
         <Box role="group" aria-labelledby={hobbiesTitleId}>
-          <Typography id={hobbiesTitleId} variant="subtitle2" component="h2">
+          <Typography id={hobbiesTitleId} variant="subtitle1" component="h2" sx={{ fontWeight: 700 }}>
             {t("perfil.aficionesTitulo")}
           </Typography>
           <Typography variant="caption" color="text.secondary" component="p" sx={{ mb: 1 }}>

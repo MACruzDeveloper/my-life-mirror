@@ -17,7 +17,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, Outlet, useLocation } from "react-router";
-import { WIDE_PAGE_MAX_WIDTH } from "@shared/ui/components/Breadcrumbs";
+import { Breadcrumbs, type BreadcrumbItem, WIDE_PAGE_MAX_WIDTH } from "@shared/ui/components/Breadcrumbs";
 
 const MENU_WIDTH = 220;
 const COLLAPSED_WIDTH = 64;
@@ -56,7 +56,7 @@ function saveCollapsed(collapsed: boolean) {
  * con un botón y se cierra al elegir. Rutas anidadas de verdad para que cada
  * sección sea recargable/enlazable directamente.
  */
-export function AccountPage() {
+export function AccountPage({ breadcrumbs = [] }: { /** Van sobre el contenido (a su altura), no sobre el menú. */ breadcrumbs?: BreadcrumbItem[] } = {}) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -113,7 +113,7 @@ export function AccountPage() {
           "& .MuiDrawer-paper": { position: "relative", zIndex: (theme) => theme.zIndex.appBar - 1, border: 0, borderRight: 1, borderColor: "divider", minHeight: 360, overflowX: "hidden" },
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: isCollapsed ? "center" : "flex-end", px: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: isCollapsed ? "center" : "flex-end", px: 1, pt: 1.5 }}>
           <IconButton size="small" aria-label={isCollapsed ? t("cuenta.desplegarMenu") : t("cuenta.plegarMenu")} aria-expanded={!isCollapsed} onClick={toggleCollapsed}>
             {isCollapsed ? <MenuIcon fontSize="small" /> : <ChevronLeftIcon fontSize="small" />}
           </IconButton>
@@ -123,7 +123,9 @@ export function AccountPage() {
       <Drawer open={isMobileOpen} onClose={() => setIsMobileOpen(false)} sx={{ display: { md: "none" } }}>
         {menu(false)}
       </Drawer>
-      <Box sx={{ flex: 1, minWidth: 0, maxWidth: 1180, bgcolor: "background.paper", border: 1, borderColor: "divider", p: { xs: 2, md: 4 }, minHeight: 360 }}>
+      <Box sx={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
+        {breadcrumbs.length > 0 && <Breadcrumbs items={breadcrumbs} align="inline" />}
+        <Box sx={{ bgcolor: "background.paper", border: 1, borderColor: "divider", p: { xs: 2, md: 4 }, minHeight: 360 }}>
         {/* Con el nombre de la sección actual: no se confunde con el menú de la cabecera. */}
         <Button
           variant="outlined"
@@ -136,6 +138,7 @@ export function AccountPage() {
           {t(currentSection.labelKey)}
         </Button>
         <Outlet />
+        </Box>
       </Box>
     </Box>
   );

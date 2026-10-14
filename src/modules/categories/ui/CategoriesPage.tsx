@@ -63,7 +63,7 @@ export function CategoriesPage() {
                 <Typography variant="h6" component="h2">
                   {entry.name}
                 </Typography>
-                {hasCategoryPage(entry.key) ? <ArrowForwardIcon color="primary" aria-hidden /> : <Chip size="small" label={t("paginasCategoria.proximamente")} />}
+                {hasCategoryPage(entry.key) ? <ArrowForwardIcon color="secondary" aria-hidden /> : <Chip size="small" label={t("paginasCategoria.proximamente")} />}
               </Box>
               <Typography variant="body2" color="text.secondary">
                 {entry.description}

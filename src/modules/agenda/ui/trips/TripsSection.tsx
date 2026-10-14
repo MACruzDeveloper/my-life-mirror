@@ -11,6 +11,8 @@ import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import FlightTakeoffOutlinedIcon from "@mui/icons-material/FlightTakeoffOutlined";
 import { useTranslation } from "react-i18next";
 import { LoadErrorBoundary } from "@shared/ui/components/LoadErrorBoundary";
+import { PAGE_MAX_WIDTH } from "@shared/ui/components/Breadcrumbs";
+import { CHART_ACCENT } from "@shared/ui/theme";
 import { type TripDto, useTripActions, useTrips } from "../tripQueries";
 import { countryName, countryOptions, monthNames, tripDate } from "./countryNames";
 import { preloadTripsMap } from "./preloadTripsMap";
@@ -23,7 +25,9 @@ const FIRST_YEAR = 1900;
 /** Los mismos dos años vista que admite el servidor (un viaje que se está planeando). */
 const YEARS_AHEAD = 2;
 
-const MAP_HEIGHT = { xs: 300, md: 440 };
+const MAP_HEIGHT = { xs: 320, md: 480 };
+/** El ancho del contenido de la página (el mapa, en cambio, va de lado a lado). */
+const CONTAINER_WIDTH = PAGE_MAX_WIDTH;
 
 /**
  * RF-49: "Tus viajes", en la página de Aventura. Arriba, el mapa a todo lo
@@ -63,7 +67,8 @@ export function TripsSection() {
   }
 
   return (
-    <Box component="section" aria-labelledby={titleId} sx={{ p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+    <Box component="section" aria-labelledby={titleId} sx={{ mt: 4, mb: 2 }}>
+      <Box sx={{ maxWidth: CONTAINER_WIDTH, mx: "auto", px: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <FlightTakeoffOutlinedIcon color="primary" />
         <Typography id={titleId} variant="h6" component="h2">
@@ -73,10 +78,13 @@ export function TripsSection() {
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         {t("viajes.intro")}
       </Typography>
+      </Box>
+      {/* El mapa, de lado a lado de la página, entre dos líneas finas del color de acento. */}
+      <Box sx={{ borderTop: 2, borderBottom: 2, borderColor: CHART_ACCENT }}>
       {/* Si el mapa no se puede descargar, se dice y el formulario y la lista siguen funcionando. */}
       <LoadErrorBoundary
         fallback={
-          <Box role="status" sx={{ minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center", px: 2, textAlign: "center", borderRadius: 2, bgcolor: "background.default" }}>
+          <Box role="status" sx={{ minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center", px: 2, textAlign: "center", bgcolor: "background.default" }}>
             <Typography variant="body2" color="text.secondary">
               {t("viajes.mapaNoCarga")}
             </Typography>
@@ -93,6 +101,8 @@ export function TripsSection() {
           <TripsMap trips={list} onCountryClick={setCountryCode} />
         </Suspense>
       </LoadErrorBoundary>
+      </Box>
+      <Box sx={{ maxWidth: CONTAINER_WIDTH, mx: "auto", px: 2 }}>
       <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.75, mb: 2.5 }}>
         {t("viajes.comoUsarMapa")}
       </Typography>
@@ -176,6 +186,7 @@ export function TripsSection() {
             {t("viajes.noCambianNota")}
           </Typography>
         </Box>
+      </Box>
       </Box>
     </Box>
   );

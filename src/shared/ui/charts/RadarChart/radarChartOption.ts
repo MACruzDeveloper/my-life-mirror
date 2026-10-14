@@ -1,3 +1,4 @@
+import { TEXT_SECONDARY } from "../../theme";
 export interface RadarAxis {
   name: string;
   value: number;
@@ -16,7 +17,7 @@ export interface RadarChartOptionInput {
   formatTooltip: (axes: RadarAxis[]) => string;
 }
 
-const SECONDARY_INK = "#72828C";
+const SECONDARY_INK = TEXT_SECONDARY;
 const GRID_LINE = "#DCDFE1";
 
 /**
