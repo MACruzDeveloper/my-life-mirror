@@ -7,7 +7,6 @@ import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -18,12 +17,13 @@ import Typography from "@mui/material/Typography";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CloseIcon from "@mui/icons-material/Close";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
-import { keyframes } from "@mui/material/styles";
+import { alpha, keyframes, type Theme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { sharedExperiencesKey, useSharedExperiences, type SharedExperienceDto } from "@modules/assessments/ui/queries";
 import { useCategories } from "@modules/categories/ui/queries";
@@ -113,13 +113,16 @@ export function RecommendationButton({ templateKey, categoryName, label, recomme
         {label ?? t("recomendaciones.titulo")}
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby={titleId} fullWidth maxWidth="sm">
-        <DialogTitle id={titleId}>{t("recomendaciones.dialogoTitulo", { categoria: categoryName })}</DialogTitle>
-        <DialogContent sx={{ px: { xs: 2, sm: 4 }, pb: { xs: 1, sm: 2 } }}>
+        <DialogTitle id={titleId} sx={{ pr: 7 }}>
+          {t("recomendaciones.dialogoTitulo", { categoria: categoryName })}
+        </DialogTitle>
+        {/* Cerrar, arriba a la derecha (como en cualquier ventana), en lugar de un botón al pie. */}
+        <IconButton aria-label={t("recomendaciones.cerrar")} onClick={() => setOpen(false)} sx={{ position: "absolute", top: 12, right: 12 }}>
+          <CloseIcon />
+        </IconButton>
+        <DialogContent sx={{ px: { xs: 2, sm: 4 }, pb: { xs: 3, sm: 4 } }}>
           <IdeaContent templateKey={templateKey} categoryName={categoryName} recommendationId={recommendationId} categoryId={categoryId} categoryKey={categoryKey} personalize={personalize} />
         </DialogContent>
-        <DialogActions sx={{ px: { xs: 2, sm: 4 }, pb: 2 }}>
-          <Button onClick={() => setOpen(false)}>{t("recomendaciones.cerrar")}</Button>
-        </DialogActions>
       </Dialog>
     </>
   );
@@ -308,12 +311,13 @@ function IdeaCarousel({ templateKey, categoryName, recommendationId, categoryId,
           variant="fullWidth"
           sx={{
             mb: 3,
-            minHeight: 44,
-            "& .MuiTabs-indicator": { display: "none" },
-            "& .MuiTabs-flexContainer": { gap: 1 },
-            // Pestañas con aspecto de botón: la elegida, rellena con el color de la marca.
-            "& .MuiTab-root": { minHeight: 44, px: 1, textTransform: "none", fontSize: "0.9rem", border: 1, borderColor: "primary.main", borderRadius: 1, color: "primary.main" },
-            "& .MuiTab-root.Mui-selected": { bgcolor: "primary.main", color: "primary.contrastText" },
+            minHeight: 48,
+            borderBottom: 1,
+            borderColor: "divider",
+            // Pestañas de verdad: subrayado azul marino bajo la elegida, que además lleva un fondo suave de la marca.
+            "& .MuiTabs-indicator": { height: 3, bgcolor: "primary.main" },
+            "& .MuiTab-root": { minHeight: 48, px: 1, textTransform: "none", fontSize: "0.95rem", lineHeight: 1.3, color: "text.secondary" },
+            "& .MuiTab-root.Mui-selected": { color: "primary.main", fontWeight: 600, bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06) },
           }}
         >
           {tabs.map((value) => (
@@ -371,7 +375,8 @@ function IdeaSlides({ keys, index, move, curatedText, personalized, actions, fee
   return (
     <>
       {/* La idea, destacada: en la segunda prueba pasaba desapercibida entre el resto de la ventana. Crece hasta llenar la pestaña. */}
-      <Box aria-live="polite" sx={{ flexGrow: 1, minHeight: 120, mb: 2, p: { xs: 2, sm: 3 }, bgcolor: "background.default" }}>
+      <Box aria-live="polite" sx={IDEA_BOX_SX}>
+        <QuoteMark />
         {personalized ? (
           <PersonalizedIdea key={currentKey} recommendationId={personalized.recommendationId} templateKey={currentKey} categoryId={personalized.categoryId} curatedText={curatedText} />
         ) : (
@@ -404,7 +409,34 @@ function IdeaSlides({ keys, index, move, curatedText, personalized, actions, fee
 }
 
 /** El texto de la idea, algo mayor que el resto de la ventana. */
-const IDEA_TEXT_SX = { color: "text.primary", fontSize: "1.1rem", lineHeight: 1.5 };
+/**
+ * El texto de una idea (y de lo que comparten otras personas): con serifa, más
+ * grande y en azul marino, para que se lea como una cita y no como el resto de
+ * la ventana. Fuentes del sistema (Georgia o equivalente): no se descarga
+ * ninguna fuente de fuera.
+ */
+const IDEA_TEXT_SX = { color: "primary.main", fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "1.15rem", sm: "1.3rem" }, lineHeight: 1.55 };
+
+/** El bloque de la idea: fondo suave de la marca y sitio a la izquierda para las comillas. Crece hasta llenar la pestaña. */
+const IDEA_BOX_SX = {
+  position: "relative",
+  flexGrow: 1,
+  minHeight: 120,
+  mb: 2,
+  py: { xs: 2.5, sm: 3 },
+  pr: { xs: 2, sm: 3 },
+  pl: { xs: 5.5, sm: 7 },
+  bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, 0.05),
+} as const;
+
+/** Las comillas de apertura, decorativas (el lector de pantalla no las anuncia). */
+function QuoteMark() {
+  return (
+    <Box component="span" aria-hidden sx={{ position: "absolute", top: { xs: 4, sm: 8 }, left: { xs: 12, sm: 18 }, fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "3.5rem", sm: "4.5rem" }, lineHeight: 1, color: "secondary.main", userSelect: "none" }}>
+      “
+    </Box>
+  );
+}
 
 /**
  * Solo se monta con la ventana abierta y para la idea que se ve: la petición se
@@ -494,8 +526,9 @@ function SharedExperiencesList({ experiences, categoryId, reported, onReported }
     <>
       <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
         {experiences.map((experience) => (
-          <Box component="li" key={experience.id} sx={{ p: 1.5, borderRadius: 2, bgcolor: "action.hover" }}>
-            <Typography variant="body2" sx={{ whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
+          <Box component="li" key={experience.id} sx={IDEA_BOX_SX}>
+            <QuoteMark />
+            <Typography sx={{ ...IDEA_TEXT_SX, whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
               {experience.text}
             </Typography>
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

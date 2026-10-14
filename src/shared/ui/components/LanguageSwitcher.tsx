@@ -21,7 +21,7 @@ const flagSx = { width: 22, height: 15, borderRadius: "2px", boxShadow: "0 0 0 1
  * mal; ahí son dos botones "ES" y "EN" con una etiqueta pequeña. Cada botón
  * se anuncia con el nombre del idioma en ese idioma.
  */
-export function LanguageSwitcher({ variant = "flags" }: { variant?: "flags" | "text" }) {
+export function LanguageSwitcher({ variant = "flags", showLabel = true }: { variant?: "flags" | "text"; /** La etiqueta "Idioma" delante (en la cabecera, sin ella: no hay sitio). */ showLabel?: boolean }) {
   const { t, i18n } = useTranslation();
   const isEnglish = i18n.language.startsWith("en");
   const choose = (code: "es" | "en") => void i18n.changeLanguage(code);
@@ -40,9 +40,11 @@ export function LanguageSwitcher({ variant = "flags" }: { variant?: "flags" | "t
     );
     return (
       <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
-        <Typography variant="caption" sx={{ opacity: 0.8, mr: 0.5 }}>
-          {t("comun.seleccionaIdioma")}
-        </Typography>
+        {showLabel && (
+          <Typography variant="caption" sx={{ opacity: 0.8, mr: 0.5 }}>
+            {t("comun.seleccionaIdioma")}
+          </Typography>
+        )}
         {option("es", "ES", "Español", !isEnglish)}
         <Box aria-hidden sx={{ opacity: 0.5 }}>
           |

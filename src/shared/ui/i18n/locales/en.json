@@ -1,5 +1,6 @@
 {
   "comun": {
+    "volverArriba": "Back to top",
     "email": "Email",
     "contrasena": "Password",
     "errorServidor": "Could not reach the server",
@@ -14,6 +15,7 @@
     "cerrar": "Close"
   },
   "breadcrumbs": {
+    "entrevista": "Interview",
     "categorias": "Categories",
     "categoria": "Category",
     "inicio": "Home",
@@ -919,5 +921,15 @@
     "borrar": "Delete the trip to {{pais}} ({{fecha}})",
     "error": "We couldn't save that change. Please try again.",
     "noCambianNota": "Your trips are only yours: they don't change your score, they are not sent to the AI and they are not shared."
+  },
+  "avisos": {
+    "titulo": "Notifications",
+    "botonNuevos_one": "Notifications: {{count}} new",
+    "botonNuevos_other": "Notifications: {{count}} new",
+    "ninguno": "You have no notifications.",
+    "evento": "How did \"{{titulo}}\" go? If you like, review your score in {{categorias}}.",
+    "idea": "You planned to try an idea for {{categoria}} on {{fecha}}.",
+    "revisar_one": "{{categoria}} hasn't been reviewed for {{count}} week. Is it still the same?",
+    "revisar_other": "{{categoria}} hasn't been reviewed for {{count}} weeks. Is it still the same?"
   }
 }

@@ -239,6 +239,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **14 oct. 2026** — *"He probado a añadir un viaje a Myanmar pero me ha puesto el marker en Africa. Cómo hacemos el match perfecto? Quizá un selector autocomplete de países o ciudades? Mejor eso que un título libre… para viajes antiguos… es suficiente con el año o solo mes y año… Entonces cómo hemos aplicado los principios de seguridad y OWASP para librerías externas?"*
 → RF-49 v1.1: un viaje es un **país de una lista cerrada y un año** (mes opcional), sin texto libre; el mapa **pinta el país entero** con formas incluidas en la app (Natural Earth), así que el lugar es exacto y no hay recursos externos (fuera las teselas de OpenStreetMap y el cambio de la política de contenido). Ciudades, descartadas por ahora: exigirían un servicio externo de búsqueda o un catálogo enorme. Al revisar las librerías con OWASP A03 (cadena de suministro) se encontró que `react-leaflet` tiene licencia Hippocratic 2.1: se quita y se usa Leaflet (BSD) directamente.
 
+**14 oct. 2026** — *"Al final desarrollamos las notificaciones? Estaría bien añadir un icono en el header… crear un submenú en el avatar y nombre de usuario… Añade Entrevistas al header… deja el selector de idiomas como en la página inicial"* (y otros ajustes de estilo)
+→ Las notificaciones (RF-13, RF-22, RF-23) no se desarrollaron. La campana se hace con lo que ya existe: **reúne los avisos que la app daba en Inicio**, dentro de la app, sin correo ni notificaciones del sistema ([UX-11](user-stories/UX-11-cabecera-y-avisos.md)). La cabecera compartida no importa módulos: la campana se la pasa la ruta protegida.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

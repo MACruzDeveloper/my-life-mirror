@@ -54,7 +54,9 @@ export class AccountPages {
       await this.page.getByRole("button", { name: /abrir menú/i }).click();
       await this.page.getByRole("menuitem", { name: /cerrar sesión/i }).click();
     } else {
-      await this.page.getByRole("button", { name: /cerrar sesión/i }).click();
+      // En escritorio, cerrar sesión está en el menú de la cuenta (avatar y nombre).
+      await this.page.getByRole("group", { name: "Mi cuenta" }).getByRole("button").click();
+      await this.page.getByRole("menuitem", { name: /cerrar sesión/i }).click();
     }
     await expect(this.page).toHaveURL(/\/(login)?$/);
   }

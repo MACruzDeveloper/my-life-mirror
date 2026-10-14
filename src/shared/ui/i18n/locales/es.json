@@ -1,5 +1,6 @@
 {
   "comun": {
+    "volverArriba": "Volver arriba",
     "email": "Email",
     "contrasena": "Contraseña",
     "errorServidor": "No se pudo contactar con el servidor",
@@ -14,6 +15,7 @@
     "cerrar": "Cerrar"
   },
   "breadcrumbs": {
+    "entrevista": "Entrevista",
     "categorias": "Categorías",
     "categoria": "Categoría",
     "inicio": "Inicio",
@@ -919,5 +921,15 @@
     "borrar": "Borrar el viaje a {{pais}} ({{fecha}})",
     "error": "No se ha podido guardar el cambio. Inténtalo de nuevo.",
     "noCambianNota": "Tus viajes son solo tuyos: no cambian tu nota, no se envían a la IA y no se comparten."
+  },
+  "avisos": {
+    "titulo": "Avisos",
+    "botonNuevos_one": "Avisos: {{count}} nuevo",
+    "botonNuevos_other": "Avisos: {{count}} nuevos",
+    "ninguno": "No tienes avisos.",
+    "evento": "¿Cómo fue «{{titulo}}»? Si quieres, revisa tu nota en {{categorias}}.",
+    "idea": "Tenías pensado probar una idea de {{categoria}} para el {{fecha}}.",
+    "revisar_one": "{{categoria}} lleva {{count}} semana sin revisarse. ¿Sigue igual?",
+    "revisar_other": "{{categoria}} lleva {{count}} semanas sin revisarse. ¿Sigue igual?"
   }
 }

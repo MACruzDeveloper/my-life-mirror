@@ -4,6 +4,8 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useAssessmentHistory } from "@modules/assessments/ui/queries";
@@ -60,10 +62,10 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
           {t("panel.bienvenida")}
         </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-          <Button component={RouterLink} to="/perfil/calendario" variant="outlined">
+          <Button component={RouterLink} to="/perfil/calendario" variant="contained" color="secondary" startIcon={<CalendarMonthOutlinedIcon />}>
             {t("cuenta.calendario")}
           </Button>
-          <Button component={RouterLink} to="/perfil/entrevista" variant="contained">
+          <Button component={RouterLink} to="/perfil/entrevista" variant="contained" startIcon={<EditNoteIcon />}>
             {t("entrevista.actualizarRespuestas")}
           </Button>
         </Box>

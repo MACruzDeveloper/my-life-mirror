@@ -141,11 +141,12 @@ export function CalendarPage() {
                       border: 1,
                       // Tres señales que no se pisan: hoy, en naranja; un día con algo anotado, en azul marino;
                       // y el día elegido, con un contorno (sin relleno, para no tapar a las otras dos).
-                      borderColor: day === today ? TODAY_COLORS.border : "transparent",
+                      borderColor: "transparent",
                       fontWeight: day === today ? 700 : 400,
                       bgcolor: day === today ? TODAY_COLORS.bg : count > 0 ? "primary.main" : "transparent",
                       color: day === today ? TODAY_COLORS.fg : count > 0 ? "primary.contrastText" : "text.primary",
-                      outline: selected ? "2px solid" : "none",
+                      // Hoy ya se distingue por su naranja: sin contorno aunque sea el día elegido.
+                      outline: selected && day !== today ? "2px solid" : "none",
                       outlineColor: "primary.main",
                       outlineOffset: 2,
                       "&:hover": { bgcolor: day === today ? TODAY_COLORS.border : count > 0 ? "primary.dark" : "action.hover" },

@@ -10,33 +10,12 @@ import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { agendaItems } from "@modules/agenda/ui/calendarMonth";
 import { useEvents } from "@modules/agenda/ui/queries";
+import { pendingFollowUps, readDismissedFollowUps, saveDismissedFollowUps } from "@modules/agenda/ui/followUps";
 import { useIdeaReactions } from "@modules/recommendations/ui/ideaReactions";
 import { dayFromToday, formatDay } from "@modules/recommendations/ui/planDates";
 
 /** Cuántas cosas próximas se enseñan en Inicio; el resto, en el calendario. */
 const MAX_UPCOMING = 3;
-/** Hasta cuándo se invita a revisar la nota tras un evento. */
-const FOLLOW_UP_DAYS = 14;
-// Preferencia de este navegador (como la guía de Inicio): las invitaciones que ya se cerraron.
-const DISMISSED_KEY = "mlm.eventFollowUpsDismissed";
-
-function readDismissed(): string[] {
-  try {
-    const stored: unknown = JSON.parse(window.localStorage.getItem(DISMISSED_KEY) ?? "[]");
-    return Array.isArray(stored) ? stored.filter((id): id is string => typeof id === "string") : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveDismissed(ids: string[]) {
-  try {
-    window.localStorage.setItem(DISMISSED_KEY, JSON.stringify(ids.slice(-50)));
-  } catch {
-    // No es crítico: la invitación volverá a salir en la próxima visita.
-  }
-}
-
 /**
  * RF-48, en Inicio. Dos cosas:
  * - Desde el día de un evento con categorías (y hasta 14 días después), una
@@ -50,36 +29,35 @@ export function AgendaSummary({ categoryNames }: { categoryNames: Record<string,
   const titleId = useId();
   const events = useEvents().data;
   const reactions = useIdeaReactions().data;
-  const [dismissed, setDismissed] = useState(readDismissed);
+  const [dismissed, setDismissed] = useState(readDismissedFollowUps);
   const today = dayFromToday(0);
   const eventList = Array.isArray(events) ? events : [];
   const upcoming = agendaItems(eventList, Array.isArray(reactions) ? reactions : [])
     .filter((item) => item.day >= today)
     .slice(0, MAX_UPCOMING);
   // Solo las categorías que siguen existiendo (y activas): de las demás no hay nota que revisar.
-  const namesOf = (categoryIds: readonly string[] | undefined) => (categoryIds ?? []).flatMap((categoryId) => categoryNames[categoryId] ?? []);
-  const followUps = eventList.filter((event) => namesOf(event.categoryIds).length > 0 && event.day <= today && event.day >= dayFromToday(-FOLLOW_UP_DAYS) && !dismissed.includes(event.id));
+  const followUps = pendingFollowUps(eventList, categoryNames, dismissed);
   const listFormat = new Intl.ListFormat(i18n.language, { style: "long", type: "conjunction" });
   if (upcoming.length === 0 && followUps.length === 0) return null;
 
   function dismiss(id: string) {
     const next = [...dismissed, id];
     setDismissed(next);
-    saveDismissed(next);
+    saveDismissedFollowUps(next);
   }
 
   return (
     <>
       {followUps.length > 0 && (
         <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
-          {followUps.map((event) => (
+          {followUps.map(({ event, categories }) => (
             <Box component="li" key={event.id} sx={{ position: "relative", display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 1.5, rowGap: 1, p: 2, pr: 6, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
               <Box sx={{ flex: "1 1 240px", minWidth: 0 }}>
                 <Typography variant="subtitle2" component="p" sx={{ overflowWrap: "anywhere" }}>
                   {t("calendario.comoFue", { titulo: event.title })}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t("calendario.revisaNota", { categoria: listFormat.format(namesOf(event.categoryIds)) })}
+                  {t("calendario.revisaNota", { categoria: listFormat.format(categories) })}
                 </Typography>
               </Box>
               <Button component={RouterLink} to="/perfil/entrevista" size="small" variant="outlined">

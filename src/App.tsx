@@ -57,6 +57,7 @@ function App() {
             path="/perfil"
             element={
               <ProtectedLayout
+                wide
                 breadcrumbs={[
                   { label: t('breadcrumbs.inicio'), path: '/inicio' },
                   { label: t('breadcrumbs.miPerfil') },

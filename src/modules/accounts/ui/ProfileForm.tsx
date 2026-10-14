@@ -116,7 +116,7 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ maxWidth: { xs: "100%", sm: 480 }, mx: "auto", mt: 4, px: 2 }}
+      sx={{ maxWidth: 880, mt: 1 }}
     >
       <Typography variant="h5" component="h1" gutterBottom>
         {t("perfil.titulo")}
@@ -124,6 +124,8 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {formState.kind === "error" && <Alert severity="error">{formState.message}</Alert>}
         {formState.kind === "guardado" && <Alert severity="success">{t("perfil.exito")}</Alert>}
+        {/* Los campos de texto, estrechos (se leen mejor); aficiones y avatar, a todo lo ancho. */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: { sm: 560 } }}>
         <TextField label={t("perfil.nombre")} value={name} onChange={(e) => setName(e.target.value)} required fullWidth />
         <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
           <TextField
@@ -163,6 +165,7 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
             </MenuItem>
           ))}
         </TextField>
+        </Box>
         <Box role="group" aria-labelledby={hobbiesTitleId}>
           <Typography id={hobbiesTitleId} variant="subtitle2" component="h2">
             {t("perfil.aficionesTitulo")}
@@ -190,7 +193,7 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
           </Box>
         </Box>
         <AvatarPicker value={avatarKey} onChange={setAvatarKey} keys={avatarKeys} />
-        <Button type="submit" variant="contained" disabled={formState.kind === "guardando"} fullWidth>
+        <Button type="submit" variant="contained" disabled={formState.kind === "guardando"} sx={{ alignSelf: { xs: "stretch", sm: "flex-start" }, minWidth: { sm: 220 } }}>
           {formState.kind === "guardando" ? t("perfil.botonEnviando") : t("perfil.boton")}
         </Button>
       </Box>

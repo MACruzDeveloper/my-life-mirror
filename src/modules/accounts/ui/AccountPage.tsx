@@ -17,6 +17,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, Outlet, useLocation } from "react-router";
+import { WIDE_PAGE_MAX_WIDTH } from "@shared/ui/components/Breadcrumbs";
 
 const MENU_WIDTH = 220;
 const COLLAPSED_WIDTH = 64;
@@ -101,7 +102,7 @@ export function AccountPage() {
   );
 
   return (
-    <Box sx={{ display: "flex", alignItems: "flex-start", gap: { md: 3 }, px: 2, mt: 2 }}>
+    <Box sx={{ display: "flex", alignItems: "flex-start", gap: { md: 3 }, px: 2, mt: 2, maxWidth: WIDE_PAGE_MAX_WIDTH, mx: "auto" }}>
       <Drawer
         variant="permanent"
         sx={{

@@ -45,6 +45,7 @@ function renderPage(key: string, client = createTestClient()) {
   );
 }
 
+// Los dos tests que abren las listas de países (236) y de años (129) son lentos con la cobertura activa: más margen.
 describe("CategoryPage: Aventura (RF-49)", () => {
   afterEach(() => vi.unstubAllGlobals());
 
@@ -83,7 +84,7 @@ describe("CategoryPage: Aventura (RF-49)", () => {
     expect(await screen.findByRole("link", { name: /puntuar aventura/i })).toHaveAttribute("href", "/perfil/entrevista");
   });
 
-  it("añade un viaje eligiendo país (de la lista, con búsqueda), año y mes opcional, sin volver a pedir la lista; no cambia ninguna nota", async () => {
+  it("añade un viaje eligiendo país (de la lista, con búsqueda), año y mes opcional, sin volver a pedir la lista; no cambia ninguna nota", { timeout: 20_000 }, async () => {
     const fetchMock = stubApi();
     renderPage("aventura");
     const trips = await screen.findByRole("region", { name: /tus viajes/i });
@@ -103,7 +104,7 @@ describe("CategoryPage: Aventura (RF-49)", () => {
     expect(fetchMock.mock.calls.some(([url, init]) => url.startsWith("/api/assessments") && init?.method === "POST")).toBe(false);
   });
 
-  it("con mes, lo envía; y pulsar un país en el mapa lo elige en el formulario", async () => {
+  it("con mes, lo envía; y pulsar un país en el mapa lo elige en el formulario", { timeout: 20_000 }, async () => {
     const fetchMock = stubApi();
     renderPage("aventura");
     const trips = await screen.findByRole("region", { name: /tus viajes/i });

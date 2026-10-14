@@ -103,7 +103,9 @@ describe("ProtectedLayout", () => {
     );
 
     await waitFor(() => expect(screen.getByText("ana@ejemplo.com")).toBeInTheDocument());
-    fireEvent.click(screen.getByRole("button", { name: /cerrar sesión/i }));
+    // Cerrar sesión está en el menú de la cuenta (el nombre de la cabecera).
+    fireEvent.click(screen.getByRole("button", { name: /ana@ejemplo\.com/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /cerrar sesión/i }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/accounts/logout", { method: "POST" }));
     await waitFor(() => expect(screen.getByText("La portada")).toBeInTheDocument());

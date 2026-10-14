@@ -11,9 +11,20 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 - **Página de Aventura:** descripción, tu última nota, tus experiencias del diario y **Tus viajes**: un mapa a todo lo ancho (Leaflet) con los países visitados pintados, zoom con la rueda del ratón, y debajo el formulario y la lista. Un viaje es un país de una lista con búsqueda (o pulsado en el mapa) y un año, con el mes opcional; sin texto libre. Puede ser de cualquier año o un plan. No cambia ninguna nota y no va a la IA. **Migraciones 0029 y 0030.**
 - El mapa no usa recursos externos: las formas de los países (Natural Earth) van dentro de la app y la política de contenido no cambia.
 
+### Añadido (UX-11: cabecera y avisos)
+
+- **Campana de avisos** en la cabecera: reúne los avisos que ya daba Inicio (revisar la nota tras un evento, ideas con fecha que ha llegado, categorías sin revisar), con el número de los nuevos. Solo dentro de la app.
+- **Cabecera reorganizada:** Inicio, Categorías y Entrevista; el avatar y el nombre abren un menú con Mi perfil, Administración y Cerrar sesión; idioma como "ES | EN"; resaltado a toda la altura, sin esquinas redondeadas.
+- Botón flotante **"Volver arriba"** en la entrevista, con un fundido.
+
 ### Cambiado
 
-- Calendario: hoy en naranja, los días con algo anotado en azul marino y el día elegido con un contorno; antes el azul tapaba el naranja.
+- **Ventana de ideas:** pestañas de verdad (subrayado y fondo suave de la marca), la idea como una cita (comillas, letra con serifa, azul marino), la misma letra en "De otras personas" y una X para cerrar arriba a la derecha.
+- **Mi perfil:** el formulario a la izquierda, con aficiones y avatares a todo lo ancho; el zoom del avatar tarda 1 segundo.
+- **Migas de pan** dentro del contenedor de cada página.
+- **Inicio:** botones con color e icono.
+- **Entrevista:** accesos a cada categoría también en escritorio (la pregunta aparece con un fundido) y menos espacio entre módulos.
+- Calendario: hoy en naranja y sin borde, los días con algo anotado en azul marino y el día elegido con un contorno; antes el azul tapaba el naranja.
 
 ### Añadido (RF-46, RF-47 y RF-48: perfil, fecha para una idea y calendario)
 
