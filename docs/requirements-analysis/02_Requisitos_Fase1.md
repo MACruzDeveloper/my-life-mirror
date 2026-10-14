@@ -106,6 +106,7 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 | RF-34 | El sistema debe permitir al usuario consultar el historial completo de sus recomendaciones (en cualquier estado: pendiente de respuesta, hecha, descartada, pospuesta), con filtros por estado, categoría y rango de fechas. | Should |
 | RF-47 | Al guardar una idea (RF-19), el usuario podrá ponerle, de forma opcional, una fecha orientativa para probarla, cambiarla o quitarla. La app la muestra sin presión: sin avisos fuera de la app y sin reproche si la fecha pasa. | Could |
 | RF-48 | El usuario podrá anotar eventos propios (un título, una fecha y, opcionalmente, una categoría) y verlos junto a sus ideas con fecha en un calendario. Pasado un evento con categoría, la app le invitará a revisar su puntuación; nunca la cambiará por él. | Could |
+| RF-49 | Cada categoría podrá tener su propia página, con lo que la persona ha vivido en ella: recuerdos y logros que no cambian su puntuación (sirven de memoria y de motivación). Como primer ejemplo, Aventura tendrá una sección de Viajes con un mapa en el que se añaden viajes de cualquier fecha. | Could |
 
 ### 2.6 Notificaciones
 | ID | Descripción | Prioridad |
@@ -224,3 +225,4 @@ Prioridad **MoSCoW**: Must / Should / Could / Won't (esta fase).
 - **v0.17 (11 oct. 2026)** — RF-26: el avatar se elige en el perfil, no durante el registro (decisión del autor: el registro ya pide nombre, email y una contraseña con sus requisitos, y el avatar no hace falta para empezar).
 - **v0.18 (12 oct. 2026)** — RF-19 implementado, aplicado a cada idea del carrusel y no a la recomendación entera: guardar (pospuesta), hecha y "no me sirve" (descartada); ver su [historia](../user-stories/RF-19-guardar-ideas.md). Nueva categoría estándar Salud, sensible (RES-04): se suma a Sexo y Espiritualidad.
 - **v0.19 (13 oct. 2026)** — alcance nuevo, pedido y confirmado por el autor: RF-46 (profesión y aficiones en el perfil, de listas cerradas, para las ideas con IA), RF-47 (fecha orientativa para una idea guardada) y RF-48 (eventos propios y calendario). En RF-48 la puntuación no cambia sola por un evento: la app invita a revisarla (RN-04: la nota la pone la persona).
+- **v0.20 (14 oct. 2026)** — alcance nuevo, pedido por el autor: RF-49 (páginas de categoría con recuerdos; primer ejemplo, los viajes de Aventura con un mapa). Los recuerdos no cambian la puntuación: una nota es cómo te va ahora, un viaje de 2015 no la mueve. Las subcategorías reales (con nota propia) quedan como trabajo futuro: Viajes es una sección de la página de Aventura.

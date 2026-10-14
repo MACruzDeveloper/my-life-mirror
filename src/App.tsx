@@ -14,6 +14,8 @@ import { Home } from '@modules/panel/ui/home/Home'
 import { InterviewPage } from '@modules/assessments/ui/InterviewPage'
 import { ResultsPage } from '@modules/assessments/ui/ResultsPage'
 import { CalendarPage } from '@modules/agenda/ui/CalendarPage'
+import { CategoriesPage } from '@modules/categories/ui/CategoriesPage'
+import { CategoryPageRoute } from '@modules/categories/ui/CategoryPage'
 import { AdminPage } from '@modules/admin/ui/AdminPage'
 import { HelpRoute } from '@modules/wellbeing/ui/HelpPage'
 import { AdminRoute } from '@modules/admin/ui/AdminRoute'
@@ -70,6 +72,15 @@ function App() {
             <Route path="calendario" element={<CalendarPage />} />
             <Route path="datos" element={<DataPrivacyPage />} />
           </Route>
+          <Route
+            path="/categorias"
+            element={
+              <ProtectedLayout breadcrumbs={[{ label: t('breadcrumbs.inicio'), path: '/inicio' }, { label: t('breadcrumbs.categorias') }]}>
+                <CategoriesPage />
+              </ProtectedLayout>
+            }
+          />
+          <Route path="/categorias/:key" element={<CategoryPageRoute />} />
           <Route
             path="/admin"
             element={

@@ -32,6 +32,12 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: /perfil/i })).toHaveAttribute("href", "/perfil");
   });
 
+  it("RF-49: incluye un enlace a Categorías", () => {
+    renderHeader();
+
+    expect(screen.getByRole("link", { name: "Categorías" })).toHaveAttribute("href", "/categorias");
+  });
+
   it("incluye un enlace a /inicio, a la izquierda de Administración", () => {
     renderHeader({ isAdmin: true });
 

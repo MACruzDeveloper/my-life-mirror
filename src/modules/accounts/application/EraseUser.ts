@@ -2,6 +2,7 @@ import type { AssessmentRepository } from "#modules/assessments/domain/Assessmen
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import type { EventRepository } from "#modules/agenda/domain/UserEvent.js";
+import type { TripRepository } from "#modules/agenda/domain/Trip.js";
 import type { IdeaReactionRepository } from "#modules/recommendations/domain/IdeaReaction.js";
 import type { ExperienceRepository } from "#modules/assessments/domain/Experience.js";
 import type { RecommendationRepository } from "#modules/recommendations/domain/RecommendationRepository.js";
@@ -23,6 +24,8 @@ export interface EraseUserDependencies {
   ideaReactionRepository: IdeaReactionRepository;
   /** RF-48: sus eventos del calendario. */
   eventRepository: EventRepository;
+  /** RF-49: sus viajes. */
+  tripRepository: TripRepository;
 }
 
 /**
@@ -33,11 +36,12 @@ export interface EraseUserDependencies {
  * camino se puede repetir (todos los pasos son repetibles) y nunca quedan
  * datos huérfanos sin una cuenta que pueda pedir su borrado.
  */
-export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository }: EraseUserDependencies) {
+export function createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository }: EraseUserDependencies) {
   return async function eraseUser(userId: string): Promise<void> {
     await personalizedIdeaRepository.deleteByUserId(userId);
     await ideaReactionRepository.deleteByUserId(userId);
     await eventRepository.deleteByUserId(userId);
+    await tripRepository.deleteByUserId(userId);
     await experienceRepository.deleteByUserId(userId);
     await recommendationRepository.deleteByUserId(userId);
     await assessmentRepository.deleteByUserId(userId);

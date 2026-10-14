@@ -14,6 +14,8 @@
     "cerrar": "Cerrar"
   },
   "breadcrumbs": {
+    "categorias": "Categorías",
+    "categoria": "Categoría",
     "inicio": "Inicio",
     "crearCuenta": "Crear cuenta",
     "iniciarSesion": "Iniciar sesión",
@@ -177,7 +179,7 @@
     "titulo": "Política de privacidad",
     "version": "Versión {{version}} — borrador para el TFM, no redactado por asesoría legal.",
     "queDatosTitulo": "Qué datos recopilamos",
-    "queDatosTexto": "Tu email, el nombre que nos das al registrarte, y las respuestas que registras en las categorías que actives (fecha de nacimiento, género, profesión y aficiones si los indicas, zona horaria, y tus evaluaciones por categoría).",
+    "queDatosTexto": "Tu email, el nombre que nos das al registrarte, y las respuestas que registras en las categorías que actives (fecha de nacimiento, género, profesión y aficiones si los indicas, zona horaria, y tus evaluaciones por categoría). Si añades viajes en la página de Aventura, guardamos el país, el año y, si lo indicas, el mes. El mapa está incluido en la app: no pide nada a otros servidores.",
     "datosSensiblesTitulo": "Categorías de datos especialmente protegidas",
     "datosSensiblesTexto": "Algunas categorías (sexo, espiritualidad) se consideran datos de categoría especial según el RGPD (art. 9). Solo se activan y registran con tu consentimiento explícito, que puedes retirar en cualquier momento desactivando la categoría.",
     "paraQueTitulo": "Para qué los usamos",
@@ -884,5 +886,38 @@
     "categorias": "¿Con qué categorías tiene que ver? (opcional)",
     "categoriasAyuda": "Si eliges alguna, el día del evento Inicio te invitará a revisar tu nota en ella.",
     "avisoRevision": "El día del evento, Inicio te invitará a revisar tu nota en lo que has elegido, haya ido bien o mal. La app no la cambia por ti."
+  },
+  "paginasCategoria": {
+    "titulo": "Categorías",
+    "intro": "Cada categoría tendrá su propia página, con lo que has vivido en ella: recuerdos y logros que te sirvan de memoria y de motivación. Empezamos por Aventura.",
+    "proximamente": "Próximamente",
+    "sinPagina": "Esta categoría todavía no tiene página.",
+    "verTodas": "Ver todas las categorías",
+    "tuNota": "Tu nota ahora",
+    "puntuadaEl": "Puntuada el {{fecha}}",
+    "sinNota": "Todavía no la has puntuado.",
+    "puntuar": "Puntuar {{categoria}}",
+    "tusExperiencias": "Tus experiencias",
+    "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista."
+  },
+  "viajes": {
+    "titulo": "Tus viajes",
+    "intro": "Los países que has visitado, o que estás planeando visitar, de cualquier año. Un mapa de tus recuerdos y de lo que te queda por ver.",
+    "mapaNoCarga": "No se ha podido cargar el mapa. Tus viajes siguen aquí debajo; prueba a recargar la página.",
+    "mapa": "Mapa de tus viajes",
+    "comoUsarMapa": "Los países visitados salen en azul. Pasa por encima para ver cuándo fuiste, pulsa en uno para elegirlo abajo y acércate con la rueda del ratón o con + y −.",
+    "anadirTitulo": "Añadir un viaje",
+    "pais": "País",
+    "sinPaises": "Ningún país con ese nombre",
+    "anio": "Año",
+    "mes": "Mes (opcional)",
+    "sinMes": "No lo recuerdo",
+    "anadir": "Añadir viaje",
+    "tusViajes_one": "{{count}} viaje",
+    "tusViajes_other": "{{count}} viajes",
+    "ninguno": "Todavía no has añadido ningún viaje.",
+    "borrar": "Borrar el viaje a {{pais}} ({{fecha}})",
+    "error": "No se ha podido guardar el cambio. Inténtalo de nuevo.",
+    "noCambianNota": "Tus viajes son solo tuyos: no cambian tu nota, no se envían a la IA y no se comparten."
   }
 }

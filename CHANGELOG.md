@@ -5,6 +5,16 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-49: páginas de categoría y viajes)
+
+- **"Categorías" en la cabecera:** todas las categorías del catálogo en tarjetas; por ahora solo Aventura tiene página, el resto sale como "Próximamente".
+- **Página de Aventura:** descripción, tu última nota, tus experiencias del diario y **Tus viajes**: un mapa a todo lo ancho (Leaflet) con los países visitados pintados, zoom con la rueda del ratón, y debajo el formulario y la lista. Un viaje es un país de una lista con búsqueda (o pulsado en el mapa) y un año, con el mes opcional; sin texto libre. Puede ser de cualquier año o un plan. No cambia ninguna nota y no va a la IA. **Migraciones 0029 y 0030.**
+- El mapa no usa recursos externos: las formas de los países (Natural Earth) van dentro de la app y la política de contenido no cambia.
+
+### Cambiado
+
+- Calendario: hoy en naranja, los días con algo anotado en azul marino y el día elegido con un contorno; antes el azul tapaba el naranja.
+
 ### Añadido (RF-46, RF-47 y RF-48: perfil, fecha para una idea y calendario)
 
 - **Profesión y aficiones en "Mi perfil" (RF-46):** opcionales y de listas cerradas, nunca texto libre. Con las ideas con IA activadas, se usan para adaptar la redacción; nunca en categorías sensibles. Al cambiarlas, las ideas ya personalizadas se rehacen. **Migración 0025.**

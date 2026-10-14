@@ -88,6 +88,9 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
               <MenuItem component={RouterLink} to="/inicio" onClick={closeMenu}>
                 {t("breadcrumbs.inicio")}
               </MenuItem>
+              <MenuItem component={RouterLink} to="/categorias" onClick={closeMenu}>
+                {t("breadcrumbs.categorias")}
+              </MenuItem>
               {isAdmin ? (
                 <MenuItem component={RouterLink} to="/admin" onClick={closeMenu}>
                   {t("breadcrumbs.administracion")}
@@ -116,6 +119,9 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
             <Box component="nav" aria-label={t("comun.paginas")} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Button size="small" component={RouterLink} to="/inicio">
                 {t("breadcrumbs.inicio")}
+              </Button>
+              <Button size="small" component={RouterLink} to="/categorias">
+                {t("breadcrumbs.categorias")}
               </Button>
               {isAdmin ? (
                 <Button size="small" component={RouterLink} to="/admin">
