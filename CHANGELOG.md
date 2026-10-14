@@ -13,6 +13,9 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ### Cambiado (séptima ronda de ajustes)
 
+- **Ventana de ideas:** las comillas de apertura van junto a la primera línea del texto en todas las pestañas (en "Con IA" quedaban lejos).
+- **Inicio:** "Actualizar mis respuestas" en el color de acento (en negro azulado no se distinguía de la cabecera) y "Calendario" con borde.
+
 - **Portada:** el selector de idioma y el aviso "Imagen generada con IA" se quedan fijos al bajar; el aviso sale una sola vez, no en cada imagen.
 - **Mapa de viajes:** más bajo y con más aire alrededor; la rueda sola desplaza la página y avisa de cómo hacer zoom (Ctrl/⌘ + rueda o pellizcando); en móvil se mueve con dos dedos. Zoom limitado: como mucho, el mundo entero; como poco, un país mediano.
 - **Ventana de ideas:** "Personalizada con IA" arriba a la derecha, "Idea 1 de 5" delante de las flechas y las comillas de cierre justo detrás del texto.

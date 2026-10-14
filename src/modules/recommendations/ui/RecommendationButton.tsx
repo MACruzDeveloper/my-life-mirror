@@ -376,14 +376,10 @@ function IdeaSlides({ keys, index, move, curatedText, personalized, actions, fee
     <>
       {/* La idea, destacada: en la segunda prueba pasaba desapercibida entre el resto de la ventana. Crece hasta llenar la pestaña. */}
       <Box aria-live="polite" sx={IDEA_BOX_SX}>
-        <QuoteMark />
         {personalized ? (
           <PersonalizedIdea key={currentKey} recommendationId={personalized.recommendationId} templateKey={currentKey} categoryId={personalized.categoryId} curatedText={curatedText} />
         ) : (
-          <DialogContentText sx={IDEA_TEXT_SX}>
-            {curatedText}
-            <CloseQuote />
-          </DialogContentText>
+          <QuotedText>{curatedText}</QuotedText>
         )}
       </Box>
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: actions ? "space-between" : "center", gap: 2, mb: 1 }}>
@@ -434,11 +430,29 @@ const IDEA_BOX_SX = {
   bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, 0.05),
 } as const;
 
-/** Las comillas de apertura, decorativas (el lector de pantalla no las anuncia), arriba a la izquierda del bloque. */
+/**
+ * Las comillas de apertura, decorativas (el lector de pantalla no las anuncia).
+ * Se colocan respecto al texto, no al bloque: así quedan igual de cerca de la
+ * primera línea en todas las pestañas, también cuando el texto baja para dejar
+ * sitio a "Personalizada con IA".
+ */
 function QuoteMark() {
   return (
-    <Box component="span" aria-hidden sx={{ position: "absolute", top: { xs: 4, sm: 8 }, left: { xs: 12, sm: 18 }, fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "3.5rem", sm: "4.5rem" }, lineHeight: 1, color: "secondary.main", userSelect: "none" }}>
+    <Box component="span" aria-hidden sx={{ position: "absolute", top: -16, left: { xs: -32, sm: -38 }, fontFamily: 'Georgia, Cambria, "Times New Roman", serif', fontSize: { xs: "3.5rem", sm: "4.5rem" }, lineHeight: 1, color: "secondary.main", userSelect: "none" }}>
       “
+    </Box>
+  );
+}
+
+/** Un texto entre comillas: las de apertura junto a su primera línea y las de cierre detrás de la última palabra. */
+function QuotedText({ children, sx }: { children: React.ReactNode; sx?: object }) {
+  return (
+    <Box sx={{ position: "relative", ...sx }}>
+      <QuoteMark />
+      <DialogContentText sx={{ ...IDEA_TEXT_SX, whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
+        {children}
+        <CloseQuote />
+      </DialogContentText>
     </Box>
   );
 }
@@ -487,10 +501,7 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, curatedTe
   if (data?.source !== "ai") {
     return (
       <>
-        <DialogContentText sx={IDEA_TEXT_SX}>
-          {curatedText}
-          <CloseQuote />
-        </DialogContentText>
+        <QuotedText>{curatedText}</QuotedText>
         {/* RF-40b: si es por el tope diario, se dice; ante un fallo del proveedor, solo la idea original. */}
         {data?.notice === "limit" && (
           <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1.5 }}>
@@ -505,10 +516,7 @@ function PersonalizedIdea({ recommendationId, templateKey, categoryId, curatedTe
     <Box>
       {/* Arriba a la derecha del bloque, apartada del texto (a la izquierda están las comillas). */}
       <Chip icon={<AutoAwesomeOutlinedIcon fontSize="small" />} label={t("recomendaciones.personalizadaConIa")} size="small" variant="outlined" sx={{ position: "absolute", top: 20, right: 20 }} />
-      <DialogContentText sx={{ ...IDEA_TEXT_SX, mt: 4 }}>
-        {data.text}
-        <CloseQuote />
-      </DialogContentText>
+      <QuotedText sx={{ mt: 4 }}>{data.text}</QuotedText>
     </Box>
   );
 }
@@ -549,11 +557,7 @@ function SharedExperiencesList({ experiences, categoryId, reported, onReported }
         {experiences.map((experience) => (
           <Box component="li" key={experience.id}>
             <Box sx={IDEA_BOX_SX}>
-              <QuoteMark />
-              <Typography sx={{ ...IDEA_TEXT_SX, whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
-                {experience.text}
-                <CloseQuote />
-              </Typography>
+              <QuotedText>{experience.text}</QuotedText>
             </Box>
             {/* Fuera del bloque de la cita: no es parte de lo que escribió la otra persona. */}
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>

@@ -65,10 +65,11 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
           {profile?.name ? t("panel.bienvenidaNombre", { nombre: profile.name, context: profile.gender }) : t("panel.bienvenidaSinNombre")}
         </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-          <Button component={RouterLink} to="/perfil/calendario" variant="contained" color="secondary" startIcon={<CalendarMonthOutlinedIcon />}>
+          {/* El de acción, en el color de acento: el negro azulado es el de la cabecera y no se distinguía. */}
+          <Button component={RouterLink} to="/perfil/calendario" variant="outlined" color="secondary" startIcon={<CalendarMonthOutlinedIcon />}>
             {t("cuenta.calendario")}
           </Button>
-          <Button component={RouterLink} to="/perfil/entrevista" variant="contained" startIcon={<EditNoteIcon />}>
+          <Button component={RouterLink} to="/perfil/entrevista" variant="contained" color="secondary" startIcon={<EditNoteIcon />}>
             {t("entrevista.actualizarRespuestas")}
           </Button>
         </Box>
