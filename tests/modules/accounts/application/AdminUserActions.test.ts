@@ -1,6 +1,7 @@
 import { checkPassword } from "@modules/accounts/domain/passwordPolicy";
 import { describe, expect, it } from "vitest";
 import { InMemoryEventRepository } from "@modules/agenda/infrastructure/InMemoryEventRepository";
+import { InMemoryTripRepository } from "@modules/agenda/infrastructure/InMemoryTripRepository";
 import { InMemoryIdeaReactionRepository } from "@modules/recommendations/infrastructure/InMemoryIdeaReactionRepository";
 import { InMemoryPersonalizedIdeaRepository } from "@modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository";
 import { InMemoryExperienceRepository } from "@modules/assessments/infrastructure/InMemoryExperienceRepository";
@@ -45,6 +46,7 @@ async function setup() {
     personalizedIdeaRepository: new InMemoryPersonalizedIdeaRepository(),
     ideaReactionRepository: new InMemoryIdeaReactionRepository(),
     eventRepository: new InMemoryEventRepository(),
+    tripRepository: new InMemoryTripRepository(),
     experienceRepository: new InMemoryExperienceRepository(),
     auditRepository,
     registerUser: createRegisterUser(authProvider, updateProfile),

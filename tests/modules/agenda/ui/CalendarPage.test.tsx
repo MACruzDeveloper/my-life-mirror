@@ -130,14 +130,15 @@ describe("CalendarPage (RF-48)", () => {
     expect(call[0]).toBe("/api/agenda/events?id=e1");
   });
 
-  it("se puede pasar de mes y volver a hoy", async () => {
+  it("se pasa de mes con las flechas; sin botón 'Hoy' (hoy ya se ve en naranja)", async () => {
     stubApi([]);
     render(withClient(<CalendarPage />));
     await screen.findByRole("heading", { name: /octubre de 2026/i });
+    expect(screen.queryByRole("button", { name: /^hoy$/i })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /mes siguiente/i }));
     expect(screen.getByRole("heading", { name: /noviembre de 2026/i })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /^hoy$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /mes anterior/i }));
     expect(screen.getByRole("heading", { name: /octubre de 2026/i })).toBeInTheDocument();
   });
 

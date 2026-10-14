@@ -9,7 +9,7 @@ import { UserAvatar } from "@shared/ui/components/UserAvatar";
 const AVATAR_SIZE = 56;
 /** Cuánto crece un avatar al señalarlo, y en cuánto tiempo (decisión del autor tras la segunda prueba con una usuaria). */
 const ZOOM_SCALE = 2;
-const ZOOM_SECONDS = 2;
+const ZOOM_SECONDS = 1;
 
 interface AvatarPickerProps {
   /** La clave elegida; sin valor, "Sin avatar". */
@@ -59,7 +59,7 @@ export function AvatarPicker({ value, onChange, keys = publishedAvatarKeys() }: 
 
   return (
     <Box>
-      <Typography id="avatar-picker-label" variant="subtitle1" component="h2">
+      <Typography id="avatar-picker-label" variant="subtitle1" component="h2" sx={{ fontWeight: 700 }}>
         {t("avatares.titulo")}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>

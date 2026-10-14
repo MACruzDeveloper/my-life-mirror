@@ -33,6 +33,10 @@ import type { EventRepository } from "#modules/agenda/domain/UserEvent.js";
 import { createAddEvent, createDeleteEvent, createListEvents } from "#modules/agenda/application/Events.js";
 import { InMemoryEventRepository } from "#modules/agenda/infrastructure/InMemoryEventRepository.js";
 import { SupabaseEventRepository } from "#modules/agenda/infrastructure/SupabaseEventRepository.js";
+import type { TripRepository } from "#modules/agenda/domain/Trip.js";
+import { createAddTrip, createDeleteTrip, createListTrips } from "#modules/agenda/application/Trips.js";
+import { InMemoryTripRepository } from "#modules/agenda/infrastructure/InMemoryTripRepository.js";
+import { SupabaseTripRepository } from "#modules/agenda/infrastructure/SupabaseTripRepository.js";
 import type { AttemptLimiter } from "#shared/domain/AttemptLimiter.js";
 import { InMemoryAttemptLimiter, UnlimitedAttemptLimiter } from "#shared/infrastructure/InMemoryAttemptLimiter.js";
 import { SupabaseAttemptLimiter } from "#shared/infrastructure/SupabaseAttemptLimiter.js";
@@ -162,6 +166,12 @@ function createEventRepository(environment: Environment): EventRepository {
   if (environment === "test") return new InMemoryEventRepository();
   const { url, serviceRoleKey } = supabaseCredentials();
   return new SupabaseEventRepository(url, serviceRoleKey);
+}
+
+function createTripRepository(environment: Environment): TripRepository {
+  if (environment === "test") return new InMemoryTripRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseTripRepository(url, serviceRoleKey);
 }
 
 function createIdeaReactionRepository(environment: Environment): IdeaReactionRepository {
@@ -355,6 +365,9 @@ export interface AppContext {
   addEvent: ReturnType<typeof createAddEvent>;
   listEvents: ReturnType<typeof createListEvents>;
   deleteEvent: ReturnType<typeof createDeleteEvent>;
+  addTrip: ReturnType<typeof createAddTrip>;
+  listTrips: ReturnType<typeof createListTrips>;
+  deleteTrip: ReturnType<typeof createDeleteTrip>;
   setIdeaReaction: ReturnType<typeof createSetIdeaReaction>;
   listIdeaReactions: ReturnType<typeof createListIdeaReactions>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
@@ -383,6 +396,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const registerUser = createRegisterUser(authProvider, updateProfile);
   const ideaReactionRepository = createIdeaReactionRepository(environment);
   const eventRepository = createEventRepository(environment);
+  const tripRepository = createTripRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider(environment, clock);
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
@@ -414,15 +428,16 @@ export function createAppContext(environment: Environment = detectEnvironment())
       personalizedIdeaRepository,
       ideaReactionRepository,
       eventRepository,
+      tripRepository,
       experienceRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
-    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -469,6 +484,9 @@ export function createAppContext(environment: Environment = detectEnvironment())
     addEvent: createAddEvent({ eventRepository, categoryRepository, clock }),
     listEvents: createListEvents(eventRepository),
     deleteEvent: createDeleteEvent(eventRepository),
+    addTrip: createAddTrip({ tripRepository, clock }),
+    listTrips: createListTrips(tripRepository),
+    deleteTrip: createDeleteTrip(tripRepository),
     setIdeaReaction: createSetIdeaReaction({ ideaReactionRepository, categoryRepository, catalog: categoryCatalogRepository, clock }),
     listIdeaReactions: createListIdeaReactions(ideaReactionRepository),
     aiIdeasAvailable: ideaProvider.writer !== undefined,

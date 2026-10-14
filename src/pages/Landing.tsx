@@ -45,7 +45,7 @@ export function Landing() {
     <>
       {/* UX-08: primera vista a pantalla completa. La imagen es decorativa (no se anuncia). */}
       <Box component="section" aria-labelledby="landing-title" sx={[SECTION, { height: "100svh", alignItems: "flex-end", pb: { xs: 5, sm: 6 }, color: "common.white", textAlign: "center" }]}>
-        <FixedBackdrop mobile={heroMobile} desktop={heroDesktop} overlay={OVERLAY} fallbackColor={PALETTE.ink} />
+        <FixedBackdrop mobile={heroMobile} desktop={heroDesktop} overlay={OVERLAY} fallbackColor={PALETTE.midnight} />
         <Box sx={{ maxWidth: 560 }}>
           <Typography id="landing-title" variant="h3" component="h1" gutterBottom>
             {t("landing.titulo")}
@@ -53,12 +53,12 @@ export function Landing() {
           <Typography variant="body1" sx={{ mb: 3 }}>
             {t("landing.descripcion")}
           </Typography>
-          {/* Botones en colores de la paleta que no compiten con la imagen: azul noche el principal, gris azulado el otro. */}
+          {/* Botones en colores de la paleta que no compiten con la imagen: negro azulado el principal, Country Blue translúcido el otro. */}
           <Stack direction="row" spacing={2} sx={{ justifyContent: "center" }}>
-            <Button component={RouterLink} to="/registro" variant="contained" sx={{ bgcolor: PALETTE.navy, color: PALETTE.mist, border: "1px solid rgba(242, 242, 242, 0.28)", "&:hover": { bgcolor: "#21445A" } }}>
+            <Button component={RouterLink} to="/registro" variant="contained" sx={{ bgcolor: PALETTE.richBlack, color: PALETTE.antiFlash, border: "1px solid rgba(243, 241, 244, 0.28)", "&:hover": { bgcolor: "#0E2523" } }}>
               {t("landing.crearCuenta")}
             </Button>
-            <Button component={RouterLink} to="/login" variant="contained" sx={{ bgcolor: "rgba(114, 130, 140, 0.55)", color: PALETTE.mist, border: "1px solid rgba(242, 242, 242, 0.28)", boxShadow: "none", "&:hover": { bgcolor: "rgba(114, 130, 140, 0.75)", boxShadow: "none" } }}>
+            <Button component={RouterLink} to="/login" variant="contained" sx={{ bgcolor: "rgba(107, 158, 168, 0.55)", color: PALETTE.antiFlash, border: "1px solid rgba(243, 241, 244, 0.28)", boxShadow: "none", "&:hover": { bgcolor: "rgba(107, 158, 168, 0.75)", boxShadow: "none" } }}>
               {t("landing.iniciarSesion")}
             </Button>
           </Stack>
@@ -73,17 +73,17 @@ export function Landing() {
             <KeyboardArrowDownIcon />
           </IconButton>
         </Box>
-        <AiNote />
       </Box>
       {/* Al bajar, esta parte sube sobre su propia imagen, que no se mueve: la primera queda tapada como por una cortina. */}
       <Box id={HOW_IT_WORKS_ID} sx={[SECTION, { minHeight: "100svh", alignItems: "flex-end", py: { xs: 6, sm: 8 } }]}>
-        <FixedBackdrop mobile={secondMobile} desktop={secondDesktop} overlay={OVERLAY} fallbackColor={PALETTE.ink} />
+        <FixedBackdrop mobile={secondMobile} desktop={secondDesktop} overlay={OVERLAY} fallbackColor={PALETTE.midnight} />
         <Box className="mlm-landing-card" sx={{ width: "100%", maxWidth: 520, bgcolor: "rgba(255, 255, 255, 0.93)", backdropFilter: "blur(6px)", borderRadius: 3, px: { xs: 2.5, sm: 4 }, pt: { xs: 3, sm: 4 }, pb: 1 }}>
           <HowItWorks />
           <HelpFooter />
         </Box>
-        <AiNote />
       </Box>
+      {/* Uno solo para las dos imágenes, fijo en la esquina: no se repite en cada parte. */}
+      <AiNote />
     </>
   );
 }
@@ -116,7 +116,7 @@ const SECTION = {
 function AiNote() {
   const { t } = useTranslation();
   return (
-    <Typography variant="caption" sx={{ position: "absolute", right: 12, bottom: 8, color: "common.white", opacity: 0.75 }}>
+    <Typography variant="caption" sx={{ position: "fixed", right: 12, bottom: 8, zIndex: 2, color: "common.white", opacity: 0.75, pointerEvents: "none" }}>
       {t("landing.imagenIA")}
     </Typography>
   );

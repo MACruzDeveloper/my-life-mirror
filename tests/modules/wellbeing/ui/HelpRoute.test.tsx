@@ -33,7 +33,7 @@ describe("HelpRoute (RF-30): se puede salir de la ayuda", () => {
     renderAt({ autenticado: true, email: "ana@ejemplo.com", name: "Ana" });
 
     expect(await screen.findByText("Ana")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Ana/ })).toHaveAttribute("aria-haspopup", "menu");
     const breadcrumbs = screen.getByRole("navigation", { name: "breadcrumb" });
     expect(within(breadcrumbs).getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/inicio");
     expect(screen.getByRole("heading", { level: 1, name: "¿Necesitas ayuda ahora?" })).toBeInTheDocument();

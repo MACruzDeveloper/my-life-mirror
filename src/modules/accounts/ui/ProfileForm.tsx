@@ -16,6 +16,7 @@ import { PERSONALIZED_IDEAS_KEY } from "@modules/recommendations/ui/queries";
 import { PROFILE_KEY, useProfile, type ProfileResponse } from "./queries";
 import { useSession } from "@shared/ui/context/SessionContext";
 import { AvatarPicker } from "./AvatarPicker";
+import { AiProfilePreview } from "./AiProfilePreview";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
 const DETECTED_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -116,14 +117,16 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ maxWidth: { xs: "100%", sm: 480 }, mx: "auto", mt: 4, px: 2 }}
+      sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) 300px" }, columnGap: 5, rowGap: 3, alignItems: "start" }}
     >
-      <Typography variant="h5" component="h1" gutterBottom>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, maxWidth: 760 }}>
+      <Typography variant="h5" component="h1" sx={{ mb: 2 }}>
         {t("perfil.titulo")}
       </Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {formState.kind === "error" && <Alert severity="error">{formState.message}</Alert>}
         {formState.kind === "guardado" && <Alert severity="success">{t("perfil.exito")}</Alert>}
+        {/* Los campos de texto, estrechos (se leen mejor); aficiones y avatar, a todo lo ancho. */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: { sm: 560 } }}>
         <TextField label={t("perfil.nombre")} value={name} onChange={(e) => setName(e.target.value)} required fullWidth />
         <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
           <TextField
@@ -163,8 +166,9 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
             </MenuItem>
           ))}
         </TextField>
+        </Box>
         <Box role="group" aria-labelledby={hobbiesTitleId}>
-          <Typography id={hobbiesTitleId} variant="subtitle2" component="h2">
+          <Typography id={hobbiesTitleId} variant="subtitle1" component="h2" sx={{ fontWeight: 700 }}>
             {t("perfil.aficionesTitulo")}
           </Typography>
           <Typography variant="caption" color="text.secondary" component="p" sx={{ mb: 1 }}>
@@ -190,9 +194,13 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
           </Box>
         </Box>
         <AvatarPicker value={avatarKey} onChange={setAvatarKey} keys={avatarKeys} />
-        <Button type="submit" variant="contained" disabled={formState.kind === "guardando"} fullWidth>
+        <Button type="submit" variant="contained" disabled={formState.kind === "guardando"} sx={{ alignSelf: { xs: "stretch", sm: "flex-start" }, minWidth: { sm: 220 } }}>
           {formState.kind === "guardando" ? t("perfil.botonEnviando") : t("perfil.boton")}
         </Button>
+      </Box>
+      {/* Al lado del formulario en pantallas anchas; debajo en móvil. Fija al desplazarse. */}
+      <Box sx={{ position: { lg: "sticky" }, top: { lg: 88 } }}>
+        <AiProfilePreview occupation={occupation} hobbies={hobbies} />
       </Box>
     </Box>
   );

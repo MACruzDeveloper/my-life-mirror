@@ -33,7 +33,7 @@ export function ScoreCards({ latestScores, renderCardExtra }: { latestScores: La
         return (
           <Box
             key={latestScore.categoryId}
-            sx={{ position: "relative", overflow: "hidden", p: 2, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}
+            sx={{ position: "relative", overflow: "hidden", p: 2, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}
           >
             <BandBackground band={band} />
             <Box sx={{ position: "relative", display: "flex", flexDirection: "column", gap: 0.5 }}>

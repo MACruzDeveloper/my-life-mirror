@@ -252,4 +252,32 @@ describe("Home (RF-39 / RF-14)", () => {
       vi.restoreAllMocks();
     });
   });
+
+  describe("saludo con el nombre", () => {
+    function stubWithProfile(profile: unknown) {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) => {
+          if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => profile });
+          if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
+          if (url === "/api/assessments") return Promise.resolve({ ok: true, json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }] });
+          return Promise.resolve({ ok: true, json: async () => [] });
+        }),
+      );
+    }
+
+    it("con el género indicado, en femenino o masculino", async () => {
+      stubWithProfile({ name: "Ana", gender: "woman" });
+      renderHome();
+
+      expect(await screen.findByRole("heading", { level: 1, name: "Bienvenida, Ana" })).toBeInTheDocument();
+    });
+
+    it("sin género (o sin indicarlo), una forma que vale para cualquiera", async () => {
+      stubWithProfile({ name: "Alex" });
+      renderHome();
+
+      expect(await screen.findByRole("heading", { level: 1, name: "Te damos la bienvenida, Alex" })).toBeInTheDocument();
+    });
+  });
 });

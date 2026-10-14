@@ -1,3 +1,6 @@
+import { PALE_TINT } from "@shared/ui/theme";
+import { ScrollToTopButton } from "@shared/ui/components/ScrollToTopButton";
+import { prefersReducedMotion } from "@shared/ui/motion";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Accordion from "@mui/material/Accordion";
@@ -48,10 +51,15 @@ import { ScoreFeedbackToast, type ScoreFeedbackMessage } from "./interview/Score
 import { scoreFeedback } from "./scoreFeedback";
 import type { LatestScoreDto } from "./ScoreCards";
 
-/** Lleva a la pregunta de una categoría; sin animación si el usuario prefiere menos movimiento. */
+/**
+ * Lleva a la pregunta de una categoría y la hace aparecer con un fundido, para
+ * que se vea a dónde se ha llegado. Sin animación si se prefiere menos movimiento.
+ */
 function scrollToQuestion(categoryId: string) {
-  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-  document.getElementById(`pregunta-${categoryId}`)?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  const reduced = prefersReducedMotion();
+  const question = document.getElementById(`pregunta-${categoryId}`);
+  question?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  if (!reduced) question?.animate?.([{ opacity: 0.25 }, { opacity: 1 }], { duration: 700, easing: "ease-out", delay: 250, fill: "backwards" });
 }
 
 function omitKey<T>(record: Record<string, T>, key: string): Record<string, T> {
@@ -71,7 +79,7 @@ const SOFT_SCROLLBAR = {
 } as const;
 
 /** Cada bloque de la columna principal (introducción, preguntas): mismo marco, distinto fondo. */
-const MODULE_STYLES = { p: { xs: 2, sm: 4 }, borderRadius: 4, display: "flex", flexDirection: "column", gap: 3 } as const;
+const MODULE_STYLES = { p: { xs: 2, sm: 4 }, borderRadius: 0, display: "flex", flexDirection: "column", gap: 3 } as const;
 
 const isOpenRecommendation = (recommendation: RecommendationDto) => recommendation.status === "pending" || recommendation.status === "postponed";
 
@@ -564,8 +572,8 @@ export function InterviewPage() {
   return (
     <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", lg: showQuestions ? "minmax(0, 1fr) 280px" : "minmax(0, 1fr)" }, alignItems: "start" }}>
     {/* Dos bloques con fondo distinto (UX-06): la introducción y, debajo, las preguntas. */}
-    <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 2, sm: 3 }, minWidth: 0 }}>
-    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: "#E6EBEE", scrollMarginTop: 72 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 1.5, sm: 2 }, minWidth: 0 }}>
+    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: PALE_TINT, scrollMarginTop: 72 }}>
       {/* La entrevista es la primera vez; con respuestas guardadas, la misma pantalla se presenta como "actualizarlas". */}
       <Typography id="entrevista-titulo" variant="h5" component="h1">
         {isFirstInterview ? t("entrevista.titulo") : t("entrevista.tituloActualizar")}
@@ -635,7 +643,7 @@ export function InterviewPage() {
       {showQuestions &&
         (isFirstInterview ? (
           // En la primera entrevista ya se leyó en el paso 1: queda plegada, por si se quiere releer.
-          <Accordion disableGutters elevation={0} sx={{ bgcolor: "rgba(255, 255, 255, 0.6)", borderRadius: 3, "&::before": { display: "none" } }}>
+          <Accordion disableGutters elevation={0} sx={{ bgcolor: "rgba(255, 255, 255, 0.6)", borderRadius: 0, "&::before": { display: "none" } }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1" component="span">
                 {t("entrevista.releerIntro")}
@@ -650,7 +658,7 @@ export function InterviewPage() {
     </Box>
 
     {showQuestions && (
-    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "#F2F2F2" }}>
+    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "background.default", pt: { xs: 1, sm: 1.5 } }}>
       {activeCategories.length > 0 && (
         <Typography id="entrevista-preguntas" variant="h6" component="h2">
           {t("entrevista.preguntasTitulo")}
@@ -658,8 +666,8 @@ export function InterviewPage() {
       )}
 
       {activeCategories.length > 0 && (
-        // En escritorio, el panel de progreso de la derecha hace de accesos directos.
-        <Box component="nav" aria-label={t("entrevista.irA")} sx={{ display: { xs: "flex", lg: "none" }, flexWrap: "wrap", gap: 1 }}>
+        // Accesos directos a cada pregunta (también en escritorio, junto al progreso de la derecha).
+        <Box component="nav" aria-label={t("entrevista.irA")} sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           {activeCategories.map((category) => {
             const isUnanswered = scores[category.id] === undefined;
             return (
@@ -778,6 +786,7 @@ export function InterviewPage() {
       </Box>
     </Box>
     )}
+    {showQuestions && <ScrollToTopButton />}
     </Box>
   );
 }

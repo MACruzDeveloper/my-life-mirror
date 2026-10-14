@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { Breadcrumbs, type BreadcrumbItem } from "./Breadcrumbs";
+import { Breadcrumbs, type BreadcrumbItem, PAGE_MAX_WIDTH, WIDE_PAGE_MAX_WIDTH } from "./Breadcrumbs";
 import { Header } from "./Header";
 import { HelpFooter } from "./HelpLink";
 import { useSession } from "../context/SessionContext";
@@ -12,6 +12,8 @@ export interface ProtectedLayoutProps {
    * ver AGENTS.md sobre nombres en inglés.
    */
   breadcrumbs?: BreadcrumbItem[];
+  /** Página ancha (con menú lateral): las migas se alinean con su contenedor. */
+  wide?: boolean;
   children: ReactNode;
 }
 
@@ -24,7 +26,7 @@ export interface ProtectedLayoutProps {
  * comparte el mismo estado que cualquier hijo (p. ej. `ProfileForm`, que
  * puede invalidarlo con `refresh()` tras guardar).
  */
-export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps) {
+export function ProtectedLayout({ breadcrumbs, wide = false, children }: ProtectedLayoutProps) {
   const { email, name, rol, avatarKey } = useSession();
   const navigate = useNavigate();
 
@@ -38,7 +40,7 @@ export function ProtectedLayout({ breadcrumbs, children }: ProtectedLayoutProps)
     <>
       {/* name (RF-03) tiene prioridad sobre el email en cuanto existe — ver api/sesion.ts. */}
       <Header displayName={name ?? email} avatarKey={avatarKey} onLogout={handleLogout} isAdmin={rol === "admin"} />
-      {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" /> : null}
+      {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" maxWidth={wide ? WIDE_PAGE_MAX_WIDTH : PAGE_MAX_WIDTH} /> : null}
       {children}
       {/* RF-30: en toda pantalla protegida, igual para todo el mundo. */}
       <HelpFooter />

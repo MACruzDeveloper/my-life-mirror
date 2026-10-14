@@ -26,7 +26,7 @@ const A_MONDAY = new Date(2024, 0, 1);
 /**
  * El día de hoy, en el naranja de la app (el de la banda "casi bajo" de las
  * puntuaciones, `scoreBand.ts`). Aquí no significa una nota: lo pidió el autor
- * para que hoy se distinga del día elegido, que va en azul marino.
+ * para que hoy se distinga de los días con algo anotado, que van en azul marino.
  */
 const TODAY_COLORS = { bg: "#FFF1E0", fg: "#A85300", border: "#FFD2A1" };
 
@@ -90,7 +90,7 @@ export function CalendarPage() {
         </Typography>
       )}
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { md: "flex-start" }, gap: 3 }}>
-        <Box sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: { xs: 1.5, sm: 2.5 }, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+        <Box sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: { xs: 1.5, sm: 2.5 }, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
             <IconButton size="small" aria-label={t("calendario.mesAnterior")} onClick={() => setVisibleMonth(shiftMonth(visibleMonth, -1))} sx={ARROW_SX}>
               <ChevronLeftIcon />
@@ -101,9 +101,6 @@ export function CalendarPage() {
             <IconButton size="small" aria-label={t("calendario.mesSiguiente")} onClick={() => setVisibleMonth(shiftMonth(visibleMonth, 1))} sx={ARROW_SX}>
               <ChevronRightIcon />
             </IconButton>
-            <Button size="small" variant="outlined" onClick={() => select(today)}>
-              {t("calendario.hoy")}
-            </Button>
           </Box>
           <Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: 0.5 }}>
             {weekdays.map((weekday) => (
@@ -139,24 +136,29 @@ export function CalendarPage() {
                       cursor: "pointer",
                       borderRadius: 2,
                       border: 1,
-                      // Hoy, en naranja y en negrita; el día elegido, en azul marino (si es hoy, conserva el borde naranja).
-                      borderColor: day === today ? TODAY_COLORS.border : "transparent",
+                      // Tres señales que no se pisan: hoy, en naranja; un día con algo anotado, en azul marino;
+                      // y el día elegido, con un contorno (sin relleno, para no tapar a las otras dos).
+                      borderColor: "transparent",
                       fontWeight: day === today ? 700 : 400,
-                      bgcolor: selected ? "primary.main" : day === today ? TODAY_COLORS.bg : "transparent",
-                      color: selected ? "primary.contrastText" : day === today ? TODAY_COLORS.fg : "text.primary",
-                      "&:hover": { bgcolor: selected ? "primary.dark" : day === today ? TODAY_COLORS.border : "action.hover" },
+                      bgcolor: day === today ? TODAY_COLORS.bg : count > 0 ? "primary.main" : "transparent",
+                      color: day === today ? TODAY_COLORS.fg : count > 0 ? "primary.contrastText" : "text.primary",
+                      // Hoy ya se distingue por su naranja: sin contorno aunque sea el día elegido.
+                      outline: selected && day !== today ? "2px solid" : "none",
+                      outlineColor: "primary.main",
+                      outlineOffset: 2,
+                      "&:hover": { bgcolor: day === today ? TODAY_COLORS.border : count > 0 ? "primary.dark" : "action.hover" },
                       "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 2 },
                     }}
                   >
                     <span>{Number(day.slice(8))}</span>
-                    {/* La marca de "hay algo": un punto, además del texto del `aria-label`. */}
-                    <Box component="span" aria-hidden sx={{ position: "absolute", bottom: 5, left: "calc(50% - 3px)", width: 6, height: 6, borderRadius: "50%", bgcolor: count > 0 ? (selected ? "primary.contrastText" : "primary.main") : "transparent" }} />
+                    {/* Hoy ya va en naranja: si además tiene algo anotado, se marca con un punto azul. */}
+                    {day === today && count > 0 && <Box component="span" aria-hidden sx={{ position: "absolute", bottom: 5, left: "calc(50% - 3px)", width: 6, height: 6, borderRadius: "50%", bgcolor: "primary.main" }} />}
                   </Box>
                 );
               })}
           </Box>
         </Box>
-        <Box component="section" aria-labelledby={dayTitleId} sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: 2.5, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+        <Box component="section" aria-labelledby={dayTitleId} sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
           <Typography id={dayTitleId} variant="subtitle1" component="h2" sx={{ fontWeight: 600, "&::first-letter": { textTransform: "uppercase" } }}>
             {fullDate(selectedDay)}
           </Typography>

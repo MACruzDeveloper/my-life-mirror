@@ -1,5 +1,6 @@
 {
   "comun": {
+    "volverArriba": "Back to top",
     "email": "Email",
     "contrasena": "Password",
     "errorServidor": "Could not reach the server",
@@ -14,6 +15,9 @@
     "cerrar": "Close"
   },
   "breadcrumbs": {
+    "entrevista": "Interview",
+    "categorias": "Categories",
+    "categoria": "Category",
     "inicio": "Home",
     "crearCuenta": "Create account",
     "iniciarSesion": "Log in",
@@ -90,6 +94,10 @@
     "errorGenerico": "Could not change the password"
   },
   "panel": {
+    "bienvenidaNombre": "Welcome, {{nombre}}",
+    "bienvenidaNombre_woman": "Welcome, {{nombre}}",
+    "bienvenidaNombre_man": "Welcome, {{nombre}}",
+    "bienvenidaSinNombre": "Welcome",
     "bienvenida": "Welcome",
     "cerrarSesion": "Log out",
     "bienvenidaTitulo": "Let's start by getting to know you",
@@ -177,7 +185,7 @@
     "titulo": "Privacy policy",
     "version": "Version {{version}} — draft for the master's thesis, not written by legal counsel.",
     "queDatosTitulo": "What data we collect",
-    "queDatosTexto": "Your email, the name you give us when registering, and the entries you record in the categories you turn on (date of birth, gender, occupation and hobbies if you provide them, time zone, and your per-category check-ins).",
+    "queDatosTexto": "Your email, the name you give us when registering, and the entries you record in the categories you turn on (date of birth, gender, occupation and hobbies if you provide them, time zone, and your per-category check-ins). If you add trips on the Adventure page, we store the country, the year and, if you give it, the month. The map is part of the app: it doesn't request anything from other servers.",
     "datosSensiblesTitulo": "Specially protected data categories",
     "datosSensiblesTexto": "Some categories (sex, spirituality) count as special category data under GDPR (art. 9). They're only turned on and recorded with your explicit consent, which you can withdraw at any time by turning the category off.",
     "paraQueTitulo": "What we use it for",
@@ -210,6 +218,7 @@
     "errorGenerico": "Could not save the interview",
     "entrevistador": "Interviewer",
     "tu": "You",
+    "verPagina": "See your {{categoria}} page",
     "verEjemplos": "See examples for {{categoria}}",
     "ejemplosTitulo": "To help you think:",
     "errorActivar": "Could not activate the category",
@@ -632,6 +641,7 @@
     "reportar": "Report",
     "reportada": "Thank you. We've hidden it.",
     "errorReportar": "We couldn't report it. Please try again.",
+    "reportarAyuda": "\"Report\" hides that experience straight away for everyone. Use it if it isn't respectful, gives away someone's details or has nothing to do with the category; nobody will know it was you.",
     "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it.",
     "limiteIa": "You've reached today's maximum of AI uses: this is the original idea. You can try again tomorrow.",
     "meGusta": "I like it",
@@ -884,5 +894,64 @@
     "categorias": "Which categories does it relate to? (optional)",
     "categoriasAyuda": "If you choose any, on the day of the event Home will invite you to review your score in it.",
     "avisoRevision": "On the day of the event, Home will invite you to review your score in what you chose, whether it went well or not. The app never changes it for you."
+  },
+  "paginasCategoria": {
+    "titulo": "Categories",
+    "intro": "Each category will have its own page with what you have lived in it: memories and achievements to remember and to keep you going. We are starting with Adventure.",
+    "proximamente": "Coming soon",
+    "sinPagina": "This category doesn't have a page yet.",
+    "verTodas": "See all categories",
+    "tuNota": "Your score now",
+    "puntuadaEl": "Scored on {{fecha}}",
+    "sinNota": "You haven't scored it yet.",
+    "puntuar": "Score {{categoria}}",
+    "tusExperiencias": "Your experiences",
+    "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview."
+  },
+  "viajes": {
+    "titulo": "Your trips",
+    "intro": "The countries you have visited, or are planning to visit, from any year. A map of your memories and of what you still want to see.",
+    "mapaNoCarga": "The map couldn't be loaded. Your trips are still below; try reloading the page.",
+    "mapa": "Map of your trips",
+    "comoUsarMapa": "Visited countries are shown filled in. Hover to see when you went and click one to choose it below. Zoom with Ctrl + scroll (⌘ on Mac), by pinching or with + and −.",
+    "anadirTitulo": "Add a trip",
+    "pais": "Country",
+    "sinPaises": "No country with that name",
+    "anio": "Year",
+    "mes": "Month (optional)",
+    "sinMes": "I don't remember",
+    "anadir": "Add trip",
+    "tusViajes_one": "{{count}} trip",
+    "tusViajes_other": "{{count}} trips",
+    "ninguno": "You haven't added any trips yet.",
+    "borrar": "Delete the trip to {{pais}} ({{fecha}})",
+    "error": "We couldn't save that change. Please try again.",
+    "noCambianNota": "Your trips are only yours: they don't change your score, they are not sent to the AI and they are not shared.",
+    "avisoRueda": "Use Ctrl + scroll (⌘ + scroll on Mac) to zoom the map",
+    "avisoDosDedos": "Use two fingers to move the map"
+  },
+  "avisos": {
+    "titulo": "Notifications",
+    "botonNuevos_one": "Notifications: {{count}} new",
+    "botonNuevos_other": "Notifications: {{count}} new",
+    "ninguno": "You have no notifications.",
+    "evento": "How did \"{{titulo}}\" go? If you like, review your score in {{categorias}}.",
+    "idea": "You planned to try an idea for {{categoria}} on {{fecha}}.",
+    "revisar_one": "{{categoria}} hasn't been reviewed for {{count}} week. Is it still the same?",
+    "revisar_other": "{{categoria}} hasn't been reviewed for {{count}} weeks. Is it still the same?"
+  },
+  "perfilIa": {
+    "titulo": "How the AI sees you",
+    "noDisponible": "AI isn't available in this installation: the ideas are always the app's own.",
+    "activadas": "AI ideas are on: the AI adapts the wording of the app's ideas with this data.",
+    "desactivadas": "AI ideas are off: nothing is sent to the AI right now.",
+    "recibe": "From your profile, it receives:",
+    "recibiria": "If you turn them on, from your profile it would receive:",
+    "nadaDelPerfil": "Nothing: you haven't set an occupation or hobbies.",
+    "ademas": "And, for each non-sensitive category, your score, whether it's going up or down and what you ticked in \"What helps you?\".",
+    "nunca": "It never receives:",
+    "nuncaLista": "Your name, your email, your date of birth, your gender, your written experiences or anything from sensitive categories.",
+    "cambiar": "Change it in Privacy and data",
+    "activar": "Turn them on in Privacy and data"
   }
 }

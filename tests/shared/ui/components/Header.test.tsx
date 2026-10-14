@@ -5,6 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import i18n from "@shared/ui/i18n";
 import { Header } from "@shared/ui/components/Header";
+import { HeaderExtrasProvider } from "@shared/ui/context/HeaderExtrasContext";
 
 function renderHeader(props: Partial<React.ComponentProps<typeof Header>> = {}) {
   return render(
@@ -26,48 +27,53 @@ describe("Header", () => {
     expect(screen.getByText("ana@ejemplo.com")).toBeInTheDocument();
   });
 
-  it("incluye un enlace a /perfil", () => {
+  it("la navegación lleva a Inicio, Categorías y Entrevista", () => {
     renderHeader();
 
-    expect(screen.getByRole("link", { name: /perfil/i })).toHaveAttribute("href", "/perfil");
+    const nav = within(screen.getByRole("navigation"));
+    expect(nav.getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/inicio");
+    expect(nav.getByRole("link", { name: "Categorías" })).toHaveAttribute("href", "/categorias");
+    expect(nav.getByRole("link", { name: "Entrevista" })).toHaveAttribute("href", "/perfil/entrevista");
   });
 
-  it("incluye un enlace a /inicio, a la izquierda de Administración", () => {
-    renderHeader({ isAdmin: true });
+  it("el nombre abre un menú con Mi perfil y Cerrar sesión; Administración, solo para un admin", () => {
+    const onLogout = vi.fn();
+    const { unmount } = renderHeader({ onLogout });
 
-    const homeLink = screen.getByRole("link", { name: /inicio/i });
-    expect(homeLink).toHaveAttribute("href", "/inicio");
-    const adminLink = screen.getByRole("link", { name: /administración/i });
-    expect(homeLink.compareDocumentPosition(adminLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
-  it("el enlace de administración solo aparece para un admin", () => {
-    const { unmount } = renderHeader();
-    expect(screen.queryByRole("link", { name: /administración/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /ana@ejemplo\.com/ }));
+    let menu = within(screen.getByRole("menu"));
+    expect(menu.getByRole("menuitem", { name: "Mi perfil" })).toHaveAttribute("href", "/perfil");
+    expect(menu.queryByRole("menuitem", { name: /administración/i })).not.toBeInTheDocument();
+    fireEvent.click(menu.getByRole("menuitem", { name: "Cerrar sesión" }));
+    expect(onLogout).toHaveBeenCalledTimes(1);
     unmount();
 
     renderHeader({ isAdmin: true });
-    expect(screen.getByRole("link", { name: /administración/i })).toHaveAttribute("href", "/admin");
+    fireEvent.click(screen.getByRole("button", { name: /ana@ejemplo\.com/ }));
+    menu = within(screen.getByRole("menu"));
+    expect(menu.getByRole("menuitem", { name: /administración/i })).toHaveAttribute("href", "/admin");
   });
 
-  it("cerrar sesión es el icono típico de salir (con su nombre accesible) y llama al callback recibido", () => {
-    const onLogout = vi.fn();
-    renderHeader({ onLogout });
-
-    const logout = screen.getByRole("button", { name: "Cerrar sesión" });
-    expect(within(logout).getByTestId("LogoutIcon")).toBeInTheDocument();
-    expect(logout).not.toHaveTextContent("Cerrar sesión");
-    fireEvent.click(logout);
-
-    expect(onLogout).toHaveBeenCalledTimes(1);
-  });
-
-  it("el selector de idioma cambia el idioma activo", async () => {
+  it("el selector de idioma es de texto (ES | EN), sin banderas, y cambia el idioma activo", async () => {
     renderHeader();
+    expect(screen.queryByRole("switch")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("switch", { name: "English" }));
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
 
-    expect(await screen.findByRole("button", { name: /log out/i })).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "Home" })).toBeInTheDocument();
+  });
+
+  it("muestra lo que la página le pase como avisos (la campana), a la derecha del todo", () => {
+    render(
+      <MemoryRouter>
+        <HeaderExtrasProvider notifications={<button type="button">campana</button>}>
+          <Header displayName="ana@ejemplo.com" onLogout={() => {}} />
+        </HeaderExtrasProvider>
+      </MemoryRouter>,
+    );
+
+    const bell = screen.getByRole("button", { name: "campana" });
+    expect(screen.getByRole("button", { name: "English" }).compareDocumentPosition(bell) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   describe("en móvil (UX-03)", () => {
@@ -91,7 +97,7 @@ describe("Header", () => {
       renderHeader({ isAdmin: true });
 
       expect(screen.getByText("MyLifeMirror")).toBeInTheDocument();
-      expect(screen.getByRole("switch", { name: "English" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "English" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /abrir menú/i })).toBeInTheDocument();
       expect(screen.queryByRole("link", { name: /inicio/i })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /cerrar sesión/i })).not.toBeInTheDocument();
@@ -105,6 +111,8 @@ describe("Header", () => {
       fireEvent.click(screen.getByRole("button", { name: /abrir menú/i }));
       const menu = screen.getByRole("menu");
       expect(within(menu).getByRole("menuitem", { name: /inicio/i })).toHaveAttribute("href", "/inicio");
+      expect(within(menu).getByRole("menuitem", { name: "Categorías" })).toHaveAttribute("href", "/categorias");
+      expect(within(menu).getByRole("menuitem", { name: "Entrevista" })).toHaveAttribute("href", "/perfil/entrevista");
       expect(within(menu).getByRole("menuitem", { name: /mi perfil/i })).toHaveAttribute("href", "/perfil");
       expect(within(menu).queryByRole("menuitem", { name: /administración/i })).not.toBeInTheDocument();
       expect(within(menu).getByText("ana@ejemplo.com")).toBeInTheDocument();
@@ -157,22 +165,22 @@ describe("Header", () => {
     expect(screen.queryByRole("img", { name: /dos trenzas largas/i })).not.toBeInTheDocument();
   });
 
-  it("en escritorio separa tres grupos: páginas, cuenta (avatar, nombre y salir juntos) e idioma", () => {
+  it("en escritorio separa cuatro grupos: páginas, cuenta (avatar y nombre, que abren el menú), idioma y avisos", () => {
     renderHeader({ displayName: "Ana", avatarKey: "longBraids" });
 
     const pages = screen.getByRole("navigation", { name: "Páginas" });
     expect(within(pages).getByRole("link", { name: "Inicio" })).toBeInTheDocument();
-    expect(within(pages).getByRole("link", { name: "Mi perfil" })).toBeInTheDocument();
+    expect(within(pages).queryByRole("link", { name: "Mi perfil" })).not.toBeInTheDocument();
     expect(within(pages).queryByText("Ana")).not.toBeInTheDocument();
 
     const account = screen.getByRole("group", { name: "Mi cuenta" });
-    expect(within(account).getByText("Ana")).toBeInTheDocument();
-    expect(within(account).getByRole("img", { name: /dos trenzas largas/i })).toBeInTheDocument();
-    expect(within(account).getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
-    expect(within(account).queryByRole("switch", { name: "English" })).not.toBeInTheDocument();
+    const accountButton = within(account).getByRole("button", { name: /Ana/ });
+    expect(within(accountButton).getByRole("img", { name: /dos trenzas largas/i })).toBeInTheDocument();
+    expect(accountButton).toHaveAttribute("aria-haspopup", "menu");
 
     // El idioma va después de la cuenta, fuera de ella.
-    const toggle = screen.getByRole("switch", { name: "English" });
-    expect(account.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const english = screen.getByRole("button", { name: "English" });
+    expect(account.compareDocumentPosition(english) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(account).queryByRole("button", { name: "English" })).not.toBeInTheDocument();
   });
 });

@@ -5,6 +5,61 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-49: páginas de categoría y viajes)
+
+- **"Categorías" en la cabecera:** todas las categorías del catálogo en tarjetas; por ahora solo Aventura tiene página, el resto sale como "Próximamente".
+- **Página de Aventura:** descripción, tu última nota, tus experiencias del diario y **Tus viajes**: un mapa a todo lo ancho (Leaflet) con los países visitados pintados, zoom con la rueda del ratón, y debajo el formulario y la lista. Un viaje es un país de una lista con búsqueda (o pulsado en el mapa) y un año, con el mes opcional; sin texto libre. Puede ser de cualquier año o un plan. No cambia ninguna nota y no va a la IA. **Migraciones 0029 y 0030.**
+- El mapa no usa recursos externos: las formas de los países (Natural Earth) van dentro de la app y la política de contenido no cambia.
+
+### Cambiado (séptima ronda de ajustes)
+
+- **Ventana de ideas:** las comillas de apertura van junto a la primera línea del texto en todas las pestañas (en "Con IA" quedaban lejos).
+- **Inicio:** "Actualizar mis respuestas" en el color de acento (en negro azulado no se distinguía de la cabecera) y "Calendario" con borde.
+
+- **Portada:** el selector de idioma y el aviso "Imagen generada con IA" se quedan fijos al bajar; el aviso sale una sola vez, no en cada imagen.
+- **Mapa de viajes:** más bajo y con más aire alrededor; la rueda sola desplaza la página y avisa de cómo hacer zoom (Ctrl/⌘ + rueda o pellizcando); en móvil se mueve con dos dedos. Zoom limitado: como mucho, el mundo entero; como poco, un país mediano.
+- **Ventana de ideas:** "Personalizada con IA" arriba a la derecha, "Idea 1 de 5" delante de las flechas y las comillas de cierre justo detrás del texto.
+- **Mi perfil:** el menú empieza a la altura del contenido, no de las migas.
+- **Entrevista:** la pregunta de Aventura enlaza a su página.
+
+### Cambiado (sexta ronda de ajustes)
+
+- **Paleta nueva, "Black Mirror"** (Midnight Black, Anti-Flash White, Loblolly, Country Blue y Rich Black): la cabecera y los botones principales en Rich Black, el fondo en Anti-Flash White y el acento en Country Blue (oscurecido donde lleva texto blanco, para el contraste AA). Un test comprueba los contrastes.
+- **Aventura:** el mapa a todo lo ancho de la página, entre dos líneas finas; la nota, solo el número en grande junto a su título; la flecha de la tarjeta con el color de acento.
+- **Ventana de ideas:** comillas de cierre, menos interlineado, título más abajo y en negrita, pestañas sin negrita, "Personalizada con IA" a la derecha y "Reportar" fuera de la cita, con una explicación de lo que hace.
+- **Mi perfil:** migas de pan a la altura del contenido, más aire sobre el botón del menú y títulos de bloque en negrita.
+
+### Añadido (quinta ronda de ajustes)
+
+- **"Así te ve la IA"** en Mi perfil: qué datos del perfil recibiría la IA para adaptar las ideas (al momento, según se rellena) y cuáles nunca, si la función está activada y el enlace para cambiarlo.
+- **Saludo con el nombre** en Inicio ("Bienvenida, Ana"; en femenino o masculino solo si se indicó el género, y si no, "Te damos la bienvenida").
+
+### Cambiado (quinta ronda de ajustes)
+
+- **Color de acento:** un verde azulado (el de los gráficos, oscurecido para que el texto blanco tenga contraste AA) en los botones de acción, los países visitados del mapa y una línea fina bajo la cabecera. Los colores con significado (bandas de puntuación, ideas, error, éxito) siguen reservados para lo suyo; la nota de la página de Aventura lleva el color y el texto de su banda.
+- **Secciones sin esquinas redondeadas** y bordes más suaves en toda la app; el contenido de Mi perfil, en blanco y más separado del menú; Privacidad y datos a la izquierda; títulos de página en negrita.
+- **Calendario** sin el botón "Hoy".
+- **Viajes:** se descargan (mapa y datos) desde Categorías antes de entrar en Aventura, y mientras llegan se reserva su sitio: sin saltos.
+
+### Corregido (quinta ronda de ajustes)
+
+- La cabecera parpadeaba sin parar al bajar 1 o 2 px desde arriba: al compactarse cambiaba la altura de la página y el desplazamiento volvía a quedar por debajo del umbral. Ahora es fija y su hueco tiene altura constante.
+
+### Añadido (UX-11: cabecera y avisos)
+
+- **Campana de avisos** en la cabecera: reúne los avisos que ya daba Inicio (revisar la nota tras un evento, ideas con fecha que ha llegado, categorías sin revisar), con el número de los nuevos. Solo dentro de la app.
+- **Cabecera reorganizada:** Inicio, Categorías y Entrevista; el avatar y el nombre abren un menú con Mi perfil, Administración y Cerrar sesión; idioma como "ES | EN"; resaltado a toda la altura, sin esquinas redondeadas.
+- Botón flotante **"Volver arriba"** en la entrevista, con un fundido.
+
+### Cambiado
+
+- **Ventana de ideas:** pestañas de verdad (subrayado y fondo suave de la marca), la idea como una cita (comillas, letra con serifa, azul marino), la misma letra en "De otras personas" y una X para cerrar arriba a la derecha.
+- **Mi perfil:** el formulario a la izquierda, con aficiones y avatares a todo lo ancho; el zoom del avatar tarda 1 segundo.
+- **Migas de pan** dentro del contenedor de cada página.
+- **Inicio:** botones con color e icono.
+- **Entrevista:** accesos a cada categoría también en escritorio (la pregunta aparece con un fundido) y menos espacio entre módulos.
+- Calendario: hoy en naranja y sin borde, los días con algo anotado en azul marino y el día elegido con un contorno; antes el azul tapaba el naranja.
+
 ### Añadido (RF-46, RF-47 y RF-48: perfil, fecha para una idea y calendario)
 
 - **Profesión y aficiones en "Mi perfil" (RF-46):** opcionales y de listas cerradas, nunca texto libre. Con las ideas con IA activadas, se usan para adaptar la redacción; nunca en categorías sensibles. Al cambiarlas, las ideas ya personalizadas se rehacen. **Migración 0025.**

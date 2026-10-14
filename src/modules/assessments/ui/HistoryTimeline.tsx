@@ -98,7 +98,7 @@ export function HistoryTimeline() {
   const visibleDays = showAll ? allDays : allDays.slice(0, INITIAL_VISIBLE);
 
   return (
-    <Box component="section" aria-labelledby={titleId} sx={{ bgcolor: "#FFFFFF", border: "1px solid #DCDFE1", borderRadius: 3, p: 2 }}>
+    <Box component="section" aria-labelledby={titleId} sx={{ bgcolor: "#FFFFFF", border: 1, borderColor: "divider", borderRadius: 0, p: 2 }}>
       <Typography id={titleId} variant="subtitle1" component="h2" sx={{ mb: 1 }}>
         {t("entrevista.historialTitulo")}
       </Typography>

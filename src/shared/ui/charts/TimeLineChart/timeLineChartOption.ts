@@ -1,4 +1,5 @@
 import { monthLabel } from "../timeWindow";
+import { PALETTE, TEXT_SECONDARY } from "../../theme";
 
 export interface TimePoint {
   date: Date;
@@ -16,7 +17,7 @@ export interface TimeLineChartOptionInput {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const SECONDARY_INK = "#72828C";
+const SECONDARY_INK = TEXT_SECONDARY;
 const GRID_LINE = "#DCDFE1";
 
 /**
@@ -48,7 +49,7 @@ export function buildTimeLineChartOption({ points, window, yAxis, locale, color,
         color: SECONDARY_INK,
         fontSize: 10,
       },
-      axisLine: { lineStyle: { color: "#BFBFBF" } },
+      axisLine: { lineStyle: { color: PALETTE.loblolly } },
       axisTick: { show: false },
       splitLine: { show: false },
     },

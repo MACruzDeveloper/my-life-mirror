@@ -41,6 +41,7 @@ const EXPERIENCES = [
 ];
 
 interface StubOptions {
+  categories?: unknown[];
   latest?: unknown;
   history?: unknown;
   recommendations?: unknown;
@@ -55,9 +56,9 @@ interface StubOptions {
 
 // Por defecto, el diario vacío: cada experiencia añade botones a la página y encarece todas las búsquedas por rol.
 
-function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [], shareRejection }: StubOptions = {}) {
+function stubFetch({ categories = CATEGORIES, latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [], shareRejection }: StubOptions = {}) {
   const fetchMock: ReturnType<typeof vi.fn> = vi.fn((url: string, init?: RequestInit) => {
-    if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => CATEGORIES });
+    if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => categories });
     if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
     if (url === "/api/assessments/history") return Promise.resolve({ ok: true, json: async () => history });
     if (url === "/api/recommendations") {
@@ -1271,6 +1272,15 @@ describe("InterviewPage (RF-10)", () => {
 
     expect(info).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText(/salario/i)).toBeVisible();
+  });
+
+  it("RF-49: la pregunta de una categoría con página (Aventura) enlaza a ella; las demás, no", async () => {
+    stubFetch({ categories: [...CATEGORIES, { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false }] });
+    renderPage();
+    await waitUntilLoaded();
+
+    expect(await screen.findByRole("link", { name: "Ver tu página de Aventura" })).toHaveAttribute("href", "/categorias/aventura");
+    expect(screen.queryByRole("link", { name: /ver tu página de economía/i })).not.toBeInTheDocument();
   });
 
   it("la respuesta recibe un fondo suave según la banda (sin colorear el número)", async () => {

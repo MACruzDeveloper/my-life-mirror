@@ -3,6 +3,7 @@ import type { Clock } from "#shared/domain/Clock.js";
 import type { AssessmentRepository } from "#modules/assessments/domain/AssessmentRepository.js";
 import type { CategoryRepository } from "#modules/categories/domain/CategoryRepository.js";
 import type { EventRepository } from "#modules/agenda/domain/UserEvent.js";
+import type { TripRepository } from "#modules/agenda/domain/Trip.js";
 import type { IdeaReactionRepository } from "#modules/recommendations/domain/IdeaReaction.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import type { ExperienceRepository } from "#modules/assessments/domain/Experience.js";
@@ -28,6 +29,8 @@ export interface UserDataExport {
   ideaReactions: { category: string; templateKey: string; reaction: string; reactedAt: string; plannedFor?: string }[];
   /** RF-48: sus eventos del calendario. */
   events: { title: string; day: string; categories: string[] }[];
+  /** RF-49: sus viajes. */
+  trips: { country: string; year: number; month?: number }[];
   /** RF-44: el diario de experiencias, de la más antigua a la más reciente. */
   experiences: { category: string; text: string; createdAt: string; sharedAt?: string; reportedAt?: string }[];
 }
@@ -42,6 +45,7 @@ interface Dependencies {
   experienceRepository: ExperienceRepository;
   ideaReactionRepository: IdeaReactionRepository;
   eventRepository: EventRepository;
+  tripRepository: TripRepository;
   clock: Clock;
 }
 
@@ -53,9 +57,9 @@ interface Dependencies {
  * que `ActivateCategory` con el consentimiento.
  * Ver docs/user-stories/RF-05-exportar-eliminar-datos.md.
  */
-export function createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, ideaReactionRepository, eventRepository, personalizedIdeaRepository, experienceRepository, clock }: Dependencies) {
+export function createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, ideaReactionRepository, eventRepository, tripRepository, personalizedIdeaRepository, experienceRepository, clock }: Dependencies) {
   return async function exportUserData(user: { id: string; email: string }): Promise<Result<UserDataExport, never>> {
-    const [profile, categories, consents, assessments, recommendations, personalizedIdeas, experiences, ideaReactions, events] = await Promise.all([
+    const [profile, categories, consents, assessments, recommendations, personalizedIdeas, experiences, ideaReactions, events, trips] = await Promise.all([
       profileRepository.findByUserId(user.id),
       categoryRepository.findByUserId(user.id),
       consentRepository.findByUser(user.id),
@@ -65,6 +69,7 @@ export function createExportUserData({ profileRepository, categoryRepository, co
       experienceRepository.findByUserId(user.id),
       ideaReactionRepository.findByUserId(user.id),
       eventRepository.findByUserId(user.id),
+      tripRepository.findByUserId(user.id),
     ]);
     const names = new Map(categories.map((c) => [c.id, c.name]));
 
@@ -98,6 +103,7 @@ export function createExportUserData({ profileRepository, categoryRepository, co
       events: [...events]
         .sort((a, b) => a.day.localeCompare(b.day))
         .map((event) => ({ title: event.title, day: event.day, categories: event.categoryIds.flatMap((categoryId) => names.get(categoryId) ?? []) })),
+      trips: [...trips].sort((a, b) => a.year - b.year || (a.month ?? 0) - (b.month ?? 0)).map(({ countryCode, year, month }) => ({ country: countryCode, year, ...(month !== undefined ? { month } : {}) })),
       experiences: [...experiences]
         .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
         .map((experience) => ({

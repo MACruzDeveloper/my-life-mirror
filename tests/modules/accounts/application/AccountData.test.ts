@@ -13,6 +13,7 @@ import { InMemoryCategoryRepository } from "@modules/categories/infrastructure/I
 import { createGrantConsent } from "@modules/consent/application/GrantConsent";
 import { InMemoryConsentRepository } from "@modules/consent/infrastructure/InMemoryConsentRepository";
 import { InMemoryEventRepository } from "@modules/agenda/infrastructure/InMemoryEventRepository";
+import { InMemoryTripRepository } from "@modules/agenda/infrastructure/InMemoryTripRepository";
 import { InMemoryIdeaReactionRepository } from "@modules/recommendations/infrastructure/InMemoryIdeaReactionRepository";
 import { InMemoryPersonalizedIdeaRepository } from "@modules/recommendations/infrastructure/InMemoryPersonalizedIdeaRepository";
 import { InMemoryRecommendationRepository } from "@modules/recommendations/infrastructure/InMemoryRecommendationRepository";
@@ -32,7 +33,8 @@ async function setup() {
   const experienceRepository = new InMemoryExperienceRepository();
   const ideaReactionRepository = new InMemoryIdeaReactionRepository();
   const eventRepository = new InMemoryEventRepository();
-  const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository };
+  const tripRepository = new InMemoryTripRepository();
+  const ports = { authProvider, profileRepository, categoryRepository, consentRepository: consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository };
 
   const ana = await authProvider.register("ana@ejemplo.com", "Bici-Azul-Lluvia-47");
   const luis = await authProvider.register("luis@ejemplo.com", "abcdefgh");
@@ -58,6 +60,8 @@ async function setup() {
   await personalizedIdeaRepository.save({ recommendationId: "r-ana", userId: ana.id, locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", experienceTags: [], model: "fake", createdAt: clock.now() });
   await ideaReactionRepository.save({ userId: ana.id, categoryId: financesAna.id, templateKey: "economia.2", reaction: "saved", reactedAt: new Date("2026-10-12T10:00:00Z"), plannedFor: "2026-10-20" });
   await eventRepository.save({ id: "ev-ana", userId: ana.id, title: "Boda de Marta", day: "2026-10-24", categoryIds: [financesAna.id, "categoria-borrada"], createdAt: new Date("2026-10-13T10:00:00Z") });
+  await tripRepository.save({ id: "t-ana", userId: ana.id, countryCode: "PT", year: 2015, month: 6, createdAt: new Date("2026-10-14T10:00:00Z") });
+  await tripRepository.save({ id: "t-luis", userId: luis.id, countryCode: "FR", year: 2020, createdAt: new Date("2026-10-14T10:00:00Z") });
   await eventRepository.save({ id: "ev-luis", userId: luis.id, title: "Cena", day: "2026-10-25", categoryIds: [], createdAt: new Date("2026-10-13T10:00:00Z") });
   await ideaReactionRepository.save({ userId: luis.id, categoryId: categoriesLuis[0].id, templateKey: "general.1", reaction: "discarded", reactedAt: new Date("2026-10-12T10:00:00Z") });
   await experienceRepository.save({ id: "e-ana", userId: ana.id, categoryId: financesAna.id, text: "Este mes he ahorrado un poco", createdAt: new Date("2026-09-21T10:00:00.000Z") });
@@ -103,6 +107,8 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     // RF-19: lo que decidió sobre cada idea.
     expect(data.ideaReactions).toEqual([{ category: "Economía", templateKey: "economia.2", reaction: "saved", reactedAt: "2026-10-12T10:00:00.000Z", plannedFor: "2026-10-20" }]);
     // RF-48: sus eventos, con el nombre de sus categorías (las que sigan existiendo); no los de otra persona.
+    // RF-49: sus viajes.
+    expect(data.trips).toEqual([{ country: "PT", year: 2015, month: 6 }]);
     expect(data.events).toEqual([{ title: "Boda de Marta", day: "2026-10-24", categories: ["Economía"] }]);
   });
 
@@ -145,7 +151,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
 
 describe("DeleteAccount (RF-05, derecho al olvido)", () => {
   it("con la contraseña correcta borra evaluaciones, categorías, consentimientos, perfil y la cuenta de acceso", async () => {
-    const { deleteAccount, ana, authProvider, assessmentRepository, categoryRepository, consentRepository, profileRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, luis } = await setup();
+    const { deleteAccount, ana, authProvider, assessmentRepository, categoryRepository, consentRepository, profileRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, luis } = await setup();
 
     const result = await deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" });
 
@@ -158,6 +164,8 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
     // RF-48: y sus eventos.
     expect(await eventRepository.findByUserId(ana.id)).toEqual([]);
     expect(await eventRepository.findByUserId(luis.id)).toHaveLength(1);
+    expect(await tripRepository.findByUserId(ana.id)).toEqual([]);
+    expect(await tripRepository.findByUserId(luis.id)).toHaveLength(1);
     expect(await experienceRepository.findByUserId(ana.id)).toEqual([]);
     expect(await assessmentRepository.findByUserId(ana.id)).toEqual([]);
     expect(await categoryRepository.findByUserId(ana.id)).toEqual([]);

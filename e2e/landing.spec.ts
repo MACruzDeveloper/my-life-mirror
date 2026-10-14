@@ -62,7 +62,10 @@ test.describe("UX-08: portada con imagen", () => {
       // La flecha lleva a la segunda parte, que sube sobre su propia imagen de fondo.
       await hero.getByRole("link", { name: "Ver cómo funciona" }).click();
       await expect(howItWorks).toBeInViewport();
-      await expect(page.getByText("Imagen generada con IA").first()).toBeAttached();
+      // El idioma y el aviso de IA se quedan fijos al bajar: siguen a la vista sobre la segunda imagen, y el aviso no está repetido.
+      await expect(page.getByRole("button", { name: "English" })).toBeInViewport();
+      await expect(page.getByText("Imagen generada con IA")).toHaveCount(1);
+      await expect(page.getByText("Imagen generada con IA")).toBeInViewport();
 
       // Las dos imágenes, cada una en el tamaño de esta pantalla y no en el otro.
       await expect.poll(() => images.length).toBe(2);
