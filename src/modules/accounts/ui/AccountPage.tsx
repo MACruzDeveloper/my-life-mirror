@@ -102,7 +102,7 @@ export function AccountPage() {
   );
 
   return (
-    <Box sx={{ display: "flex", alignItems: "flex-start", gap: { md: 3 }, px: 2, mt: 2, maxWidth: WIDE_PAGE_MAX_WIDTH, mx: "auto" }}>
+    <Box sx={{ display: "flex", alignItems: "flex-start", gap: { md: 5 }, px: 2, mt: 2, maxWidth: WIDE_PAGE_MAX_WIDTH, mx: "auto" }}>
       <Drawer
         variant="permanent"
         sx={{
@@ -123,7 +123,7 @@ export function AccountPage() {
       <Drawer open={isMobileOpen} onClose={() => setIsMobileOpen(false)} sx={{ display: { md: "none" } }}>
         {menu(false)}
       </Drawer>
-      <Box sx={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
+      <Box sx={{ flex: 1, minWidth: 0, maxWidth: 1180, bgcolor: "background.paper", border: 1, borderColor: "divider", p: { xs: 2, md: 4 }, minHeight: 360 }}>
         {/* Con el nombre de la sección actual: no se confunde con el menú de la cabecera. */}
         <Button
           variant="outlined"

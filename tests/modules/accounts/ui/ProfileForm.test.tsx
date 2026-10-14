@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
+import { MemoryRouter } from "react-router";
 import { ProfileForm } from "@modules/accounts/ui/ProfileForm";
 import { SessionProvider } from "@shared/ui/context/SessionContext";
 import type { QueryClient } from "@tanstack/react-query";
@@ -28,9 +29,12 @@ function stubFetch(profile: unknown) {
 function renderProfileForm(client: QueryClient = createTestClient()) {
   return render(
     withClient(
-      <SessionProvider>
-        <ProfileForm />
-      </SessionProvider>,
+      // Con router: "Así te ve la IA" enlaza a Privacidad y datos.
+      <MemoryRouter>
+        <SessionProvider>
+          <ProfileForm />
+        </SessionProvider>
+      </MemoryRouter>,
       client,
     ),
   );
@@ -178,5 +182,47 @@ describe("ProfileForm (RF-03)", () => {
     await waitFor(() => expect(screen.getByText(/perfil guardado/i)).toBeInTheDocument());
     const [, init] = fetchMock.mock.calls.find(([url, request]) => url === "/api/accounts/profile" && request?.method === "POST")!;
     expect(JSON.parse(init!.body as string)).toMatchObject({ occupation: null, hobbies: [] });
+  });
+
+  describe("Así te ve la IA", () => {
+    function stubSession(aiIdeasAvailable: boolean, profile: unknown) {
+      const fetchMock = vi.fn((url: string) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable }) });
+        return Promise.resolve({ ok: true, json: async () => profile });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+    }
+
+    it("con las ideas con IA activadas, dice qué recibe la IA de este perfil (al momento, según se edita) y qué nunca recibe", async () => {
+      stubSession(true, { name: "Ana", birthDate: "1990-01-01", occupation: "desarrolloWeb", hobbies: ["montana"], aiIdeasEnabled: true });
+      renderProfileForm();
+
+      const aside = await screen.findByRole("complementary", { name: /así te ve la ia/i });
+      expect(await within(aside).findByText(/están activadas/i)).toBeInTheDocument();
+      expect(within(aside).getByText("Desarrollo web")).toBeInTheDocument();
+      expect(within(aside).getByText("Montaña")).toBeInTheDocument();
+      expect(within(aside).getByText(/tu nombre, tu email, tu fecha de nacimiento/i)).toBeInTheDocument();
+
+      fireEvent.click(within(screen.getByRole("group", { name: /aficiones/i })).getByRole("button", { name: "Viajar" }));
+      expect(within(aside).getByText("Viajar")).toBeInTheDocument();
+      expect(within(aside).getByRole("link", { name: /privacidad y datos/i })).toHaveAttribute("href", "/perfil/datos");
+    });
+
+    it("con las ideas con IA desactivadas, dice que ahora no recibe nada y qué recibiría", async () => {
+      stubSession(true, { name: "Ana", occupation: "docencia" });
+      renderProfileForm();
+
+      const aside = await screen.findByRole("complementary", { name: /así te ve la ia/i });
+      expect(await within(aside).findByText(/ahora no se envía nada/i)).toBeInTheDocument();
+      expect(within(aside).getByText("Docencia y educación")).toBeInTheDocument();
+    });
+
+    it("si la IA no está disponible en esta instalación, lo dice", async () => {
+      stubSession(false, { name: "Ana" });
+      renderProfileForm();
+
+      const aside = await screen.findByRole("complementary", { name: /así te ve la ia/i });
+      expect(await within(aside).findByText(/no está disponible/i)).toBeInTheDocument();
+    });
   });
 });

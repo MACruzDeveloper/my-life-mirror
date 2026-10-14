@@ -66,7 +66,10 @@ describe("CategoryPage: Aventura (RF-49)", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Aventura" })).toBeInTheDocument();
     expect(screen.getByText("Nuevas experiencias y retos.")).toBeInTheDocument();
-    expect(await screen.findByText("7")).toBeInTheDocument();
+    const score = await screen.findByText("7");
+    // Con el color de su banda (ámbar para un 7) y su texto: el color nunca es lo único que informa.
+    expect(score.closest("[data-band]")).toHaveAttribute("data-band", "medium");
+    expect(score.closest("[data-band]")).toHaveTextContent(/medio/i);
     expect(await screen.findByText("Subí a una montaña por primera vez")).toBeInTheDocument();
     expect(screen.queryByText("No es de Aventura")).not.toBeInTheDocument();
     const trips = await screen.findByRole("region", { name: /tus viajes/i });

@@ -11,6 +11,22 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 - **Página de Aventura:** descripción, tu última nota, tus experiencias del diario y **Tus viajes**: un mapa a todo lo ancho (Leaflet) con los países visitados pintados, zoom con la rueda del ratón, y debajo el formulario y la lista. Un viaje es un país de una lista con búsqueda (o pulsado en el mapa) y un año, con el mes opcional; sin texto libre. Puede ser de cualquier año o un plan. No cambia ninguna nota y no va a la IA. **Migraciones 0029 y 0030.**
 - El mapa no usa recursos externos: las formas de los países (Natural Earth) van dentro de la app y la política de contenido no cambia.
 
+### Añadido (quinta ronda de ajustes)
+
+- **"Así te ve la IA"** en Mi perfil: qué datos del perfil recibiría la IA para adaptar las ideas (al momento, según se rellena) y cuáles nunca, si la función está activada y el enlace para cambiarlo.
+- **Saludo con el nombre** en Inicio ("Bienvenida, Ana"; en femenino o masculino solo si se indicó el género, y si no, "Te damos la bienvenida").
+
+### Cambiado (quinta ronda de ajustes)
+
+- **Color de acento:** un verde azulado (el de los gráficos, oscurecido para que el texto blanco tenga contraste AA) en los botones de acción, los países visitados del mapa y una línea fina bajo la cabecera. Los colores con significado (bandas de puntuación, ideas, error, éxito) siguen reservados para lo suyo; la nota de la página de Aventura lleva el color y el texto de su banda.
+- **Secciones sin esquinas redondeadas** y bordes más suaves en toda la app; el contenido de Mi perfil, en blanco y más separado del menú; Privacidad y datos a la izquierda; títulos de página en negrita.
+- **Calendario** sin el botón "Hoy".
+- **Viajes:** se descargan (mapa y datos) desde Categorías antes de entrar en Aventura, y mientras llegan se reserva su sitio: sin saltos.
+
+### Corregido (quinta ronda de ajustes)
+
+- La cabecera parpadeaba sin parar al bajar 1 o 2 px desde arriba: al compactarse cambiaba la altura de la página y el desplazamiento volvía a quedar por debajo del umbral. Ahora es fija y su hueco tiene altura constante.
+
 ### Añadido (UX-11: cabecera y avisos)
 
 - **Campana de avisos** en la cabecera: reúne los avisos que ya daba Inicio (revisar la nota tras un evento, ideas con fecha que ha llegado, categorías sin revisar), con el número de los nuevos. Solo dentro de la app.

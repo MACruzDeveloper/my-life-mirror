@@ -25,6 +25,20 @@ export const PALETTE = {
 export const CHART_ACCENT = "#0E9AA7";
 
 /**
+ * El mismo verde azulado, más oscuro, para lo que lleva texto blanco encima
+ * (botones de acción, chips elegidos): así llega al contraste AA (4,9:1). Es el
+ * color "vivo" de la app; los de significado (bandas de puntuación, error,
+ * éxito, el amarillo de las ideas) siguen reservados para lo suyo.
+ */
+export const ACCENT = "#0B7C86";
+
+/**
+ * Bordes de tarjetas y separadores: un gris muy claro con un punto del azul de
+ * la marca, más suave que el plateado de la paleta.
+ */
+const SOFT_BORDER = "#DDE2E5";
+
+/**
  * Texto secundario: el gris azulado de la paleta, oscurecido. Tal cual
  * (#72828C) no llega al contraste AA sobre fondo claro (3,9:1 y hacen falta
  * 4,5:1); este tono sí (6,6:1 sobre blanco).
@@ -40,10 +54,14 @@ export const theme = createTheme({
   palette: {
     mode: "light",
     primary: { main: PALETTE.navy, contrastText: PALETTE.mist },
-    secondary: { main: PALETTE.slate, contrastText: "#FFFFFF" },
+    secondary: { main: ACCENT, contrastText: "#FFFFFF" },
     text: { primary: PALETTE.ink, secondary: SLATE_TEXT },
     background: { default: PALETTE.mist, paper: "#FFFFFF" },
-    divider: PALETTE.silver,
+    divider: SOFT_BORDER,
+  },
+  components: {
+    // El título de cada página (un h1, sea cual sea su variante), en negrita.
+    MuiTypography: { styleOverrides: { root: { "&:is(h1)": { fontWeight: 700 } } } },
   },
 });
 

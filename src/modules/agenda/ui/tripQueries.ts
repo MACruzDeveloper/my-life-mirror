@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { type QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getJson } from "@shared/ui/api/getJson";
 import { byNewestTrip } from "@modules/agenda/domain/Trip";
 
@@ -15,8 +15,15 @@ export interface TripDto {
 /** Fuera de `["assessments"]`: un viaje no cambia ninguna puntuación. Cada cambio actualiza esta caché a mano. */
 export const TRIPS_KEY = ["agenda", "trips"] as const;
 
+const fetchTrips = ({ signal }: { signal?: AbortSignal }) => getJson<TripDto[]>("/api/agenda/trips", signal);
+
 export function useTrips() {
-  return useQuery({ queryKey: TRIPS_KEY, queryFn: ({ signal }) => getJson<TripDto[]>("/api/agenda/trips", signal) });
+  return useQuery({ queryKey: TRIPS_KEY, queryFn: fetchTrips });
+}
+
+/** Pide los viajes antes de hacer falta (desde Categorías); si ya están en la caché, no hace nada. */
+export function prefetchTrips(queryClient: QueryClient) {
+  return queryClient.prefetchQuery({ queryKey: TRIPS_KEY, queryFn: fetchTrips });
 }
 
 /** Añadir y borrar: la caché se actualiza con la respuesta del servidor, sin volver a pedir la lista. */

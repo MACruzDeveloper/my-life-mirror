@@ -90,7 +90,7 @@ export function CalendarPage() {
         </Typography>
       )}
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { md: "flex-start" }, gap: 3 }}>
-        <Box sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: { xs: 1.5, sm: 2.5 }, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+        <Box sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: { xs: 1.5, sm: 2.5 }, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
             <IconButton size="small" aria-label={t("calendario.mesAnterior")} onClick={() => setVisibleMonth(shiftMonth(visibleMonth, -1))} sx={ARROW_SX}>
               <ChevronLeftIcon />
@@ -101,9 +101,6 @@ export function CalendarPage() {
             <IconButton size="small" aria-label={t("calendario.mesSiguiente")} onClick={() => setVisibleMonth(shiftMonth(visibleMonth, 1))} sx={ARROW_SX}>
               <ChevronRightIcon />
             </IconButton>
-            <Button size="small" variant="outlined" onClick={() => select(today)}>
-              {t("calendario.hoy")}
-            </Button>
           </Box>
           <Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: 0.5 }}>
             {weekdays.map((weekday) => (
@@ -161,7 +158,7 @@ export function CalendarPage() {
               })}
           </Box>
         </Box>
-        <Box component="section" aria-labelledby={dayTitleId} sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: 2.5, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+        <Box component="section" aria-labelledby={dayTitleId} sx={{ flex: { md: "1 1 0" }, minWidth: 0, p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
           <Typography id={dayTitleId} variant="subtitle1" component="h2" sx={{ fontWeight: 600, "&::first-letter": { textTransform: "uppercase" } }}>
             {fullDate(selectedDay)}
           </Typography>

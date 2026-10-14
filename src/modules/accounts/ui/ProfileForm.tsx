@@ -16,6 +16,7 @@ import { PERSONALIZED_IDEAS_KEY } from "@modules/recommendations/ui/queries";
 import { PROFILE_KEY, useProfile, type ProfileResponse } from "./queries";
 import { useSession } from "@shared/ui/context/SessionContext";
 import { AvatarPicker } from "./AvatarPicker";
+import { AiProfilePreview } from "./AiProfilePreview";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
 const DETECTED_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -116,12 +117,12 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ maxWidth: 880, mt: 1 }}
+      sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) 300px" }, columnGap: 5, rowGap: 3, alignItems: "start" }}
     >
-      <Typography variant="h5" component="h1" gutterBottom>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, maxWidth: 760 }}>
+      <Typography variant="h5" component="h1" sx={{ mb: 2 }}>
         {t("perfil.titulo")}
       </Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {formState.kind === "error" && <Alert severity="error">{formState.message}</Alert>}
         {formState.kind === "guardado" && <Alert severity="success">{t("perfil.exito")}</Alert>}
         {/* Los campos de texto, estrechos (se leen mejor); aficiones y avatar, a todo lo ancho. */}
@@ -196,6 +197,10 @@ function ProfileFields({ initial: inicial, loadError: errorCarga, avatarKeys }: 
         <Button type="submit" variant="contained" disabled={formState.kind === "guardando"} sx={{ alignSelf: { xs: "stretch", sm: "flex-start" }, minWidth: { sm: 220 } }}>
           {formState.kind === "guardando" ? t("perfil.botonEnviando") : t("perfil.boton")}
         </Button>
+      </Box>
+      {/* Al lado del formulario en pantallas anchas; debajo en móvil. Fija al desplazarse. */}
+      <Box sx={{ position: { lg: "sticky" }, top: { lg: 88 } }}>
+        <AiProfilePreview occupation={occupation} hobbies={hobbies} />
       </Box>
     </Box>
   );

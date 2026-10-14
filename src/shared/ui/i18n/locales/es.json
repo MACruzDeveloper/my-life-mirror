@@ -94,6 +94,10 @@
     "errorGenerico": "No se pudo cambiar la contraseña"
   },
   "panel": {
+    "bienvenidaNombre": "Te damos la bienvenida, {{nombre}}",
+    "bienvenidaNombre_woman": "Bienvenida, {{nombre}}",
+    "bienvenidaNombre_man": "Bienvenido, {{nombre}}",
+    "bienvenidaSinNombre": "Te damos la bienvenida",
     "bienvenida": "Bienvenido",
     "cerrarSesion": "Cerrar sesión",
     "bienvenidaTitulo": "Empecemos por conocerte",
@@ -907,7 +911,7 @@
     "intro": "Los países que has visitado, o que estás planeando visitar, de cualquier año. Un mapa de tus recuerdos y de lo que te queda por ver.",
     "mapaNoCarga": "No se ha podido cargar el mapa. Tus viajes siguen aquí debajo; prueba a recargar la página.",
     "mapa": "Mapa de tus viajes",
-    "comoUsarMapa": "Los países visitados salen en azul. Pasa por encima para ver cuándo fuiste, pulsa en uno para elegirlo abajo y acércate con la rueda del ratón o con + y −.",
+    "comoUsarMapa": "Los países visitados salen pintados. Pasa por encima para ver cuándo fuiste, pulsa en uno para elegirlo abajo y acércate con la rueda del ratón o con + y −.",
     "anadirTitulo": "Añadir un viaje",
     "pais": "País",
     "sinPaises": "Ningún país con ese nombre",
@@ -931,5 +935,19 @@
     "idea": "Tenías pensado probar una idea de {{categoria}} para el {{fecha}}.",
     "revisar_one": "{{categoria}} lleva {{count}} semana sin revisarse. ¿Sigue igual?",
     "revisar_other": "{{categoria}} lleva {{count}} semanas sin revisarse. ¿Sigue igual?"
+  },
+  "perfilIa": {
+    "titulo": "Así te ve la IA",
+    "noDisponible": "En esta instalación la IA no está disponible: las ideas son siempre las de la app.",
+    "activadas": "Las ideas con IA están activadas: la IA adapta la redacción de las ideas de la app con estos datos.",
+    "desactivadas": "Las ideas con IA están desactivadas: ahora no se envía nada a la IA.",
+    "recibe": "De tu perfil, recibe:",
+    "recibiria": "Si las activas, de tu perfil recibiría:",
+    "nadaDelPerfil": "Nada: no has indicado profesión ni aficiones.",
+    "ademas": "Y, de cada categoría no sensible, tu nota, si va a mejor o a peor y lo que marcas en «¿Qué te ayuda?».",
+    "nunca": "Nunca recibe:",
+    "nuncaLista": "Tu nombre, tu email, tu fecha de nacimiento, tu género, tus experiencias escritas ni nada de las categorías sensibles.",
+    "cambiar": "Cambiarlo en Privacidad y datos",
+    "activar": "Activarlas en Privacidad y datos"
   }
 }

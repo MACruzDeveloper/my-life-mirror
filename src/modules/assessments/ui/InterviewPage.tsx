@@ -78,7 +78,7 @@ const SOFT_SCROLLBAR = {
 } as const;
 
 /** Cada bloque de la columna principal (introducción, preguntas): mismo marco, distinto fondo. */
-const MODULE_STYLES = { p: { xs: 2, sm: 4 }, borderRadius: 4, display: "flex", flexDirection: "column", gap: 3 } as const;
+const MODULE_STYLES = { p: { xs: 2, sm: 4 }, borderRadius: 0, display: "flex", flexDirection: "column", gap: 3 } as const;
 
 const isOpenRecommendation = (recommendation: RecommendationDto) => recommendation.status === "pending" || recommendation.status === "postponed";
 
@@ -642,7 +642,7 @@ export function InterviewPage() {
       {showQuestions &&
         (isFirstInterview ? (
           // En la primera entrevista ya se leyó en el paso 1: queda plegada, por si se quiere releer.
-          <Accordion disableGutters elevation={0} sx={{ bgcolor: "rgba(255, 255, 255, 0.6)", borderRadius: 3, "&::before": { display: "none" } }}>
+          <Accordion disableGutters elevation={0} sx={{ bgcolor: "rgba(255, 255, 255, 0.6)", borderRadius: 0, "&::before": { display: "none" } }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1" component="span">
                 {t("entrevista.releerIntro")}

@@ -53,7 +53,7 @@ export function DashboardGuide() {
   }) as string[];
 
   return (
-    <Box component="section" aria-labelledby={headingId} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, bgcolor: "#E9EEF1" }}>
+    <Box component="section" aria-labelledby={headingId} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 0, bgcolor: "#E9EEF1" }}>
       <Typography id={headingId} variant="subtitle1" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
         {t("guia.panelTitulo")}
       </Typography>

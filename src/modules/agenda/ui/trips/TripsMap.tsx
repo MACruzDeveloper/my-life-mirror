@@ -7,7 +7,7 @@ import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-50m.json";
 import { COUNTRIES } from "@modules/agenda/domain/countries";
-import { PALETTE } from "@shared/ui/theme";
+import { CHART_ACCENT, PALETTE } from "@shared/ui/theme";
 import type { TripDto } from "../tripQueries";
 import { countryName, tripDate } from "./countryNames";
 
@@ -55,10 +55,10 @@ function codeOf(shape: CountryFeature): string | undefined {
   return (shape.id !== undefined ? CODE_BY_NUMERIC.get(String(shape.id)) : undefined) ?? CODE_BY_MAP_NAME.get(shape.properties.name);
 }
 
-/** Colores de la paleta: el mar en gris claro, la tierra en blanco y lo visitado en azul marino. */
+/** El mar en gris claro, la tierra en blanco y lo visitado en el verde azulado de acento: se ve vivo sobre lo demás. */
 const SEA = PALETTE.mist;
 const LAND: L.PathOptions = { color: PALETTE.silver, weight: 0.6, fillColor: "#FFFFFF", fillOpacity: 1 };
-const VISITED: L.PathOptions = { color: "#FFFFFF", weight: 0.8, fillColor: PALETTE.navy, fillOpacity: 1 };
+const VISITED: L.PathOptions = { color: "#FFFFFF", weight: 0.8, fillColor: CHART_ACCENT, fillOpacity: 1 };
 const HOVER: L.PathOptions = { fillColor: PALETTE.slate };
 
 /**

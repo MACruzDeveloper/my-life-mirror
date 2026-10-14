@@ -19,7 +19,7 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
-import { headerTheme } from "../theme";
+import { CHART_ACCENT, headerTheme } from "../theme";
 import { useHeaderExtras } from "../context/HeaderExtrasContext";
 import { UserAvatar } from "./UserAvatar";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -103,14 +103,20 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
 
   return (
     <ThemeProvider theme={headerTheme}>
+      {/*
+        Fija (no "sticky"): al compactarse baja de altura, y si ocupara sitio en la página, el contenido subiría,
+        el desplazamiento volvería a menos de 16 px y la cabecera se agrandaría otra vez, sin parar (fallo visto
+        al bajar 1 o 2 px). Fija no ocupa sitio: el hueco lo guarda el espaciador de abajo, de altura constante.
+      */}
       <AppBar
-        position="sticky"
+        position="fixed"
         elevation={isCompact ? 4 : 0}
         data-compact={isCompact}
         sx={{
           bgcolor: "background.default",
           color: "text.primary",
           transition: "box-shadow 200ms",
+          borderBottom: `2px solid ${CHART_ACCENT}`,
           // Letra de los botones: más pequeña en compacto (el logo cambia aparte).
           "& .MuiButton-root": { fontSize: isCompact ? "0.75rem" : "0.8125rem", transition: "font-size 200ms" },
         }}
@@ -182,6 +188,7 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
           )}
         </Toolbar>
       </AppBar>
+      <Box aria-hidden sx={{ height: { xs: 58, sm: 66 }, flexShrink: 0 }} />
     </ThemeProvider>
   );
 }

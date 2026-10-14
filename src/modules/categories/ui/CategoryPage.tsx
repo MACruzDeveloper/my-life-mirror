@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, useParams } from "react-router";
 import { useExperiences, useLatestScores } from "@modules/assessments/ui/queries";
+import { BAND_COLORS, BAND_LABEL_KEYS, scoreBand } from "@modules/assessments/ui/scoreBand";
 import { TripsSection } from "@modules/agenda/ui/trips/TripsSection";
 import { ProtectedLayout } from "@shared/ui/components/ProtectedLayout";
 import { useCategoryLabel } from "./categoryLabels";
@@ -30,7 +31,7 @@ export function CategoryPageRoute() {
   );
 }
 
-const SECTION_SX = { p: 2.5, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" };
+const SECTION_SX = { p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" };
 
 /**
  * RF-49: la página de una categoría, con lo que la persona ha vivido en ella.
@@ -96,15 +97,21 @@ function LatestScore({ catalogId, categoryName }: { catalogId: string; categoryN
       </Typography>
       {latest ? (
         <>
-          <Typography variant="h3" component="p" sx={{ fontWeight: 600, color: "primary.main" }}>
-            {latest.score}
-          </Typography>
+          {/* Con el color de su banda y su texto (el color nunca es lo único que informa), como en Resultados. */}
+          <Box data-band={scoreBand(latest.score!)} sx={{ display: "inline-flex", alignItems: "baseline", gap: 1.5, my: 1, px: 2, py: 1, bgcolor: BAND_COLORS[scoreBand(latest.score!)].bg, color: BAND_COLORS[scoreBand(latest.score!)].fg, border: 1, borderColor: BAND_COLORS[scoreBand(latest.score!)].border }}>
+            <Typography variant="h3" component="p" sx={{ fontWeight: 700, color: "inherit" }}>
+              {latest.score}
+            </Typography>
+            <Typography variant="body2" component="span" sx={{ fontWeight: 600, color: "inherit" }}>
+              {t(BAND_LABEL_KEYS[scoreBand(latest.score!)])}
+            </Typography>
+          </Box>
           {latest.recordedAt && (
             <Typography variant="body2" color="text.secondary" gutterBottom>
               {t("paginasCategoria.puntuadaEl", { fecha: new Date(latest.recordedAt).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" }) })}
             </Typography>
           )}
-          <Button component={RouterLink} to="/perfil/entrevista" size="small" variant="outlined" sx={{ mt: 1 }}>
+          <Button component={RouterLink} to="/perfil/entrevista" size="small" variant="contained" color="secondary" sx={{ mt: 1 }}>
             {t("entrevista.actualizarRespuestas")}
           </Button>
         </>
@@ -113,7 +120,7 @@ function LatestScore({ catalogId, categoryName }: { catalogId: string; categoryN
           <Typography variant="body2" color="text.secondary" sx={{ my: 1 }}>
             {t("paginasCategoria.sinNota")}
           </Typography>
-          <Button component={RouterLink} to="/perfil/entrevista" size="small" variant="contained">
+          <Button component={RouterLink} to="/perfil/entrevista" size="small" variant="contained" color="secondary">
             {t("paginasCategoria.puntuar", { categoria: categoryName })}
           </Button>
         </>

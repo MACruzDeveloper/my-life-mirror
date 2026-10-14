@@ -20,7 +20,7 @@ export function CheckInReminder({ latestScores, now = new Date() }: { latestScor
   if (stale.length === 0) return null;
 
   return (
-    <Box component="section" aria-labelledby={titleId} sx={{ p: 2.5, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+    <Box component="section" aria-labelledby={titleId} sx={{ p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
       <Typography id={titleId} variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>
         {t("recordatorio.titulo")}
       </Typography>

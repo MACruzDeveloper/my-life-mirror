@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 import { AccountPages } from "./pages/AccountPages";
 import { newUser } from "./pages/users";
 
-/** Los países pintados como visitados (el azul marino de la paleta). */
-const VISITED_FILL = 'path.leaflet-interactive[fill="#183140"]';
+/** Los países pintados como visitados (el verde azulado de acento). */
+const VISITED_FILL = 'path.leaflet-interactive[fill="#0E9AA7"]';
 
 // RF-49: páginas de categoría; la primera, Aventura, con los viajes en un mapa de países.
 test.describe("RF-49: Categorías y viajes en Aventura", () => {

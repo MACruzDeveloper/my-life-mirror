@@ -41,7 +41,7 @@ export function InterviewProgress({ items, onSelect }: { items: ProgressItem[]; 
 
   return (
     <Box component="aside" aria-labelledby={titleId}>
-    <Accordion defaultExpanded disableGutters elevation={0} sx={{ bgcolor: "#F2F2F2", borderRadius: 3, "&::before": { display: "none" }, overflow: "hidden" }}>
+    <Accordion defaultExpanded disableGutters elevation={0} sx={{ bgcolor: "#F2F2F2", borderRadius: 0, "&::before": { display: "none" }, overflow: "hidden" }}>
       {/* El resumen (cuántas respondidas y la barra) va en la cabecera: se ve también plegado. */}
       <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ "& .MuiAccordionSummary-content": { flexDirection: "column", mr: 1 } }}>
         <Typography id={titleId} variant="subtitle1" component="span">

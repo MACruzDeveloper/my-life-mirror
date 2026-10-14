@@ -242,6 +242,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **14 oct. 2026** — *"Al final desarrollamos las notificaciones? Estaría bien añadir un icono en el header… crear un submenú en el avatar y nombre de usuario… Añade Entrevistas al header… deja el selector de idiomas como en la página inicial"* (y otros ajustes de estilo)
 → Las notificaciones (RF-13, RF-22, RF-23) no se desarrollaron. La campana se hace con lo que ya existe: **reúne los avisos que la app daba en Inicio**, dentro de la app, sin correo ni notificaciones del sistema ([UX-11](user-stories/UX-11-cabecera-y-avisos.md)). La cabecera compartida no importa módulos: la campana se la pasa la ruta protegida.
 
+**14 oct. 2026** — *"No sé si necesitamos más colores. Si usamos los naranja, amarillo, verde, etc que ya estás usando? O necesitas nuevos?… en la página de Categoría dale algo de color, por ejemplo prueba naranja al score o a los botones… Añade el usuario después de Bienvenido"*
+→ Los colores con significado no se usan como decoración: el naranja es la banda "casi bajo", y pintar de naranja un 9 diría lo contrario. Para dar vida se usa **un solo color de acento**, el verde azulado de los gráficos oscurecido para el contraste AA con texto blanco (botones, mapa, línea de la cabecera); la nota de Aventura lleva **el color de su propia banda**. El saludo usa el género solo si la persona lo indicó; si no, una forma neutra.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

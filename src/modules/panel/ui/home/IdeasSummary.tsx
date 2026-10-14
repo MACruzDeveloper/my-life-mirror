@@ -28,7 +28,7 @@ export function IdeasSummary({ ideas, personalize = false }: { ideas: IdeaSummar
   if (ideas.length === 0) return null;
 
   return (
-    <Box component="section" aria-labelledby={headingId} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, bgcolor: "#FFFBEB", border: 1, borderColor: "#F1D98A" }}>
+    <Box component="section" aria-labelledby={headingId} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 0, bgcolor: "#FFFBEB", border: 1, borderColor: "#F1D98A" }}>
       <Typography id={headingId} variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>
         {t("recomendaciones.resumenTitulo")}
       </Typography>

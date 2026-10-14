@@ -51,7 +51,7 @@ export function AgendaSummary({ categoryNames }: { categoryNames: Record<string,
       {followUps.length > 0 && (
         <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
           {followUps.map(({ event, categories }) => (
-            <Box component="li" key={event.id} sx={{ position: "relative", display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 1.5, rowGap: 1, p: 2, pr: 6, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+            <Box component="li" key={event.id} sx={{ position: "relative", display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 1.5, rowGap: 1, p: 2, pr: 6, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
               <Box sx={{ flex: "1 1 240px", minWidth: 0 }}>
                 <Typography variant="subtitle2" component="p" sx={{ overflowWrap: "anywhere" }}>
                   {t("calendario.comoFue", { titulo: event.title })}
@@ -71,7 +71,7 @@ export function AgendaSummary({ categoryNames }: { categoryNames: Record<string,
         </Box>
       )}
       {upcoming.length > 0 && (
-        <Box component="section" aria-labelledby={titleId} sx={{ p: 2.5, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+        <Box component="section" aria-labelledby={titleId} sx={{ p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <EventOutlinedIcon fontSize="small" color="primary" />
             <Typography id={titleId} variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>

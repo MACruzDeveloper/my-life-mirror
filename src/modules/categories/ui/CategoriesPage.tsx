@@ -6,7 +6,11 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { prefetchTrips } from "@modules/agenda/ui/tripQueries";
+import { preloadTripsMap } from "@modules/agenda/ui/trips/preloadTripsMap";
 import { Link as RouterLink } from "react-router";
 import { resolveCategoryLabel } from "./categoryLabels";
 import { hasCategoryPage } from "./categoryPages";
@@ -21,6 +25,12 @@ import { useCategoryLabelsQuery } from "./queries";
 export function CategoriesPage() {
   const { t, i18n } = useTranslation();
   const labels = useCategoryLabelsQuery();
+  const queryClient = useQueryClient();
+  // Mientras se elige, se descargan el mapa y los viajes de Aventura: al entrar ya están (sin espera ni salto).
+  useEffect(() => {
+    void prefetchTrips(queryClient);
+    void preloadTripsMap().catch(() => {});
+  }, [queryClient]);
 
   if (labels.isPending) {
     return (

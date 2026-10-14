@@ -13,9 +13,11 @@ import { useTranslation } from "react-i18next";
 import { LoadErrorBoundary } from "@shared/ui/components/LoadErrorBoundary";
 import { type TripDto, useTripActions, useTrips } from "../tripQueries";
 import { countryName, countryOptions, monthNames, tripDate } from "./countryNames";
+import { preloadTripsMap } from "./preloadTripsMap";
+import Skeleton from "@mui/material/Skeleton";
 
 /** Leaflet y las formas de los países solo se descargan al abrir la página que los usa (como los gráficos en Inicio). */
-const TripsMap = lazy(() => import("./TripsMap").then((module) => ({ default: module.TripsMap })));
+const TripsMap = lazy(() => preloadTripsMap().then((module) => ({ default: module.TripsMap })));
 
 const FIRST_YEAR = 1900;
 /** Los mismos dos años vista que admite el servidor (un viaje que se está planeando). */
@@ -61,7 +63,7 @@ export function TripsSection() {
   }
 
   return (
-    <Box component="section" aria-labelledby={titleId} sx={{ p: 2.5, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+    <Box component="section" aria-labelledby={titleId} sx={{ p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <FlightTakeoffOutlinedIcon color="primary" />
         <Typography id={titleId} variant="h6" component="h2">
@@ -125,7 +127,7 @@ export function TripsSection() {
               ))}
             </TextField>
           </Box>
-          <Button type="submit" variant="contained" disabled={sending} sx={{ alignSelf: { sm: "flex-start" } }}>
+          <Button type="submit" variant="contained" color="secondary" disabled={sending} sx={{ alignSelf: { sm: "flex-start" } }}>
             {t("viajes.anadir")}
           </Button>
           {failed && (
@@ -138,7 +140,14 @@ export function TripsSection() {
           <Typography variant="subtitle2" component="h3">
             {t("viajes.tusViajes", { count: list.length })}
           </Typography>
-          {list.length === 0 ? (
+          {trips.isPending ? (
+            // Mientras llegan, el sitio que ocuparán: sin saltos al aparecer.
+            <Box aria-hidden sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {[0, 1, 2].map((row) => (
+                <Skeleton key={row} variant="rectangular" height={40} />
+              ))}
+            </Box>
+          ) : list.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
               {t("viajes.ninguno")}
             </Typography>
