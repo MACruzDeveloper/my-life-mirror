@@ -1,3 +1,4 @@
+import { isBalanced } from "@modules/recommendations/domain/leisureIdeas";
 import { PALE_TINT } from "@shared/ui/theme";
 import { ScrollToTopButton } from "@shared/ui/components/ScrollToTopButton";
 import { prefersReducedMotion } from "@shared/ui/motion";
@@ -477,6 +478,8 @@ export function InterviewPage() {
     const score = scores[categoryId];
     setSaveStatus(categoryId, { kind: "saving" });
     const openBefore = new Set((queryClient.getQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY) ?? []).filter(isOpenRecommendation).map((recommendation) => recommendation.id));
+    // RF-50: ¿estaba ya todo en verde antes de guardar? Solo se avisa cuando se llega, no cada vez.
+    const balancedBefore = isBalanced(activeCategories.map((category) => savedScores[category.id]));
 
     try {
       const response = await fetch("/api/assessments", {
@@ -516,7 +519,9 @@ export function InterviewPage() {
         const label = categoryLabel(savedCategory.catalogId);
         const isSensitive = savedCategory.isSensitiveData === true;
         const feedback = scoreFeedback({ score, isSensitive, canShare: !isSensitive && !label.aiExcluded });
-        setHighScoreFeedback(feedback ? { ...feedback, categoryName: label.name, score } : undefined);
+        const balancedNow = isBalanced(activeCategories.map((category) => (category.id === categoryId ? score : savedScores[category.id])));
+        if (!balancedBefore && balancedNow) setHighScoreFeedback({ kind: "balanced" });
+        else setHighScoreFeedback(feedback ? { ...feedback, categoryName: label.name, score } : undefined);
       }
       return true;
     } catch {

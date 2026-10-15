@@ -1274,6 +1274,43 @@ describe("InterviewPage (RF-10)", () => {
     expect(screen.getByText(/salario/i)).toBeVisible();
   });
 
+  describe("todo en verde (RF-50)", () => {
+    const THREE = [
+      { id: "c1", catalogId: "k-economia", name: "Economía", description: "...", status: "active", isSensitiveData: false },
+      { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false },
+      { id: "c6", catalogId: "k-familia", name: "Familia", description: "...", status: "active", isSensitiveData: false },
+    ];
+    const latestWith = (familia: number) => [
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c5", catalogId: "k-aventura", categoryName: "Aventura", score: 8, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c6", catalogId: "k-familia", categoryName: "Familia", score: familia, recordedAt: "2026-10-01T10:00:00.000Z" },
+    ];
+
+    it("al subir la última categoría a 8 y guardar, avisa de que todo está en verde y enlaza a Inicio", async () => {
+      stubFetch({ categories: THREE, latest: latestWith(5), history: [] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("familia", 8);
+      fireEvent.click(saveButton("Familia"));
+
+      expect(await screen.findByText(/todo en verde/i)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /ver ideas en inicio/i })).toHaveAttribute("href", "/inicio");
+    });
+
+    it("si ya estaba todo en verde, guardar otra nota alta no lo repite (sale el mensaje de siempre)", async () => {
+      stubFetch({ categories: THREE, latest: latestWith(8), history: [] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("familia", 9);
+      fireEvent.click(saveButton("Familia"));
+
+      expect(await screen.findByText(/enhorabuena/i)).toBeInTheDocument();
+      expect(screen.queryByText(/todo en verde/i)).not.toBeInTheDocument();
+    });
+  });
+
   it("RF-49: la pregunta de una categoría con página (Aventura) enlaza a ella; las demás, no", async () => {
     stubFetch({ categories: [...CATEGORIES, { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false }] });
     renderPage();

@@ -280,4 +280,23 @@ describe("Home (RF-39 / RF-14)", () => {
       expect(await screen.findByRole("heading", { level: 1, name: "Te damos la bienvenida, Alex" })).toBeInTheDocument();
     });
   });
+
+  describe("todo va bien (RF-50)", () => {
+    const scored = (score: number | undefined, key: string, id: string) => ({ categoryId: id, catalogId: `k-${key}`, categoryName: key, ...(score !== undefined ? { score, recordedAt: "2026-10-10T10:00:00.000Z" } : {}) });
+
+    it("con todas las categorías en verde, Inicio ofrece ideas para disfrutar", async () => {
+      stub([scored(9, "economia", "c1"), scored(8, "familia", "c2"), scored(10, "aventura", "c3")]);
+      renderHome();
+
+      expect(await screen.findByRole("region", { name: "Todo va bien" })).toBeInTheDocument();
+    });
+
+    it("con una categoría sin puntuar, no", async () => {
+      stub([scored(9, "economia", "c1"), scored(8, "familia", "c2"), scored(undefined, "aventura", "c3")]);
+      renderHome();
+
+      expect(await screen.findByText("Economía")).toBeInTheDocument();
+      expect(screen.queryByRole("region", { name: "Todo va bien" })).not.toBeInTheDocument();
+    });
+  });
 });

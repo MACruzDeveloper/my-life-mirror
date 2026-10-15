@@ -334,6 +334,8 @@
     },
     "sugerenciasLimite": "You've reached today's maximum of AI uses. You can try again tomorrow.",
     "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later.",
+    "todoEnVerde": "All green! Your categories are in the top band: on Home you'll find ideas to enjoy it.",
+    "verIdeasInicio": "See ideas on Home",
     "puntuacionAlta": {
       "recognizeCompartir": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary or share it anonymously.",
       "recognize": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary.",
@@ -546,6 +548,21 @@
     "errorCuentaDemo": "This is the project's demo account and it can't be deleted. If you'd like to try deleting an account, create your own: it is really deleted, with all its data."
   },
   "recomendaciones": {
+    "ocio": {
+      "titulo": "All is going well",
+      "texto": "All your categories are green. There's nothing you need to improve: these ideas are for enjoying it.",
+      "otra": "Another idea",
+      "ideas": {
+        "1": "Give yourself some time just for you, with no goal and no to-do list.",
+        "2": "Keep an afternoon for something you enjoy just because: a film, a walk, a book.",
+        "3": "Treat yourself to something small: a massage, a long bath or your favourite meal.",
+        "4": "Plan a getaway or a few days of rest, even close to home.",
+        "5": "Spend some good time with someone you love, for no other reason than enjoying it.",
+        "6": "Take a break from this app too: come back in a few weeks, whenever you feel like it.",
+        "7": "Write down three things that are going well, to have them at hand another day.",
+        "8": "Celebrate what you have built: what you have now is also something you have looked after."
+      }
+    },
     "ideaAnterior": "Previous idea",
     "ideaSiguiente": "Next idea",
     "ideaPosicion": "Idea {{actual}} of {{total}}",

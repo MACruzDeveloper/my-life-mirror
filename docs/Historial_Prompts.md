@@ -248,6 +248,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **14 oct. 2026** — *"el verde turquesa no me convence, prueba esta nueva paleta para toda la app: The Black Mirror Color Scheme… Midnight Black (#00020C), Anti-Flash White (#F3F1F4), Loblolly (#BBC9D2), Country Blue (#6B9EA8) and Rich Black (#001312)"*
 → Paleta nueva en el tema: Rich Black para cabecera y botones principales, Anti-Flash White de fondo, Midnight Black para el texto, Loblolly para bordes y tierras del mapa y Country Blue como acento. Country Blue tal cual no llega al contraste con texto blanco (2,9:1): para botones se usa oscurecido (#4A7C86, 4,6:1) y para gráficos y mapa, un punto más oscuro (#5F929C, 3:1). Un test vigila los contrastes.
 
+**15 oct. 2026** — *"Como todavía quedan unos días vamos a aprovechar para añadir algo más… categoría Naturaleza… completar la landing de Aventura… blog… Resultados tipo bar… qué coste tendría añadir el script de Python para que el usuario genere un avatar nuevo?… Si un usuario consigue tener buena nota en todas las categorías… ideas más relacionadas con Ocio o autocuidado"*
+→ Orden acordado, de una en una y probando entre medias: RF-50 (ideas para disfrutar cuando todo va bien), Resultados en barras, hitos en Aventura y Deporte. Descartados: el blog (el contenido y su revisión cuestan más que el código), el avatar generado por el usuario (sin GPU en Vercel, coste por imagen, función serverless que no queda y, sobre todo, imágenes sin revisión humana, contra lo decidido en RF-26) y, por ahora, Naturaleza (se solapa con opciones existentes). Cierre de funcionalidades el 17; demo, slides y vídeo, el 18 y el 19; entrega el 20.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

@@ -5,6 +5,11 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (RF-50: cuando todo va bien)
+
+- Si todas las categorías activas (al menos tres) están puntuadas con 8 o más, Inicio enseña **"Todo va bien"**: no hace falta mejorar nada, y propone ideas para disfrutar de un catálogo curado de ocho (un rato para ti, un capricho como un masaje, una escapada, incluso un descanso de la propia app), con "Otra idea" y el aviso de siempre. Sin IA y sin datos nuevos.
+- En la entrevista, al guardar la nota que deja todas las categorías en verde, un aviso de unos segundos lo dice y enlaza a esas ideas en Inicio (solo al llegar, no cada vez que se guarda otra nota alta).
+
 ### Añadido (RF-49: páginas de categoría y viajes)
 
 - **"Categorías" en la cabecera:** todas las categorías del catálogo en tarjetas; por ahora solo Aventura tiene página, el resto sale como "Próximamente".

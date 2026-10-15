@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
+import { MemoryRouter } from "react-router";
 import { ScoreFeedbackToast } from "@modules/assessments/ui/interview/ScoreFeedbackToast";
 
 describe("ScoreFeedbackToast (UX-09)", () => {
@@ -48,5 +49,16 @@ describe("ScoreFeedbackToast (UX-09)", () => {
     render(<ScoreFeedbackToast feedback={undefined} onClose={() => {}} />);
 
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("RF-50: al quedar todo en verde, lo dice y enlaza a Inicio, donde están las ideas para disfrutar", () => {
+    render(
+      <MemoryRouter>
+        <ScoreFeedbackToast feedback={{ kind: "balanced" }} onClose={() => {}} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("status")).toHaveTextContent(/todo en verde/i);
+    expect(screen.getByRole("link", { name: /ver ideas en inicio/i })).toHaveAttribute("href", "/inicio");
   });
 });

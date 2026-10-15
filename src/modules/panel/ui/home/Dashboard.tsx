@@ -17,6 +17,7 @@ import { AgendaSummary } from "./AgendaSummary";
 import { CheckInReminder } from "./CheckInReminder";
 import { DashboardGuide } from "./DashboardGuide";
 import { IdeasSummary } from "./IdeasSummary";
+import { LeisureIdeas } from "./LeisureIdeas";
 import { SavedIdeas } from "./SavedIdeas";
 import { useAiIdeasActive, useProfile } from "@modules/accounts/ui/queries";
 
@@ -78,6 +79,8 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
       <AgendaSummary categoryNames={categoryNames} />
       <SavedIdeas categoryNames={categoryNames} />
       <CheckInReminder latestScores={displayedScores} />
+      {/* RF-50: con todo en verde, ideas para disfrutar en lugar de mejoras. */}
+      <LeisureIdeas scores={latestScores.map((latestScore) => latestScore.score)} />
       <IdeasSummary
         personalize={personalize}
         ideas={recommendations.map((recommendation) => ({

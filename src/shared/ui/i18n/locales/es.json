@@ -334,6 +334,8 @@
     },
     "sugerenciasLimite": "Has llegado al máximo de usos de IA por hoy. Mañana puedes volver a probar.",
     "sugerenciasNoDisponibles": "Ahora no se han podido pedir sugerencias. Prueba más tarde.",
+    "todoEnVerde": "¡Todo en verde! Tus categorías están en la banda alta: en Inicio tienes ideas para disfrutarlo.",
+    "verIdeasInicio": "Ver ideas en Inicio",
     "puntuacionAlta": {
       "recognizeCompartir": "{{categoria}} te va bien ahora. ¿Qué te está ayudando? Puedes anotarlo en tu diario o compartirlo de forma anónima.",
       "recognize": "{{categoria}} te va bien ahora. ¿Qué te está ayudando? Puedes anotarlo en tu diario.",
@@ -546,6 +548,21 @@
     "errorCuentaDemo": "Esta es la cuenta de demostración del proyecto y no se puede eliminar. Si quieres probar el borrado, crea una cuenta propia: se elimina de verdad, con todos sus datos."
   },
   "recomendaciones": {
+    "ocio": {
+      "titulo": "Todo va bien",
+      "texto": "Todas tus categorías están en verde. No hace falta mejorar nada: estas ideas son para disfrutarlo.",
+      "otra": "Otra idea",
+      "ideas": {
+        "1": "Regálate un rato solo para ti, sin objetivo ni lista de tareas.",
+        "2": "Reserva una tarde para algo que te guste solo porque sí: una película, un paseo, un libro.",
+        "3": "Date un capricho pequeño: un masaje, un baño largo o tu comida favorita.",
+        "4": "Planea una escapada o unos días de descanso, aunque sea cerca de casa.",
+        "5": "Comparte un buen rato con alguien a quien quieras, sin más motivo que disfrutarlo.",
+        "6": "Tómate un descanso también de esta app: vuelve dentro de unas semanas, cuando te apetezca.",
+        "7": "Apunta tres cosas que estén saliendo bien, para tenerlas a mano otro día.",
+        "8": "Celebra lo que has construido: lo que tienes ahora también lo has cuidado tú."
+      }
+    },
     "ideaAnterior": "Idea anterior",
     "ideaSiguiente": "Idea siguiente",
     "ideaPosicion": "Idea {{actual}} de {{total}}",
