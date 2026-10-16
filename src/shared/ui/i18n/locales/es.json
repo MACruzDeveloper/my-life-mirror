@@ -334,6 +334,11 @@
     },
     "sugerenciasLimite": "Has llegado al máximo de usos de IA por hoy. Mañana puedes volver a probar.",
     "sugerenciasNoDisponibles": "Ahora no se han podido pedir sugerencias. Prueba más tarde.",
+    "guardarTodoConCuenta": "Guardar todo ({{count}})",
+    "guardandoTodo": "Guardando…",
+    "errorGuardarTodo": "No se han podido guardar los cambios. Inténtalo de nuevo.",
+    "ideaNuevaPara": "{{categoria}}: tienes una idea nueva.",
+    "verEnInicio": "Ver en Inicio",
     "todoEnVerde": "¡Todo en verde! Tus categorías están en la banda alta: en Inicio tienes ideas para disfrutarlo.",
     "verIdeasInicio": "Ver ideas en Inicio",
     "puntuacionAlta": {

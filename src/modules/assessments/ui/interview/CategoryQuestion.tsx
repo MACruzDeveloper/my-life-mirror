@@ -185,7 +185,8 @@ export function CategoryQuestion({
         flexDirection: "column",
         gap: 1.5,
         // Al saltar a una pregunta, que no quede bajo la cabecera fija (48 px compacta).
-        scrollMarginTop: 72,
+        // Bajo la cabecera compacta y la barra fija de accesos (UX-12).
+        scrollMarginTop: 112,
         pl: 1.5,
         // Mismo ancho de borde siempre, para que contestar no desplace nada.
         borderLeft: "3px solid",

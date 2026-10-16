@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (UX-12: guardar todo)
+
+- En la entrevista, una **barra fija** bajo la cabecera con los accesos a cada categoría y **"Guardar todo (N)"**: guarda de una vez todas las notas cambiadas, en una sola petición (todas o ninguna). El "Guardar" de cada categoría se queda. Al bajar, la barra pasa a una **versión compacta** pegada a la cabecera, a todo lo ancho. Si el guardado deja varios avisos (ideas nuevas, notas altas, todo en verde), **un solo resumen** los enumera todos y enlaza a Inicio, en lugar de abrir varias ventanas o quedarse con uno; si falla, lo dice junto al botón y las notas se conservan.
+
 ### Añadido (RF-50: cuando todo va bien)
 
 - Si todas las categorías activas (al menos tres) están puntuadas con 8 o más, Inicio enseña **"Todo va bien"**: no hace falta mejorar nada, y propone ideas para disfrutar de un catálogo curado de ocho (un rato para ti, un capricho como un masaje, una escapada, incluso un descanso de la propia app), con "Otra idea" y el aviso de siempre. Sin IA y sin datos nuevos.

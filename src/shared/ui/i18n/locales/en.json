@@ -334,6 +334,11 @@
     },
     "sugerenciasLimite": "You've reached today's maximum of AI uses. You can try again tomorrow.",
     "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later.",
+    "guardarTodoConCuenta": "Save all ({{count}})",
+    "guardandoTodo": "Saving…",
+    "errorGuardarTodo": "We couldn't save your changes. Please try again.",
+    "ideaNuevaPara": "{{categoria}}: you have a new idea.",
+    "verEnInicio": "See on Home",
     "todoEnVerde": "All green! Your categories are in the top band: on Home you'll find ideas to enjoy it.",
     "verIdeasInicio": "See ideas on Home",
     "puntuacionAlta": {

@@ -251,6 +251,12 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **15 oct. 2026** — *"Como todavía quedan unos días vamos a aprovechar para añadir algo más… categoría Naturaleza… completar la landing de Aventura… blog… Resultados tipo bar… qué coste tendría añadir el script de Python para que el usuario genere un avatar nuevo?… Si un usuario consigue tener buena nota en todas las categorías… ideas más relacionadas con Ocio o autocuidado"*
 → Orden acordado, de una en una y probando entre medias: RF-50 (ideas para disfrutar cuando todo va bien), Resultados en barras, hitos en Aventura y Deporte. Descartados: el blog (el contenido y su revisión cuestan más que el código), el avatar generado por el usuario (sin GPU en Vercel, coste por imagen, función serverless que no queda y, sobre todo, imágenes sin revisión humana, contra lo decidido en RF-26) y, por ahora, Naturaleza (se solapa con opciones existentes). Cierre de funcionalidades el 17; demo, slides y vídeo, el 18 y el 19; entrega el 20.
 
+**15 oct. 2026** — *"recuérdame por qué te pedí poner un botón guardar para cada categoría y no uno general… ¿Se podría hacer en menu sticky los links anchor de categorías y un botón de guardar todo a su derecha?… al ser muchas categorías puede resultar molesto para el usuario tener que guardar una por una"*
+→ El "Guardar" por categoría (UX-05, 3 oct.) salió de que el botón único del final no se encontraba y su mensaje quedaba fuera de la vista; el autoguardado se descartó porque cada nota es un registro inmutable (RF-12). [UX-12](user-stories/UX-12-guardar-todo.md): barra fija con los accesos y "Guardar todo (N)", que resuelve las dos cosas; el "Guardar" de cada categoría se queda y sigue sin haber autoguardado.
+
+**15 oct. 2026** — *"deberían salir todas las notas que correspondan para que el usuario no pierda información… cuando el header está en sticky el bloque de categorías no queda pegado. Se podría pegar al header y hacerlo full-width también? Y reducir tamaño de los botones"*
+→ UX-12 v1.1: al guardar varias categorías, un solo resumen con todos los avisos (ideas nuevas, notas altas, todo en verde) en lugar de quedarse con uno; y, al bajar, una versión compacta fija de la barra, pegada a la cabecera, a todo lo ancho y centrada.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*
