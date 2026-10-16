@@ -5,6 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { SessionProvider, useSession } from "@shared/ui/context/SessionContext";
 import { HeaderExtrasProvider } from "@shared/ui/context/HeaderExtrasContext";
 import { NotificationsBell } from "@modules/panel/ui/notifications/NotificationsBell";
+import { SessionExpiredDialog } from "@shared/ui/components/SessionExpiredDialog";
 
 function Guard({ children }: { children: ReactNode }) {
   const { loading, authenticated } = useSession();
@@ -21,8 +22,13 @@ function Guard({ children }: { children: ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
-  // La campana de avisos, en la cabecera de toda pantalla protegida.
-  return <HeaderExtrasProvider notifications={<NotificationsBell />}>{children}</HeaderExtrasProvider>;
+  // La campana de avisos, en la cabecera de toda pantalla protegida; y el aviso de sesión caducada (SEC-05).
+  return (
+    <HeaderExtrasProvider notifications={<NotificationsBell />}>
+      {children}
+      <SessionExpiredDialog />
+    </HeaderExtrasProvider>
+  );
 }
 
 /**

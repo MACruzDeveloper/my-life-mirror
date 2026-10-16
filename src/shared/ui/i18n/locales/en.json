@@ -1045,5 +1045,10 @@
     "titulo": "From the community",
     "intro": "What other people who are doing well in this area share anonymously.",
     "ninguna": "Nobody has shared anything in this category yet. When things go well for you, you can share an experience from your diary in the interview."
+  },
+  "sesion": {
+    "caducadaTitulo": "Your session has expired",
+    "caducadaTexto": "For your security, your session closes after two days without using the app. Sign in again to carry on; if you were saving something, please do it again afterwards.",
+    "volverAEntrar": "Sign in again"
   }
 }

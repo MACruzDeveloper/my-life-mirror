@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { AuthProvider, LoggedInSession, AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
+import type { AuthProvider, LoggedInSession, AuthenticatedUser, RenewedTokens, UserSummary } from "../domain/AuthProvider.js";
 import { DEFAULT_ROLE, type UserRole } from "../domain/UserRole.js";
 import { AuthenticationError, ConflictError } from "#shared/domain/DomainError.js";
 
@@ -16,6 +16,17 @@ interface StoredUser {
 export class InMemoryAuthProvider implements AuthProvider {
   private readonly users: StoredUser[] = [];
   private readonly resetTokens = new Map<string, string>(); // token -> email
+  /** SEC-05: tokens de acceso vigentes y de renovación sin usar (token -> id del usuario). */
+  private readonly accessTokens = new Map<string, string>();
+  private readonly refreshTokens = new Map<string, string>();
+
+  private issueTokens(userId: string): RenewedTokens {
+    const token = `fake-token:${userId}:${randomUUID()}`;
+    const refreshToken = `fake-refresh:${randomUUID()}`;
+    this.accessTokens.set(token, userId);
+    this.refreshTokens.set(refreshToken, userId);
+    return { token, refreshToken };
+  }
 
   async register(email: string, password: string): Promise<AuthenticatedUser> {
     if (this.users.some((u) => u.email === email)) {
@@ -33,16 +44,30 @@ export class InMemoryAuthProvider implements AuthProvider {
     if (!user || user.suspendido) {
       throw new AuthenticationError("Email o contraseña incorrectos");
     }
-    return { id: user.id, email: user.email, token: `fake-token:${user.id}` };
+    return { id: user.id, email: user.email, ...this.issueTokens(user.id) };
   }
 
   async verifySession(token: string): Promise<AuthenticatedUser> {
-    const id = token.startsWith("fake-token:") ? token.slice("fake-token:".length) : undefined;
+    const id = this.accessTokens.get(token);
     const user = id ? this.users.find((u) => u.id === id) : undefined;
     if (!user || user.suspendido) {
       throw new AuthenticationError("Sesión no válida");
     }
     return { id: user.id, email: user.email, rol: user.rol };
+  }
+
+  async refreshSession(refreshToken: string): Promise<RenewedTokens> {
+    const id = this.refreshTokens.get(refreshToken);
+    const user = id ? this.users.find((u) => u.id === id) : undefined;
+    if (!user || user.suspendido) throw new AuthenticationError("Sesión no válida");
+    // Se rota, como en Supabase: el de renovación usado deja de valer.
+    this.refreshTokens.delete(refreshToken);
+    return this.issueTokens(user.id);
+  }
+
+  /** Solo para tests (SEC-05) — simula que ha pasado la hora: ningún token de acceso emitido vale ya. */
+  expireAccessTokens(): void {
+    this.accessTokens.clear();
   }
 
   async listAllUsers(): Promise<UserSummary[]> {

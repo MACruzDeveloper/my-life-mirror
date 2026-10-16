@@ -70,7 +70,7 @@ import type { AdminAuditRepository } from "#modules/accounts/domain/AdminAuditRe
 import { InMemoryAdminAuditRepository } from "#modules/accounts/infrastructure/InMemoryAdminAuditRepository.js";
 import { SupabaseAdminAuditRepository } from "#modules/accounts/infrastructure/SupabaseAdminAuditRepository.js";
 import { createListUsers } from "#modules/accounts/application/ListUsers.js";
-import { createVerifySession } from "#modules/accounts/application/VerifySession.js";
+import { createResumeSession } from "#modules/accounts/application/ResumeSession.js";
 import { createRequestPasswordReset } from "#modules/accounts/application/RequestPasswordReset.js";
 import { createResetPassword } from "#modules/accounts/application/ResetPassword.js";
 import type { ConsentRepository } from "#modules/consent/domain/ConsentRepository.js";
@@ -331,7 +331,7 @@ export interface AppContext {
   authProvider: AuthProvider;
   registerUser: ReturnType<typeof createRegisterUser>;
   logIn: ReturnType<typeof createLogIn>;
-  verifySession: ReturnType<typeof createVerifySession>;
+  resumeSession: ReturnType<typeof createResumeSession>;
   listUsers: ReturnType<typeof createListUsers>;
   adminUsers: ReturnType<typeof createAdminUserActions>;
   exportUserData: ReturnType<typeof createExportUserData>;
@@ -430,7 +430,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     // inicial en la misma operación, RF-03) — de ahí construirlo después.
     registerUser,
     logIn: createLogIn(authProvider),
-    verifySession: createVerifySession(authProvider),
+    resumeSession: createResumeSession(authProvider),
     listUsers: createListUsers(authProvider, profileRepository),
     adminUsers: createAdminUserActions({
       authProvider,

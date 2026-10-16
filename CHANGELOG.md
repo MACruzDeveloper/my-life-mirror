@@ -5,6 +5,11 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Corregido (SEC-05: sesión renovada)
+
+- **La sesión ya no se corta a la hora.** Se renueva sola con un token de renovación guardado en una cookie httpOnly (solo para `/api`); la contraseña se pide tras **dos días sin usar la app**. Una cuenta suspendida no se renueva. Antes, pasada la hora, guardar fallaba con un "No autenticado" sin traducir.
+- Si aun así la sesión caduca, la app avisa ("Tu sesión ha caducado") y lleva a entrar.
+
 ### Añadido (categoría Tecnología)
 
 - **Tecnología**, categoría nueva del catálogo: la relación con la tecnología (pantallas, desconexión, aprender herramientas). No sensible. Con cinco ideas curadas, seis opciones de "¿Qué te ayuda?", ejemplos para la entrevista y su icono. **Migración 0032.**

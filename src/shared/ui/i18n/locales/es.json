@@ -1045,5 +1045,10 @@
     "titulo": "De la comunidad",
     "intro": "Lo que comparten, de forma anónima, otras personas a las que les va bien en esta área.",
     "ninguna": "Todavía nadie ha compartido nada en esta categoría. Cuando te vaya bien, puedes compartir una experiencia desde tu diario en la entrevista."
+  },
+  "sesion": {
+    "caducadaTitulo": "Tu sesión ha caducado",
+    "caducadaTexto": "Por seguridad, la sesión se cierra tras dos días sin usar la app. Vuelve a entrar para seguir; si estabas guardando algo, repítelo después.",
+    "volverAEntrar": "Volver a entrar"
   }
 }

@@ -266,6 +266,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **16 oct. 2026** — *"Sigo viendo un poco pobres las landings de Aventura y sobre todo de Deportes, qué más podríamos añadir? … eventos (no personales) … vídeos de youtube … testimonios, noticias"* y *"añade una categoría más al proyecto … Tecnología"*
 → Landings con imagen de cabecera y sin migas; "Para inspirarte" (tres vídeos de YouTube curados por el autor, sin cookies hasta reproducir; política de contenido ampliada solo a `i.ytimg.com` y `youtube-nocookie.com`) y "De la comunidad" (experiencias compartidas de RF-43). Descartados eventos públicos y noticias (fuente externa, caducan) y testimonios inventados (serían falsos). Categoría Tecnología (relación con la tecnología, no sensible, migración 0032). Avatar de la entrevista: robot con rasgos humanos, generado en local sin la revisión de estereotipos (es un robot; lo revisa el autor).
 
+**16 oct. 2026** — *"he encontrado un bug … al querer guardar una profesión en mi perfil me sale un error de que no estoy autenticado"* y *"aplica los dos puntos que propones, y duración 2 días. Importante lo que comentas de avisar al usuario de que tu sesión ha caducado"*
+→ Causa: la cookie y el token de Supabase duraban una hora sin renovación. [SEC-05](user-stories/SEC-05-sesion-renovada.md): renovación con el token de renovación (cookie httpOnly de dos días, solo para `/api`) y aviso "Tu sesión ha caducado" en la interfaz.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*
