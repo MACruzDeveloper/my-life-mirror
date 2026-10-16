@@ -52,7 +52,7 @@ import {
 } from "./queries";
 import { ScoreFeedbackToast, type ScoreFeedbackMessage } from "./interview/ScoreFeedbackToast";
 import { scoreFeedback } from "./scoreFeedback";
-import type { LatestScoreDto } from "./ScoreCards";
+import type { LatestScoreDto } from "./queries";
 
 /**
  * Lleva a la pregunta de una categoría y la hace aparecer con un fundido, para

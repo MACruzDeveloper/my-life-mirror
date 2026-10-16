@@ -1,6 +1,15 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getJson } from "@shared/ui/api/getJson";
-import type { LatestScoreDto } from "./ScoreCards";
+
+export interface LatestScoreDto {
+  categoryId: string;
+  categoryName: string;
+  /** Identidad en el catálogo: se muestra con `useCategoryLabel`. */
+  catalogId?: string;
+  score?: number;
+  note?: string;
+  recordedAt?: string;
+}
 
 export interface HistoryEntryDto {
   categoryId: string;

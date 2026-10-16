@@ -257,6 +257,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **15 oct. 2026** — *"deberían salir todas las notas que correspondan para que el usuario no pierda información… cuando el header está en sticky el bloque de categorías no queda pegado. Se podría pegar al header y hacerlo full-width también? Y reducir tamaño de los botones"*
 → UX-12 v1.1: al guardar varias categorías, un solo resumen con todos los avisos (ideas nuevas, notas altas, todo en verde) en lugar de quedarse con uno; y, al bajar, una versión compacta fija de la barra, pegada a la cabecera, a todo lo ancho y centrada.
 
+**16 oct. 2026** — *"cambia los colores de las barras, no encajan mucho con la paleta o con la página de Entrevista. Creo que quedaría mejor con echarts, tipo bar horizontal"* (y, tras probar el naranja, *"lo veo peor, vuelve al country blue"*)
+→ [UX-13](user-stories/UX-13-resultados-en-barras.md) v1.1: Resultados con una plantilla de barras horizontales de ECharts (`BarChart`), todas del color de los gráficos (Country Blue); la banda, escrita en el tooltip, la descripción y la tabla. Las ideas, en una lista bajo el gráfico.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

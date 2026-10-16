@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (UX-13: resultados en barras)
+
+- **Resultados** pasa de tarjetas a un **gráfico de barras horizontales** (ECharts), en la misma escala de 0 a 10 y del color de los gráficos, con el número al final de cada barra. El tooltip (por fila) dice la banda y la fecha, y "Ver datos" abre la tabla. Debajo, las categorías sin puntuar y "Ideas para ti", con el botón de la idea junto a cada categoría.
+
 ### Añadido (UX-12: guardar todo)
 
 - En la entrevista, una **barra fija** bajo la cabecera con los accesos a cada categoría y **"Guardar todo (N)"**: guarda de una vez todas las notas cambiadas, en una sola petición (todas o ninguna). El "Guardar" de cada categoría se queda. Al bajar, la barra pasa a una **versión compacta** pegada a la cabecera, a todo lo ancho. Si el guardado deja varios avisos (ideas nuevas, notas altas, todo en verde), **un solo resumen** los enumera todos y enlaza a Inicio, en lugar de abrir varias ventanas o quedarse con uno; si falla, lo dice junto al botón y las notas se conservan.

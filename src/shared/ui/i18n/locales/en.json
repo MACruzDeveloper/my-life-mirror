@@ -359,7 +359,14 @@
     "bandaLow": "Low",
     "bandaMediumLow": "Almost low",
     "bandaMedium": "Medium",
-    "bandaHigh": "Good"
+    "bandaHigh": "Good",
+    "grafico": "Latest score for each category: {{lista}}",
+    "puntuacionConBanda": "{{categoria}}: {{puntuacion}} ({{banda}})",
+    "tabla": "Latest score for each category",
+    "nivel": "Level",
+    "fecha": "Last time",
+    "sinPuntuarLista": "Not scored yet: {{lista}}",
+    "ideas": "Ideas for you"
   },
   "cuenta": {
     "calendario": "Calendar",

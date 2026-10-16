@@ -9,7 +9,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useAssessmentHistory } from "@modules/assessments/ui/queries";
-import type { LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
+import type { LatestScoreDto } from "@modules/assessments/ui/queries";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";

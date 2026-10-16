@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ChartDataTable } from "@shared/ui/charts/ChartDataTable";
 import { escapeHtml } from "@shared/ui/charts/escapeHtml";
 import { RadarChart } from "@shared/ui/charts/RadarChart/RadarChart";
-import type { LatestScoreDto } from "../ScoreCards";
+import type { LatestScoreDto } from "../queries";
 import { buildBalance } from "./balance";
 
 /**
