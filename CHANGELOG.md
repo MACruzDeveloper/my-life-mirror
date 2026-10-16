@@ -5,9 +5,24 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (categoría Tecnología)
+
+- **Tecnología**, categoría nueva del catálogo: la relación con la tecnología (pantallas, desconexión, aprender herramientas). No sensible. Con cinco ideas curadas, seis opciones de "¿Qué te ayuda?", ejemplos para la entrevista y su icono. **Migración 0032.**
+
+### Añadido (RF-49: hitos y página de Deporte)
+
+- **Hitos** en las páginas de categoría: un título corto, un año y el mes si se recuerda. En Aventura, "Retos superados" (después de los viajes); y una **página nueva de Deporte**, con "Carreras, competiciones y marcas". Son privados, no cambian la nota y no van a la IA; se exportan y se borran con la cuenta. **Migración 0031.**
+- **Páginas de categoría con cabecera:** una imagen a todo lo ancho detrás del título (con un velo de la paleta para que se lea), y las tarjetas de la nota y las experiencias montadas sobre su parte baja. Por ahora, una imagen de la portada en todas, hasta tener las de cada categoría.
+- **"Para inspirarte"** en las páginas de Aventura y Deporte: tres vídeos elegidos por el autor (de ejemplo, charlas de TED), en tres columnas. Solo se carga la miniatura; el reproductor, de YouTube sin cookies, al pulsar. La política de contenido admite solo `i.ytimg.com` (imágenes) y `www.youtube-nocookie.com` (reproductor).
+- **"De la comunidad"** en las mismas páginas: hasta tres experiencias que comparten otras personas en esa categoría (RF-43), con su aviso y la opción de reportar.
+- **Categorías:** cada tarjeta lleva el icono de su categoría, del color de la flecha. Las páginas de categoría, sin migas de pan (son landings) y con la imagen más alta.
+- **Landings de categoría:** la cabecera de la app va transparente encima de la imagen, que empieza en el borde superior y es más alta; al bajar, la cabecera recupera su fondo.
+- **Entrevista:** el avatar que hace las preguntas es ahora un robot amable con cara humana, generado en local con el mismo modelo y estilo que los avatares de RF-26 y elegido por el autor.
+- **Cabecera:** Inicio, Categorías o Entrevista se marcan como página actual, con el mismo fondo que al pasar el ratón (también dentro de una categoría).
+
 ### Cambiado (UX-13: resultados en barras)
 
-- **Resultados** pasa de tarjetas a un **gráfico de barras horizontales** (ECharts), en la misma escala de 0 a 10 y del color de los gráficos, con el número al final de cada barra. El tooltip (por fila) dice la banda y la fecha, y "Ver datos" abre la tabla. Debajo, las categorías sin puntuar y "Ideas para ti", con el botón de la idea junto a cada categoría.
+- **Resultados** pasa de tarjetas a un **gráfico de barras horizontales** (ECharts), en la misma escala de 0 a 10 y del color de los gráficos (algo transparente, más suave; entero al pasar por encima), con el número al final de cada barra. El tooltip (por fila) dice la banda y la fecha, y "Ver datos" abre la tabla. Debajo, las categorías sin puntuar y "Ideas para ti", con el botón de la idea junto a cada categoría.
 
 ### Añadido (UX-12: guardar todo)
 

@@ -260,6 +260,12 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **16 oct. 2026** — *"cambia los colores de las barras, no encajan mucho con la paleta o con la página de Entrevista. Creo que quedaría mejor con echarts, tipo bar horizontal"* (y, tras probar el naranja, *"lo veo peor, vuelve al country blue"*)
 → [UX-13](user-stories/UX-13-resultados-en-barras.md) v1.1: Resultados con una plantilla de barras horizontales de ECharts (`BarChart`), todas del color de los gráficos (Country Blue); la banda, escrita en el tooltip, la descripción y la tabla. Las ideas, en una lista bajo el gráfico.
 
+**16 oct. 2026** — *"sigue con los hitos y ya haré PR después"*
+→ [Hitos](user-stories/RF-49-hitos.md), dentro de RF-49 (que ya hablaba de "recuerdos y logros"): título corto privado, año y mes opcional, solo del pasado. En Aventura y en una página nueva de Deporte. En la función de la agenda (12 de 12), migración 0031.
+
+**16 oct. 2026** — *"Sigo viendo un poco pobres las landings de Aventura y sobre todo de Deportes, qué más podríamos añadir? … eventos (no personales) … vídeos de youtube … testimonios, noticias"* y *"añade una categoría más al proyecto … Tecnología"*
+→ Landings con imagen de cabecera y sin migas; "Para inspirarte" (tres vídeos de YouTube curados por el autor, sin cookies hasta reproducir; política de contenido ampliada solo a `i.ytimg.com` y `youtube-nocookie.com`) y "De la comunidad" (experiencias compartidas de RF-43). Descartados eventos públicos y noticias (fuente externa, caducan) y testimonios inventados (serían falsos). Categoría Tecnología (relación con la tecnología, no sensible, migración 0032). Avatar de la entrevista: robot con rasgos humanos, generado en local sin la revisión de estereotipos (es un robot; lo revisa el autor).
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

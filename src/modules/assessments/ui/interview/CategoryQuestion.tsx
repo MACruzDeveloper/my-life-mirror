@@ -17,7 +17,7 @@ import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivism
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { useTranslation } from "react-i18next";
-import interviewerAvatar from "../../../../assets/avatars/interviewer.svg";
+import interviewerAvatar from "../../../../assets/avatars/interviewer.webp";
 import userAvatar from "../../../../assets/avatars/user.svg";
 import type { CategoryLabel } from "@modules/categories/ui/categoryLabels";
 import type { CategoryDto } from "@modules/categories/ui/queries";

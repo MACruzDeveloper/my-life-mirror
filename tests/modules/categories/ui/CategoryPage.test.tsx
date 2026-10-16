@@ -18,14 +18,20 @@ vi.mock("@modules/agenda/ui/trips/TripsMap", () => ({
   ),
 }));
 
-const LABELS = [{ catalogId: "k-ave", key: "aventura", translations: { es: { name: "Aventura", description: "Nuevas experiencias y retos." } } }];
-const CATEGORIES = [{ id: "c-ave", catalogId: "k-ave", name: "Aventura", status: "active" }];
+const LABELS = [
+  { catalogId: "k-ave", key: "aventura", translations: { es: { name: "Aventura", description: "Nuevas experiencias y retos." } } },
+  { catalogId: "k-dep", key: "deporte", translations: { es: { name: "Deporte", description: "Actividad física." } } },
+];
+const CATEGORIES = [
+  { id: "c-ave", catalogId: "k-ave", name: "Aventura", status: "active" },
+  { id: "c-dep", catalogId: "k-dep", name: "Deporte", status: "inactive" },
+];
 
-function stubApi({ trips = [] as unknown[], latest = [] as unknown[], diary = [] as unknown[] } = {}) {
+function stubApi({ trips = [] as unknown[], latest = [] as unknown[], diary = [] as unknown[], milestones = {} as Record<string, unknown[]>, shared = {} as Record<string, unknown[]> } = {}) {
   const fetchMock = vi.fn((url: string, init?: RequestInit) => {
     if (init?.method === "POST") return Promise.resolve({ ok: true, status: 201, json: async () => ({ id: "t-nuevo", ...JSON.parse(init.body as string) }) });
     if (init?.method === "DELETE") return Promise.resolve({ ok: true, json: async () => ({ deleted: true }) });
-    const data: Record<string, unknown> = { "/api/categories/translations": LABELS, "/api/categories": CATEGORIES, "/api/agenda/trips": trips, "/api/assessments": latest, "/api/categories/diary": diary };
+    const data: Record<string, unknown> = { "/api/categories/translations": LABELS, "/api/categories": CATEGORIES, "/api/agenda/trips": trips, "/api/assessments": latest, "/api/categories/diary": diary, ...Object.fromEntries(Object.entries(milestones).map(([key, list]) => [`/api/agenda/milestones?category=${key}`, list])), ...Object.fromEntries(Object.entries(shared).map(([categoryId, list]) => [`/api/categories/shared?categoryId=${categoryId}&locale=es`, list])) };
     return Promise.resolve({ ok: true, json: async () => data[url] ?? [] });
   });
   vi.stubGlobal("fetch", fetchMock);
@@ -141,5 +147,116 @@ describe("CategoryPage: Aventura (RF-49)", () => {
 
     expect(await screen.findByText(/todavía no tiene página/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /ver todas las categorías/i })).toHaveAttribute("href", "/categorias");
+  });
+});
+
+describe("CategoryPage: hitos en Aventura y Deporte (RF-49)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("Deporte tiene su página: descripción, nota y sus hitos, del más reciente al más antiguo; sin viajes", async () => {
+    stubApi({
+      milestones: {
+        deporte: [
+          { id: "m1", categoryKey: "deporte", title: "Media maratón de Valencia", year: 2024, month: 11 },
+          { id: "m2", categoryKey: "deporte", title: "Primer 10K", year: 2019 },
+        ],
+      },
+    });
+    renderPage("deporte");
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Deporte" })).toBeInTheDocument();
+    // La cabecera, con su imagen detrás del título (decorativa: sin texto alternativo).
+    const hero = screen.getByTestId("category-hero");
+    expect(within(hero).getByRole("heading", { level: 1 })).toHaveTextContent("Deporte");
+    expect(hero.querySelector("img")).toHaveAttribute("alt", "");
+    const milestones = await screen.findByRole("region", { name: /carreras, competiciones y marcas/i });
+    const items = await within(milestones).findAllByRole("listitem");
+    expect(items[0]).toHaveTextContent(/Media maratón de Valencia[\s\S]*noviembre de 2024/);
+    expect(items[1]).toHaveTextContent(/Primer 10K[\s\S]*2019/);
+    expect(within(milestones).getByText(/no cambian tu nota/i)).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: /tus viajes/i })).not.toBeInTheDocument();
+  });
+
+  it("Aventura enseña sus retos superados, pedidos para Aventura", async () => {
+    const fetchMock = stubApi({ milestones: { aventura: [{ id: "m3", categoryKey: "aventura", title: "Camino de Santiago", year: 2018 }] } });
+    renderPage("aventura");
+
+    const milestones = await screen.findByRole("region", { name: /retos superados/i });
+    expect(await within(milestones).findByText("Camino de Santiago")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => url === "/api/agenda/milestones?category=aventura")).toBe(true);
+  });
+
+  it("añade un hito con título, año y mes, sin volver a pedir la lista; no cambia ninguna nota", { timeout: 20_000 }, async () => {
+    const fetchMock = stubApi();
+    renderPage("deporte");
+    const milestones = await screen.findByRole("region", { name: /carreras, competiciones y marcas/i });
+    await within(milestones).findByText(/todavía no has añadido ningún hito/i);
+
+    fireEvent.change(within(milestones).getByRole("textbox", { name: /qué conseguiste/i }), { target: { value: "Media maratón de Valencia" } });
+    fireEvent.mouseDown(within(milestones).getByRole("combobox", { name: /^año/i }));
+    fireEvent.click(screen.getByRole("option", { name: "2024" }));
+    fireEvent.mouseDown(within(milestones).getByRole("combobox", { name: /mes/i }));
+    fireEvent.click(screen.getByRole("option", { name: "noviembre" }));
+    fireEvent.click(within(milestones).getByRole("button", { name: /añadir hito/i }));
+
+    expect(await within(milestones).findByText("Media maratón de Valencia")).toBeInTheDocument();
+    const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST")!;
+    expect(post[0]).toBe("/api/agenda/milestones");
+    expect(JSON.parse(post[1]!.body as string)).toEqual({ categoryKey: "deporte", title: "Media maratón de Valencia", year: 2024, month: 11 });
+    expect(fetchMock.mock.calls.filter(([url, init]) => url === "/api/agenda/milestones?category=deporte" && !init?.method)).toHaveLength(1);
+    expect(fetchMock.mock.calls.some(([url, init]) => url.startsWith("/api/assessments") && init?.method === "POST")).toBe(false);
+  });
+
+  it("borra un hito", async () => {
+    const fetchMock = stubApi({ milestones: { deporte: [{ id: "m1", categoryKey: "deporte", title: "Primer 10K", year: 2019 }] } });
+    renderPage("deporte");
+
+    fireEvent.click(await screen.findByRole("button", { name: /borrar.*primer 10k/i }));
+
+    await waitFor(() => expect(screen.getByText(/todavía no has añadido ningún hito/i)).toBeInTheDocument());
+    expect(fetchMock.mock.calls.find(([, init]) => init?.method === "DELETE")![0]).toBe("/api/agenda/milestones?id=m1");
+  });
+});
+
+describe("CategoryPage: vídeos y comunidad (RF-49)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("tres vídeos de inspiración: al principio solo la miniatura; al pulsar, el reproductor sin cookies de YouTube", async () => {
+    stubApi();
+    renderPage("deporte");
+
+    const videos = await screen.findByRole("region", { name: /para inspirarte/i });
+    const play = within(videos).getAllByRole("button", { name: /reproducir/i });
+    expect(play).toHaveLength(3);
+    expect(videos.querySelector("iframe")).toBeNull();
+
+    fireEvent.click(play[0]);
+
+    const player = videos.querySelector("iframe")!;
+    expect(player.getAttribute("src")).toMatch(/^https:\/\/www\.youtube-nocookie\.com\/embed\/[A-Za-z0-9_-]{11}\?autoplay=1$/);
+    expect(player).toHaveAttribute("title");
+  });
+
+  it("'De la comunidad': lo que comparten otras personas en esta categoría, con su aviso y la opción de reportar", async () => {
+    const fetchMock = stubApi({ shared: { "c-dep": [{ id: "s1", text: "Correr con amigos los domingos me cambió la semana." }] } });
+    renderPage("deporte");
+
+    const community = await screen.findByRole("region", { name: /de la comunidad/i });
+    expect(await within(community).findByText(/correr con amigos los domingos/i)).toBeInTheDocument();
+    expect(within(community).getByText(/no son consejo profesional|no sustituyen/i)).toBeInTheDocument();
+
+    fireEvent.click(within(community).getByRole("button", { name: /reportar/i }));
+
+    await waitFor(() => expect(within(community).queryByText(/correr con amigos los domingos/i)).not.toBeInTheDocument());
+    const report = fetchMock.mock.calls.find(([url, init]) => url === "/api/categories/shared" && init?.method === "POST")!;
+    expect(JSON.parse(report[1]!.body as string)).toEqual({ id: "s1" });
+  });
+
+  it("si nadie ha compartido nada todavía, lo dice", async () => {
+    stubApi();
+    renderPage("deporte");
+
+    const community = await screen.findByRole("region", { name: /de la comunidad/i });
+    expect(await within(community).findByText(/todavía nadie ha compartido/i)).toBeInTheDocument();
   });
 });

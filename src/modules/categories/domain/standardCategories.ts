@@ -106,4 +106,14 @@ export const STANDARD_CATEGORIES: readonly StandardCategoryTemplate[] = [
       en: { name: "Health", description: "How you feel: rest, energy and looking after yourself." },
     },
   },
+  {
+    // Añadida el 16 oct. 2026, pedida por el autor: la relación con la tecnología (pantallas,
+    // desconexión, aprender herramientas). No sensible: no pide datos de categorías especiales.
+    key: "tecnologia",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Tecnología", description: "Tu relación con la tecnología: pantallas, desconexión y lo que aprendes." },
+      en: { name: "Technology", description: "Your relationship with technology: screens, switching off and what you learn." },
+    },
+  },
 ];

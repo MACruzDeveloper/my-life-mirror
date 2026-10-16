@@ -51,5 +51,10 @@
   {"key": "salud.2", "category": "salud"},
   {"key": "salud.3", "category": "salud"},
   {"key": "salud.4", "category": "salud"},
-  {"key": "salud.5", "category": "salud"}
+  {"key": "salud.5", "category": "salud"},
+  {"key": "tecnologia.1", "category": "tecnologia"},
+  {"key": "tecnologia.2", "category": "tecnologia"},
+  {"key": "tecnologia.3", "category": "tecnologia"},
+  {"key": "tecnologia.4", "category": "tecnologia"},
+  {"key": "tecnologia.5", "category": "tecnologia"}
 ]

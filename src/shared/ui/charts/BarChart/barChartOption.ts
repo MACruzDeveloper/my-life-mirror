@@ -67,8 +67,9 @@ export function buildBarChartOption({ bars, scale, color, reducedMotion, compact
         type: "bar",
         data: bars.map((bar) => bar.value),
         barWidth: 14,
-        itemStyle: { color, borderRadius: [0, 4, 4, 0] },
-        emphasis: { itemStyle: { color, opacity: 0.85 } },
+        // Más suave que el color lleno (pedido por el autor); al pasar por encima, entero.
+        itemStyle: { color, opacity: 0.7, borderRadius: [0, 4, 4, 0] },
+        emphasis: { itemStyle: { color, opacity: 1 } },
         label: { show: true, position: "right", color: PALETTE.midnight, fontWeight: 700, fontSize: 13 },
       },
     ],

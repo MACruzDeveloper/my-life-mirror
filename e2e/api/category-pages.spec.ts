@@ -9,10 +9,11 @@ const VISITED_FILL = 'path.leaflet-interactive[fill="#5F929C"]';
 test.describe("RF-49: Categorías y viajes en Aventura", () => {
   test("desde la cabecera a Aventura; un viaje a Myanmar pinta Myanmar, sigue tras recargar y se borra", async ({ page }, testInfo) => {
     // El mapa no pide nada fuera de la app: cualquier petición a otro dominio haría fallar el test.
+    // La única excepción son las miniaturas de los vídeos de inspiración (i.ytimg.com, permitido en la política de contenido).
     const external: string[] = [];
     page.on("request", (request) => {
       const { hostname } = new URL(request.url());
-      if (!["localhost", "127.0.0.1"].includes(hostname)) external.push(request.url());
+      if (!["localhost", "127.0.0.1", "i.ytimg.com"].includes(hostname)) external.push(request.url());
     });
     await new AccountPages(page).register(newUser());
 
@@ -30,7 +31,8 @@ test.describe("RF-49: Categorías y viajes en Aventura", () => {
 
     await expect(page).toHaveURL(/\/categorias\/aventura$/);
     await expect(page.getByRole("heading", { level: 1, name: "Aventura" })).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "breadcrumb" })).toContainText("Categorías/Aventura");
+    // Una landing: sin migas de pan encima de la imagen de cabecera.
+    await expect(page.getByRole("navigation", { name: "breadcrumb" })).toHaveCount(0);
     const trips = page.getByRole("region", { name: "Tus viajes" });
     const map = trips.getByRole("group", { name: "Mapa de tus viajes" });
     await expect(map.locator("path.leaflet-interactive").first()).toBeAttached();

@@ -24,6 +24,8 @@ describe("buildBarChartOption (plantilla de barras horizontales)", () => {
     expect(series.type).toBe("bar");
     expect(series.data).toEqual([9, 4]);
     expect(series.itemStyle.color).toBe("#5F929C");
+    // Más suave que el color lleno; al pasar por encima, entero.
+    expect((series.itemStyle as { opacity?: number }).opacity).toBeLessThan(1);
     expect(series.itemStyle.borderRadius).toEqual([0, 4, 4, 0]);
     expect(series.label).toMatchObject({ show: true, position: "right" });
   });

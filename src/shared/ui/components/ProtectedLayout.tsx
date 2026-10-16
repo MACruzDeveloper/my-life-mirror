@@ -14,6 +14,8 @@ export interface ProtectedLayoutProps {
   breadcrumbs?: BreadcrumbItem[];
   /** Página ancha (con menú lateral): las migas se alinean con su contenedor. */
   wide?: boolean;
+  /** Landing con imagen de cabecera: la cabecera de la app va transparente encima de ella (ver `Header`). */
+  overlayHeader?: boolean;
   children: ReactNode;
 }
 
@@ -26,7 +28,7 @@ export interface ProtectedLayoutProps {
  * comparte el mismo estado que cualquier hijo (p. ej. `ProfileForm`, que
  * puede invalidarlo con `refresh()` tras guardar).
  */
-export function ProtectedLayout({ breadcrumbs, wide = false, children }: ProtectedLayoutProps) {
+export function ProtectedLayout({ breadcrumbs, wide = false, overlayHeader = false, children }: ProtectedLayoutProps) {
   const { email, name, rol, avatarKey } = useSession();
   const navigate = useNavigate();
 
@@ -39,7 +41,7 @@ export function ProtectedLayout({ breadcrumbs, wide = false, children }: Protect
   return (
     <>
       {/* name (RF-03) tiene prioridad sobre el email en cuanto existe — ver api/sesion.ts. */}
-      <Header displayName={name ?? email} avatarKey={avatarKey} onLogout={handleLogout} isAdmin={rol === "admin"} />
+      <Header displayName={name ?? email} avatarKey={avatarKey} onLogout={handleLogout} isAdmin={rol === "admin"} overlay={overlayHeader} />
       {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" maxWidth={wide ? WIDE_PAGE_MAX_WIDTH : PAGE_MAX_WIDTH} /> : null}
       {children}
       {/* RF-30: en toda pantalla protegida, igual para todo el mundo. */}

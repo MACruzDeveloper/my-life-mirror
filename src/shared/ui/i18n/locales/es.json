@@ -429,6 +429,11 @@
       "¿Cómo andas de energía en tu día a día?",
       "¿Descansas lo que necesitas?",
       "¿Te sientes a gusto con cómo cuidas de ti?"
+    ],
+    "tecnologia": [
+      "¿Cuánto tiempo pasas con pantallas sin darte cuenta?",
+      "¿La tecnología te ayuda o te agobia en tu día a día?",
+      "¿Te sientes a gusto con las herramientas que usas?"
     ]
   },
   "admin": {
@@ -655,6 +660,13 @@
         "3": "Deja una botella de agua a la vista en el sitio donde pasas más horas.",
         "4": "Por cada hora que pases sentado, levántate y estira un minuto.",
         "5": "Durante tres días, apunta con una sola palabra cómo te encuentras al despertar."
+      },
+      "tecnologia": {
+        "1": "Elige un rato al día sin pantallas esta semana y mira qué haces con ese tiempo.",
+        "2": "Quita las notificaciones de una app que te interrumpa a menudo y mira si la echas de menos.",
+        "3": "Aprende a hacer una cosa nueva con una herramienta que ya usas: un atajo o una función que no conocías.",
+        "4": "Deja el móvil fuera del dormitorio una noche y mira cómo te levantas.",
+        "5": "Dedica media hora a ordenar tus fotos o tus archivos: menos ruido y más fácil encontrar lo que importa."
       }
     },
     "dialogoTitulo": "Una idea para {{categoria}}",
@@ -815,6 +827,14 @@
       "comerConCalma": "Comer con calma",
       "descansos": "Hacer descansos",
       "rutinas": "Tener rutinas"
+    },
+    "tecnologia": {
+      "limitarPantallas": "Poner límites a las pantallas",
+      "menosNotificaciones": "Menos notificaciones",
+      "desconectar": "Desconectar un rato",
+      "aprenderAlgoNuevo": "Aprender algo nuevo",
+      "ordenDigital": "Orden digital",
+      "crearAlgoPropio": "Crear algo propio"
     }
   },
   "situaciones": {
@@ -937,6 +957,28 @@
     "tusExperiencias": "Tus experiencias",
     "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista."
   },
+  "hitos": {
+    "titulo": {
+      "aventura": "Retos superados",
+      "deporte": "Carreras, competiciones y marcas"
+    },
+    "intro": {
+      "aventura": "Lo que has conseguido: una cumbre, una travesía, ese reto que te daba respeto. Para recordarlo cuando te cueste.",
+      "deporte": "Tus carreras, competiciones y marcas personales, de cualquier año. Para recordar de lo que eres capaz."
+    },
+    "ejemplo": {
+      "aventura": "Ej.: Camino de Santiago",
+      "deporte": "Ej.: Media maratón de Valencia"
+    },
+    "anadirTitulo": "Añadir un hito",
+    "queConseguiste": "Qué conseguiste",
+    "anadir": "Añadir hito",
+    "tusHitos_one": "{{count}} hito",
+    "tusHitos_other": "{{count}} hitos",
+    "ninguno": "Todavía no has añadido ningún hito.",
+    "borrar": "Borrar «{{titulo}}» ({{fecha}})",
+    "noCambianNota": "Tus hitos son solo tuyos: no cambian tu nota, no se envían a la IA y no se comparten."
+  },
   "viajes": {
     "titulo": "Tus viajes",
     "intro": "Los países que has visitado, o que estás planeando visitar, de cualquier año. Un mapa de tus recuerdos y de lo que te queda por ver.",
@@ -982,5 +1024,26 @@
     "nuncaLista": "Tu nombre, tu email, tu fecha de nacimiento, tu género, tus experiencias escritas ni nada de las categorías sensibles.",
     "cambiar": "Cambiarlo en Privacidad y datos",
     "activar": "Activarlas en Privacidad y datos"
+  },
+  "videos": {
+    "titulo": "Para inspirarte",
+    "intro": "Charlas en vídeo que pueden darte ideas o ganas. Las eligió quien hizo la app; están en inglés, con subtítulos.",
+    "reproducir": "Reproducir «{{titulo}}», de {{ponente}}",
+    "aviso": "Las imágenes y los vídeos vienen de YouTube: al reproducir uno, YouTube recibe tu visita (sin cookies de seguimiento hasta que lo pulsas).",
+    "aventura": {
+      "saunders": "Al Polo Sur y vuelta: los 105 días más duros de mi vida",
+      "cutts": "Prueba algo nuevo durante 30 días",
+      "jiang": "Lo que aprendí de 100 días de rechazo"
+    },
+    "deporte": {
+      "suzuki": "Lo que el ejercicio hace por tu cerebro",
+      "mcdougall": "¿Nacimos para correr?",
+      "balcetis": "Por qué a algunas personas les cuesta más el ejercicio"
+    }
+  },
+  "comunidad": {
+    "titulo": "De la comunidad",
+    "intro": "Lo que comparten, de forma anónima, otras personas a las que les va bien en esta área.",
+    "ninguna": "Todavía nadie ha compartido nada en esta categoría. Cuando te vaya bien, puedes compartir una experiencia desde tu diario en la entrevista."
   }
 }

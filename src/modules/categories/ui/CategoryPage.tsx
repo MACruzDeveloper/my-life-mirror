@@ -3,32 +3,44 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
+import { PALETTE } from "@shared/ui/theme";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, useParams } from "react-router";
 import { useExperiences, useLatestScores } from "@modules/assessments/ui/queries";
 import { TripsSection } from "@modules/agenda/ui/trips/TripsSection";
+import { MilestonesSection } from "@modules/agenda/ui/milestones/MilestonesSection";
 import { ProtectedLayout } from "@shared/ui/components/ProtectedLayout";
 import { useCategoryLabel } from "./categoryLabels";
 import { hasCategoryPage } from "./categoryPages";
+import { CATEGORY_HEROES } from "./categoryHeroes";
+import { VideosSection } from "./landing/VideosSection";
+import { inspirationVideosFor } from "../domain/inspirationVideos";
+import { CommunitySection } from "./landing/CommunitySection";
 import { useCategories, useCategoryLabelsQuery } from "./queries";
 
 /**
- * La ruta de una página de categoría, con su miga de pan: "Inicio / Categorías /
- * Aventura" (el nombre de la categoría en el idioma de la interfaz, no un
- * genérico).
+ * La ruta de una página de categoría. Sin migas de pan: la página es una
+ * landing con su imagen de cabecera pegada a la cabecera de la app, y las
+ * migas encima de la imagen no quedaban bien (decisión del autor, 16 oct.).
+ * Se vuelve con "Categorías" de la cabecera, que aquí va transparente encima
+ * de la imagen (`overlayHeader`), y la imagen empieza en el borde superior.
  */
 export function CategoryPageRoute() {
-  const { t } = useTranslation();
-  const { key } = useParams();
-  const { categoryLabel } = useCategoryLabel();
-  const entry = (useCategoryLabelsQuery().data ?? []).find((candidate) => candidate.key === key);
-  const name = entry ? categoryLabel(entry.catalogId).name : "";
   return (
-    <ProtectedLayout breadcrumbs={[{ label: t("breadcrumbs.inicio"), path: "/inicio" }, { label: t("breadcrumbs.categorias"), path: "/categorias" }, { label: name || t("breadcrumbs.categoria") }]}>
+    <ProtectedLayout overlayHeader>
       <CategoryPage />
     </ProtectedLayout>
   );
 }
+
+/** La altura de la imagen de cabecera (pedida por el autor: 740 px en escritorio). */
+const HERO_HEIGHT = { xs: 560, md: 740 };
+/** El mismo espacio arriba y abajo de cada bloque de la página. */
+const SECTION_SPACING = { xs: 4, md: 5 };
+
+/** Velo sobre la imagen: el azul noche de la paleta, más denso donde va el texto (arriba) que donde lo tapan las tarjetas (abajo). */
+const HERO_VEIL = `linear-gradient(180deg, ${alpha(PALETTE.midnight, 0.6)} 0%, ${alpha(PALETTE.midnight, 0.6)} 60%, ${alpha(PALETTE.midnight, 0.3)} 100%)`;
 
 const SECTION_SX = { p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" };
 
@@ -36,12 +48,14 @@ const SECTION_SX = { p: 2.5, borderRadius: 0, border: 1, borderColor: "divider",
  * RF-49: la página de una categoría, con lo que la persona ha vivido en ella.
  * Lo común a todas: la descripción, la última nota (con enlace a la
  * entrevista) y las experiencias del diario. Lo propio de cada una va debajo:
- * en Aventura, los viajes. Nada de esta página cambia una puntuación.
+ * en Aventura, los viajes y los retos superados; en Deporte, las carreras y
+ * marcas (los hitos). Nada de esta página cambia una puntuación.
  */
 export function CategoryPage() {
   const { t } = useTranslation();
   const { key } = useParams();
   const labels = useCategoryLabelsQuery();
+  const categories = useCategories();
   const { categoryLabel } = useCategoryLabel();
 
   if (labels.isPending) {
@@ -67,24 +81,58 @@ export function CategoryPage() {
   }
 
   const label = categoryLabel(entry.catalogId);
+  const hero = CATEGORY_HEROES[key];
+  // La copia de la categoría de esta persona (activa o no): con ella se piden las experiencias compartidas.
+  const ownCategoryId = (categories.data ?? []).find((category) => category.catalogId === entry.catalogId)?.id;
   return (
     <>
-    <Box sx={{ maxWidth: 1100, mx: "auto", mt: 3, px: 2, display: "flex", flexDirection: "column", gap: 2 }}>
-      <Box>
-        <Typography variant="h4" component="h1" gutterBottom>
+    {/*
+      La cabecera: la imagen de la categoría a todo lo ancho, detrás del título, con un velo oscuro de la
+      paleta para que el texto blanco se lea. Las tarjetas van dentro, montadas sobre la parte baja de la
+      imagen: el bloque mide lo que la imagen o, si las tarjetas son más largas, lo que ellas. Así el
+      bloque siguiente nunca empieza encima de la imagen.
+    */}
+    <Box data-testid="category-hero" sx={{ position: "relative", overflow: "hidden", boxSizing: "border-box", minHeight: HERO_HEIGHT, pb: SECTION_SPACING }}>
+      <Box sx={{ position: "absolute", top: 0, left: 0, right: 0, height: HERO_HEIGHT }}>
+        <picture>
+          <source media="(min-width: 600px)" srcSet={hero.desktop} />
+          <Box component="img" src={hero.mobile} alt="" sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        </picture>
+        <Box aria-hidden sx={{ position: "absolute", inset: 0, background: HERO_VEIL }} />
+      </Box>
+      {/* El título ocupa un alto fijo: las tarjetas empiezan siempre a la misma altura. */}
+      <Box sx={{ position: "relative", boxSizing: "border-box", height: { xs: 432, md: 516 }, maxWidth: 1100, mx: "auto", px: 2, pt: { xs: 16, md: 22 }, color: "common.white" }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: { xs: "2rem", md: "2.75rem" } }}>
           {label.name}
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ maxWidth: 640 }}>
           {label.description}
         </Typography>
       </Box>
-      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 2fr" }, gap: 2 }}>
+      <Box sx={{ position: "relative", maxWidth: 1100, mx: "auto", px: 2, display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 2fr" }, gap: 2 }}>
         <LatestScore catalogId={entry.catalogId} categoryName={label.name} />
         <DiaryEntries catalogId={entry.catalogId} />
       </Box>
     </Box>
-    {/* Lo propio de cada categoría, a todo lo ancho de la página. */}
-    {key === "aventura" && <TripsSection />}
+    {/* Cada bloque, con el mismo espacio arriba y abajo. Lo propio de cada categoría primero: en Aventura, los viajes (el mapa, a todo lo ancho). */}
+    {key === "aventura" && (
+      <Box sx={{ py: SECTION_SPACING }}>
+        <TripsSection />
+      </Box>
+    )}
+    {/* Los hitos: en Aventura, después de los viajes; en Deporte, lo propio de la página. */}
+    <Box sx={{ py: SECTION_SPACING }}>
+      <MilestonesSection categoryKey={key} />
+    </Box>
+    {/* Inspiración: vídeos curados por el autor y lo que comparten otras personas (RF-43). */}
+    {inspirationVideosFor(key).length > 0 && (
+      <Box sx={{ py: SECTION_SPACING }}>
+        <VideosSection categoryKey={key} />
+      </Box>
+    )}
+    <Box sx={{ py: SECTION_SPACING }}>
+      <CommunitySection categoryId={ownCategoryId} />
+    </Box>
     </>
   );
 }

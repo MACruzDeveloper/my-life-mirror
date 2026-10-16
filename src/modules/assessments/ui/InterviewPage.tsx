@@ -23,7 +23,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import interviewerAvatar from "../../../assets/avatars/interviewer.svg";
+import interviewerAvatar from "../../../assets/avatars/interviewer.webp";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
 import { useAiIdeasActive, useAiSuggestionsActive } from "@modules/accounts/ui/queries";

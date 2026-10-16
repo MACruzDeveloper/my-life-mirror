@@ -14,6 +14,7 @@ import { preloadTripsMap } from "@modules/agenda/ui/trips/preloadTripsMap";
 import { Link as RouterLink } from "react-router";
 import { resolveCategoryLabel } from "./categoryLabels";
 import { hasCategoryPage } from "./categoryPages";
+import { categoryIcon } from "./categoryIcons";
 import { useCategoryLabelsQuery } from "./queries";
 
 /**
@@ -57,12 +58,17 @@ export function CategoriesPage() {
       )}
       <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }, gap: 2 }}>
         {entries.map((entry) => {
+          const Icon = categoryIcon(entry.key);
           const content = (
             <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1, height: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-                <Typography variant="h6" component="h2">
-                  {entry.name}
-                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+                  {/* Del mismo color que la flecha; decorativo, el nombre va al lado. */}
+                  <Icon color="secondary" aria-hidden />
+                  <Typography variant="h6" component="h2">
+                    {entry.name}
+                  </Typography>
+                </Box>
                 {hasCategoryPage(entry.key) ? <ArrowForwardIcon color="secondary" aria-hidden /> : <Chip size="small" label={t("paginasCategoria.proximamente")} />}
               </Box>
               <Typography variant="body2" color="text.secondary">

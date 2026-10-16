@@ -120,3 +120,18 @@ export function useSharedExperiences(categoryId: string | undefined, locale: str
     enabled: enabled && categoryId !== undefined,
   });
 }
+
+/** RF-43: reportar una experiencia de otra persona: deja de verse al momento (también en esta caché). Lo comparten la ventana de ideas y las páginas de categoría. */
+export function useReportSharedExperience(categoryId: string, locale: string) {
+  const queryClient = useQueryClient();
+  return async function report(experienceId: string): Promise<boolean> {
+    try {
+      const response = await fetch("/api/categories/shared", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: experienceId }) });
+      if (!response.ok) return false;
+      queryClient.setQueryData<SharedExperienceDto[]>(sharedExperiencesKey(categoryId, locale), (current) => current?.filter((candidate) => candidate.id !== experienceId));
+      return true;
+    } catch {
+      return false;
+    }
+  };
+}
