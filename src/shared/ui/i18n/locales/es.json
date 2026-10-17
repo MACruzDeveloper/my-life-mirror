@@ -50,9 +50,9 @@
         "MyLifeMirror no sustituye a ningún profesional. Es un espacio para pararte, mirarte con calma y dar el siguiente paso.",
         "¿Empezamos?"
       ],
-      "posicion": "Posición del audio"
-    },
-    "invitacion": "¿Te animas? Crea tu cuenta aquí abajo."
+      "posicion": "Posición del audio",
+      "cerrar": "Cerrar el reproductor"
+    }
   },
   "registro": {
     "titulo": "Crear cuenta",

@@ -54,7 +54,7 @@ test.describe("UX-08: portada con imagen", () => {
       expect(box.width).toBe(viewport.width);
       expect(box.height).toBe(viewport.height);
       await expect(hero.getByRole("heading", { level: 1 })).toBeInViewport();
-      await expect(hero.getByText(/Crea tu cuenta/)).toBeInViewport();
+      await expect(hero.getByRole("link", { name: "Crear cuenta" })).toBeInViewport();
       await expect(page.getByRole("button", { name: "English" })).toBeInViewport();
       const howItWorks = page.getByRole("heading", { name: "Cómo funciona" });
       await expect(howItWorks).not.toBeInViewport();
@@ -62,8 +62,6 @@ test.describe("UX-08: portada con imagen", () => {
       // La flecha lleva a la segunda parte, que sube sobre su propia imagen de fondo.
       await hero.getByRole("link", { name: "Ver cómo funciona" }).click();
       await expect(howItWorks).toBeInViewport();
-      // Los botones de entrar, ahí, junto a cómo funciona.
-      await expect(page.getByRole("link", { name: "Crear cuenta" })).toBeInViewport();
       // El idioma y el aviso de IA se quedan fijos al bajar: siguen a la vista sobre la segunda imagen, y el aviso no está repetido.
       await expect(page.getByRole("button", { name: "English" })).toBeInViewport();
       await expect(page.getByText("Imagen generada con IA")).toHaveCount(1);

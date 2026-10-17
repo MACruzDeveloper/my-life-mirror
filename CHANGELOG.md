@@ -8,7 +8,7 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 ### Añadido (presentación en audio)
 
 - **Portada:** "Escuchar la presentación", un audio de unos 50 segundos que explica la app, en español o inglés según la interfaz. Voz generada con IA (ElevenLabs) a partir de un texto fijo, sin datos de nadie; no suena sola, el archivo solo se descarga al pulsar, tiene una barra para ver por dónde va e ir adelante o atrás, y su transcripción. Lo dice: "Voz generada con IA (ElevenLabs)".
-- **Portada en orden:** título, descripción, audio y una invitación con la flecha; los botones de crear cuenta e iniciar sesión, en la segunda parte, junto a cómo funciona.
+- **Portada:** título, descripción, audio y, después, los botones de crear cuenta e iniciar sesión (quien ya tiene cuenta entra desde la primera vista). Antes de pulsar, solo el botón de reproducir (icono y texto, un solo botón); la barra, el tiempo y el aviso de voz generada con IA aparecen al empezar, con una animación de un segundo, y un botón los recoge y vuelve al principio. "Cómo funciona", en una tarjeta más pequeña que en escritorio se desliza del centro a la izquierda al llegar a ella.
 
 ### Cambiado (ajustes finales)
 

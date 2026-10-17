@@ -17,7 +17,7 @@ describe("Landing (RF-39)", () => {
     expect(screen.getByRole("link", { name: /iniciar sesión/i })).toHaveAttribute("href", "/login");
   });
 
-  it("UX-08: el título, la descripción, el audio y la invitación van sobre la imagen; los botones, en la segunda parte, con cómo funciona", () => {
+  it("UX-08: el título, la descripción, el audio y los botones van sobre la imagen, que dice estar generada con IA y no se anuncia", () => {
     render(
       <MemoryRouter>
         <Landing />
@@ -26,12 +26,9 @@ describe("Landing (RF-39)", () => {
 
     const hero = screen.getByRole("region", { name: "MyLifeMirror" });
     expect(within(hero).getByRole("heading", { level: 1, name: "MyLifeMirror" })).toBeInTheDocument();
-    // En orden: título, descripción, audio, invitación a crear la cuenta y flecha; los botones, abajo.
-    expect(within(hero).getByText(/crea tu cuenta/i)).toBeInTheDocument();
-    expect(within(hero).queryByRole("link", { name: /crear cuenta/i })).not.toBeInTheDocument();
-    const second = document.getElementById("como-funciona")!;
-    expect(within(second).getByRole("link", { name: /crear cuenta/i })).toHaveAttribute("href", "/registro");
-    expect(within(second).getByRole("link", { name: /iniciar sesión/i })).toHaveAttribute("href", "/login");
+    // Quien ya tiene cuenta entra desde aquí mismo: los botones, en la primera vista, después del audio.
+    expect(within(hero).getByRole("link", { name: /crear cuenta/i })).toHaveAttribute("href", "/registro");
+    expect(within(hero).getByRole("link", { name: /iniciar sesión/i })).toHaveAttribute("href", "/login");
     // El aviso de imagen generada con IA, una sola vez (fijo sobre las dos imágenes), no repetido en cada una.
     expect(screen.getAllByText(/imagen generada con ia/i)).toHaveLength(1);
     // La flecha es un enlace a la parte siguiente: funciona también sin JavaScript y con el teclado.
@@ -107,7 +104,8 @@ describe("Landing: presentación en audio", () => {
 
     const hero = screen.getByRole("region", { name: "MyLifeMirror" });
     expect(play).not.toHaveBeenCalled();
-    expect(within(hero).getByText(/voz generada con ia/i)).toBeInTheDocument();
+    // Antes de pulsar, solo el botón: el aviso de IA y la transcripción aparecen con el resto del reproductor.
+    expect(within(hero).queryByText(/voz generada con ia/i)).not.toBeInTheDocument();
 
     fireEvent.click(within(hero).getByRole("button", { name: /escuchar la presentación/i }));
     expect(play).toHaveBeenCalledOnce();
@@ -118,12 +116,22 @@ describe("Landing: presentación en audio", () => {
     audio.currentTime = 12;
     fireEvent.timeUpdate(audio);
     const slider = await within(hero).findByRole("slider", { name: /posición/i });
+    expect(within(hero).getByText(/voz generada con ia/i)).toBeInTheDocument();
     expect(slider).toHaveAttribute("aria-valuenow", "12");
     expect(within(hero).getByText("0:12 / 0:47")).toBeInTheDocument();
     fireEvent.change(slider, { target: { value: 30 } });
     expect(audio.currentTime).toBe(30);
     fireEvent.click(within(hero).getByRole("button", { name: /pausar/i }));
     expect(pause).toHaveBeenCalled();
+
+    // Volver al estado inicial: se para, vuelve al principio y desaparecen la barra y el aviso.
+    fireEvent.click(within(hero).getByRole("button", { name: /cerrar el reproductor/i }));
+    expect(within(hero).queryByRole("slider")).not.toBeInTheDocument();
+    expect(within(hero).getByRole("button", { name: /escuchar la presentación/i })).toBeInTheDocument();
+    expect(audio.currentTime).toBe(0);
+    // Y se puede volver a empezar.
+    fireEvent.click(within(hero).getByRole("button", { name: /escuchar la presentación/i }));
+    expect(await within(hero).findByRole("slider", { name: /posición/i })).toBeInTheDocument();
 
     fireEvent.click(within(hero).getByRole("button", { name: /transcripción/i }));
     expect(await screen.findByRole("dialog", { name: /transcripción/i })).toHaveTextContent(/un espejo de tu vida, no un examen/i);

@@ -50,9 +50,9 @@
         "MyLifeMirror doesn't replace any professional. It's a space to pause, look at yourself calmly and take the next step.",
         "Shall we begin?"
       ],
-      "posicion": "Audio position"
-    },
-    "invitacion": "Ready? Create your account just below."
+      "posicion": "Audio position",
+      "cerrar": "Close the player"
+    }
   },
   "registro": {
     "titulo": "Create account",
