@@ -19,10 +19,10 @@ import Typography from "@mui/material/Typography";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import YouTubeIcon from "@mui/icons-material/YouTube";
+import { ADMIN_BLOCK_TITLE_SX, ADMIN_PANEL_SX, ADMIN_TABLE_HEAD_SX } from "./adminStyles";
 import { useTranslation } from "react-i18next";
 import { getJson } from "@shared/ui/api/getJson";
 import { SUPPORTED_LOCALES } from "@shared/domain/locales";
-import { PALE_TINT } from "@shared/ui/theme";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { INSPIRATION_VIDEOS_KEY, type InspirationVideoDto, useCategoryLabelsQuery } from "@modules/categories/ui/queries";
 
@@ -131,36 +131,38 @@ export function AdminVideos() {
       <Typography variant="body2" color="text.secondary">
         {t("admin.videos.intro")}
       </Typography>
-      {/* Categoría e idioma, estrechos; el enlace y el título, anchos; el botón a la derecha. */}
+      {/* Media anchura para todo: categoría e idioma arriba, el título y el enlace debajo, alineados con el idioma; el botón, a la derecha del enlace. */}
       <Box
         component="form"
         onSubmit={submit}
         aria-label={formTitle}
-        sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "200px 160px 1fr" }, gap: 1.5, p: 2, border: 1, borderColor: editingId ? "secondary.main" : "divider", bgcolor: "background.paper" }}
+        sx={{ ...ADMIN_PANEL_SX, borderColor: editingId ? "secondary.main" : "divider", p: 2, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" }, columnGap: 2, rowGap: 1.5, alignItems: "start" }}
       >
         <Box sx={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 1 }}>
           <YouTubeIcon sx={{ color: "text.secondary" }} aria-hidden />
-          <Typography variant="subtitle2" component="h2">
+          <Typography variant="subtitle1" component="h2" sx={{ ...ADMIN_BLOCK_TITLE_SX, mb: 0 }}>
             {formTitle}
           </Typography>
         </Box>
-        <TextField select label={t("admin.videos.categoria")} size="small" required {...field("categoryKey")}>
-          {categories.map((category) => (
-            <MenuItem key={category.key} value={category.key}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField select label={t("admin.videos.idioma")} size="small" required {...field("locale")}>
-          {SUPPORTED_LOCALES.map((locale) => (
-            <MenuItem key={locale} value={locale}>
-              {languageName(locale)}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField label={t("admin.videos.enlace")} size="small" required placeholder="https://www.youtube.com/watch?v=…" sx={{ gridColumn: { sm: "1 / -1", md: "auto" } }} slotProps={{ htmlInput: { maxLength: 500 } }} {...field("youtubeUrl")} />
-        <TextField label={t("admin.videos.titulo")} helperText={t("admin.videos.tituloAyuda")} size="small" required sx={{ gridColumn: { sm: "1 / -1", md: "1 / 3" } }} slotProps={{ htmlInput: { maxLength: MAX_TITLE } }} {...field("title")} />
-        <Box sx={{ gridColumn: { sm: "1 / -1", md: "auto" }, display: "flex", justifyContent: "flex-end", alignItems: "flex-start", gap: 1 }}>
+        <Box sx={{ gridColumn: 1, display: "flex", flexWrap: { xs: "wrap", sm: "nowrap" }, gap: 1.5 }}>
+          <TextField select label={t("admin.videos.categoria")} size="small" required sx={{ flex: 1, minWidth: 0 }} {...field("categoryKey")}>
+            {categories.map((category) => (
+              <MenuItem key={category.key} value={category.key}>
+                {category.name}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField select label={t("admin.videos.idioma")} size="small" required sx={{ width: { xs: "100%", sm: 160 }, flexShrink: 0 }} {...field("locale")}>
+            {SUPPORTED_LOCALES.map((locale) => (
+              <MenuItem key={locale} value={locale}>
+                {languageName(locale)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+        <TextField label={t("admin.videos.titulo")} size="small" required sx={{ gridColumn: 1 }} slotProps={{ htmlInput: { maxLength: MAX_TITLE } }} {...field("title")} />
+        <TextField label={t("admin.videos.enlace")} size="small" required placeholder="https://www.youtube.com/watch?v=…" sx={{ gridColumn: 1 }} slotProps={{ htmlInput: { maxLength: 500 } }} {...field("youtubeUrl")} />
+        <Box sx={{ gridColumn: { xs: 1, md: 2 }, gridRow: { md: 4 }, display: "flex", gap: 1 }}>
           <Button type="submit" variant="contained" color="secondary" disabled={!complete || submitting}>
             {editingId ? t("admin.videos.guardarCambios") : t("admin.videos.anadir")}
           </Button>
@@ -173,8 +175,9 @@ export function AdminVideos() {
         </Alert>
       )}
       {/* El filtro y la tabla, en un mismo bloque: el filtro es de esta tabla. */}
-      <Box sx={{ border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
+      <Box sx={ADMIN_PANEL_SX}>
+      {/* El filtro, a la derecha, encima de su tabla. */}
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider", display: "flex", justifyContent: "flex-end" }}>
       <TextField
         select
         label={t("admin.videos.filtrar")}
@@ -203,7 +206,7 @@ export function AdminVideos() {
       ) : (
         <TableContainer>
           <Table size="small" aria-label={t("admin.videos.lista")}>
-            <TableHead sx={{ bgcolor: PALE_TINT, "& .MuiTableCell-head": { fontWeight: 700 } }}>
+            <TableHead sx={ADMIN_TABLE_HEAD_SX}>
               <TableRow>
                 <TableCell>{t("admin.videos.categoria")}</TableCell>
                 <TableCell>{t("admin.videos.idioma")}</TableCell>

@@ -44,7 +44,8 @@
     "exito": "Account created for {{email}}.",
     "irALogin": "Log in",
     "errorGenerico": "Could not complete the registration",
-    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password."
+    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password.",
+    "despues": "We only ask for what's needed to get started. Later, in “My profile”, you can choose your avatar and, if you like, add your occupation and hobbies."
   },
   "login": {
     "titulo": "Log in",
@@ -537,7 +538,6 @@
       "idioma": "Language",
       "enlace": "YouTube link",
       "titulo": "Title",
-      "tituloAyuda": "As published, in the video's language.",
       "anadir": "Add video",
       "ninguno": "No videos yet.",
       "lista": "Inspiration videos",
@@ -556,7 +556,9 @@
       "editar": "Edit “{{titulo}}”",
       "porPagina": "Per page",
       "mostrando": "{{from}}–{{to}} of {{count}}"
-    }
+    },
+    "anadirPagina": "Its page will appear in Categories as “Coming soon”.",
+    "retirarCategoria": "Retire “{{nombre}}”"
   },
   "datos": {
     "titulo": "Privacy & data",
@@ -986,7 +988,8 @@
     "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview.",
     "verTodasExperiencias": "See all ({{count}})",
     "verMenos": "See less",
-    "avisoMarcas": "The header image is AI-generated and used for illustrative purposes only in a non-profit academic project. Any brands, logos or competition names that may appear belong to their owners, who are not affiliated with or endorse this app."
+    "avisoMarcas": "The header image is AI-generated and used for illustrative purposes only in a non-profit academic project. Any brands, logos or competition names that may appear belong to their owners, who are not affiliated with or endorse this app.",
+    "avisoMarcasTitulo": "Disclaimer"
   },
   "hitos": {
     "titulo": {
@@ -1040,7 +1043,8 @@
     "evento": "How did \"{{titulo}}\" go? If you like, review your score in {{categorias}}.",
     "idea": "You planned to try an idea for {{categoria}} on {{fecha}}.",
     "revisar_one": "{{categoria}} hasn't been reviewed for {{count}} week. Is it still the same?",
-    "revisar_other": "{{categoria}} hasn't been reviewed for {{count}} weeks. Is it still the same?"
+    "revisar_other": "{{categoria}} hasn't been reviewed for {{count}} weeks. Is it still the same?",
+    "perfil": "Complete your profile: choose an avatar and, if you like, your occupation and hobbies, so ideas fit you better."
   },
   "perfilIa": {
     "titulo": "How the AI sees you",

@@ -101,9 +101,13 @@ export function CategoryPage() {
           <Box component="img" src={hero.mobile} alt="" sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
         </picture>
         <Box aria-hidden sx={{ position: "absolute", inset: 0, background: HERO_VEIL }} />
-        {/* Como en la portada: la imagen está generada con IA, y se dice. */}
-        <Typography variant="caption" sx={{ position: "absolute", top: { xs: 68, sm: 76 }, right: 16, color: "common.white", opacity: 0.75 }}>
+        {/*
+          Como en la portada: la imagen está generada con IA, y se dice. Abajo a la derecha de la imagen; en
+          móvil las tarjetas la tapan por abajo, así que va arriba. El asterisco remite al disclaimer del pie.
+        */}
+        <Typography variant="caption" sx={{ position: "absolute", top: { xs: 68, md: "auto" }, bottom: { md: 8 }, right: 16, color: "common.white", opacity: 0.75 }}>
           {t("landing.imagenIA")}
+          {hero.showsThirdPartyBrands && " *"}
         </Typography>
       </Box>
       {/* El título ocupa un alto fijo, abajo del todo, justo encima de las tarjetas: empiezan siempre a la misma altura. */}
@@ -138,9 +142,14 @@ export function CategoryPage() {
     </Box>
     {hero.showsThirdPartyBrands && (
       // Al pie: la imagen (generada con IA) muestra marcas que no tienen relación con la app.
-      <Typography variant="caption" color="text.secondary" component="p" sx={{ maxWidth: 1100, mx: "auto", px: 2, pb: 2 }}>
-        {t("paginasCategoria.avisoMarcas")}
-      </Typography>
+      <Box component="aside" aria-labelledby="aviso-marcas" sx={{ maxWidth: 1100, mx: "auto", px: 2, pb: 2 }}>
+        <Typography id="aviso-marcas" variant="caption" component="h2" sx={{ fontWeight: 700, display: "block" }}>
+          * {t("paginasCategoria.avisoMarcasTitulo")}
+        </Typography>
+        <Typography variant="caption" color="text.secondary" component="p">
+          {t("paginasCategoria.avisoMarcas")}
+        </Typography>
+      </Box>
     )}
     </>
   );

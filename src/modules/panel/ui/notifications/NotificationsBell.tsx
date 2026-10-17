@@ -9,6 +9,7 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useEvents } from "@modules/agenda/ui/queries";
+import { useProfile } from "@modules/accounts/ui/queries";
 import { readDismissedFollowUps } from "@modules/agenda/ui/followUps";
 import { useLatestScores } from "@modules/assessments/ui/queries";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
@@ -53,6 +54,7 @@ export function NotificationsBell() {
   const reactions = useIdeaReactions().data;
   const latest = useLatestScores().data;
   const categories = useCategories().data;
+  const profile = useProfile();
   const { categoryLabel } = useCategoryLabel();
 
   const categoryNames = Object.fromEntries((Array.isArray(categories) ? categories : []).map((category) => [category.id, categoryLabel(category.catalogId).name || category.name]));
@@ -63,6 +65,8 @@ export function NotificationsBell() {
     dismissedFollowUps: readDismissedFollowUps(),
     reactions: Array.isArray(reactions) ? reactions : [],
     latestScores: (Array.isArray(latest) ? latest : []).map((score) => ({ ...score, categoryName: categoryNames[score.categoryId] ?? score.categoryName })),
+    // Solo si ha llegado bien: un fallo al cargarlo no es "perfil vacío".
+    profile: profile.isSuccess ? profile.data : undefined,
   });
   const unseen = items.filter((item) => !seen.includes(item.id)).length;
 
@@ -75,6 +79,7 @@ export function NotificationsBell() {
 
   function text(item: AppNotification): string {
     if (item.kind === "event") return t("avisos.evento", { titulo: item.title, categorias: new Intl.ListFormat(i18n.language, { type: "conjunction" }).format(item.categories) });
+    if (item.kind === "profile") return t("avisos.perfil");
     if (item.kind === "idea") return t("avisos.idea", { categoria: item.category, fecha: formatDay(item.day, i18n.language) });
     return t("avisos.revisar", { categoria: item.category, count: item.weeks });
   }

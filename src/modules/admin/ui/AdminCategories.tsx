@@ -12,6 +12,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
+import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -20,6 +22,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { ADMIN_BLOCK_TITLE_SX, ADMIN_PANEL_SX, ADMIN_TABLE_HEAD_SX } from "./adminStyles";
 import { useTranslation } from "react-i18next";
 import { getJson, HttpError } from "@shared/ui/api/getJson";
 import { DEFAULT_LOCALE, isSupportedLocale, SUPPORTED_LOCALES, type Locale } from "@shared/domain/locales";
@@ -143,16 +146,18 @@ export function AdminCategories() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box>
-        <Typography variant="subtitle1">{t("admin.catalogoTitulo")}</Typography>
+        <Typography variant="subtitle1" component="h2" sx={ADMIN_BLOCK_TITLE_SX}>
+          {t("admin.catalogoTitulo")}
+        </Typography>
         <Typography variant="body2" color="text.secondary">
           {t("admin.catalogoAyuda")}
         </Typography>
       </Box>
       {actionError && <Alert severity="error">{actionError}</Alert>}
 
-      <TableContainer sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
+      <TableContainer sx={ADMIN_PANEL_SX}>
         <Table size="small">
-          <TableHead>
+          <TableHead sx={ADMIN_TABLE_HEAD_SX}>
             <TableRow>
               {SUPPORTED_LOCALES.map((locale) => (
                 <TableCell key={locale}>{t("admin.nombreEnIdioma", { idioma: languageName(locale) })}</TableCell>
@@ -175,9 +180,9 @@ export function AdminCategories() {
                 <TableCell>{category.retiredAt ? t("admin.retirada") : t("admin.vigente")}</TableCell>
                 <TableCell>
                   {!category.retiredAt && (
-                    <Button size="small" color="warning" onClick={() => setCategoryToRetire(category)}>
-                      {t("admin.retirar")}
-                    </Button>
+                    <IconButton size="small" color="warning" onClick={() => setCategoryToRetire(category)} aria-label={t("admin.retirarCategoria", { nombre: textIn(category, interfaceLocale)?.name ?? "" })}>
+                      <ArchiveOutlinedIcon fontSize="small" />
+                    </IconButton>
                   )}
                 </TableCell>
               </TableRow>
@@ -186,12 +191,20 @@ export function AdminCategories() {
         </Table>
       </TableContainer>
 
-      <Box component="form" onSubmit={addCategory} sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 760 }}>
-        <Typography variant="subtitle1">{t("admin.anadirTitulo")}</Typography>
-        {/* Una columna por idioma (apiladas en móvil): nombre y descripción de cada uno. */}
-        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: `repeat(${SUPPORTED_LOCALES.length}, 1fr)` } }}>
+      <Box component="form" onSubmit={addCategory} sx={{ ...ADMIN_PANEL_SX, p: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box>
+          <Typography variant="subtitle1" component="h2" sx={ADMIN_BLOCK_TITLE_SX}>
+            {t("admin.anadirTitulo")}
+          </Typography>
+          {/* Sin página propia todavía: la tarjeta sale en Categorías como "Próximamente" (RF-49). */}
+          <Typography variant="body2" color="text.secondary">
+            {t("admin.anadirPagina")}
+          </Typography>
+        </Box>
+        {/* Una fila por idioma: el nombre y la descripción, a la mitad cada uno (apilados en móvil). */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {SUPPORTED_LOCALES.map((locale) => (
-            <Box key={locale} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box key={locale} sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" }, alignItems: "start" }}>
               <TextField
                 label={t("admin.nombreEnIdioma", { idioma: languageName(locale) })}
                 value={form.translations[locale].name}

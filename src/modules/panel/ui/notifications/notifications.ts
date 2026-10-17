@@ -13,7 +13,11 @@ import { type ScoredCategory, staleCategories } from "../home/staleCategories";
 export type AppNotification =
   | { kind: "event"; id: string; title: string; categories: string[]; link: string }
   | { kind: "idea"; id: string; category: string; day: string; link: string }
-  | { kind: "stale"; id: string; category: string; weeks: number; link: string };
+  | { kind: "stale"; id: string; category: string; weeks: number; link: string }
+  | { kind: "profile"; id: string; link: string };
+
+/** Lo que mira el aviso de completar el perfil; `null`, todavía sin perfil; `undefined`, aún no ha llegado. */
+type ProfileSummary = { avatarKey?: string; occupation?: string; hobbies?: readonly string[] } | null | undefined;
 
 interface NotificationSources {
   now: Date;
@@ -24,14 +28,22 @@ interface NotificationSources {
   dismissedFollowUps: readonly string[];
   reactions: readonly IdeaReactionDto[];
   latestScores: readonly ScoredCategory[];
+  profile?: ProfileSummary;
+}
+
+/** Sin avatar, profesión ni aficiones: lo que hace la app más suya (y las ideas, más a su medida) está sin descubrir. */
+function isProfileBare(profile: ProfileSummary): boolean {
+  if (profile === undefined) return false;
+  return !profile?.avatarKey && !profile?.occupation && (profile?.hobbies ?? []).length === 0;
 }
 
 /**
- * Los avisos, en este orden: revisar la nota tras un evento (RF-48), ideas
+ * Los avisos, en este orden: completar el perfil (si no tiene avatar,
+ * profesión ni aficiones), revisar la nota tras un evento (RF-48), ideas
  * guardadas cuya fecha ha llegado (RF-47) y categorías sin revisar desde hace
  * más de un mes (UX-10).
  */
-export function buildNotifications({ now, categoryNames, events, dismissedFollowUps, reactions, latestScores }: NotificationSources): AppNotification[] {
+export function buildNotifications({ now, categoryNames, events, dismissedFollowUps, reactions, latestScores, profile }: NotificationSources): AppNotification[] {
   const today = dayFromToday(0, now);
   const afterEvents: AppNotification[] = pendingFollowUps(events, categoryNames, dismissedFollowUps, now).map(({ event, categories }) => ({ kind: "event", id: `event:${event.id}`, title: event.title, categories, link: "/perfil/entrevista" }));
   const dueIdeas: AppNotification[] = reactions
@@ -42,5 +54,6 @@ export function buildNotifications({ now, categoryNames, events, dismissedFollow
     // Con la fecha de la nota en el id: si se vuelve a puntuar y vuelve a pasar un mes, es un aviso nuevo.
     return { kind: "stale", id: `stale:${category.categoryId}:${recordedAt}`, category: category.categoryName, weeks: category.weeks, link: "/perfil/entrevista" };
   });
-  return [...afterEvents, ...dueIdeas, ...stale];
+  const completeProfile: AppNotification[] = isProfileBare(profile) ? [{ kind: "profile", id: "profile:complete", link: "/perfil" }] : [];
+  return [...completeProfile, ...afterEvents, ...dueIdeas, ...stale];
 }

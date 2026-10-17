@@ -10,6 +10,8 @@ const DATA: Record<string, unknown> = {
   "/api/agenda/events": [{ id: "e1", title: "Boda de Marta", day: "2026-10-10", categoryIds: ["c1"] }],
   "/api/recommendations/reactions": [],
   "/api/assessments": [],
+  // Con avatar: el aviso de completar el perfil no sale (se prueba aparte, en notifications.test).
+  "/api/accounts/profile": { name: "Ana", avatarKey: "roundGlasses" },
   "/api/categories": [{ id: "c1", catalogId: "k-social", name: "Vida social", status: "active" }],
   "/api/categories/translations": [{ catalogId: "k-social", key: "vidaSocial", translations: { es: { name: "Vida social", description: "" } } }],
 };
@@ -47,7 +49,7 @@ describe("NotificationsBell", () => {
   });
 
   it("sin avisos, lo dice", async () => {
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve({ ok: true, json: async () => [] })));
+    vi.stubGlobal("fetch", vi.fn((url: string) => Promise.resolve({ ok: true, json: async () => (url === "/api/accounts/profile" ? { name: "Ana", avatarKey: "roundGlasses" } : []) })));
     renderBell();
 
     fireEvent.click(await screen.findByRole("button", { name: "Avisos" }));

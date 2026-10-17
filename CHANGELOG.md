@@ -11,7 +11,9 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 - **Aventura y Deporte** con su imagen de cabecera (generadas con IA y elegidas por el autor; la página lo dice). La de Deporte es provisional: muestra marcas de terceros y lleva un aviso al pie hasta sustituirla.
 - **Inicio, primera vez:** el botón "Empezar mi entrevista" lleva el color de acento.
 - **Landings de categoría:** título más grande y justo encima de las tarjetas, tarjetas de nota y experiencias en gris suave y más bajas, y menos espacio entre bloques. "Tus experiencias" enseña las dos más recientes y "Ver todas" despliega el resto en la misma tarjeta.
-- **Panel de administración:** pestañas con el mismo estilo que las de la ventana de ideas.
+- **Panel de administración:** pestañas con el mismo estilo que las de la ventana de ideas; todas las tablas y bloques con el mismo estilo (fondo blanco, cabecera gris azulada en negrita, títulos en negrita). Al añadir una categoría, se avisa de que su página saldrá como "Próximamente"; nombre y descripción de cada idioma en una fila. "Retirar" y las acciones de los vídeos, con iconos.
+- **Completar el perfil:** aviso en la campana mientras el perfil no tenga avatar, profesión ni aficiones, y una frase en el registro que lo anuncia.
+- **Entrevista, paso 1:** más aire entre la explicación y los pasos.
 
 ### Corregido (SEC-05: sesión renovada)
 

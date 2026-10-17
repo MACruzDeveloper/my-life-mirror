@@ -107,6 +107,10 @@ export function RegisterForm() {
         <Typography variant="h5" component="h1" gutterBottom>
           {t("registro.titulo")}
         </Typography>
+        {/* Solo lo imprescindible para empezar; lo demás, después y si se quiere. */}
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {t("registro.despues")}
+        </Typography>
         <Stack spacing={2}>
           {formState.kind === "error" && <Alert severity="error">{formState.message}</Alert>}
           <TextField

@@ -41,4 +41,15 @@ describe("avisos de la campana (dentro de la app)", () => {
 
     expect(items).toEqual([]);
   });
+
+  it("si el perfil está sin completar (sin avatar, profesión ni aficiones), invita a completarlo, el primero", () => {
+    const base = { now: NOW, categoryNames: NAMES, dismissedFollowUps: [], events: [], reactions: [], latestScores: [] };
+
+    const missing = buildNotifications({ ...base, profile: {} });
+    expect(missing.map((item) => [item.kind, item.link])).toEqual([["profile", "/perfil"]]);
+    // Con algo de lo que da más juego (un avatar, o profesión o aficiones), ya no; ni mientras el perfil no ha llegado.
+    expect(buildNotifications({ ...base, profile: { avatarKey: "roundGlasses" } })).toEqual([]);
+    expect(buildNotifications({ ...base, profile: { hobbies: ["deporte"] } })).toEqual([]);
+    expect(buildNotifications({ ...base, profile: undefined })).toEqual([]);
+  });
 });
