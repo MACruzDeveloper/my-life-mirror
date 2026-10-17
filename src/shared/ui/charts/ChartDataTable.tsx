@@ -9,8 +9,9 @@ import TableRow from "@mui/material/TableRow";
 
 export interface ChartDataTableProps {
   caption: string;
-  headers: [string, string];
-  rows: { key: string; cells: [string, string | number] }[];
+  /** La primera columna nombra la fila; las demás son datos (alineados a la derecha). */
+  headers: string[];
+  rows: { key: string; cells: (string | number)[] }[];
   showLabel: string;
   hideLabel: string;
 }
@@ -32,15 +33,21 @@ export function ChartDataTable({ caption, headers, rows, showLabel, hideLabel }:
         <Table size="small" aria-label={caption}>
           <TableHead>
             <TableRow>
-              <TableCell>{headers[0]}</TableCell>
-              <TableCell align="right">{headers[1]}</TableCell>
+              {headers.map((header, index) => (
+                <TableCell key={header} align={index === 0 ? "left" : "right"}>
+                  {header}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.key}>
-                <TableCell>{row.cells[0]}</TableCell>
-                <TableCell align="right">{row.cells[1]}</TableCell>
+                {row.cells.map((cell, index) => (
+                  <TableCell key={index} align={index === 0 ? "left" : "right"}>
+                    {cell}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>

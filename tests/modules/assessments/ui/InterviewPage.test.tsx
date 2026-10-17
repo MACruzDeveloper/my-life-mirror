@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // solo; con toda la batería en paralelo puede multiplicarse y rozar los 5 s por defecto. Medido el 5 oct.:
 // no es una regresión (antes de RF-44 ya iba a ~0,64 s por test), así que se ajusta el límite solo aquí.
 vi.setConfig({ testTimeout: 15_000 });
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { InterviewPage } from "@modules/assessments/ui/InterviewPage";
@@ -1272,6 +1272,167 @@ describe("InterviewPage (RF-10)", () => {
 
     expect(info).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText(/salario/i)).toBeVisible();
+  });
+
+  describe("guardar todo (UX-12)", () => {
+    const THREE = [
+      { id: "c1", catalogId: "k-economia", name: "Economía", description: "...", status: "active", isSensitiveData: false },
+      { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false },
+      { id: "c6", catalogId: "k-familia", name: "Familia", description: "...", status: "active", isSensitiveData: false },
+    ];
+    const LATEST_THREE = [
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c5", catalogId: "k-aventura", categoryName: "Aventura", score: 6, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c6", catalogId: "k-familia", categoryName: "Familia", score: 6, recordedAt: "2026-10-01T10:00:00.000Z" },
+    ];
+    const idea = (id: string, categoryId: string, catalogId: string, templateKey: string) => ({ id, categoryId, catalogId, categoryName: "", templateKey, status: "pending" });
+    const saveAllButton = () => screen.getByRole("button", { name: /guardar todo/i });
+
+    it("sin cambios está desactivado; con dos notas cambiadas, una sola petición con las dos, y las dos quedan guardadas", async () => {
+      const fetchMock = stubFetch({ categories: THREE, latest: LATEST_THREE, history: [] });
+      renderPage();
+      await waitUntilLoaded();
+      expect(saveAllButton()).toBeDisabled();
+
+      chooseScore("economía", 7);
+      chooseScore("familia", 7);
+      expect(saveAllButton()).toHaveAccessibleName("Guardar todo (2)");
+      fireEvent.click(saveAllButton());
+
+      await waitFor(() => expect(within(question("c1")).getByText("Guardado ahora")).toBeInTheDocument());
+      expect(within(question("c6")).getByText("Guardado ahora")).toBeInTheDocument();
+      const posts = postCalls(fetchMock, "/api/assessments");
+      expect(posts).toHaveLength(1);
+      expect(JSON.parse(posts[0][1].body as string).entries).toEqual([
+        { categoryId: "c1", score: 7 },
+        { categoryId: "c6", score: 7 },
+      ]);
+      expect(saveAllButton()).toBeDisabled();
+    });
+
+    it("si se abren ideas nuevas en varias categorías, un aviso las nombra y enlaza a Inicio, sin abrir ventanas", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], recommendationsAfterSave: [idea("r1", "c1", "k-economia", "economia.1"), idea("r6", "c6", "k-familia", "familia.1")] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("economía", 2);
+      chooseScore("familia", 2);
+      fireEvent.click(saveAllButton());
+
+      // Hay más "status" en la página ("Guardado ahora" en cada categoría): el resumen, por su texto.
+      const summary = (await screen.findByText(/economía: tienes una idea nueva/i)).closest("[role='status']") as HTMLElement;
+      expect(summary).toHaveTextContent(/economía: tienes una idea nueva/i);
+      expect(summary).toHaveTextContent(/familia: tienes una idea nueva/i);
+      expect(within(summary).getByRole("link", { name: /ver en inicio/i })).toHaveAttribute("href", "/inicio");
+      expect(screen.queryByRole("dialog", { name: /cambios guardados/i })).not.toBeInTheDocument();
+    });
+
+    it("no se pierde ningún aviso: una idea nueva en una y una nota alta en otra salen las dos, en un solo resumen", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], recommendationsAfterSave: [idea("r1", "c1", "k-economia", "economia.1")] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("economía", 2);
+      chooseScore("aventura", 9);
+      fireEvent.click(saveAllButton());
+
+      // Hay más "status" en la página ("Guardado ahora" en cada categoría): el resumen, por su texto.
+      const summary = (await screen.findByText(/economía: tienes una idea nueva/i)).closest("[role='status']") as HTMLElement;
+      expect(summary).toHaveTextContent(/economía: tienes una idea nueva/i);
+      expect(summary).toHaveTextContent(/enhorabuena.*un 9 en aventura/i);
+      expect(screen.queryByRole("dialog", { name: /cambios guardados/i })).not.toBeInTheDocument();
+    });
+
+    it("si lo único que pasa es una idea nueva, la ventana de siempre", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], recommendationsAfterSave: [idea("r1", "c1", "k-economia", "economia.1")] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("economía", 2);
+      chooseScore("familia", 7);
+      fireEvent.click(saveAllButton());
+
+      expect(await screen.findByRole("dialog", { name: /cambios guardados/i })).toBeInTheDocument();
+    });
+
+    it("si falla, lo dice junto al botón y las notas siguen cambiadas", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], saveResponse: () => Promise.resolve({ ok: false, json: async () => ({ error: "Algo ha fallado" }) }) });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("economía", 7);
+      fireEvent.click(saveAllButton());
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(/no se han podido guardar/i);
+      expect(saveAllButton()).toHaveAccessibleName("Guardar todo (1)");
+      expect(saveAllButton()).toBeEnabled();
+    });
+
+    it("al bajar y salir la barra de la vista, aparece una versión compacta fija con un solo \"Guardar todo\"", async () => {
+      // jsdom no tiene IntersectionObserver: uno simulado, que se dispara a mano.
+      let report: (entry: Partial<IntersectionObserverEntry>) => void = () => {};
+      class FakeObserver {
+        constructor(callback: IntersectionObserverCallback) {
+          report = (entry) => callback([entry as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+        }
+        observe() {}
+        disconnect() {}
+      }
+      vi.stubGlobal("IntersectionObserver", FakeObserver);
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [] });
+      renderPage();
+      await waitUntilLoaded();
+      expect(screen.queryByTestId("questions-bar-compact")).not.toBeInTheDocument();
+
+      act(() => report({ isIntersecting: false, boundingClientRect: { top: -40 } as DOMRectReadOnly }));
+
+      const compact = await screen.findByTestId("questions-bar-compact");
+      chooseScore("economía", 7);
+      // La normal queda oculta mientras tanto: para el lector de pantalla hay un solo botón.
+      expect(screen.getAllByRole("button", { name: /guardar todo/i })).toHaveLength(1);
+      expect(within(compact).getByRole("button", { name: "Guardar todo (1)" })).toBeEnabled();
+
+      act(() => report({ isIntersecting: true, boundingClientRect: { top: 200 } as DOMRectReadOnly }));
+      await waitFor(() => expect(screen.queryByTestId("questions-bar-compact")).not.toBeInTheDocument());
+      vi.unstubAllGlobals();
+    });
+  });
+
+  describe("todo en verde (RF-50)", () => {
+    const THREE = [
+      { id: "c1", catalogId: "k-economia", name: "Economía", description: "...", status: "active", isSensitiveData: false },
+      { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false },
+      { id: "c6", catalogId: "k-familia", name: "Familia", description: "...", status: "active", isSensitiveData: false },
+    ];
+    const latestWith = (familia: number) => [
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c5", catalogId: "k-aventura", categoryName: "Aventura", score: 8, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c6", catalogId: "k-familia", categoryName: "Familia", score: familia, recordedAt: "2026-10-01T10:00:00.000Z" },
+    ];
+
+    it("al subir la última categoría a 8 y guardar, avisa de que todo está en verde y enlaza a Inicio", async () => {
+      stubFetch({ categories: THREE, latest: latestWith(5), history: [] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("familia", 8);
+      fireEvent.click(saveButton("Familia"));
+
+      expect(await screen.findByText(/todo en verde/i)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /ver ideas en inicio/i })).toHaveAttribute("href", "/inicio");
+    });
+
+    it("si ya estaba todo en verde, guardar otra nota alta no lo repite (sale el mensaje de siempre)", async () => {
+      stubFetch({ categories: THREE, latest: latestWith(8), history: [] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("familia", 9);
+      fireEvent.click(saveButton("Familia"));
+
+      expect(await screen.findByText(/enhorabuena/i)).toBeInTheDocument();
+      expect(screen.queryByText(/todo en verde/i)).not.toBeInTheDocument();
+    });
   });
 
   it("RF-49: la pregunta de una categoría con página (Aventura) enlaza a ella; las demás, no", async () => {

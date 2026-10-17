@@ -334,6 +334,13 @@
     },
     "sugerenciasLimite": "Has llegado al máximo de usos de IA por hoy. Mañana puedes volver a probar.",
     "sugerenciasNoDisponibles": "Ahora no se han podido pedir sugerencias. Prueba más tarde.",
+    "guardarTodoConCuenta": "Guardar todo ({{count}})",
+    "guardandoTodo": "Guardando…",
+    "errorGuardarTodo": "No se han podido guardar los cambios. Inténtalo de nuevo.",
+    "ideaNuevaPara": "{{categoria}}: tienes una idea nueva.",
+    "verEnInicio": "Ver en Inicio",
+    "todoEnVerde": "¡Todo en verde! Tus categorías están en la banda alta: en Inicio tienes ideas para disfrutarlo.",
+    "verIdeasInicio": "Ver ideas en Inicio",
     "puntuacionAlta": {
       "recognizeCompartir": "{{categoria}} te va bien ahora. ¿Qué te está ayudando? Puedes anotarlo en tu diario o compartirlo de forma anónima.",
       "recognize": "{{categoria}} te va bien ahora. ¿Qué te está ayudando? Puedes anotarlo en tu diario.",
@@ -352,7 +359,14 @@
     "bandaLow": "Bajo",
     "bandaMediumLow": "Casi bajo",
     "bandaMedium": "Medio",
-    "bandaHigh": "Bueno"
+    "bandaHigh": "Bueno",
+    "grafico": "Última puntuación de cada categoría: {{lista}}",
+    "puntuacionConBanda": "{{categoria}}: {{puntuacion}} ({{banda}})",
+    "tabla": "Última puntuación de cada categoría",
+    "nivel": "Nivel",
+    "fecha": "Última vez",
+    "sinPuntuarLista": "Sin puntuar todavía: {{lista}}",
+    "ideas": "Ideas para ti"
   },
   "cuenta": {
     "calendario": "Calendario",
@@ -415,6 +429,11 @@
       "¿Cómo andas de energía en tu día a día?",
       "¿Descansas lo que necesitas?",
       "¿Te sientes a gusto con cómo cuidas de ti?"
+    ],
+    "tecnologia": [
+      "¿Cuánto tiempo pasas con pantallas sin darte cuenta?",
+      "¿La tecnología te ayuda o te agobia en tu día a día?",
+      "¿Te sientes a gusto con las herramientas que usas?"
     ]
   },
   "admin": {
@@ -546,6 +565,21 @@
     "errorCuentaDemo": "Esta es la cuenta de demostración del proyecto y no se puede eliminar. Si quieres probar el borrado, crea una cuenta propia: se elimina de verdad, con todos sus datos."
   },
   "recomendaciones": {
+    "ocio": {
+      "titulo": "Todo va bien",
+      "texto": "Todas tus categorías están en verde. No hace falta mejorar nada: estas ideas son para disfrutarlo.",
+      "otra": "Otra idea",
+      "ideas": {
+        "1": "Regálate un rato solo para ti, sin objetivo ni lista de tareas.",
+        "2": "Reserva una tarde para algo que te guste solo porque sí: una película, un paseo, un libro.",
+        "3": "Date un capricho pequeño: un masaje, un baño largo o tu comida favorita.",
+        "4": "Planea una escapada o unos días de descanso, aunque sea cerca de casa.",
+        "5": "Comparte un buen rato con alguien a quien quieras, sin más motivo que disfrutarlo.",
+        "6": "Tómate un descanso también de esta app: vuelve dentro de unas semanas, cuando te apetezca.",
+        "7": "Apunta tres cosas que estén saliendo bien, para tenerlas a mano otro día.",
+        "8": "Celebra lo que has construido: lo que tienes ahora también lo has cuidado tú."
+      }
+    },
     "ideaAnterior": "Idea anterior",
     "ideaSiguiente": "Idea siguiente",
     "ideaPosicion": "Idea {{actual}} de {{total}}",
@@ -626,6 +660,13 @@
         "3": "Deja una botella de agua a la vista en el sitio donde pasas más horas.",
         "4": "Por cada hora que pases sentado, levántate y estira un minuto.",
         "5": "Durante tres días, apunta con una sola palabra cómo te encuentras al despertar."
+      },
+      "tecnologia": {
+        "1": "Elige un rato al día sin pantallas esta semana y mira qué haces con ese tiempo.",
+        "2": "Quita las notificaciones de una app que te interrumpa a menudo y mira si la echas de menos.",
+        "3": "Aprende a hacer una cosa nueva con una herramienta que ya usas: un atajo o una función que no conocías.",
+        "4": "Deja el móvil fuera del dormitorio una noche y mira cómo te levantas.",
+        "5": "Dedica media hora a ordenar tus fotos o tus archivos: menos ruido y más fácil encontrar lo que importa."
       }
     },
     "dialogoTitulo": "Una idea para {{categoria}}",
@@ -786,6 +827,14 @@
       "comerConCalma": "Comer con calma",
       "descansos": "Hacer descansos",
       "rutinas": "Tener rutinas"
+    },
+    "tecnologia": {
+      "limitarPantallas": "Poner límites a las pantallas",
+      "menosNotificaciones": "Menos notificaciones",
+      "desconectar": "Desconectar un rato",
+      "aprenderAlgoNuevo": "Aprender algo nuevo",
+      "ordenDigital": "Orden digital",
+      "crearAlgoPropio": "Crear algo propio"
     }
   },
   "situaciones": {
@@ -908,6 +957,28 @@
     "tusExperiencias": "Tus experiencias",
     "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista."
   },
+  "hitos": {
+    "titulo": {
+      "aventura": "Retos superados",
+      "deporte": "Carreras, competiciones y marcas"
+    },
+    "intro": {
+      "aventura": "Lo que has conseguido: una cumbre, una travesía, ese reto que te daba respeto. Para recordarlo cuando te cueste.",
+      "deporte": "Tus carreras, competiciones y marcas personales, de cualquier año. Para recordar de lo que eres capaz."
+    },
+    "ejemplo": {
+      "aventura": "Ej.: Camino de Santiago",
+      "deporte": "Ej.: Media maratón de Valencia"
+    },
+    "anadirTitulo": "Añadir un hito",
+    "queConseguiste": "Qué conseguiste",
+    "anadir": "Añadir hito",
+    "tusHitos_one": "{{count}} hito",
+    "tusHitos_other": "{{count}} hitos",
+    "ninguno": "Todavía no has añadido ningún hito.",
+    "borrar": "Borrar «{{titulo}}» ({{fecha}})",
+    "noCambianNota": "Tus hitos son solo tuyos: no cambian tu nota, no se envían a la IA y no se comparten."
+  },
   "viajes": {
     "titulo": "Tus viajes",
     "intro": "Los países que has visitado, o que estás planeando visitar, de cualquier año. Un mapa de tus recuerdos y de lo que te queda por ver.",
@@ -953,5 +1024,31 @@
     "nuncaLista": "Tu nombre, tu email, tu fecha de nacimiento, tu género, tus experiencias escritas ni nada de las categorías sensibles.",
     "cambiar": "Cambiarlo en Privacidad y datos",
     "activar": "Activarlas en Privacidad y datos"
+  },
+  "videos": {
+    "titulo": "Para inspirarte",
+    "intro": "Charlas en vídeo que pueden darte ideas o ganas. Las eligió quien hizo la app; están en inglés, con subtítulos.",
+    "reproducir": "Reproducir «{{titulo}}», de {{ponente}}",
+    "aviso": "Las imágenes y los vídeos vienen de YouTube: al reproducir uno, YouTube recibe tu visita (sin cookies de seguimiento hasta que lo pulsas).",
+    "aventura": {
+      "saunders": "Al Polo Sur y vuelta: los 105 días más duros de mi vida",
+      "cutts": "Prueba algo nuevo durante 30 días",
+      "jiang": "Lo que aprendí de 100 días de rechazo"
+    },
+    "deporte": {
+      "suzuki": "Lo que el ejercicio hace por tu cerebro",
+      "mcdougall": "¿Nacimos para correr?",
+      "balcetis": "Por qué a algunas personas les cuesta más el ejercicio"
+    }
+  },
+  "comunidad": {
+    "titulo": "De la comunidad",
+    "intro": "Lo que comparten, de forma anónima, otras personas a las que les va bien en esta área.",
+    "ninguna": "Todavía nadie ha compartido nada en esta categoría. Cuando te vaya bien, puedes compartir una experiencia desde tu diario en la entrevista."
+  },
+  "sesion": {
+    "caducadaTitulo": "Tu sesión ha caducado",
+    "caducadaTexto": "Por seguridad, la sesión se cierra tras dos días sin usar la app. Vuelve a entrar para seguir; si estabas guardando algo, repítelo después.",
+    "volverAEntrar": "Volver a entrar"
   }
 }

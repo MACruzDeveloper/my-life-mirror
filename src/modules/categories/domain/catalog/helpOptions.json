@@ -57,5 +57,11 @@
   {"key": "salud.moverme", "category": "salud"},
   {"key": "salud.comerConCalma", "category": "salud"},
   {"key": "salud.descansos", "category": "salud"},
-  {"key": "salud.rutinas", "category": "salud"}
+  {"key": "salud.rutinas", "category": "salud"},
+  {"key": "tecnologia.limitarPantallas", "category": "tecnologia"},
+  {"key": "tecnologia.menosNotificaciones", "category": "tecnologia"},
+  {"key": "tecnologia.desconectar", "category": "tecnologia"},
+  {"key": "tecnologia.aprenderAlgoNuevo", "category": "tecnologia"},
+  {"key": "tecnologia.ordenDigital", "category": "tecnologia"},
+  {"key": "tecnologia.crearAlgoPropio", "category": "tecnologia"}
 ]

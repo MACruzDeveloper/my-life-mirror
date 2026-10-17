@@ -45,7 +45,9 @@ export function CategorySelection({ categories, categoryLabel, pendingCategoryId
   const renderCategoryRow = (category: CategoryDto) => (
     <Box key={category.id} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <FormControlLabel
-        control={<Checkbox checked={category.status === "active"} onChange={() => onToggle(category)} />}
+        // Arriba, a la altura del nombre: con descripciones de varias líneas, centrado quedaba suelto.
+        sx={{ alignItems: "flex-start", mb: 0.5 }}
+        control={<Checkbox checked={category.status === "active"} onChange={() => onToggle(category)} sx={{ pt: 0 }} />}
         label={
           <Box>
             <Typography variant="body1" component="span">

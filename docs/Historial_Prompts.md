@@ -248,6 +248,27 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **14 oct. 2026** — *"el verde turquesa no me convence, prueba esta nueva paleta para toda la app: The Black Mirror Color Scheme… Midnight Black (#00020C), Anti-Flash White (#F3F1F4), Loblolly (#BBC9D2), Country Blue (#6B9EA8) and Rich Black (#001312)"*
 → Paleta nueva en el tema: Rich Black para cabecera y botones principales, Anti-Flash White de fondo, Midnight Black para el texto, Loblolly para bordes y tierras del mapa y Country Blue como acento. Country Blue tal cual no llega al contraste con texto blanco (2,9:1): para botones se usa oscurecido (#4A7C86, 4,6:1) y para gráficos y mapa, un punto más oscuro (#5F929C, 3:1). Un test vigila los contrastes.
 
+**15 oct. 2026** — *"Como todavía quedan unos días vamos a aprovechar para añadir algo más… categoría Naturaleza… completar la landing de Aventura… blog… Resultados tipo bar… qué coste tendría añadir el script de Python para que el usuario genere un avatar nuevo?… Si un usuario consigue tener buena nota en todas las categorías… ideas más relacionadas con Ocio o autocuidado"*
+→ Orden acordado, de una en una y probando entre medias: RF-50 (ideas para disfrutar cuando todo va bien), Resultados en barras, hitos en Aventura y Deporte. Descartados: el blog (el contenido y su revisión cuestan más que el código), el avatar generado por el usuario (sin GPU en Vercel, coste por imagen, función serverless que no queda y, sobre todo, imágenes sin revisión humana, contra lo decidido en RF-26) y, por ahora, Naturaleza (se solapa con opciones existentes). Cierre de funcionalidades el 17; demo, slides y vídeo, el 18 y el 19; entrega el 20.
+
+**15 oct. 2026** — *"recuérdame por qué te pedí poner un botón guardar para cada categoría y no uno general… ¿Se podría hacer en menu sticky los links anchor de categorías y un botón de guardar todo a su derecha?… al ser muchas categorías puede resultar molesto para el usuario tener que guardar una por una"*
+→ El "Guardar" por categoría (UX-05, 3 oct.) salió de que el botón único del final no se encontraba y su mensaje quedaba fuera de la vista; el autoguardado se descartó porque cada nota es un registro inmutable (RF-12). [UX-12](user-stories/UX-12-guardar-todo.md): barra fija con los accesos y "Guardar todo (N)", que resuelve las dos cosas; el "Guardar" de cada categoría se queda y sigue sin haber autoguardado.
+
+**15 oct. 2026** — *"deberían salir todas las notas que correspondan para que el usuario no pierda información… cuando el header está en sticky el bloque de categorías no queda pegado. Se podría pegar al header y hacerlo full-width también? Y reducir tamaño de los botones"*
+→ UX-12 v1.1: al guardar varias categorías, un solo resumen con todos los avisos (ideas nuevas, notas altas, todo en verde) en lugar de quedarse con uno; y, al bajar, una versión compacta fija de la barra, pegada a la cabecera, a todo lo ancho y centrada.
+
+**16 oct. 2026** — *"cambia los colores de las barras, no encajan mucho con la paleta o con la página de Entrevista. Creo que quedaría mejor con echarts, tipo bar horizontal"* (y, tras probar el naranja, *"lo veo peor, vuelve al country blue"*)
+→ [UX-13](user-stories/UX-13-resultados-en-barras.md) v1.1: Resultados con una plantilla de barras horizontales de ECharts (`BarChart`), todas del color de los gráficos (Country Blue); la banda, escrita en el tooltip, la descripción y la tabla. Las ideas, en una lista bajo el gráfico.
+
+**16 oct. 2026** — *"sigue con los hitos y ya haré PR después"*
+→ [Hitos](user-stories/RF-49-hitos.md), dentro de RF-49 (que ya hablaba de "recuerdos y logros"): título corto privado, año y mes opcional, solo del pasado. En Aventura y en una página nueva de Deporte. En la función de la agenda (12 de 12), migración 0031.
+
+**16 oct. 2026** — *"Sigo viendo un poco pobres las landings de Aventura y sobre todo de Deportes, qué más podríamos añadir? … eventos (no personales) … vídeos de youtube … testimonios, noticias"* y *"añade una categoría más al proyecto … Tecnología"*
+→ Landings con imagen de cabecera y sin migas; "Para inspirarte" (tres vídeos de YouTube curados por el autor, sin cookies hasta reproducir; política de contenido ampliada solo a `i.ytimg.com` y `youtube-nocookie.com`) y "De la comunidad" (experiencias compartidas de RF-43). Descartados eventos públicos y noticias (fuente externa, caducan) y testimonios inventados (serían falsos). Categoría Tecnología (relación con la tecnología, no sensible, migración 0032). Avatar de la entrevista: robot con rasgos humanos, generado en local sin la revisión de estereotipos (es un robot; lo revisa el autor).
+
+**16 oct. 2026** — *"he encontrado un bug … al querer guardar una profesión en mi perfil me sale un error de que no estoy autenticado"* y *"aplica los dos puntos que propones, y duración 2 días. Importante lo que comentas de avisar al usuario de que tu sesión ha caducado"*
+→ Causa: la cookie y el token de Supabase duraban una hora sin renovación. [SEC-05](user-stories/SEC-05-sesion-renovada.md): renovación con el token de renovación (cookie httpOnly de dos días, solo para `/api`) y aviso "Tu sesión ha caducado" en la interfaz.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

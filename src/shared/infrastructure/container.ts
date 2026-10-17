@@ -37,6 +37,10 @@ import type { TripRepository } from "#modules/agenda/domain/Trip.js";
 import { createAddTrip, createDeleteTrip, createListTrips } from "#modules/agenda/application/Trips.js";
 import { InMemoryTripRepository } from "#modules/agenda/infrastructure/InMemoryTripRepository.js";
 import { SupabaseTripRepository } from "#modules/agenda/infrastructure/SupabaseTripRepository.js";
+import type { MilestoneRepository } from "#modules/agenda/domain/Milestone.js";
+import { createAddMilestone, createDeleteMilestone, createListMilestones } from "#modules/agenda/application/Milestones.js";
+import { InMemoryMilestoneRepository } from "#modules/agenda/infrastructure/InMemoryMilestoneRepository.js";
+import { SupabaseMilestoneRepository } from "#modules/agenda/infrastructure/SupabaseMilestoneRepository.js";
 import type { AttemptLimiter } from "#shared/domain/AttemptLimiter.js";
 import { InMemoryAttemptLimiter, UnlimitedAttemptLimiter } from "#shared/infrastructure/InMemoryAttemptLimiter.js";
 import { SupabaseAttemptLimiter } from "#shared/infrastructure/SupabaseAttemptLimiter.js";
@@ -66,7 +70,7 @@ import type { AdminAuditRepository } from "#modules/accounts/domain/AdminAuditRe
 import { InMemoryAdminAuditRepository } from "#modules/accounts/infrastructure/InMemoryAdminAuditRepository.js";
 import { SupabaseAdminAuditRepository } from "#modules/accounts/infrastructure/SupabaseAdminAuditRepository.js";
 import { createListUsers } from "#modules/accounts/application/ListUsers.js";
-import { createVerifySession } from "#modules/accounts/application/VerifySession.js";
+import { createResumeSession } from "#modules/accounts/application/ResumeSession.js";
 import { createRequestPasswordReset } from "#modules/accounts/application/RequestPasswordReset.js";
 import { createResetPassword } from "#modules/accounts/application/ResetPassword.js";
 import type { ConsentRepository } from "#modules/consent/domain/ConsentRepository.js";
@@ -172,6 +176,12 @@ function createTripRepository(environment: Environment): TripRepository {
   if (environment === "test") return new InMemoryTripRepository();
   const { url, serviceRoleKey } = supabaseCredentials();
   return new SupabaseTripRepository(url, serviceRoleKey);
+}
+
+function createMilestoneRepository(environment: Environment): MilestoneRepository {
+  if (environment === "test") return new InMemoryMilestoneRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseMilestoneRepository(url, serviceRoleKey);
 }
 
 function createIdeaReactionRepository(environment: Environment): IdeaReactionRepository {
@@ -321,7 +331,7 @@ export interface AppContext {
   authProvider: AuthProvider;
   registerUser: ReturnType<typeof createRegisterUser>;
   logIn: ReturnType<typeof createLogIn>;
-  verifySession: ReturnType<typeof createVerifySession>;
+  resumeSession: ReturnType<typeof createResumeSession>;
   listUsers: ReturnType<typeof createListUsers>;
   adminUsers: ReturnType<typeof createAdminUserActions>;
   exportUserData: ReturnType<typeof createExportUserData>;
@@ -368,6 +378,9 @@ export interface AppContext {
   addTrip: ReturnType<typeof createAddTrip>;
   listTrips: ReturnType<typeof createListTrips>;
   deleteTrip: ReturnType<typeof createDeleteTrip>;
+  addMilestone: ReturnType<typeof createAddMilestone>;
+  listMilestones: ReturnType<typeof createListMilestones>;
+  deleteMilestone: ReturnType<typeof createDeleteMilestone>;
   setIdeaReaction: ReturnType<typeof createSetIdeaReaction>;
   listIdeaReactions: ReturnType<typeof createListIdeaReactions>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
@@ -397,6 +410,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const ideaReactionRepository = createIdeaReactionRepository(environment);
   const eventRepository = createEventRepository(environment);
   const tripRepository = createTripRepository(environment);
+  const milestoneRepository = createMilestoneRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider(environment, clock);
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
@@ -416,7 +430,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     // inicial en la misma operación, RF-03) — de ahí construirlo después.
     registerUser,
     logIn: createLogIn(authProvider),
-    verifySession: createVerifySession(authProvider),
+    resumeSession: createResumeSession(authProvider),
     listUsers: createListUsers(authProvider, profileRepository),
     adminUsers: createAdminUserActions({
       authProvider,
@@ -429,15 +443,16 @@ export function createAppContext(environment: Environment = detectEnvironment())
       ideaReactionRepository,
       eventRepository,
       tripRepository,
+      milestoneRepository,
       experienceRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
-    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, milestoneRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, milestoneRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, milestoneRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -487,6 +502,9 @@ export function createAppContext(environment: Environment = detectEnvironment())
     addTrip: createAddTrip({ tripRepository, clock }),
     listTrips: createListTrips(tripRepository),
     deleteTrip: createDeleteTrip(tripRepository),
+    addMilestone: createAddMilestone({ milestoneRepository, clock }),
+    listMilestones: createListMilestones(milestoneRepository),
+    deleteMilestone: createDeleteMilestone(milestoneRepository),
     setIdeaReaction: createSetIdeaReaction({ ideaReactionRepository, categoryRepository, catalog: categoryCatalogRepository, clock }),
     listIdeaReactions: createListIdeaReactions(ideaReactionRepository),
     aiIdeasAvailable: ideaProvider.writer !== undefined,

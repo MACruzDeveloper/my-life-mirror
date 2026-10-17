@@ -7,9 +7,9 @@ import i18n from "@shared/ui/i18n";
 import { Header } from "@shared/ui/components/Header";
 import { HeaderExtrasProvider } from "@shared/ui/context/HeaderExtrasContext";
 
-function renderHeader(props: Partial<React.ComponentProps<typeof Header>> = {}) {
+function renderHeader(props: Partial<React.ComponentProps<typeof Header>> = {}, path = "/") {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[path]}>
       <Header displayName="ana@ejemplo.com" onLogout={() => {}} {...props} />
     </MemoryRouter>,
   );
@@ -34,6 +34,26 @@ describe("Header", () => {
     expect(nav.getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/inicio");
     expect(nav.getByRole("link", { name: "Categorías" })).toHaveAttribute("href", "/categorias");
     expect(nav.getByRole("link", { name: "Entrevista" })).toHaveAttribute("href", "/perfil/entrevista");
+  });
+
+  it("en una landing va transparente arriba del todo y sin espaciador; si no, con su fondo", () => {
+    const { unmount } = renderHeader({ overlay: true });
+    expect(screen.getByRole("banner")).toHaveAttribute("data-transparent", "true");
+    expect(screen.queryByTestId("header-spacer")).not.toBeInTheDocument();
+    unmount();
+
+    renderHeader();
+    expect(screen.getByRole("banner")).toHaveAttribute("data-transparent", "false");
+    expect(screen.getByTestId("header-spacer")).toBeInTheDocument();
+  });
+
+  it("marca la página en la que se está (también dentro de ella, como una categoría), con el estilo de pasar el ratón", () => {
+    renderHeader({}, "/categorias/aventura");
+
+    const nav = within(screen.getByRole("navigation"));
+    expect(nav.getByRole("link", { name: "Categorías" })).toHaveAttribute("aria-current", "page");
+    expect(nav.getByRole("link", { name: "Inicio" })).not.toHaveAttribute("aria-current");
+    expect(nav.getByRole("link", { name: "Entrevista" })).not.toHaveAttribute("aria-current");
   });
 
   it("el nombre abre un menú con Mi perfil y Cerrar sesión; Administración, solo para un admin", () => {

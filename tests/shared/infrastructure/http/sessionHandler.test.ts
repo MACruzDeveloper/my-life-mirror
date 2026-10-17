@@ -10,9 +10,9 @@ import { NotShareableError } from "@modules/assessments/domain/Experience";
 function fakeResponse() {
   const res = {
     statusCode: 0,
-    headers: {} as Record<string, string>,
+    headers: {} as Record<string, string | string[]>,
     body: undefined as unknown,
-    writeHead: vi.fn((status: number, headers: Record<string, string>) => {
+    writeHead: vi.fn((status: number, headers: Record<string, string | string[]>) => {
       res.statusCode = status;
       res.headers = headers;
     }),
@@ -25,9 +25,11 @@ function request(method: string, { body, url = "/api/x", cookie = "sesion=ok", o
   return { method, url, headers: { cookie, host: "app.example", ...(origin && { origin }) }, body } as never;
 }
 
-/** Solo lo que usa la plantilla: la sesión es válida con la cookie "ok". */
+/** Solo lo que usa la plantilla: la sesión es válida con la cookie "ok", y se renueva con la de renovación "r1" (SEC-05). */
+const ANA = { id: "u1", email: "ana@ejemplo.com", rol: "usuario" };
 const context = {
-  verifySession: async (token: string | undefined) => (token === "ok" ? ok({ id: "u1", email: "ana@ejemplo.com", rol: "usuario" }) : err(new ValidationError("no"))),
+  resumeSession: async ({ token, refreshToken }: { token?: string; refreshToken?: string }) =>
+    token === "ok" ? ok({ user: ANA }) : refreshToken === "r1" ? ok({ user: ANA, renewed: { token: "nuevo", refreshToken: "r2" } }) : err(new ValidationError("no")),
 } as unknown as AppContext;
 
 async function call(handler: ReturnType<typeof sessionHandler>, req: never) {
@@ -38,6 +40,28 @@ async function call(handler: ReturnType<typeof sessionHandler>, req: never) {
 
 describe("sessionHandler: la plantilla común de los controladores con sesión", () => {
   const Schema = z.object({ name: z.string() });
+
+  it("SEC-05: con el token de acceso caducado y el de renovación válido, ejecuta y devuelve las dos cookies renovadas", async () => {
+    const execute = vi.fn(async () => ok({ hecho: true }));
+    const handler = sessionHandler({ route: "/api/x", getContext: () => context, POST: action({ schema: Schema, execute }) });
+
+    const res = await call(handler, request("POST", { body: { name: "a" }, cookie: "sesion=caducado; sesion_renovar=r1" }));
+
+    expect(res.statusCode).toBe(200);
+    expect(execute).toHaveBeenCalledOnce();
+    const cookies = res.headers["Set-Cookie"] as string[];
+    expect(cookies[0]).toMatch(/^sesion=nuevo; /);
+    expect(cookies[1]).toMatch(/^sesion_renovar=r2; /);
+  });
+
+  it("SEC-05: sin ninguna sesión válida, 401 con su código, para que la interfaz avise de que ha caducado", async () => {
+    const handler = sessionHandler({ route: "/api/x", getContext: () => context, GET: action({ execute: async () => ok({}) }) });
+
+    const res = await call(handler, request("GET", { cookie: "sesion=caducado; sesion_renovar=usado" }));
+
+    expect(res.statusCode).toBe(401);
+    expect(res.body).toMatchObject({ code: "SESSION_EXPIRED" });
+  });
 
   it("un método no previsto → 405; sin sesión → 401, sin ejecutar nada", async () => {
     const execute = vi.fn(async () => ok({}));

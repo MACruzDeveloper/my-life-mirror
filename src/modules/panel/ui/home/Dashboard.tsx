@@ -9,7 +9,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useAssessmentHistory } from "@modules/assessments/ui/queries";
-import type { LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
+import type { LatestScoreDto } from "@modules/assessments/ui/queries";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
@@ -17,6 +17,7 @@ import { AgendaSummary } from "./AgendaSummary";
 import { CheckInReminder } from "./CheckInReminder";
 import { DashboardGuide } from "./DashboardGuide";
 import { IdeasSummary } from "./IdeasSummary";
+import { LeisureIdeas } from "./LeisureIdeas";
 import { SavedIdeas } from "./SavedIdeas";
 import { useAiIdeasActive, useProfile } from "@modules/accounts/ui/queries";
 
@@ -78,6 +79,8 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
       <AgendaSummary categoryNames={categoryNames} />
       <SavedIdeas categoryNames={categoryNames} />
       <CheckInReminder latestScores={displayedScores} />
+      {/* RF-50: con todo en verde, ideas para disfrutar en lugar de mejoras. */}
+      <LeisureIdeas scores={latestScores.map((latestScore) => latestScore.score)} />
       <IdeasSummary
         personalize={personalize}
         ideas={recommendations.map((recommendation) => ({

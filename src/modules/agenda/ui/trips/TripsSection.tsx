@@ -67,7 +67,7 @@ export function TripsSection() {
   }
 
   return (
-    <Box component="section" aria-labelledby={titleId} sx={{ mt: { xs: 5, md: 7 }, mb: { xs: 4, md: 6 } }}>
+    <Box component="section" aria-labelledby={titleId}>
       <Box sx={{ maxWidth: CONTAINER_WIDTH, mx: "auto", px: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <FlightTakeoffOutlinedIcon color="primary" />
@@ -106,7 +106,8 @@ export function TripsSection() {
       <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.75, mb: 2.5 }}>
         {t("viajes.comoUsarMapa")}
       </Typography>
-      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3 }}>
+      {/* El formulario y la lista, en blanco como las tarjetas de arriba de la página. */}
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3, p: 2.5, border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
         <Box component="form" onSubmit={handleSubmit} aria-label={t("viajes.anadirTitulo")} sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
           <Typography variant="subtitle2" component="h3">
             {t("viajes.anadirTitulo")}

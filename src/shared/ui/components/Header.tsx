@@ -16,9 +16,9 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { ThemeProvider, alpha, useTheme, type Theme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useLocation } from "react-router";
 import { CHART_ACCENT, headerTheme } from "../theme";
 import { useHeaderExtras } from "../context/HeaderExtrasContext";
 import { UserAvatar } from "./UserAvatar";
@@ -32,6 +32,12 @@ export interface HeaderProps {
   onLogout: () => void;
   /** Solo muestra el enlace: la protección real de /admin está en el servidor (ADM-01). */
   isAdmin?: boolean;
+  /**
+   * Landings con imagen de cabecera (páginas de categoría): arriba del todo, sin
+   * fondo ni borde, encima de la imagen, y sin espaciador (la imagen empieza en
+   * el borde superior). Al bajar, al compactarse, recupera su fondo para que se lea.
+   */
+  overlay?: boolean;
 }
 
 /** Las páginas de la cabecera. Mi perfil y Administración van en el menú de la cuenta. */
@@ -50,6 +56,18 @@ const GROUP_BORDER = "rgba(242, 242, 242, 0.28)";
  */
 const FULL_HEIGHT_SX = { alignSelf: "stretch", borderRadius: 0, px: 2, minWidth: 0 };
 
+/** La página en la que se está: el mismo fondo que al pasar el ratón (el de los botones de texto de MUI). */
+const CURRENT_PAGE_SX = { "&[aria-current='page']": { bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity) } };
+/** Sobre la imagen de una landing, el fondo no queda bien: solo negrita. */
+const CURRENT_PAGE_OVERLAY_SX = { "&[aria-current='page']": { fontWeight: 700 } };
+
+/** Separador entre grupos: de arriba abajo con fondo; sobre la imagen de una landing, una línea corta, de la altura del texto. */
+function separatorSx(transparent: boolean, sides: ("left" | "right")[]) {
+  if (!transparent) return Object.fromEntries(sides.map((side) => [side === "left" ? "borderLeft" : "borderRight", `1px solid ${GROUP_BORDER}`]));
+  const line = (side: "left" | "right") => ({ content: '""', position: "absolute", [side]: 0, top: "50%", height: 18, transform: "translateY(-50%)", borderLeft: `1px solid ${GROUP_BORDER}` });
+  return { position: "relative", ...(sides.includes("left") ? { "&::before": line("left") } : {}), ...(sides.includes("right") ? { "&::after": line("right") } : {}) };
+}
+
 /**
  * Cabecera de las páginas protegidas (RF-39). En escritorio, cuatro grupos:
  * páginas (Inicio, Categorías y Entrevista), la cuenta (avatar y nombre, que
@@ -59,7 +77,7 @@ const FULL_HEIGHT_SX = { alignSelf: "stretch", borderRadius: 0, px: 2, minWidth:
  * apartado 6, UX-03): en móvil, logo, idioma, avisos y un menú con todo lo
  * demás. UX-06: oscura y fija arriba; al bajar se compacta.
  */
-export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProps) {
+export function Header({ displayName, avatarKey, onLogout, isAdmin, overlay = false }: HeaderProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { notifications } = useHeaderExtras();
@@ -67,6 +85,10 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const closeMenu = () => setMenuAnchor(null);
   const isCompact = useScrollTrigger({ disableHysteresis: true, threshold: 16 });
+  const { pathname } = useLocation();
+  // Activa también dentro de la página (una categoría, dentro de Categorías).
+  const isCurrent = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
+  const transparent = overlay && !isCompact;
 
   // Lo común a los dos menús (móvil y cuenta): Mi perfil, Administración y Cerrar sesión.
   const accountItems = [
@@ -112,11 +134,12 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
         position="fixed"
         elevation={isCompact ? 4 : 0}
         data-compact={isCompact}
+        data-transparent={transparent}
         sx={{
-          bgcolor: "background.default",
+          bgcolor: transparent ? "transparent" : "background.default",
           color: "text.primary",
-          transition: "box-shadow 200ms",
-          borderBottom: `2px solid ${CHART_ACCENT}`,
+          transition: "box-shadow 200ms, background-color 200ms, border-color 200ms",
+          borderBottom: `2px solid ${transparent ? "transparent" : CHART_ACCENT}`,
           // Letra de los botones: más pequeña en compacto (el logo cambia aparte).
           "& .MuiButton-root": { fontSize: isCompact ? "0.75rem" : "0.8125rem", transition: "font-size 200ms" },
         }}
@@ -148,7 +171,7 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
                 ) : null}
                 {displayName ? <Divider /> : null}
                 {PAGES.map((page) => (
-                  <MenuItem key={page.path} component={RouterLink} to={page.path} onClick={closeMenu}>
+                  <MenuItem key={page.path} component={RouterLink} to={page.path} onClick={closeMenu} selected={isCurrent(page.path)} aria-current={isCurrent(page.path) ? "page" : undefined}>
                     {t(page.labelKey)}
                   </MenuItem>
                 ))}
@@ -160,12 +183,12 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
             <Box sx={{ display: "flex", alignItems: "stretch" }}>
               <Box component="nav" aria-label={t("comun.paginas")} sx={{ display: "flex", alignItems: "stretch" }}>
                 {PAGES.map((page) => (
-                  <Button key={page.path} component={RouterLink} to={page.path} sx={FULL_HEIGHT_SX}>
+                  <Button key={page.path} component={RouterLink} to={page.path} aria-current={isCurrent(page.path) ? "page" : undefined} sx={{ ...FULL_HEIGHT_SX, ...(transparent ? CURRENT_PAGE_OVERLAY_SX : CURRENT_PAGE_SX) }}>
                     {t(page.labelKey)}
                   </Button>
                 ))}
               </Box>
-              <Box role="group" aria-label={t("comun.miCuenta")} sx={{ display: "flex", alignItems: "stretch", ml: 1, borderLeft: 1, borderRight: 1, borderColor: GROUP_BORDER }}>
+              <Box role="group" aria-label={t("comun.miCuenta")} sx={{ display: "flex", alignItems: "stretch", ml: 1, ...separatorSx(transparent, ["left", "right"]) }}>
                 <Button
                   aria-haspopup="menu"
                   aria-expanded={menuAnchor ? "true" : undefined}
@@ -183,12 +206,12 @@ export function Header({ displayName, avatarKey, onLogout, isAdmin }: HeaderProp
               <Box sx={{ display: "flex", alignItems: "center", px: 2 }}>
                 <LanguageSwitcher variant="text" showLabel={false} />
               </Box>
-              {notifications ? <Box sx={{ display: "flex", alignItems: "stretch", borderLeft: 1, borderColor: GROUP_BORDER }}>{notifications}</Box> : null}
+              {notifications ? <Box sx={{ display: "flex", alignItems: "stretch", ...separatorSx(transparent, ["left"]) }}>{notifications}</Box> : null}
             </Box>
           )}
         </Toolbar>
       </AppBar>
-      <Box aria-hidden sx={{ height: { xs: 58, sm: 66 }, flexShrink: 0 }} />
+      {!overlay && <Box aria-hidden data-testid="header-spacer" sx={{ height: { xs: 58, sm: 66 }, flexShrink: 0 }} />}
     </ThemeProvider>
   );
 }

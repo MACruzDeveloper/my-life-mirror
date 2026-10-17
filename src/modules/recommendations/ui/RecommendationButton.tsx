@@ -1,5 +1,4 @@
 import { useId, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -25,7 +24,7 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import { alpha, keyframes, type Theme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import { sharedExperiencesKey, useSharedExperiences, type SharedExperienceDto } from "@modules/assessments/ui/queries";
+import { useReportSharedExperience, useSharedExperiences, type SharedExperienceDto } from "@modules/assessments/ui/queries";
 import { useCategories } from "@modules/categories/ui/queries";
 import { HelpLink } from "@shared/ui/components/HelpLink";
 import type { IdeaReactionKind } from "../domain/IdeaReaction";
@@ -536,19 +535,13 @@ interface SharedExperiencesListProps {
  */
 function SharedExperiencesList({ experiences, categoryId, reported, onReported }: SharedExperiencesListProps) {
   const { t, i18n } = useTranslation();
-  const queryClient = useQueryClient();
+  const reportExperience = useReportSharedExperience(categoryId, i18n.language);
   const [failed, setFailed] = useState(false);
 
   async function report(experience: SharedExperienceDto) {
     setFailed(false);
-    try {
-      const response = await fetch("/api/categories/shared", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: experience.id }) });
-      if (!response.ok) throw new Error("rejected");
-      queryClient.setQueryData<SharedExperienceDto[]>(sharedExperiencesKey(categoryId, i18n.language), (current) => current?.filter((candidate) => candidate.id !== experience.id));
-      onReported();
-    } catch {
-      setFailed(true);
-    }
+    if (await reportExperience(experience.id)) onReported();
+    else setFailed(true);
   }
 
   return (

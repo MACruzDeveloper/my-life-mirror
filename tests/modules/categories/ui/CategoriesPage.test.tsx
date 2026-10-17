@@ -9,6 +9,7 @@ import { withClient } from "../../../helpers/queryClient";
 const LABELS = [
   { catalogId: "k-eco", key: "economia", translations: { es: { name: "Economía", description: "Dinero y estabilidad." } } },
   { catalogId: "k-ave", key: "aventura", translations: { es: { name: "Aventura", description: "Nuevas experiencias y retos." } } },
+  { catalogId: "k-dep", key: "deporte", translations: { es: { name: "Deporte", description: "Actividad física." } } },
   { catalogId: "k-new", translations: { es: { name: "Creatividad", description: "Creada desde administración." } } },
 ];
 
@@ -22,8 +23,23 @@ describe("CategoriesPage (RF-49)", () => {
 
     expect(await screen.findByRole("link", { name: /aventura/i })).toHaveAttribute("href", "/categorias/aventura");
     expect(screen.getByText("Nuevas experiencias y retos.")).toBeInTheDocument();
+    // RF-49 (hitos): Deporte ya tiene página.
+    expect(screen.getByRole("link", { name: /deporte/i })).toHaveAttribute("href", "/categorias/deporte");
     expect(screen.queryByRole("link", { name: /economía/i })).not.toBeInTheDocument();
     expect(screen.getByText("Economía").closest("[aria-disabled='true']")).toHaveTextContent(/próximamente/i);
     expect(screen.getByText("Creatividad").closest("[aria-disabled='true']")).toBeInTheDocument();
+  });
+
+  it("cada tarjeta lleva el icono de su categoría; una creada desde administración, uno genérico", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve({ ok: true, json: async () => LABELS })));
+
+    render(withClient(<MemoryRouter><CategoriesPage /></MemoryRouter>));
+
+    const card = (name: string) => screen.getByText(name).closest("li")!;
+    await screen.findByText("Aventura");
+    expect(card("Aventura").querySelector("[data-testid='ExploreOutlinedIcon']")).toBeInTheDocument();
+    expect(card("Deporte").querySelector("[data-testid='DirectionsRunOutlinedIcon']")).toBeInTheDocument();
+    expect(card("Economía").querySelector("[data-testid='AccountBalanceWalletOutlinedIcon']")).toBeInTheDocument();
+    expect(card("Creatividad").querySelector("[data-testid='CategoryOutlinedIcon']")).toBeInTheDocument();
   });
 });

@@ -4,7 +4,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { periodWindow, type Period } from "@shared/ui/charts/timeWindow";
 import type { HistorySessionDto } from "../queries";
-import type { LatestScoreDto } from "../ScoreCards";
+import type { LatestScoreDto } from "../queries";
 import { CategoryEvolutionCard } from "./CategoryEvolutionCard";
 import { PeriodSelector } from "./PeriodSelector";
 import { buildCategoryTimeSeries } from "./scoreHistory";

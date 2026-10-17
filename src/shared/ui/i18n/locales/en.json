@@ -334,6 +334,13 @@
     },
     "sugerenciasLimite": "You've reached today's maximum of AI uses. You can try again tomorrow.",
     "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later.",
+    "guardarTodoConCuenta": "Save all ({{count}})",
+    "guardandoTodo": "Saving…",
+    "errorGuardarTodo": "We couldn't save your changes. Please try again.",
+    "ideaNuevaPara": "{{categoria}}: you have a new idea.",
+    "verEnInicio": "See on Home",
+    "todoEnVerde": "All green! Your categories are in the top band: on Home you'll find ideas to enjoy it.",
+    "verIdeasInicio": "See ideas on Home",
     "puntuacionAlta": {
       "recognizeCompartir": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary or share it anonymously.",
       "recognize": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary.",
@@ -352,7 +359,14 @@
     "bandaLow": "Low",
     "bandaMediumLow": "Almost low",
     "bandaMedium": "Medium",
-    "bandaHigh": "Good"
+    "bandaHigh": "Good",
+    "grafico": "Latest score for each category: {{lista}}",
+    "puntuacionConBanda": "{{categoria}}: {{puntuacion}} ({{banda}})",
+    "tabla": "Latest score for each category",
+    "nivel": "Level",
+    "fecha": "Last time",
+    "sinPuntuarLista": "Not scored yet: {{lista}}",
+    "ideas": "Ideas for you"
   },
   "cuenta": {
     "calendario": "Calendar",
@@ -415,6 +429,11 @@
       "How are your energy levels day to day?",
       "Do you get the rest you need?",
       "Are you comfortable with how you look after yourself?"
+    ],
+    "tecnologia": [
+      "How much time do you spend on screens without noticing?",
+      "Does technology help you or overwhelm you day to day?",
+      "Do you feel comfortable with the tools you use?"
     ]
   },
   "admin": {
@@ -546,6 +565,21 @@
     "errorCuentaDemo": "This is the project's demo account and it can't be deleted. If you'd like to try deleting an account, create your own: it is really deleted, with all its data."
   },
   "recomendaciones": {
+    "ocio": {
+      "titulo": "All is going well",
+      "texto": "All your categories are green. There's nothing you need to improve: these ideas are for enjoying it.",
+      "otra": "Another idea",
+      "ideas": {
+        "1": "Give yourself some time just for you, with no goal and no to-do list.",
+        "2": "Keep an afternoon for something you enjoy just because: a film, a walk, a book.",
+        "3": "Treat yourself to something small: a massage, a long bath or your favourite meal.",
+        "4": "Plan a getaway or a few days of rest, even close to home.",
+        "5": "Spend some good time with someone you love, for no other reason than enjoying it.",
+        "6": "Take a break from this app too: come back in a few weeks, whenever you feel like it.",
+        "7": "Write down three things that are going well, to have them at hand another day.",
+        "8": "Celebrate what you have built: what you have now is also something you have looked after."
+      }
+    },
     "ideaAnterior": "Previous idea",
     "ideaSiguiente": "Next idea",
     "ideaPosicion": "Idea {{actual}} of {{total}}",
@@ -626,6 +660,13 @@
         "3": "Keep a bottle of water in sight in the place where you spend most of your time.",
         "4": "For every hour you spend sitting, stand up and stretch for a minute.",
         "5": "For three days, write down in a single word how you feel when you wake up."
+      },
+      "tecnologia": {
+        "1": "Pick a screen-free moment each day this week and see what you do with that time.",
+        "2": "Turn off notifications for an app that often interrupts you and see whether you miss it.",
+        "3": "Learn one new thing with a tool you already use: a shortcut or a feature you didn't know.",
+        "4": "Leave your phone outside the bedroom for one night and see how you wake up.",
+        "5": "Spend half an hour tidying your photos or files: less noise, and easier to find what matters."
       }
     },
     "dialogoTitulo": "An idea for {{categoria}}",
@@ -786,6 +827,14 @@
       "comerConCalma": "Eating without rushing",
       "descansos": "Taking breaks",
       "rutinas": "Having routines"
+    },
+    "tecnologia": {
+      "limitarPantallas": "Setting screen limits",
+      "menosNotificaciones": "Fewer notifications",
+      "desconectar": "Switching off for a while",
+      "aprenderAlgoNuevo": "Learning something new",
+      "ordenDigital": "Digital tidiness",
+      "crearAlgoPropio": "Making something of my own"
     }
   },
   "situaciones": {
@@ -908,6 +957,28 @@
     "tusExperiencias": "Your experiences",
     "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview."
   },
+  "hitos": {
+    "titulo": {
+      "aventura": "Challenges you've overcome",
+      "deporte": "Races, competitions and personal bests"
+    },
+    "intro": {
+      "aventura": "What you've achieved: a summit, a long trek, that challenge that made you nervous. To remember it when things get hard.",
+      "deporte": "Your races, competitions and personal bests, from any year. To remember what you're capable of."
+    },
+    "ejemplo": {
+      "aventura": "E.g. Camino de Santiago",
+      "deporte": "E.g. Valencia half marathon"
+    },
+    "anadirTitulo": "Add a milestone",
+    "queConseguiste": "What you achieved",
+    "anadir": "Add milestone",
+    "tusHitos_one": "{{count}} milestone",
+    "tusHitos_other": "{{count}} milestones",
+    "ninguno": "You haven't added any milestones yet.",
+    "borrar": "Delete “{{titulo}}” ({{fecha}})",
+    "noCambianNota": "Your milestones are yours alone: they don't change your score, aren't sent to the AI and aren't shared."
+  },
   "viajes": {
     "titulo": "Your trips",
     "intro": "The countries you have visited, or are planning to visit, from any year. A map of your memories and of what you still want to see.",
@@ -953,5 +1024,31 @@
     "nuncaLista": "Your name, your email, your date of birth, your gender, your written experiences or anything from sensitive categories.",
     "cambiar": "Change it in Privacy and data",
     "activar": "Turn them on in Privacy and data"
+  },
+  "videos": {
+    "titulo": "For inspiration",
+    "intro": "Video talks that might give you ideas or a push. Chosen by the app's author; they're in English, with subtitles.",
+    "reproducir": "Play “{{titulo}}”, by {{ponente}}",
+    "aviso": "Images and videos come from YouTube: when you play one, YouTube knows you visited (no tracking cookies until you press play).",
+    "aventura": {
+      "saunders": "To the South Pole and back: the hardest 105 days of my life",
+      "cutts": "Try something new for 30 days",
+      "jiang": "What I learned from 100 days of rejection"
+    },
+    "deporte": {
+      "suzuki": "The brain-changing benefits of exercise",
+      "mcdougall": "Are we born to run?",
+      "balcetis": "Why some people find exercise harder than others"
+    }
+  },
+  "comunidad": {
+    "titulo": "From the community",
+    "intro": "What other people who are doing well in this area share anonymously.",
+    "ninguna": "Nobody has shared anything in this category yet. When things go well for you, you can share an experience from your diary in the interview."
+  },
+  "sesion": {
+    "caducadaTitulo": "Your session has expired",
+    "caducadaTexto": "For your security, your session closes after two days without using the app. Sign in again to carry on; if you were saving something, please do it again afterwards.",
+    "volverAEntrar": "Sign in again"
   }
 }

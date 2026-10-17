@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { sessionCookie } from "#shared/infrastructure/cookies.js";
+import { sessionCookies } from "#shared/infrastructure/cookies.js";
 import { AUTH_LIMITS, MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_PASSWORD_INPUT_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { publicHandler } from "#shared/infrastructure/http/publicHandler.js";
 import { reply } from "#shared/infrastructure/http/sessionHandler.js";
@@ -36,6 +36,6 @@ export default publicHandler({
     // este paso fallara, la cuenta ya existe: se responde 201 sin cookie y el
     // frontend le ofrece iniciar sesión a mano.
     const session = await context.logIn({ email: body.email, password: body.password });
-    return reply(201, { id: result.value.id, email: result.value.email, sesionIniciada: session.ok }, session.ok ? { "Set-Cookie": sessionCookie(session.value.token) } : {});
+    return reply(201, { id: result.value.id, email: result.value.email, sesionIniciada: session.ok }, session.ok ? { "Set-Cookie": sessionCookies(session.value) } : {});
   },
 });

@@ -6,6 +6,12 @@ import { MemoryRouter } from "react-router";
 import { withClient } from "../../../helpers/queryClient";
 import { ResultsPage } from "@modules/assessments/ui/ResultsPage";
 import { categoryLabelsFixture } from "../../../helpers/categoryLabels";
+import { CHART_ACCENT } from "@shared/ui/theme";
+
+// UX-13: el gráfico de barras es de ECharts; aquí se comprueba la opción que recibe.
+const setOption = vi.fn();
+vi.mock("echarts/core", () => ({ use: vi.fn(), init: vi.fn(() => ({ setOption, resize: vi.fn(), dispose: vi.fn() })) }));
+const lastOption = () => setOption.mock.calls.at(-1)![0];
 
 function stub(ok: boolean, body: unknown, recommendations: unknown = []) {
   vi.stubGlobal(
@@ -38,6 +44,9 @@ function renderPage() {
 
 afterEach(() => vi.unstubAllGlobals());
 
+/** La idea de una categoría, en la lista de debajo del gráfico (UX-13). */
+const ideaItem = (name: string) => screen.queryAllByRole("listitem").find((item) => item.textContent?.startsWith(name));
+
 describe("ResultsPage", () => {
   it("muestra la puntuación de cada categoría junto a su nombre", async () => {
     stub(true, [
@@ -46,11 +55,18 @@ describe("ResultsPage", () => {
     ]);
     renderPage();
 
-    await waitFor(() => expect(screen.getByText("Economía")).toBeInTheDocument());
-    expect(screen.getByText("8")).toBeInTheDocument();
-    expect(screen.getByText("2")).toBeInTheDocument();
-    expect(screen.getByText("Bueno", { selector: "[data-band]" })).toHaveAttribute("data-band", "high");
-    expect(screen.getByText("Bajo", { selector: "[data-band]" })).toHaveAttribute("data-band", "low");
+    // UX-13: un gráfico de barras, una por categoría puntuada, todas del color de los gráficos.
+    const chart = await screen.findByRole("img", { name: /Economía: 8 \(Bueno\).*Deporte: 2 \(Bajo\)/ });
+    expect(chart).toBeInTheDocument();
+    expect(lastOption().yAxis.data).toEqual(["Economía", "Deporte"]);
+    expect(lastOption().series[0].data).toEqual([8, 2]);
+    expect(lastOption().series[0].itemStyle.color).toBe(CHART_ACCENT);
+    // El tooltip dice la banda y la fecha.
+    expect(lastOption().tooltip.formatter({ dataIndex: 1 })).toMatch(/Deporte.*2.*Bajo.*19\/9\/2026/s);
+    // La tabla de datos, también con la banda.
+    fireEvent.click(screen.getByRole("button", { name: "Ver datos" }));
+    const table = screen.getByRole("table");
+    expect(within(table).getAllByRole("row")[1]).toHaveTextContent(/Economía[\s\S]*8[\s\S]*Bueno/);
     // RF-44: la nota antigua de la evaluación ya no se enseña (está en el diario de experiencias).
     expect(screen.queryByText("Poco")).not.toBeInTheDocument();
   });
@@ -59,7 +75,9 @@ describe("ResultsPage", () => {
     stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }]);
     renderPage();
 
-    await waitFor(() => expect(screen.getByText("Sin puntuar todavía")).toBeInTheDocument());
+    expect(await screen.findByText(/Sin puntuar todavía: Economía/)).toBeInTheDocument();
+    // Sin ninguna puntuada, no hay gráfico.
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 
   it("sin puntuaciones lo dice y ofrece hacer una entrevista", async () => {
@@ -77,7 +95,7 @@ describe("ResultsPage", () => {
     expect(await screen.findByText("No se pudieron cargar tus resultados")).toBeInTheDocument();
   });
 
-  it("muestra la recomendación dentro de la tarjeta de su categoría, con el aviso de que no es asesoramiento profesional", async () => {
+  it("muestra la recomendación bajo el gráfico, junto al nombre de su categoría, con el aviso de que no es asesoramiento profesional", async () => {
     stub(
       true,
       [
@@ -88,10 +106,9 @@ describe("ResultsPage", () => {
     );
     renderPage();
 
-    const sportCard = (await screen.findByText("Deporte")).closest("div[class]")!.parentElement!;
-    const ideaButton = await within(sportCard).findByRole("button", { name: /una idea para ti/i });
-    const economyCard = screen.getByText("Economía").closest("div[class]")!.parentElement!;
-    expect(within(economyCard).queryByRole("button", { name: /una idea para ti/i })).not.toBeInTheDocument();
+    await waitFor(() => expect(ideaItem("Deporte")).toBeDefined());
+    const ideaButton = within(ideaItem("Deporte")!).getByRole("button", { name: /una idea para ti/i });
+    expect(ideaItem("Economía")).toBeUndefined();
     fireEvent.click(ideaButton);
     const dialog = screen.getByRole("dialog");
     // RF-42: el carrusel espera a tener las categorías (para quitar las ideas que chocan).
@@ -112,7 +129,7 @@ describe("ResultsPage", () => {
     );
     renderPage();
 
-    expect(await screen.findByText("Economía")).toBeInTheDocument();
+    expect(await screen.findByRole("img", { name: /Economía/ })).toBeInTheDocument();
     expect(screen.queryByText(/no sustituyen el asesoramiento/i)).not.toBeInTheDocument();
   });
 
@@ -124,14 +141,14 @@ describe("ResultsPage", () => {
     expect(screen.queryByRole("link", { name: /hacer una entrevista/i })).not.toBeInTheDocument();
   });
 
-  it("en inglés, las tarjetas de detalle usan el nombre traducido", async () => {
+  it("en inglés, el gráfico usa el nombre traducido", async () => {
     const i18n = (await import("@shared/ui/i18n")).default;
     await i18n.changeLanguage("en");
     try {
       stub(true, [{ categoryId: "c1", catalogId: "k-vidaSocial", categoryName: "Vida social", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
       renderPage();
 
-      expect(await screen.findByText("Social life")).toBeInTheDocument();
+      expect(await screen.findByRole("img", { name: /Social life: 6/ })).toBeInTheDocument();
     } finally {
       await i18n.changeLanguage("es");
     }

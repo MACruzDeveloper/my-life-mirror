@@ -17,7 +17,7 @@ import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivism
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { useTranslation } from "react-i18next";
-import interviewerAvatar from "../../../../assets/avatars/interviewer.svg";
+import interviewerAvatar from "../../../../assets/avatars/interviewer.webp";
 import userAvatar from "../../../../assets/avatars/user.svg";
 import type { CategoryLabel } from "@modules/categories/ui/categoryLabels";
 import type { CategoryDto } from "@modules/categories/ui/queries";
@@ -185,7 +185,8 @@ export function CategoryQuestion({
         flexDirection: "column",
         gap: 1.5,
         // Al saltar a una pregunta, que no quede bajo la cabecera fija (48 px compacta).
-        scrollMarginTop: 72,
+        // Bajo la cabecera compacta y la barra fija de accesos (UX-12).
+        scrollMarginTop: 112,
         pl: 1.5,
         // Mismo ancho de borde siempre, para que contestar no desplace nada.
         borderLeft: "3px solid",
