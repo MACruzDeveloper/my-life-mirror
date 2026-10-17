@@ -528,7 +528,35 @@
     "acciones_user_recovery_sent": "Enlace de recuperación enviado",
     "acciones_reauth_failed": "Contraseña de confirmación incorrecta",
     "nombreEnIdioma": "Nombre ({{idioma}})",
-    "descripcionEnIdioma": "Descripción ({{idioma}})"
+    "descripcionEnIdioma": "Descripción ({{idioma}})",
+    "pestanaVideos": "Vídeos",
+    "videos": {
+      "intro": "Los vídeos de \"Para inspirarte\" de cada página de categoría, por idioma. La página enseña los del idioma de la persona; si no hay ninguno en ese idioma, los de otro. Como mucho 6 por categoría e idioma.",
+      "anadirTitulo": "Añadir un vídeo",
+      "categoria": "Categoría",
+      "idioma": "Idioma",
+      "enlace": "Enlace de YouTube",
+      "titulo": "Título",
+      "tituloAyuda": "Tal como se publicó, en el idioma del vídeo.",
+      "anadir": "Añadir vídeo",
+      "ninguno": "Todavía no hay vídeos.",
+      "lista": "Vídeos de inspiración",
+      "quitar": "Borrar «{{titulo}}»",
+      "errorRepetido": "Ese vídeo ya está en esa página (misma categoría e idioma).",
+      "errorDatos": "No se ha podido guardar. Revisa el enlace de YouTube y el título (hasta 120 caracteres), y que no haya ya 6 vídeos en esa página.",
+      "errorQuitar": "No se ha podido borrar. Inténtalo de nuevo.",
+      "editarTitulo": "Editar el vídeo",
+      "guardarCambios": "Guardar cambios",
+      "cancelar": "Cancelar",
+      "filtrar": "Filtrar por categoría",
+      "todas": "Todas",
+      "youtube": "YouTube",
+      "acciones": "Acciones",
+      "verEnYoutube": "Ver en YouTube «{{titulo}}»",
+      "editar": "Editar «{{titulo}}»",
+      "porPagina": "Por página",
+      "mostrando": "{{from}}–{{to}} de {{count}}"
+    }
   },
   "datos": {
     "titulo": "Privacidad y datos",
@@ -955,7 +983,10 @@
     "sinNota": "Todavía no la has puntuado.",
     "puntuar": "Puntuar {{categoria}}",
     "tusExperiencias": "Tus experiencias",
-    "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista."
+    "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista.",
+    "verTodasExperiencias": "Ver todas ({{count}})",
+    "verMenos": "Ver menos",
+    "avisoMarcas": "La imagen de cabecera está generada con IA y se usa solo con fines ilustrativos en un proyecto académico, sin ánimo de lucro. Las marcas, logotipos y nombres de competiciones que puedan aparecer pertenecen a sus titulares, que no tienen relación con esta app ni la respaldan."
   },
   "hitos": {
     "titulo": {
@@ -1027,19 +1058,9 @@
   },
   "videos": {
     "titulo": "Para inspirarte",
-    "intro": "Charlas en vídeo que pueden darte ideas o ganas. Las eligió quien hizo la app; están en inglés, con subtítulos.",
-    "reproducir": "Reproducir «{{titulo}}», de {{ponente}}",
-    "aviso": "Las imágenes y los vídeos vienen de YouTube: al reproducir uno, YouTube recibe tu visita (sin cookies de seguimiento hasta que lo pulsas).",
-    "aventura": {
-      "saunders": "Al Polo Sur y vuelta: los 105 días más duros de mi vida",
-      "cutts": "Prueba algo nuevo durante 30 días",
-      "jiang": "Lo que aprendí de 100 días de rechazo"
-    },
-    "deporte": {
-      "suzuki": "Lo que el ejercicio hace por tu cerebro",
-      "mcdougall": "¿Nacimos para correr?",
-      "balcetis": "Por qué a algunas personas les cuesta más el ejercicio"
-    }
+    "intro": "Charlas en vídeo que pueden darte ideas o ganas. Las eligió quien hizo la app.",
+    "reproducir": "Reproducir «{{titulo}}»",
+    "aviso": "Las imágenes y los vídeos vienen de YouTube: al reproducir uno, YouTube recibe tu visita (sin cookies de seguimiento hasta que lo pulsas)."
   },
   "comunidad": {
     "titulo": "De la comunidad",

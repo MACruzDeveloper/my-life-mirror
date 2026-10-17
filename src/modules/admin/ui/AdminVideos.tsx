@@ -1,0 +1,264 @@
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
+import MenuItem from "@mui/material/MenuItem";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import { useTranslation } from "react-i18next";
+import { getJson } from "@shared/ui/api/getJson";
+import { SUPPORTED_LOCALES } from "@shared/domain/locales";
+import { PALE_TINT } from "@shared/ui/theme";
+import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
+import { INSPIRATION_VIDEOS_KEY, type InspirationVideoDto, useCategoryLabelsQuery } from "@modules/categories/ui/queries";
+
+const ADMIN_VIDEOS_KEY = ["admin", "videos"] as const;
+/** El mismo límite que el caso de uso (el servidor lo vuelve a comprobar). */
+const MAX_TITLE = 120;
+const ROWS_PER_PAGE = [5, 10, 25];
+/** "Todas" en el filtro: un valor propio (con "" el desplegable se ve vacío). */
+const ALL = "all";
+
+const EMPTY_FORM = { categoryKey: "", locale: "", youtubeUrl: "", title: "" };
+
+/**
+ * ADM-04: los vídeos de inspiración de las páginas de categoría, por categoría
+ * e idioma. Añadir con el enlace de YouTube (el servidor guarda solo el
+ * identificador), editar y borrar; la lista se filtra por categoría y se pagina.
+ * Solo refleja lo que responde la API: el permiso lo decide el servidor.
+ */
+export function AdminVideos() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const videos = useQuery({ queryKey: ADMIN_VIDEOS_KEY, queryFn: ({ signal }) => getJson<InspirationVideoDto[]>("/api/admin/videos", signal) });
+  const labels = useCategoryLabelsQuery();
+  const { categoryLabel } = useCategoryLabel();
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [editingId, setEditingId] = useState<string>();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string>();
+  const [filter, setFilter] = useState(ALL);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE[0]);
+
+  // Solo las categorías con clave estable: las páginas de categoría se identifican por ella.
+  const categories = (Array.isArray(labels.data) ? labels.data : []).flatMap((entry) => (entry.key ? [{ key: entry.key, name: categoryLabel(entry.catalogId).name }] : []));
+  const categoryName = (key: string) => categories.find((category) => category.key === key)?.name ?? key;
+  const languageName = (locale: string) => {
+    const name = t(`idiomas.${locale}`, { defaultValue: locale });
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+  const filtered = (Array.isArray(videos.data) ? videos.data : [])
+    .filter((video) => filter === ALL || video.categoryKey === filter)
+    .sort((a, b) => categoryName(a.categoryKey).localeCompare(categoryName(b.categoryKey)) || a.locale.localeCompare(b.locale));
+  const shown = filtered.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+  const complete = Object.values(form).every((value) => value.trim().length > 0);
+
+  function refresh() {
+    void queryClient.invalidateQueries({ queryKey: ADMIN_VIDEOS_KEY });
+    void queryClient.invalidateQueries({ queryKey: INSPIRATION_VIDEOS_KEY });
+  }
+
+  function resetForm() {
+    setForm(EMPTY_FORM);
+    setEditingId(undefined);
+  }
+
+  function startEditing(video: InspirationVideoDto) {
+    setError(undefined);
+    setEditingId(video.id);
+    setForm({ categoryKey: video.categoryKey, locale: video.locale, youtubeUrl: video.youtubeId, title: video.title });
+  }
+
+  async function submit(submitEvent: React.FormEvent) {
+    submitEvent.preventDefault();
+    if (!complete) return;
+    setSubmitting(true);
+    setError(undefined);
+    try {
+      const response = await fetch("/api/admin/videos", {
+        method: editingId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingId ? { id: editingId, ...form } : form),
+      });
+      if (response.ok) {
+        resetForm();
+        refresh();
+      } else {
+        setError(response.status === 409 ? t("admin.videos.errorRepetido") : response.status === 403 ? t("admin.sinPermiso") : t("admin.videos.errorDatos"));
+      }
+    } catch {
+      setError(t("admin.videos.errorDatos"));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function remove(id: string) {
+    setError(undefined);
+    try {
+      const response = await fetch(`/api/admin/videos?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("rejected");
+      if (editingId === id) resetForm();
+      refresh();
+    } catch {
+      setError(t("admin.videos.errorQuitar"));
+    }
+  }
+
+  const field = (name: keyof typeof EMPTY_FORM) => ({
+    value: form[name],
+    onChange: (changeEvent: React.ChangeEvent<HTMLInputElement>) => setForm((current) => ({ ...current, [name]: changeEvent.target.value })),
+  });
+  const formTitle = editingId ? t("admin.videos.editarTitulo") : t("admin.videos.anadirTitulo");
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Typography variant="body2" color="text.secondary">
+        {t("admin.videos.intro")}
+      </Typography>
+      {/* Categoría e idioma, estrechos; el enlace y el título, anchos; el botón a la derecha. */}
+      <Box
+        component="form"
+        onSubmit={submit}
+        aria-label={formTitle}
+        sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "200px 160px 1fr" }, gap: 1.5, p: 2, border: 1, borderColor: editingId ? "secondary.main" : "divider", bgcolor: "background.paper" }}
+      >
+        <Box sx={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 1 }}>
+          <YouTubeIcon sx={{ color: "text.secondary" }} aria-hidden />
+          <Typography variant="subtitle2" component="h2">
+            {formTitle}
+          </Typography>
+        </Box>
+        <TextField select label={t("admin.videos.categoria")} size="small" required {...field("categoryKey")}>
+          {categories.map((category) => (
+            <MenuItem key={category.key} value={category.key}>
+              {category.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField select label={t("admin.videos.idioma")} size="small" required {...field("locale")}>
+          {SUPPORTED_LOCALES.map((locale) => (
+            <MenuItem key={locale} value={locale}>
+              {languageName(locale)}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField label={t("admin.videos.enlace")} size="small" required placeholder="https://www.youtube.com/watch?v=…" sx={{ gridColumn: { sm: "1 / -1", md: "auto" } }} slotProps={{ htmlInput: { maxLength: 500 } }} {...field("youtubeUrl")} />
+        <TextField label={t("admin.videos.titulo")} helperText={t("admin.videos.tituloAyuda")} size="small" required sx={{ gridColumn: { sm: "1 / -1", md: "1 / 3" } }} slotProps={{ htmlInput: { maxLength: MAX_TITLE } }} {...field("title")} />
+        <Box sx={{ gridColumn: { sm: "1 / -1", md: "auto" }, display: "flex", justifyContent: "flex-end", alignItems: "flex-start", gap: 1 }}>
+          <Button type="submit" variant="contained" color="secondary" disabled={!complete || submitting}>
+            {editingId ? t("admin.videos.guardarCambios") : t("admin.videos.anadir")}
+          </Button>
+          {editingId && <Button onClick={resetForm}>{t("admin.videos.cancelar")}</Button>}
+        </Box>
+      </Box>
+      {error && (
+        <Alert severity="error" role="alert">
+          {error}
+        </Alert>
+      )}
+      {/* El filtro y la tabla, en un mismo bloque: el filtro es de esta tabla. */}
+      <Box sx={{ border: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
+      <TextField
+        select
+        label={t("admin.videos.filtrar")}
+        size="small"
+        value={filter}
+        onChange={(changeEvent) => {
+          setFilter(changeEvent.target.value);
+          setPage(0);
+        }}
+        sx={{ width: { xs: "100%", sm: 280 } }}
+      >
+        <MenuItem value={ALL}>{t("admin.videos.todas")}</MenuItem>
+        {categories.map((category) => (
+          <MenuItem key={category.key} value={category.key}>
+            {category.name}
+          </MenuItem>
+        ))}
+      </TextField>
+      </Box>
+      {videos.isPending ? (
+        <CircularProgress size={24} sx={{ m: 2 }} />
+      ) : filtered.length === 0 ? (
+        <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
+          {t("admin.videos.ninguno")}
+        </Typography>
+      ) : (
+        <TableContainer>
+          <Table size="small" aria-label={t("admin.videos.lista")}>
+            <TableHead sx={{ bgcolor: PALE_TINT, "& .MuiTableCell-head": { fontWeight: 700 } }}>
+              <TableRow>
+                <TableCell>{t("admin.videos.categoria")}</TableCell>
+                <TableCell>{t("admin.videos.idioma")}</TableCell>
+                <TableCell>{t("admin.videos.titulo")}</TableCell>
+                <TableCell>
+                  <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+                    <YouTubeIcon fontSize="small" aria-hidden />
+                    {t("admin.videos.youtube")}
+                  </Box>
+                </TableCell>
+                <TableCell align="right">{t("admin.videos.acciones")}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {shown.map((video) => (
+                <TableRow key={video.id} selected={video.id === editingId}>
+                  <TableCell>{categoryName(video.categoryKey)}</TableCell>
+                  <TableCell>{languageName(video.locale)}</TableCell>
+                  <TableCell lang={video.locale}>{video.title}</TableCell>
+                  <TableCell>
+                    <Link href={`https://www.youtube.com/watch?v=${video.youtubeId}`} target="_blank" rel="noopener noreferrer" aria-label={t("admin.videos.verEnYoutube", { titulo: video.title })} sx={{ whiteSpace: "nowrap" }}>
+                      youtu.be/{video.youtubeId}
+                    </Link>
+                  </TableCell>
+                  <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                    <IconButton size="small" onClick={() => startEditing(video)} aria-label={t("admin.videos.editar", { titulo: video.title })}>
+                      <EditOutlinedIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" color="error" onClick={() => void remove(video.id)} aria-label={t("admin.videos.quitar", { titulo: video.title })}>
+                      <DeleteOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            component="div"
+            count={filtered.length}
+            page={page}
+            onPageChange={(_, value) => setPage(value)}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={ROWS_PER_PAGE}
+            onRowsPerPageChange={(changeEvent) => {
+              setRowsPerPage(Number(changeEvent.target.value));
+              setPage(0);
+            }}
+            labelRowsPerPage={t("admin.videos.porPagina")}
+            labelDisplayedRows={({ from, to, count }) => t("admin.videos.mostrando", { from, to, count })}
+            // Centrada bajo la tabla (por defecto MUI la pega a la derecha).
+            sx={{ "& .MuiTablePagination-toolbar": { justifyContent: "center" }, "& .MuiTablePagination-spacer": { display: "none" } }}
+          />
+        </TableContainer>
+      )}
+      </Box>
+    </Box>
+  );
+}

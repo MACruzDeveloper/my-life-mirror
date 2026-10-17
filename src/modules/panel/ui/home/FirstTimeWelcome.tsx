@@ -21,7 +21,7 @@ export function FirstTimeWelcome() {
       <Typography variant="body1" sx={{ mb: 4 }}>
         {t("panel.bienvenidaTexto")}
       </Typography>
-      <Button component={RouterLink} to="/perfil/entrevista" variant="contained" size="large" endIcon={<ArrowForwardIcon />} sx={{ px: 5, py: 1.5, fontSize: "1.1rem", borderRadius: 3 }}>
+      <Button component={RouterLink} to="/perfil/entrevista" variant="contained" color="secondary" size="large" endIcon={<ArrowForwardIcon />} sx={{ px: 5, py: 1.5, fontSize: "1.1rem", borderRadius: 3 }}>
         {t("panel.empezar")}
       </Button>
       <Box sx={{ mt: { xs: 5, sm: 6 }, mb: 4 }}>

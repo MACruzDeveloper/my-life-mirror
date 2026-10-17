@@ -5,6 +5,14 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (ajustes finales)
+
+- **Vídeos por idioma, desde administración (ADM-04, primera parte):** pestaña **"Vídeos"** en el panel para añadir, editar y borrar los de "Para inspirarte" por categoría e idioma, con el enlace de YouTube (se guarda solo el identificador, validado); la tabla se filtra por categoría y se pagina. La página enseña los del idioma de la interfaz y, si no hay ninguno, los de otro, cada uno con el icono de YouTube. Los vídeos pasan del código a la base de datos, con los seis de ejemplo. **Migración 0033.**
+- **Aventura y Deporte** con su imagen de cabecera (generadas con IA y elegidas por el autor; la página lo dice). La de Deporte es provisional: muestra marcas de terceros y lleva un aviso al pie hasta sustituirla.
+- **Inicio, primera vez:** el botón "Empezar mi entrevista" lleva el color de acento.
+- **Landings de categoría:** título más grande y justo encima de las tarjetas, tarjetas de nota y experiencias en gris suave y más bajas, y menos espacio entre bloques. "Tus experiencias" enseña las dos más recientes y "Ver todas" despliega el resto en la misma tarjeta.
+- **Panel de administración:** pestañas con el mismo estilo que las de la ventana de ideas.
+
 ### Corregido (SEC-05: sesión renovada)
 
 - **La sesión ya no se corta a la hora.** Se renueva sola con un token de renovación guardado en una cookie httpOnly (solo para `/api`); la contraseña se pide tras **dos días sin usar la app**. Una cuenta suspendida no se renueva. Antes, pasada la hora, guardar fallaba con un "No autenticado" sin traducir.

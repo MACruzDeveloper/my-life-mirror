@@ -27,11 +27,14 @@ const CATEGORIES = [
   { id: "c-dep", catalogId: "k-dep", name: "Deporte", status: "inactive" },
 ];
 
+/** Tres vídeos de ejemplo de Deporte, en inglés (ADM-04: vienen de la API). */
+const SPORT_VIDEOS = ["AAAAAAAAAAA", "BBBBBBBBBBB", "CCCCCCCCCCC"].map((youtubeId, index) => ({ id: `v${index}`, categoryKey: "deporte", locale: "en", youtubeId, title: `Talk ${index}` }));
+
 function stubApi({ trips = [] as unknown[], latest = [] as unknown[], diary = [] as unknown[], milestones = {} as Record<string, unknown[]>, shared = {} as Record<string, unknown[]> } = {}) {
   const fetchMock = vi.fn((url: string, init?: RequestInit) => {
     if (init?.method === "POST") return Promise.resolve({ ok: true, status: 201, json: async () => ({ id: "t-nuevo", ...JSON.parse(init.body as string) }) });
     if (init?.method === "DELETE") return Promise.resolve({ ok: true, json: async () => ({ deleted: true }) });
-    const data: Record<string, unknown> = { "/api/categories/translations": LABELS, "/api/categories": CATEGORIES, "/api/agenda/trips": trips, "/api/assessments": latest, "/api/categories/diary": diary, ...Object.fromEntries(Object.entries(milestones).map(([key, list]) => [`/api/agenda/milestones?category=${key}`, list])), ...Object.fromEntries(Object.entries(shared).map(([categoryId, list]) => [`/api/categories/shared?categoryId=${categoryId}&locale=es`, list])) };
+    const data: Record<string, unknown> = { "/api/categories/translations": LABELS, "/api/categories": CATEGORIES, "/api/agenda/trips": trips, "/api/assessments": latest, "/api/categories/diary": diary, "/api/categories/videos?category=deporte&locale=es": SPORT_VIDEOS, ...Object.fromEntries(Object.entries(milestones).map(([key, list]) => [`/api/agenda/milestones?category=${key}`, list])), ...Object.fromEntries(Object.entries(shared).map(([categoryId, list]) => [`/api/categories/shared?categoryId=${categoryId}&locale=es`, list])) };
     return Promise.resolve({ ok: true, json: async () => data[url] ?? [] });
   });
   vi.stubGlobal("fetch", fetchMock);
@@ -229,6 +232,8 @@ describe("CategoryPage: vídeos y comunidad (RF-49)", () => {
     const play = within(videos).getAllByRole("button", { name: /reproducir/i });
     expect(play).toHaveLength(3);
     expect(videos.querySelector("iframe")).toBeNull();
+    // Cada uno, con el icono de YouTube.
+    expect(videos.querySelectorAll("[data-testid='YouTubeIcon']")).toHaveLength(3);
 
     fireEvent.click(play[0]);
 
@@ -258,5 +263,24 @@ describe("CategoryPage: vídeos y comunidad (RF-49)", () => {
 
     const community = await screen.findByRole("region", { name: /de la comunidad/i });
     expect(await within(community).findByText(/todavía nadie ha compartido/i)).toBeInTheDocument();
+  });
+});
+
+describe("CategoryPage: muchas experiencias", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("la tarjeta enseña las dos más recientes y 'Ver todas' despliega el resto", async () => {
+    stubApi({ diary: [1, 2, 3, 4].map((day) => ({ id: `x${day}`, categoryId: "c-ave", text: `Experiencia ${day}`, createdAt: `2026-09-0${day}T10:00:00Z` })) });
+    renderPage("aventura");
+
+    const card = await screen.findByRole("region", { name: /tus experiencias/i });
+    expect(await within(card).findByText("Experiencia 4")).toBeInTheDocument();
+    expect(within(card).getByText("Experiencia 3")).toBeInTheDocument();
+    expect(within(card).queryByText("Experiencia 2")).not.toBeInTheDocument();
+
+    fireEvent.click(within(card).getByRole("button", { name: /ver todas \(4\)/i }));
+
+    expect(within(card).getByText("Experiencia 1")).toBeInTheDocument();
+    expect(within(card).getByRole("button", { name: /ver menos/i })).toHaveAttribute("aria-expanded", "true");
   });
 });

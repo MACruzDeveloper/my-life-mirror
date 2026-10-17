@@ -269,6 +269,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **16 oct. 2026** — *"he encontrado un bug … al querer guardar una profesión en mi perfil me sale un error de que no estoy autenticado"* y *"aplica los dos puntos que propones, y duración 2 días. Importante lo que comentas de avisar al usuario de que tu sesión ha caducado"*
 → Causa: la cookie y el token de Supabase duraban una hora sin renovación. [SEC-05](user-stories/SEC-05-sesion-renovada.md): renovación con el token de renovación (cookie httpOnly de dos días, solo para `/api`) y aviso "Tu sesión ha caducado" en la interfaz.
 
+**17 oct. 2026** — *"deberíamos poder poner vídeos diferentes por idioma, y es posible que los pueda añadir desde el panel de admin? … creo que sí tenemos tiempo, así completamos algo más el panel de admin"*
+→ [ADM-04, primera parte](user-stories/ADM-04-videos-desde-admin.md): pestaña "Vídeos" en el panel, por categoría e idioma; los vídeos pasan del JSON a la base de datos (migración 0033). En la página, los del idioma de la interfaz o, si no hay, los de otro, marcados. Imagen de cabecera de Aventura, generada por el autor con IA (la página lo dice).
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

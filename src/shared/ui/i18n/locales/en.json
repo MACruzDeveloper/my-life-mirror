@@ -528,7 +528,35 @@
     "acciones_user_recovery_sent": "Recovery link sent",
     "acciones_reauth_failed": "Wrong confirmation password",
     "nombreEnIdioma": "Name ({{idioma}})",
-    "descripcionEnIdioma": "Description ({{idioma}})"
+    "descripcionEnIdioma": "Description ({{idioma}})",
+    "pestanaVideos": "Videos",
+    "videos": {
+      "intro": "The \"For inspiration\" videos on each category page, by language. The page shows those in the person's language; if there are none in that language, those in another one. At most 6 per category and language.",
+      "anadirTitulo": "Add a video",
+      "categoria": "Category",
+      "idioma": "Language",
+      "enlace": "YouTube link",
+      "titulo": "Title",
+      "tituloAyuda": "As published, in the video's language.",
+      "anadir": "Add video",
+      "ninguno": "No videos yet.",
+      "lista": "Inspiration videos",
+      "quitar": "Delete “{{titulo}}”",
+      "errorRepetido": "That video is already on that page (same category and language).",
+      "errorDatos": "Couldn't save it. Check the YouTube link and the title (up to 120 characters), and that the page doesn't already have 6 videos.",
+      "errorQuitar": "Couldn't delete it. Please try again.",
+      "editarTitulo": "Edit the video",
+      "guardarCambios": "Save changes",
+      "cancelar": "Cancel",
+      "filtrar": "Filter by category",
+      "todas": "All",
+      "youtube": "YouTube",
+      "acciones": "Actions",
+      "verEnYoutube": "Watch “{{titulo}}” on YouTube",
+      "editar": "Edit “{{titulo}}”",
+      "porPagina": "Per page",
+      "mostrando": "{{from}}–{{to}} of {{count}}"
+    }
   },
   "datos": {
     "titulo": "Privacy & data",
@@ -955,7 +983,10 @@
     "sinNota": "You haven't scored it yet.",
     "puntuar": "Score {{categoria}}",
     "tusExperiencias": "Your experiences",
-    "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview."
+    "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview.",
+    "verTodasExperiencias": "See all ({{count}})",
+    "verMenos": "See less",
+    "avisoMarcas": "The header image is AI-generated and used for illustrative purposes only in a non-profit academic project. Any brands, logos or competition names that may appear belong to their owners, who are not affiliated with or endorse this app."
   },
   "hitos": {
     "titulo": {
@@ -1027,19 +1058,9 @@
   },
   "videos": {
     "titulo": "For inspiration",
-    "intro": "Video talks that might give you ideas or a push. Chosen by the app's author; they're in English, with subtitles.",
-    "reproducir": "Play “{{titulo}}”, by {{ponente}}",
-    "aviso": "Images and videos come from YouTube: when you play one, YouTube knows you visited (no tracking cookies until you press play).",
-    "aventura": {
-      "saunders": "To the South Pole and back: the hardest 105 days of my life",
-      "cutts": "Try something new for 30 days",
-      "jiang": "What I learned from 100 days of rejection"
-    },
-    "deporte": {
-      "suzuki": "The brain-changing benefits of exercise",
-      "mcdougall": "Are we born to run?",
-      "balcetis": "Why some people find exercise harder than others"
-    }
+    "intro": "Video talks that might give you ideas or a push. Chosen by the app's author.",
+    "reproducir": "Play “{{titulo}}”",
+    "aviso": "Images and videos come from YouTube: when you play one, YouTube knows you visited (no tracking cookies until you press play)."
   },
   "comunidad": {
     "titulo": "From the community",
