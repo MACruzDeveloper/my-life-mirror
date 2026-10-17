@@ -196,7 +196,7 @@ export function AdminUsers() {
               <TableCell>{t("admin.estado")}</TableCell>
               <TableCell>{t("admin.alta")}</TableCell>
               <TableCell>{t("admin.ultimoAcceso")}</TableCell>
-              <TableCell>{t("admin.acciones")}</TableCell>
+              <TableCell align="center">{t("admin.acciones")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -210,7 +210,7 @@ export function AdminUsers() {
                 </TableCell>
                 <TableCell>{date(user.createdAt)}</TableCell>
                 <TableCell>{date(user.lastSignInAt)}</TableCell>
-                <TableCell>
+                <TableCell align="center">
                   <IconButton size="small" aria-label={t("admin.accionesDe", { email: user.email })} onClick={(e) => setMenu({ anchor: e.currentTarget, user: user })}>
                     <MoreVertIcon fontSize="small" />
                   </IconButton>

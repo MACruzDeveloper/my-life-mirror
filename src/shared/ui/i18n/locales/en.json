@@ -35,7 +35,24 @@
     "crearCuenta": "Create account",
     "iniciarSesion": "Log in",
     "imagenIA": "AI-generated image",
-    "verComoFunciona": "See how it works"
+    "verComoFunciona": "See how it works",
+    "audio": {
+      "escuchar": "Listen to the introduction",
+      "pausar": "Pause",
+      "vozIa": "AI-generated voice (ElevenLabs)",
+      "transcripcion": "Transcript",
+      "transcripcionTitulo": "Transcript of the introduction",
+      "texto": [
+        "Hi. This is MyLifeMirror: a mirror of your life, not an exam.",
+        "Here's how it works. You choose the areas you want to look at: your finances, your family, your health, sport, adventure… And in each one you give yourself a score from one to ten, without judgement and at your own pace.",
+        "You'll see your balance at a glance, how it changes over time and, wherever you want to improve, small and concrete ideas to get started. If something is going well, you can note what works for you and share it anonymously, in case it helps someone else.",
+        "Your data is yours: what you write is private, and you can download or delete it whenever you like.",
+        "MyLifeMirror doesn't replace any professional. It's a space to pause, look at yourself calmly and take the next step.",
+        "Shall we begin?"
+      ],
+      "posicion": "Audio position"
+    },
+    "invitacion": "Ready? Create your account just below."
   },
   "registro": {
     "titulo": "Create account",

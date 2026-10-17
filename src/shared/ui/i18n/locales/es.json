@@ -35,7 +35,24 @@
     "crearCuenta": "Crear cuenta",
     "iniciarSesion": "Iniciar sesión",
     "imagenIA": "Imagen generada con IA",
-    "verComoFunciona": "Ver cómo funciona"
+    "verComoFunciona": "Ver cómo funciona",
+    "audio": {
+      "escuchar": "Escuchar la presentación",
+      "pausar": "Pausar",
+      "vozIa": "Voz generada con IA (ElevenLabs)",
+      "transcripcion": "Transcripción",
+      "transcripcionTitulo": "Transcripción de la presentación",
+      "texto": [
+        "Hola. Esto es MyLifeMirror: un espejo de tu vida, no un examen.",
+        "Funciona así. Eliges las áreas que quieres mirar: tu economía, tu familia, tu salud, el deporte, la aventura… Y en cada una te pones una nota del uno al diez, sin juicios y a tu ritmo.",
+        "Con eso verás tu equilibrio de un vistazo, cómo cambia con el tiempo y, donde quieras mejorar, ideas pequeñas y concretas para empezar. Si te va bien en algo, puedes anotar qué te funciona y compartirlo de forma anónima, por si a otra persona le sirve.",
+        "Tus datos son tuyos: lo que escribes es privado, y puedes descargarlo o borrarlo cuando quieras.",
+        "MyLifeMirror no sustituye a ningún profesional. Es un espacio para pararte, mirarte con calma y dar el siguiente paso.",
+        "¿Empezamos?"
+      ],
+      "posicion": "Posición del audio"
+    },
+    "invitacion": "¿Te animas? Crea tu cuenta aquí abajo."
   },
   "registro": {
     "titulo": "Crear cuenta",

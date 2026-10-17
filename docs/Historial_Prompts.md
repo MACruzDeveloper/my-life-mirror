@@ -272,6 +272,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **17 oct. 2026** — *"deberíamos poder poner vídeos diferentes por idioma, y es posible que los pueda añadir desde el panel de admin? … creo que sí tenemos tiempo, así completamos algo más el panel de admin"*
 → [ADM-04, primera parte](user-stories/ADM-04-videos-desde-admin.md): pestaña "Vídeos" en el panel, por categoría e idioma; los vídeos pasan del JSON a la base de datos (migración 0033). En la página, los del idioma de la interfaz o, si no hay, los de otro, marcados. Imagen de cabecera de Aventura, generada por el autor con IA (la página lo dice).
 
+**17 oct. 2026** — *"En cuanto al audio, para que el usuario no tenga que decir nada privado podemos cambiar el enfoque … (Solo nos quedaríamos con una de las ideas)"* y *"ok probemos con la presentación"*
+→ Audio de presentación en la portada, voz generada con ElevenLabs (plan gratuito) por el autor a partir de un texto fijo, con transcripción y aviso de IA. Descartadas las ideas que reconocen la voz del usuario (el audio iría a terceros). También: icono al crear categoría, como mejora futura; categorías nuevas con "Próximamente".
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

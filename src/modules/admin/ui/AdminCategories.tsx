@@ -164,7 +164,7 @@ export function AdminCategories() {
               ))}
               <TableCell>{t("admin.descripcion")}</TableCell>
               <TableCell>{t("admin.estado")}</TableCell>
-              <TableCell>{t("admin.acciones")}</TableCell>
+              <TableCell align="center">{t("admin.acciones")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -178,7 +178,7 @@ export function AdminCategories() {
                 ))}
                 <TableCell>{textIn(category, interfaceLocale)?.description}</TableCell>
                 <TableCell>{category.retiredAt ? t("admin.retirada") : t("admin.vigente")}</TableCell>
-                <TableCell>
+                <TableCell align="center">
                   {!category.retiredAt && (
                     <IconButton size="small" color="warning" onClick={() => setCategoryToRetire(category)} aria-label={t("admin.retirarCategoria", { nombre: textIn(category, interfaceLocale)?.name ?? "" })}>
                       <ArchiveOutlinedIcon fontSize="small" />
@@ -201,10 +201,10 @@ export function AdminCategories() {
             {t("admin.anadirPagina")}
           </Typography>
         </Box>
-        {/* Una fila por idioma: el nombre y la descripción, a la mitad cada uno (apilados en móvil). */}
+        {/* Una fila por idioma: el nombre (corto, un cuarto) y la descripción (el resto); apilados en móvil. */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {SUPPORTED_LOCALES.map((locale) => (
-            <Box key={locale} sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" }, alignItems: "start" }}>
+            <Box key={locale} sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "minmax(0, 1fr) minmax(0, 3fr)" }, alignItems: "start" }}>
               <TextField
                 label={t("admin.nombreEnIdioma", { idioma: languageName(locale) })}
                 value={form.translations[locale].name}

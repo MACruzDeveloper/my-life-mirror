@@ -217,7 +217,7 @@ export function AdminVideos() {
                     {t("admin.videos.youtube")}
                   </Box>
                 </TableCell>
-                <TableCell align="right">{t("admin.videos.acciones")}</TableCell>
+                <TableCell align="center">{t("admin.videos.acciones")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -231,7 +231,7 @@ export function AdminVideos() {
                       youtu.be/{video.youtubeId}
                     </Link>
                   </TableCell>
-                  <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                  <TableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                     <IconButton size="small" onClick={() => startEditing(video)} aria-label={t("admin.videos.editar", { titulo: video.title })}>
                       <EditOutlinedIcon fontSize="small" />
                     </IconButton>

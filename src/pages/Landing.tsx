@@ -12,6 +12,7 @@ import { HowItWorks } from "@shared/ui/components/HowItWorks";
 import { HelpFooter } from "@shared/ui/components/HelpLink";
 import { PALETTE } from "@shared/ui/theme";
 import { FixedBackdrop } from "@shared/ui/components/FixedBackdrop";
+import { PresentationAudio } from "./PresentationAudio";
 import heroDesktop from "../assets/backgrounds/portada-a-1672.webp";
 import heroMobile from "../assets/backgrounds/portada-a-828.webp";
 import secondDesktop from "../assets/backgrounds/portada-b-1672.webp";
@@ -53,22 +54,19 @@ export function Landing() {
           <Typography variant="body1" sx={{ mb: 3 }}>
             {t("landing.descripcion")}
           </Typography>
-          {/* Botones en colores de la paleta que no compiten con la imagen: negro azulado el principal, Country Blue translúcido el otro. */}
-          <Stack direction="row" spacing={2} sx={{ justifyContent: "center" }}>
-            <Button component={RouterLink} to="/registro" variant="contained" sx={{ bgcolor: PALETTE.richBlack, color: PALETTE.antiFlash, border: "1px solid rgba(243, 241, 244, 0.28)", "&:hover": { bgcolor: "#0E2523" } }}>
-              {t("landing.crearCuenta")}
-            </Button>
-            <Button component={RouterLink} to="/login" variant="contained" sx={{ bgcolor: "rgba(107, 158, 168, 0.55)", color: PALETTE.antiFlash, border: "1px solid rgba(243, 241, 244, 0.28)", boxShadow: "none", "&:hover": { bgcolor: "rgba(107, 158, 168, 0.75)", boxShadow: "none" } }}>
-              {t("landing.iniciarSesion")}
-            </Button>
-          </Stack>
+          {/* La presentación en audio: voz generada con IA, solo al pulsar. */}
+          <PresentationAudio />
+          {/* La invitación; los botones para entrar están en la parte siguiente, junto a cómo funciona. */}
+          <Typography variant="body2" sx={{ mt: { xs: 2.5, sm: 3 }, fontWeight: 600 }}>
+            {t("landing.invitacion")}
+          </Typography>
           {/* La flecha lleva a la parte siguiente. Es un enlace: funciona con el teclado y sin JavaScript. */}
           <IconButton
             component="a"
             href={`#${HOW_IT_WORKS_ID}`}
             aria-label={t("landing.verComoFunciona")}
             onClick={scrollToHowItWorks}
-            sx={{ mt: { xs: 2.5, sm: 3 }, color: "common.white", border: "1px solid rgba(255, 255, 255, 0.85)", "&:hover": { bgcolor: "rgba(255, 255, 255, 0.12)" } }}
+            sx={{ mt: 1, color: "common.white", border: "1px solid rgba(255, 255, 255, 0.85)", "&:hover": { bgcolor: "rgba(255, 255, 255, 0.12)" } }}
           >
             <KeyboardArrowDownIcon />
           </IconButton>
@@ -78,6 +76,15 @@ export function Landing() {
       <Box id={HOW_IT_WORKS_ID} sx={[SECTION, { minHeight: "100svh", alignItems: "flex-end", py: { xs: 6, sm: 8 } }]}>
         <FixedBackdrop mobile={secondMobile} desktop={secondDesktop} overlay={OVERLAY} fallbackColor={PALETTE.midnight} />
         <Box className="mlm-landing-card" sx={{ width: "100%", maxWidth: 520, bgcolor: "rgba(255, 255, 255, 0.93)", backdropFilter: "blur(6px)", borderRadius: 3, px: { xs: 2.5, sm: 4 }, pt: { xs: 3, sm: 4 }, pb: 1 }}>
+          {/* Primero entrar (lo que se buscaba al bajar) y, debajo, cómo funciona. Sobre la tarjeta clara, los colores de la marca. */}
+          <Stack direction="row" spacing={2} sx={{ justifyContent: "center", mb: 3 }}>
+            <Button component={RouterLink} to="/registro" variant="contained" color="secondary">
+              {t("landing.crearCuenta")}
+            </Button>
+            <Button component={RouterLink} to="/login" variant="outlined" color="primary">
+              {t("landing.iniciarSesion")}
+            </Button>
+          </Stack>
           <HowItWorks />
           <HelpFooter />
         </Box>

@@ -5,13 +5,18 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (presentación en audio)
+
+- **Portada:** "Escuchar la presentación", un audio de unos 50 segundos que explica la app, en español o inglés según la interfaz. Voz generada con IA (ElevenLabs) a partir de un texto fijo, sin datos de nadie; no suena sola, el archivo solo se descarga al pulsar, tiene una barra para ver por dónde va e ir adelante o atrás, y su transcripción. Lo dice: "Voz generada con IA (ElevenLabs)".
+- **Portada en orden:** título, descripción, audio y una invitación con la flecha; los botones de crear cuenta e iniciar sesión, en la segunda parte, junto a cómo funciona.
+
 ### Cambiado (ajustes finales)
 
 - **Vídeos por idioma, desde administración (ADM-04, primera parte):** pestaña **"Vídeos"** en el panel para añadir, editar y borrar los de "Para inspirarte" por categoría e idioma, con el enlace de YouTube (se guarda solo el identificador, validado); la tabla se filtra por categoría y se pagina. La página enseña los del idioma de la interfaz y, si no hay ninguno, los de otro, cada uno con el icono de YouTube. Los vídeos pasan del código a la base de datos, con los seis de ejemplo. **Migración 0033.**
 - **Aventura y Deporte** con su imagen de cabecera (generadas con IA y elegidas por el autor; la página lo dice). La de Deporte es provisional: muestra marcas de terceros y lleva un aviso al pie hasta sustituirla.
 - **Inicio, primera vez:** el botón "Empezar mi entrevista" lleva el color de acento.
 - **Landings de categoría:** título más grande y justo encima de las tarjetas, tarjetas de nota y experiencias en gris suave y más bajas, y menos espacio entre bloques. "Tus experiencias" enseña las dos más recientes y "Ver todas" despliega el resto en la misma tarjeta.
-- **Panel de administración:** pestañas con el mismo estilo que las de la ventana de ideas; todas las tablas y bloques con el mismo estilo (fondo blanco, cabecera gris azulada en negrita, títulos en negrita). Al añadir una categoría, se avisa de que su página saldrá como "Próximamente"; nombre y descripción de cada idioma en una fila. "Retirar" y las acciones de los vídeos, con iconos.
+- **Panel de administración:** pestañas con el mismo estilo que las de la ventana de ideas; todas las tablas y bloques con el mismo estilo (fondo blanco, cabecera gris azulada en negrita, títulos en negrita). Al añadir una categoría, se avisa de que su página saldrá como "Próximamente"; nombre (más estrecho) y descripción de cada idioma en una fila; los iconos de acciones, centrados en todas las tablas. "Retirar" y las acciones de los vídeos, con iconos.
 - **Completar el perfil:** aviso en la campana mientras el perfil no tenga avatar, profesión ni aficiones, y una frase en el registro que lo anuncia.
 - **Entrevista, paso 1:** más aire entre la explicación y los pasos.
 
