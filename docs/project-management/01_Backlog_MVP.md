@@ -204,3 +204,4 @@ Detalle en [docs/user-stories/](../user-stories/) y en el [CHANGELOG](../../CHAN
 - **v2.66 (18 oct. 2026)** — revisión final tras la v1.4.0: deuda técnica anotada en "Decisiones y deuda pendientes" (rendimiento, E2E en CI, zona horaria, historial de Git, contenido retirado).
 - **v2.67 (18 oct. 2026)** — revisión de calidad con las lecciones del máster: cobertura por niveles, puertas de calidad documentadas, decisión sobre Sentry/RUM; nuevas deudas: cargar cada pantalla aparte y un límite de errores para toda la aplicación.
 - **v2.68 (18 oct. 2026)** — UX-14 hecha (límite de errores de toda la app), a petición del autor.
+- **v2.69 (18 oct. 2026)** — v1.4.1: revisión de calidad (CLS, caché de `/assets/`, cobertura por niveles) y UX-14.
