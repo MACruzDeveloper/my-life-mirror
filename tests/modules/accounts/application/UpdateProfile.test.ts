@@ -104,6 +104,15 @@ describe("UpdateProfile (RF-03/RF-01)", () => {
     if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
   });
 
+  // Fallo real (CI, 18 oct.): Chrome detecta "UTC", que Node no incluye en Intl.supportedValuesOf, y el perfil no se guardaba.
+  it.each(["UTC", "Etc/UTC", "Europe/Madrid"])("acepta la zona horaria %s, aunque no esté en la lista de Intl.supportedValuesOf", async (timeZone) => {
+    const updateProfile = createUpdateProfile(new InMemoryProfileRepository());
+
+    const result = await updateProfile({ userId: "u1", name: "Ana", timeZone });
+
+    expect(result.ok).toBe(true);
+  });
+
   it("rechaza un género que no está en la lista conocida", async () => {
     const updateProfile = createUpdateProfile(new InMemoryProfileRepository());
 
