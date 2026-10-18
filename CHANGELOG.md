@@ -5,6 +5,14 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.4.0] - 2026-10-18
+
+La versión de la entrega del TFM: páginas de categoría (Aventura con viajes y hitos, Deporte, Espiritualidad y Voluntariado), calendario y eventos, ideas para cuando todo va bien, "Guardar todo", Resultados en barras, vídeos de inspiración gestionados desde el panel, presentación en audio en la portada, sesión que se renueva sola y reorganización de categorías (Finanzas, Formación, Voluntariado). **Migraciones 0022 a 0034** (todas ya ejecutadas en producción). Sin variables nuevas en Vercel; la política de contenido de `vercel.json` admite ahora las miniaturas y el reproductor de YouTube sin cookies.
+
+### Cambiado (política de privacidad)
+
+- Nueva sección sobre los vídeos de YouTube (miniaturas al abrir la página, reproductor sin cookies solo al pulsar, sin datos de la app). Salud figura ya entre las categorías especialmente protegidas. Sin cambio de versión de la política: no se vuelve a pedir el consentimiento.
+
 ### Cambiado (categorías)
 
 - **Economía pasa a llamarse Finanzas** e incluye la inversión; **Inversiones se retira** (deja de ofrecerse y se desactiva; sus puntuaciones se conservan en el historial).
