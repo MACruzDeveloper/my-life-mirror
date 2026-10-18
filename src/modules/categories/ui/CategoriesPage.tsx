@@ -41,7 +41,8 @@ export function CategoriesPage() {
     );
   }
 
-  const entries = (Array.isArray(labels.data) ? labels.data : []).map((entry) => ({ catalogId: entry.catalogId, key: entry.key, ...resolveCategoryLabel(new Map([[entry.catalogId, entry]]), entry.catalogId, i18n.language) }));
+  // Las retiradas no se ofrecen (sus textos siguen llegando para nombrarlas en el historial).
+  const entries = (Array.isArray(labels.data) ? labels.data : []).filter((entry) => !entry.retired).map((entry) => ({ catalogId: entry.catalogId, key: entry.key, ...resolveCategoryLabel(new Map([[entry.catalogId, entry]]), entry.catalogId, i18n.language) }));
 
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", mt: 3, px: 2 }}>

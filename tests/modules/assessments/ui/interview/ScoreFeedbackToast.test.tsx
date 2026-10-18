@@ -65,12 +65,12 @@ describe("ScoreFeedbackToast (UX-09)", () => {
   it("UX-12: un resumen con una línea por aviso, y enlace a Inicio si hay ideas nuevas", () => {
     render(
       <MemoryRouter>
-        <ScoreFeedbackToast feedback={{ kind: "summary", items: ["Economía: tienes una idea nueva.", "¡Enhorabuena! Un 9 en Aventura."], linkToHome: true }} onClose={() => {}} />
+        <ScoreFeedbackToast feedback={{ kind: "summary", items: ["Finanzas: tienes una idea nueva.", "¡Enhorabuena! Un 9 en Aventura."], linkToHome: true }} onClose={() => {}} />
       </MemoryRouter>,
     );
 
     const items = screen.getAllByRole("listitem");
-    expect(items.map((item) => item.textContent)).toEqual(["Economía: tienes una idea nueva.", "¡Enhorabuena! Un 9 en Aventura."]);
+    expect(items.map((item) => item.textContent)).toEqual(["Finanzas: tienes una idea nueva.", "¡Enhorabuena! Un 9 en Aventura."]);
     expect(screen.getByRole("link", { name: /ver en inicio/i })).toHaveAttribute("href", "/inicio");
   });
 

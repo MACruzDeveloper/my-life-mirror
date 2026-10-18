@@ -9,8 +9,8 @@ test("con tres categorías en verde, Inicio enseña 'Todo va bien' y se puede pa
   await new AccountPages(page).register(newUser());
   await new HomePage(page).startInterviewLink().click();
   const interview = new InterviewPage(page);
-  for (const name of ["Economía", "Familia", "Aventura"]) await interview.activate(name);
-  for (const name of ["Economía", "Familia"]) {
+  for (const name of ["Finanzas", "Familia", "Aventura"]) await interview.activate(name);
+  for (const name of ["Finanzas", "Familia"]) {
     await interview.score(name, 9);
     await interview.save(name);
   }

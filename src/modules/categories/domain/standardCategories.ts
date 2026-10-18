@@ -27,8 +27,9 @@ export const STANDARD_CATEGORIES: readonly StandardCategoryTemplate[] = [
     key: "economia",
     isSensitiveData: false,
     translations: {
-      es: { name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas." },
-      en: { name: "Finances", description: "Your personal finances: savings, spending, debts." },
+      // "Finanzas" desde el 18 oct. 2026 (antes "Economía"): incluye la inversión, que deja de ser una categoría aparte. La clave sigue siendo `economia`.
+      es: { name: "Finanzas", description: "Tus finanzas: ahorro, gasto, deudas e inversión a largo plazo." },
+      en: { name: "Finances", description: "Your finances: savings, spending, debts and long-term investing." },
     },
   },
   {
@@ -89,14 +90,6 @@ export const STANDARD_CATEGORIES: readonly StandardCategoryTemplate[] = [
     },
   },
   {
-    key: "inversiones",
-    isSensitiveData: false,
-    translations: {
-      es: { name: "Inversiones", description: "Inversión y planificación financiera a largo plazo." },
-      en: { name: "Investments", description: "Investing and long-term financial planning." },
-    },
-  },
-  {
     // Añadida el 12 oct. 2026, tras la segunda prueba con una usuaria. Sensible (salud es categoría
     // especial del RGPD): pide consentimiento y queda fuera de la IA y de las experiencias compartidas.
     key: "salud",
@@ -116,4 +109,30 @@ export const STANDARD_CATEGORIES: readonly StandardCategoryTemplate[] = [
       en: { name: "Technology", description: "Your relationship with technology: screens, switching off and what you learn." },
     },
   },
+  {
+    // Añadida el 18 oct. 2026, pedida por el autor: estudios, cursos e idiomas (Idiomas, creada desde
+    // el panel, pasa a ser esta: migración 0034).
+    key: "formacion",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Formación", description: "Lo que aprendes: estudios, cursos, idiomas y habilidades nuevas." },
+      en: { name: "Learning", description: "What you learn: studies, courses, languages and new skills." },
+    },
+  },
+  {
+    // Añadida el 18 oct. 2026, pedida por el autor. No sensible.
+    key: "voluntariado",
+    isSensitiveData: false,
+    translations: {
+      es: { name: "Voluntariado", description: "El tiempo que dedicas a ayudar a otras personas, a los animales o a tu entorno." },
+      en: { name: "Volunteering", description: "The time you give to help other people, animals or your surroundings." },
+    },
+  },
 ];
+
+/**
+ * Categorías estándar retiradas (ADM-02): ya no se ofrecen ni se puntúan, pero sus ideas, opciones y
+ * textos se conservan para el historial de quien las usó. Inversiones, retirada el 18 oct. 2026: pasa
+ * a formar parte de Finanzas (`economia`).
+ */
+export const RETIRED_CATEGORY_KEYS = ["inversiones"] as const;

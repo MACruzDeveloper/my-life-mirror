@@ -9,12 +9,12 @@ vi.mock("echarts/core", () => ({ use: vi.fn(), init: vi.fn(() => ({ setOption, r
 import { EvolutionPanel } from "@modules/assessments/ui/evolution/EvolutionPanel";
 
 const LATEST_SCORES = [
-  { categoryId: "c1", categoryName: "Economía", score: 7 },
+  { categoryId: "c1", categoryName: "Finanzas", score: 7 },
   { categoryId: "c2", categoryName: "Deporte", score: 3 },
 ];
 const SESSIONS = [
-  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Economía", score: 7 }, { categoryId: "c2", categoryName: "Deporte", score: 3 }] },
-  { recordedAt: "2025-02-10T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Economía", score: 4 }] },
+  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Finanzas", score: 7 }, { categoryId: "c2", categoryName: "Deporte", score: 3 }] },
+  { recordedAt: "2025-02-10T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Finanzas", score: 4 }] },
 ];
 
 /** Una llamada a setOption por tarjeta: las dos últimas deben compartir ventana. */

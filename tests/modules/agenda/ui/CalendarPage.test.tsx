@@ -7,12 +7,12 @@ import { createTestClient, withClient } from "../../../helpers/queryClient";
 
 const CATEGORIES = [
   { id: "c1", catalogId: "k-social", name: "Vida social", status: "active" },
-  { id: "c2", catalogId: "k-eco", name: "Economía", status: "inactive" },
+  { id: "c2", catalogId: "k-eco", name: "Finanzas", status: "inactive" },
   { id: "c3", catalogId: "k-fam", name: "Familia", status: "active" },
 ];
 const LABELS = [
   { catalogId: "k-social", key: "vidaSocial", translations: { es: { name: "Vida social", description: "" } } },
-  { catalogId: "k-eco", key: "economia", translations: { es: { name: "Economía", description: "" } } },
+  { catalogId: "k-eco", key: "economia", translations: { es: { name: "Finanzas", description: "" } } },
   { catalogId: "k-fam", key: "familia", translations: { es: { name: "Familia", description: "" } } },
 ];
 
@@ -71,7 +71,7 @@ describe("CalendarPage (RF-48)", () => {
 
     fireEvent.change(screen.getByLabelText(/qué tienes/i), { target: { value: "Boda de Marta" } });
     const categories = within(screen.getByRole("group", { name: /categorías/i }));
-    expect(categories.queryByRole("button", { name: "Economía" })).not.toBeInTheDocument();
+    expect(categories.queryByRole("button", { name: "Finanzas" })).not.toBeInTheDocument();
     // Sin categorías elegidas, se explica para qué sirven; la promesa concreta sale al elegir.
     expect(screen.getByText(/si eliges alguna, el día del evento/i)).toBeInTheDocument();
     expect(screen.queryByText(/no la cambia por ti/i)).not.toBeInTheDocument();

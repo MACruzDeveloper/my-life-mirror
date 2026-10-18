@@ -35,7 +35,24 @@
     "crearCuenta": "Create account",
     "iniciarSesion": "Log in",
     "imagenIA": "AI-generated image",
-    "verComoFunciona": "See how it works"
+    "verComoFunciona": "See how it works",
+    "audio": {
+      "escuchar": "Listen to the introduction",
+      "pausar": "Pause",
+      "vozIa": "AI-generated voice (ElevenLabs)",
+      "transcripcion": "Transcript",
+      "transcripcionTitulo": "Transcript of the introduction",
+      "texto": [
+        "Hi. This is MyLifeMirror: a mirror of your life, not an exam.",
+        "Here's how it works. You choose the areas you want to look at: your finances, your family, your health, sport, adventure… And in each one you give yourself a score from one to ten, without judgement and at your own pace.",
+        "You'll see your balance at a glance, how it changes over time and, wherever you want to improve, small and concrete ideas to get started. If something is going well, you can note what works for you and share it anonymously, in case it helps someone else.",
+        "Your data is yours: what you write is private, and you can download or delete it whenever you like.",
+        "MyLifeMirror doesn't replace any professional. It's a space to pause, look at yourself calmly and take the next step.",
+        "Shall we begin?"
+      ],
+      "posicion": "Audio position",
+      "cerrar": "Close the player"
+    }
   },
   "registro": {
     "titulo": "Create account",
@@ -44,7 +61,8 @@
     "exito": "Account created for {{email}}.",
     "irALogin": "Log in",
     "errorGenerico": "Could not complete the registration",
-    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password."
+    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password.",
+    "despues": "We only ask for what's needed to get started. Later, in “My profile”, you can choose your avatar and, if you like, add your occupation and hobbies."
   },
   "login": {
     "titulo": "Log in",
@@ -434,6 +452,16 @@
       "How much time do you spend on screens without noticing?",
       "Does technology help you or overwhelm you day to day?",
       "Do you feel comfortable with the tools you use?"
+    ],
+    "formacion": [
+      "Are you learning something that excites you?",
+      "Do you make time to study or learn languages?",
+      "Do you feel you keep growing in what you know?"
+    ],
+    "voluntariado": [
+      "Do you give some of your time to help other people or causes?",
+      "Would you like to join a charity project?",
+      "How do you feel when you help others?"
     ]
   },
   "admin": {
@@ -528,7 +556,36 @@
     "acciones_user_recovery_sent": "Recovery link sent",
     "acciones_reauth_failed": "Wrong confirmation password",
     "nombreEnIdioma": "Name ({{idioma}})",
-    "descripcionEnIdioma": "Description ({{idioma}})"
+    "descripcionEnIdioma": "Description ({{idioma}})",
+    "pestanaVideos": "Videos",
+    "videos": {
+      "intro": "The \"For inspiration\" videos on each category page, by language. The page shows those in the person's language; if there are none in that language, those in another one. At most 6 per category and language.",
+      "anadirTitulo": "Add a video",
+      "categoria": "Category",
+      "idioma": "Language",
+      "enlace": "YouTube link",
+      "titulo": "Title",
+      "anadir": "Add video",
+      "ninguno": "No videos yet.",
+      "lista": "Inspiration videos",
+      "quitar": "Delete “{{titulo}}”",
+      "errorRepetido": "That video is already on that page (same category and language).",
+      "errorDatos": "Couldn't save it. Check the YouTube link and the title (up to 120 characters), and that the page doesn't already have 6 videos.",
+      "errorQuitar": "Couldn't delete it. Please try again.",
+      "editarTitulo": "Edit the video",
+      "guardarCambios": "Save changes",
+      "cancelar": "Cancel",
+      "filtrar": "Filter by category",
+      "todas": "All",
+      "youtube": "YouTube",
+      "acciones": "Actions",
+      "verEnYoutube": "Watch “{{titulo}}” on YouTube",
+      "editar": "Edit “{{titulo}}”",
+      "porPagina": "Per page",
+      "mostrando": "{{from}}–{{to}} of {{count}}"
+    },
+    "anadirPagina": "Its page will appear in Categories as “Coming soon”.",
+    "retirarCategoria": "Retire “{{nombre}}”"
   },
   "datos": {
     "titulo": "Privacy & data",
@@ -590,7 +647,7 @@
         "1": "If you feel like it, note down where your money goes for a week, without judging yourself: just looking already helps.",
         "2": "Try setting aside a small amount as soon as you're paid, even a symbolic one. The habit is what matters.",
         "3": "Pick a small, recurring expense that doesn't give you much and try a week without it, just to see how it feels.",
-        "4": "Write down a concrete, near savings goal, like a small treat, and how much is left to reach it.",
+        "4": "Write down a concrete goal for your money, near or long term, and how far you are from it: knowing what it's for helps you decide calmly.",
         "5": "If talking about money helps you, share what worries you with someone you trust; putting it into words already clears things up."
       },
       "vidaSocial": {
@@ -667,6 +724,20 @@
         "3": "Learn one new thing with a tool you already use: a shortcut or a feature you didn't know.",
         "4": "Leave your phone outside the bedroom for one night and see how you wake up.",
         "5": "Spend half an hour tidying your photos or files: less noise, and easier to find what matters."
+      },
+      "formacion": {
+        "1": "Pick something you'd like to learn and find a short course or tutorial to start this week.",
+        "2": "Set aside a regular time each week, even twenty minutes, to learn something new.",
+        "3": "If you're learning a language, try watching a series or listening to a podcast in it with subtitles.",
+        "4": "Learn with someone else: sharing what you study helps you keep going.",
+        "5": "Write down three things you've learned this month, however small: seeing them written down keeps you motivated."
+      },
+      "voluntariado": {
+        "1": "Look for an organisation near you and ask how you could help, even a few hours a month.",
+        "2": "Start with something one-off: a food drive, a beach clean-up or a charity event.",
+        "3": "Ask someone around you if they know a project to help with, and join them for a day.",
+        "4": "If you like animals, find out whether a nearby shelter needs help with walks or care.",
+        "5": "Think of something you're good at that could help other people: sometimes that's the best way to give."
       }
     },
     "dialogoTitulo": "An idea for {{categoria}}",
@@ -755,7 +826,8 @@
       "apps": "Money apps",
       "hablarlo": "Talking it over with someone I trust",
       "aprender": "Learning about money",
-      "ingresosExtra": "Extra income"
+      "ingresosExtra": "Extra income",
+      "largoPlazo": "Thinking long term"
     },
     "vidaSocial": {
       "quedarEnPersona": "Meeting up in person",
@@ -835,6 +907,22 @@
       "aprenderAlgoNuevo": "Learning something new",
       "ordenDigital": "Digital tidiness",
       "crearAlgoPropio": "Making something of my own"
+    },
+    "formacion": {
+      "cursoCorto": "A short course",
+      "ratoFijo": "A regular time to learn",
+      "aprenderConOtros": "Learning with others",
+      "practicarIdioma": "Practising a language",
+      "leer": "Reading",
+      "proyectoPropio": "A project of my own"
+    },
+    "voluntariado": {
+      "asociacionCerca": "An organisation nearby",
+      "pocoTiempo": "Even a little time",
+      "conAmigos": "With friends or family",
+      "animales": "Helping animals",
+      "entorno": "Caring for the environment",
+      "acompanarPersonas": "Keeping people company"
     }
   },
   "situaciones": {
@@ -946,7 +1034,7 @@
   },
   "paginasCategoria": {
     "titulo": "Categories",
-    "intro": "Each category will have its own page with what you have lived in it: memories and achievements to remember and to keep you going. We are starting with Adventure.",
+    "intro": "Each category will have its own page with what you have lived in it: memories and achievements to remember and to keep you going. Some are ready to explore; the rest are coming soon.",
     "proximamente": "Coming soon",
     "sinPagina": "This category doesn't have a page yet.",
     "verTodas": "See all categories",
@@ -955,7 +1043,11 @@
     "sinNota": "You haven't scored it yet.",
     "puntuar": "Score {{categoria}}",
     "tusExperiencias": "Your experiences",
-    "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview."
+    "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview.",
+    "verTodasExperiencias": "See all ({{count}})",
+    "verMenos": "See less",
+    "avisoMarcasTitulo": "Disclaimer",
+    "avisoMarcas": "The header image is AI-generated and used for illustrative purposes only in a non-profit academic project. Any colours or designs that may resemble real brands imply no affiliation with or endorsement by them."
   },
   "hitos": {
     "titulo": {
@@ -1009,7 +1101,8 @@
     "evento": "How did \"{{titulo}}\" go? If you like, review your score in {{categorias}}.",
     "idea": "You planned to try an idea for {{categoria}} on {{fecha}}.",
     "revisar_one": "{{categoria}} hasn't been reviewed for {{count}} week. Is it still the same?",
-    "revisar_other": "{{categoria}} hasn't been reviewed for {{count}} weeks. Is it still the same?"
+    "revisar_other": "{{categoria}} hasn't been reviewed for {{count}} weeks. Is it still the same?",
+    "perfil": "Complete your profile: choose an avatar and, if you like, your occupation and hobbies, so ideas fit you better."
   },
   "perfilIa": {
     "titulo": "How the AI sees you",
@@ -1027,19 +1120,9 @@
   },
   "videos": {
     "titulo": "For inspiration",
-    "intro": "Video talks that might give you ideas or a push. Chosen by the app's author; they're in English, with subtitles.",
-    "reproducir": "Play “{{titulo}}”, by {{ponente}}",
-    "aviso": "Images and videos come from YouTube: when you play one, YouTube knows you visited (no tracking cookies until you press play).",
-    "aventura": {
-      "saunders": "To the South Pole and back: the hardest 105 days of my life",
-      "cutts": "Try something new for 30 days",
-      "jiang": "What I learned from 100 days of rejection"
-    },
-    "deporte": {
-      "suzuki": "The brain-changing benefits of exercise",
-      "mcdougall": "Are we born to run?",
-      "balcetis": "Why some people find exercise harder than others"
-    }
+    "intro": "Video talks that might give you ideas or a push. Chosen by the app's author.",
+    "reproducir": "Play “{{titulo}}”",
+    "aviso": "Images and videos come from YouTube: when you play one, YouTube knows you visited (no tracking cookies until you press play)."
   },
   "comunidad": {
     "titulo": "From the community",

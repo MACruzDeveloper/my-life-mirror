@@ -35,7 +35,24 @@
     "crearCuenta": "Crear cuenta",
     "iniciarSesion": "Iniciar sesión",
     "imagenIA": "Imagen generada con IA",
-    "verComoFunciona": "Ver cómo funciona"
+    "verComoFunciona": "Ver cómo funciona",
+    "audio": {
+      "escuchar": "Escuchar la presentación",
+      "pausar": "Pausar",
+      "vozIa": "Voz generada con IA (ElevenLabs)",
+      "transcripcion": "Transcripción",
+      "transcripcionTitulo": "Transcripción de la presentación",
+      "texto": [
+        "Hola. Esto es MyLifeMirror: un espejo de tu vida, no un examen.",
+        "Funciona así. Eliges las áreas que quieres mirar: tu economía, tu familia, tu salud, el deporte, la aventura… Y en cada una te pones una nota del uno al diez, sin juicios y a tu ritmo.",
+        "Con eso verás tu equilibrio de un vistazo, cómo cambia con el tiempo y, donde quieras mejorar, ideas pequeñas y concretas para empezar. Si te va bien en algo, puedes anotar qué te funciona y compartirlo de forma anónima, por si a otra persona le sirve.",
+        "Tus datos son tuyos: lo que escribes es privado, y puedes descargarlo o borrarlo cuando quieras.",
+        "MyLifeMirror no sustituye a ningún profesional. Es un espacio para pararte, mirarte con calma y dar el siguiente paso.",
+        "¿Empezamos?"
+      ],
+      "posicion": "Posición del audio",
+      "cerrar": "Cerrar el reproductor"
+    }
   },
   "registro": {
     "titulo": "Crear cuenta",
@@ -44,7 +61,8 @@
     "exito": "Cuenta creada para {{email}}.",
     "irALogin": "Iniciar sesión",
     "errorGenerico": "No se pudo completar el registro",
-    "errorEmail": "No se ha podido crear la cuenta con este email. Si ya tienes una, inicia sesión o recupera tu contraseña."
+    "errorEmail": "No se ha podido crear la cuenta con este email. Si ya tienes una, inicia sesión o recupera tu contraseña.",
+    "despues": "Solo te pedimos lo justo para empezar. Después, en «Mi perfil», podrás elegir tu avatar y, si quieres, añadir tu profesión y tus aficiones."
   },
   "login": {
     "titulo": "Iniciar sesión",
@@ -434,6 +452,16 @@
       "¿Cuánto tiempo pasas con pantallas sin darte cuenta?",
       "¿La tecnología te ayuda o te agobia en tu día a día?",
       "¿Te sientes a gusto con las herramientas que usas?"
+    ],
+    "formacion": [
+      "¿Estás aprendiendo algo que te ilusione?",
+      "¿Te das tiempo para formarte o aprender idiomas?",
+      "¿Sientes que sigues creciendo en lo que sabes?"
+    ],
+    "voluntariado": [
+      "¿Dedicas algo de tu tiempo a ayudar a otras personas o causas?",
+      "¿Te gustaría colaborar con algún proyecto solidario?",
+      "¿Cómo te sientes cuando ayudas a los demás?"
     ]
   },
   "admin": {
@@ -528,7 +556,36 @@
     "acciones_user_recovery_sent": "Enlace de recuperación enviado",
     "acciones_reauth_failed": "Contraseña de confirmación incorrecta",
     "nombreEnIdioma": "Nombre ({{idioma}})",
-    "descripcionEnIdioma": "Descripción ({{idioma}})"
+    "descripcionEnIdioma": "Descripción ({{idioma}})",
+    "pestanaVideos": "Vídeos",
+    "videos": {
+      "intro": "Los vídeos de \"Para inspirarte\" de cada página de categoría, por idioma. La página enseña los del idioma de la persona; si no hay ninguno en ese idioma, los de otro. Como mucho 6 por categoría e idioma.",
+      "anadirTitulo": "Añadir un vídeo",
+      "categoria": "Categoría",
+      "idioma": "Idioma",
+      "enlace": "Enlace de YouTube",
+      "titulo": "Título",
+      "anadir": "Añadir vídeo",
+      "ninguno": "Todavía no hay vídeos.",
+      "lista": "Vídeos de inspiración",
+      "quitar": "Borrar «{{titulo}}»",
+      "errorRepetido": "Ese vídeo ya está en esa página (misma categoría e idioma).",
+      "errorDatos": "No se ha podido guardar. Revisa el enlace de YouTube y el título (hasta 120 caracteres), y que no haya ya 6 vídeos en esa página.",
+      "errorQuitar": "No se ha podido borrar. Inténtalo de nuevo.",
+      "editarTitulo": "Editar el vídeo",
+      "guardarCambios": "Guardar cambios",
+      "cancelar": "Cancelar",
+      "filtrar": "Filtrar por categoría",
+      "todas": "Todas",
+      "youtube": "YouTube",
+      "acciones": "Acciones",
+      "verEnYoutube": "Ver en YouTube «{{titulo}}»",
+      "editar": "Editar «{{titulo}}»",
+      "porPagina": "Por página",
+      "mostrando": "{{from}}–{{to}} de {{count}}"
+    },
+    "anadirPagina": "Su página aparecerá en Categorías como «Próximamente».",
+    "retirarCategoria": "Retirar «{{nombre}}»"
   },
   "datos": {
     "titulo": "Privacidad y datos",
@@ -590,7 +647,7 @@
         "1": "Si te apetece, anota durante una semana en qué se va tu dinero, sin juzgarte: solo mirarlo ya ayuda.",
         "2": "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica. Lo importante es el hábito.",
         "3": "Elige un gasto pequeño y repetido que no te aporte mucho y prueba una semana sin él, a ver cómo te sientes.",
-        "4": "Pon por escrito un objetivo de ahorro concreto y cercano, como un pequeño capricho, y cuánto te falta.",
+        "4": "Pon por escrito un objetivo concreto para tu dinero, cercano o a largo plazo, y cuánto te falta: tener claro el para qué ayuda a decidir con calma.",
         "5": "Si hablar de dinero te ayuda, comenta con alguien de confianza qué te preocupa; ponerlo en palabras ya aclara."
       },
       "vidaSocial": {
@@ -667,6 +724,20 @@
         "3": "Aprende a hacer una cosa nueva con una herramienta que ya usas: un atajo o una función que no conocías.",
         "4": "Deja el móvil fuera del dormitorio una noche y mira cómo te levantas.",
         "5": "Dedica media hora a ordenar tus fotos o tus archivos: menos ruido y más fácil encontrar lo que importa."
+      },
+      "formacion": {
+        "1": "Elige algo que te apetezca aprender y busca un curso corto o un tutorial para empezar esta semana.",
+        "2": "Reserva un rato fijo a la semana, aunque sean veinte minutos, para aprender algo nuevo.",
+        "3": "Si estudias un idioma, prueba a ver una serie o escuchar un podcast en ese idioma con subtítulos.",
+        "4": "Aprende con otra persona: compartir lo que estudias ayuda a no dejarlo.",
+        "5": "Anota tres cosas que hayas aprendido este mes, aunque sean pequeñas: verlo escrito anima a seguir."
+      },
+      "voluntariado": {
+        "1": "Busca una asociación cerca de ti y pregunta cómo puedes colaborar, aunque sea unas horas al mes.",
+        "2": "Empieza con algo puntual: una recogida de alimentos, una limpieza de playa o un evento solidario.",
+        "3": "Pregunta a alguien de tu entorno si conoce un proyecto en el que ayudar y acompáñale un día.",
+        "4": "Si te gustan los animales, informa de si alguna protectora cercana necesita ayuda para pasear o cuidar.",
+        "5": "Piensa en algo que se te dé bien y que podría servir a otras personas: a veces es la mejor forma de ayudar."
       }
     },
     "dialogoTitulo": "Una idea para {{categoria}}",
@@ -755,7 +826,8 @@
       "apps": "Apps de finanzas",
       "hablarlo": "Hablarlo con alguien de confianza",
       "aprender": "Aprender sobre dinero",
-      "ingresosExtra": "Ingresos extra"
+      "ingresosExtra": "Ingresos extra",
+      "largoPlazo": "Pensar a largo plazo"
     },
     "vidaSocial": {
       "quedarEnPersona": "Quedar en persona",
@@ -835,6 +907,22 @@
       "aprenderAlgoNuevo": "Aprender algo nuevo",
       "ordenDigital": "Orden digital",
       "crearAlgoPropio": "Crear algo propio"
+    },
+    "formacion": {
+      "cursoCorto": "Un curso corto",
+      "ratoFijo": "Un rato fijo para aprender",
+      "aprenderConOtros": "Aprender con otras personas",
+      "practicarIdioma": "Practicar un idioma",
+      "leer": "Leer",
+      "proyectoPropio": "Un proyecto propio"
+    },
+    "voluntariado": {
+      "asociacionCerca": "Una asociación cerca",
+      "pocoTiempo": "Aunque sea poco tiempo",
+      "conAmigos": "Con amigos o familia",
+      "animales": "Ayudar a animales",
+      "entorno": "Cuidar el entorno",
+      "acompanarPersonas": "Acompañar a personas"
     }
   },
   "situaciones": {
@@ -946,7 +1034,7 @@
   },
   "paginasCategoria": {
     "titulo": "Categorías",
-    "intro": "Cada categoría tendrá su propia página, con lo que has vivido en ella: recuerdos y logros que te sirvan de memoria y de motivación. Empezamos por Aventura.",
+    "intro": "Cada categoría tendrá su propia página, con lo que has vivido en ella: recuerdos y logros que te sirvan de memoria y de motivación. Ya puedes entrar en algunas; las demás llegarán pronto.",
     "proximamente": "Próximamente",
     "sinPagina": "Esta categoría todavía no tiene página.",
     "verTodas": "Ver todas las categorías",
@@ -955,7 +1043,11 @@
     "sinNota": "Todavía no la has puntuado.",
     "puntuar": "Puntuar {{categoria}}",
     "tusExperiencias": "Tus experiencias",
-    "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista."
+    "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista.",
+    "verTodasExperiencias": "Ver todas ({{count}})",
+    "verMenos": "Ver menos",
+    "avisoMarcasTitulo": "Disclaimer",
+    "avisoMarcas": "La imagen de cabecera está generada con IA y se usa solo con fines ilustrativos en un proyecto académico, sin ánimo de lucro. Los colores o diseños que puedan recordar a marcas reales no implican ninguna relación con ellas ni su respaldo."
   },
   "hitos": {
     "titulo": {
@@ -1009,7 +1101,8 @@
     "evento": "¿Cómo fue «{{titulo}}»? Si quieres, revisa tu nota en {{categorias}}.",
     "idea": "Tenías pensado probar una idea de {{categoria}} para el {{fecha}}.",
     "revisar_one": "{{categoria}} lleva {{count}} semana sin revisarse. ¿Sigue igual?",
-    "revisar_other": "{{categoria}} lleva {{count}} semanas sin revisarse. ¿Sigue igual?"
+    "revisar_other": "{{categoria}} lleva {{count}} semanas sin revisarse. ¿Sigue igual?",
+    "perfil": "Completa tu perfil: elige un avatar y, si quieres, tu profesión y tus aficiones, para que las ideas se ajusten más a ti."
   },
   "perfilIa": {
     "titulo": "Así te ve la IA",
@@ -1027,19 +1120,9 @@
   },
   "videos": {
     "titulo": "Para inspirarte",
-    "intro": "Charlas en vídeo que pueden darte ideas o ganas. Las eligió quien hizo la app; están en inglés, con subtítulos.",
-    "reproducir": "Reproducir «{{titulo}}», de {{ponente}}",
-    "aviso": "Las imágenes y los vídeos vienen de YouTube: al reproducir uno, YouTube recibe tu visita (sin cookies de seguimiento hasta que lo pulsas).",
-    "aventura": {
-      "saunders": "Al Polo Sur y vuelta: los 105 días más duros de mi vida",
-      "cutts": "Prueba algo nuevo durante 30 días",
-      "jiang": "Lo que aprendí de 100 días de rechazo"
-    },
-    "deporte": {
-      "suzuki": "Lo que el ejercicio hace por tu cerebro",
-      "mcdougall": "¿Nacimos para correr?",
-      "balcetis": "Por qué a algunas personas les cuesta más el ejercicio"
-    }
+    "intro": "Charlas en vídeo que pueden darte ideas o ganas. Las eligió quien hizo la app.",
+    "reproducir": "Reproducir «{{titulo}}»",
+    "aviso": "Las imágenes y los vídeos vienen de YouTube: al reproducir uno, YouTube recibe tu visita (sin cookies de seguimiento hasta que lo pulsas)."
   },
   "comunidad": {
     "titulo": "De la comunidad",

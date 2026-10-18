@@ -74,7 +74,7 @@ describe("eventos propios (RF-48)", () => {
 
   it("rechaza más categorías de las permitidas", async () => {
     const { addEvent, categoryOf } = await setup();
-    const names = ["Economía", "Vida social", "Pareja", "Deporte", "Aventura", "Familia"];
+    const names = ["Finanzas", "Vida social", "Pareja", "Deporte", "Aventura", "Familia"];
     const categoryIds = await Promise.all(names.map(async (name) => (await categoryOf("ana", name)).id));
     expect(categoryIds).toHaveLength(MAX_EVENT_CATEGORIES + 1);
 

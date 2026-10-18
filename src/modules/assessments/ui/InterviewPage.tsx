@@ -639,7 +639,7 @@ export function InterviewPage() {
       <Typography variant="body1">{isFirstInterview ? t("entrevista.descripcion") : t("entrevista.descripcionActualizar")}</Typography>
       {/* UX-01: la primera vez, los pasos concretos de esta pantalla; al actualizar ya se conocen. */}
       {isFirstInterview && (
-        <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ my: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+        <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ mt: 1.5, mb: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
           {(t("entrevista.pasosPrimeraVez", { returnObjects: true, boton: t("entrevista.guardar") }) as string[]).map((text) => (
             <Typography component="li" variant="body2" key={text}>
               {text}
@@ -647,7 +647,7 @@ export function InterviewPage() {
           ))}
         </Box>
       )}
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
         {t("entrevista.escala")}
       </Typography>
     </Bubble>

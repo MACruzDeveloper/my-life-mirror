@@ -37,6 +37,10 @@ import type { TripRepository } from "#modules/agenda/domain/Trip.js";
 import { createAddTrip, createDeleteTrip, createListTrips } from "#modules/agenda/application/Trips.js";
 import { InMemoryTripRepository } from "#modules/agenda/infrastructure/InMemoryTripRepository.js";
 import { SupabaseTripRepository } from "#modules/agenda/infrastructure/SupabaseTripRepository.js";
+import type { InspirationVideoRepository } from "#modules/categories/domain/InspirationVideo.js";
+import { createAddInspirationVideo, createDeleteInspirationVideo, createListAllInspirationVideos, createListInspirationVideos, createUpdateInspirationVideo } from "#modules/categories/application/InspirationVideos.js";
+import { InMemoryInspirationVideoRepository } from "#modules/categories/infrastructure/InMemoryInspirationVideoRepository.js";
+import { SupabaseInspirationVideoRepository } from "#modules/categories/infrastructure/SupabaseInspirationVideoRepository.js";
 import type { MilestoneRepository } from "#modules/agenda/domain/Milestone.js";
 import { createAddMilestone, createDeleteMilestone, createListMilestones } from "#modules/agenda/application/Milestones.js";
 import { InMemoryMilestoneRepository } from "#modules/agenda/infrastructure/InMemoryMilestoneRepository.js";
@@ -170,6 +174,12 @@ function createEventRepository(environment: Environment): EventRepository {
   if (environment === "test") return new InMemoryEventRepository();
   const { url, serviceRoleKey } = supabaseCredentials();
   return new SupabaseEventRepository(url, serviceRoleKey);
+}
+
+function createInspirationVideoRepository(environment: Environment): InspirationVideoRepository {
+  if (environment === "test") return new InMemoryInspirationVideoRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseInspirationVideoRepository(url, serviceRoleKey);
 }
 
 function createTripRepository(environment: Environment): TripRepository {
@@ -349,6 +359,11 @@ export interface AppContext {
   categoryRepository: CategoryRepository;
   categoryCatalogRepository: CategoryCatalogRepository;
   listCatalog: ReturnType<typeof createListCatalog>;
+  listInspirationVideos: ReturnType<typeof createListInspirationVideos>;
+  listAllInspirationVideos: ReturnType<typeof createListAllInspirationVideos>;
+  addInspirationVideo: ReturnType<typeof createAddInspirationVideo>;
+  deleteInspirationVideo: ReturnType<typeof createDeleteInspirationVideo>;
+  updateInspirationVideo: ReturnType<typeof createUpdateInspirationVideo>;
   listCatalogLabels: ReturnType<typeof createListCatalogLabels>;
   addCatalogCategory: ReturnType<typeof createAddCatalogCategory>;
   retireCatalogCategory: ReturnType<typeof createRetireCatalogCategory>;
@@ -410,6 +425,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const ideaReactionRepository = createIdeaReactionRepository(environment);
   const eventRepository = createEventRepository(environment);
   const tripRepository = createTripRepository(environment);
+  const inspirationVideoRepository = createInspirationVideoRepository(environment);
   const milestoneRepository = createMilestoneRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider(environment, clock);
@@ -464,6 +480,11 @@ export function createAppContext(environment: Environment = detectEnvironment())
     categoryRepository,
     categoryCatalogRepository,
     listCatalog: createListCatalog(categoryCatalogRepository),
+    listInspirationVideos: createListInspirationVideos(inspirationVideoRepository),
+    listAllInspirationVideos: createListAllInspirationVideos(inspirationVideoRepository),
+    addInspirationVideo: createAddInspirationVideo({ repository: inspirationVideoRepository, clock }),
+    deleteInspirationVideo: createDeleteInspirationVideo(inspirationVideoRepository),
+    updateInspirationVideo: createUpdateInspirationVideo(inspirationVideoRepository),
     listCatalogLabels: createListCatalogLabels(categoryCatalogRepository),
     addCatalogCategory: createAddCatalogCategory(categoryCatalogRepository),
     retireCatalogCategory: createRetireCatalogCategory(categoryCatalogRepository, categoryRepository, () => clock.now()),

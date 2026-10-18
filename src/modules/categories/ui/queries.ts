@@ -22,6 +22,8 @@ export interface CatalogLabelDto {
   key?: string;
   /** RF-45: fuera de la IA. */
   aiExcluded?: boolean;
+  /** Retirada del catálogo (ADM-02): no se ofrece, pero el historial la nombra. */
+  retired?: boolean;
   translations: Partial<Record<Locale, { name: string; description: string }>>;
 }
 
@@ -37,4 +39,24 @@ export function useCategories() {
 /** Textos de todas las categorías del catálogo en cada idioma (RNF-10). */
 export function useCategoryLabelsQuery() {
   return useQuery({ queryKey: CATEGORY_LABELS_KEY, queryFn: ({ signal }) => getJson<CatalogLabelDto[]>("/api/categories/translations", signal) });
+}
+
+/** RF-49 / ADM-04: un vídeo de inspiración, como lo ve la pantalla. */
+export interface InspirationVideoDto {
+  id: string;
+  categoryKey: string;
+  locale: string;
+  youtubeId: string;
+  title: string;
+}
+
+/** Bajo `["categories"]`; administración la invalida al añadir o quitar un vídeo. */
+export const INSPIRATION_VIDEOS_KEY = ["categories", "videos"] as const;
+
+/** Los vídeos de la página de una categoría, en el idioma de la interfaz (o en otro, si no hay en ese). */
+export function useInspirationVideos(categoryKey: string, locale: string) {
+  return useQuery({
+    queryKey: [...INSPIRATION_VIDEOS_KEY, categoryKey, locale],
+    queryFn: ({ signal }) => getJson<InspirationVideoDto[]>(`/api/categories/videos?category=${encodeURIComponent(categoryKey)}&locale=${encodeURIComponent(locale)}`, signal),
+  });
 }

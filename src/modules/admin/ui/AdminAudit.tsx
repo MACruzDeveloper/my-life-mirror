@@ -8,6 +8,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import { ADMIN_PANEL_SX, ADMIN_TABLE_HEAD_SX } from "./adminStyles";
 import { useTranslation } from "react-i18next";
 import { HttpError } from "@shared/ui/api/getJson";
 import { useAdminAudit, useAdminUsers } from "./adminQueries";
@@ -42,9 +43,9 @@ export function AdminAudit() {
       {auditoria.data.length === 0 ? (
         <Typography>{t("admin.auditoriaVacia")}</Typography>
       ) : (
-        <TableContainer sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
+        <TableContainer sx={ADMIN_PANEL_SX}>
           <Table size="small">
-            <TableHead>
+            <TableHead sx={ADMIN_TABLE_HEAD_SX}>
               <TableRow>
                 <TableCell>{t("admin.fecha")}</TableCell>
                 <TableCell>{t("admin.quien")}</TableCell>

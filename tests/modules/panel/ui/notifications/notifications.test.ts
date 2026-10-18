@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildNotifications } from "@modules/panel/ui/notifications/notifications";
 
-const NAMES = { c1: "Vida social", c2: "Familia", c3: "Economía" };
+const NAMES = { c1: "Vida social", c2: "Familia", c3: "Finanzas" };
 const NOW = new Date(2026, 9, 14, 12);
 
 describe("avisos de la campana (dentro de la app)", () => {
@@ -32,7 +32,7 @@ describe("avisos de la campana (dentro de la app)", () => {
       ["stale", "stale:c2:2026-08-01T10:00:00Z"],
     ]);
     expect(items[0]).toMatchObject({ title: "Boda de Marta", categories: ["Vida social", "Familia"], link: "/perfil/entrevista" });
-    expect(items[1]).toMatchObject({ category: "Economía", day: "2026-10-14", link: "/inicio" });
+    expect(items[1]).toMatchObject({ category: "Finanzas", day: "2026-10-14", link: "/inicio" });
     expect(items[2]).toMatchObject({ category: "Familia", weeks: 10, link: "/perfil/entrevista" });
   });
 
@@ -40,5 +40,16 @@ describe("avisos de la campana (dentro de la app)", () => {
     const items = buildNotifications({ now: NOW, categoryNames: NAMES, dismissedFollowUps: ["e1"], events: [{ id: "e1", title: "Boda", day: "2026-10-10", categoryIds: ["c1"] }], reactions: [], latestScores: [] });
 
     expect(items).toEqual([]);
+  });
+
+  it("si el perfil está sin completar (sin avatar, profesión ni aficiones), invita a completarlo, el primero", () => {
+    const base = { now: NOW, categoryNames: NAMES, dismissedFollowUps: [], events: [], reactions: [], latestScores: [] };
+
+    const missing = buildNotifications({ ...base, profile: {} });
+    expect(missing.map((item) => [item.kind, item.link])).toEqual([["profile", "/perfil"]]);
+    // Con algo de lo que da más juego (un avatar, o profesión o aficiones), ya no; ni mientras el perfil no ha llegado.
+    expect(buildNotifications({ ...base, profile: { avatarKey: "roundGlasses" } })).toEqual([]);
+    expect(buildNotifications({ ...base, profile: { hobbies: ["deporte"] } })).toEqual([]);
+    expect(buildNotifications({ ...base, profile: undefined })).toEqual([]);
   });
 });

@@ -19,9 +19,9 @@ describe("Caché de datos compartida entre pantallas", () => {
   it("ir de Inicio a la Entrevista no vuelve a pedir el historial ni las puntuaciones", async () => {
     const fetchMock = vi.fn((url: string) => {
       const bodies: Record<string, unknown> = {
-        "/api/assessments": [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" }],
-        "/api/assessments/history": [{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7 }] }],
-        "/api/categories": [{ id: "c1", catalogId: "k-economia", name: "Economía", status: "active", isSensitiveData: false }],
+        "/api/assessments": [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" }],
+        "/api/assessments/history": [{ recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7 }] }],
+        "/api/categories": [{ id: "c1", catalogId: "k-economia", name: "Finanzas", status: "active", isSensitiveData: false }],
         "/api/recommendations": [],
         "/api/categories/translations": categoryLabelsFixture(),
       };
@@ -31,7 +31,7 @@ describe("Caché de datos compartida entre pantallas", () => {
     const client = createTestClient();
 
     const start = render(withClient(<MemoryRouter><Home /></MemoryRouter>, client));
-    await screen.findByRole("region", { name: "Economía" });
+    await screen.findByRole("region", { name: "Finanzas" });
     await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => u === "/api/assessments/history")).toBe(true));
     start.unmount();
 

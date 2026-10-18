@@ -9,17 +9,17 @@ test("dos notas cambiadas se guardan de una vez, siguen tras recargar, y la barr
   await new AccountPages(page).register(newUser());
   await new HomePage(page).startInterviewLink().click();
   const interview = new InterviewPage(page);
-  for (const name of ["Economía", "Familia", "Aventura"]) await interview.activate(name);
+  for (const name of ["Finanzas", "Familia", "Aventura"]) await interview.activate(name);
 
   await interview.goToQuestions();
   const saveAll = page.getByRole("button", { name: /^Guardar todo/ });
   await expect(saveAll).toBeDisabled();
-  await interview.score("Economía", 7);
+  await interview.score("Finanzas", 7);
   await interview.score("Familia", 6);
   await expect(saveAll).toHaveAccessibleName("Guardar todo (2)");
 
   // Al bajar hasta la última pregunta, el botón sigue a la vista.
-  await interview.question("Economía").scrollIntoViewIfNeeded();
+  await interview.question("Finanzas").scrollIntoViewIfNeeded();
   await expect(saveAll).toBeInViewport();
 
   const saved = page.waitForResponse((response) => new URL(response.url()).pathname === "/api/assessments" && response.request().method() === "POST");
@@ -28,6 +28,6 @@ test("dos notas cambiadas se guardan de una vez, siguen tras recargar, y la barr
   await expect(saveAll).toBeDisabled();
 
   await page.reload();
-  await expect(interview.question("Economía")).toContainText("· 7");
+  await expect(interview.question("Finanzas")).toContainText("· 7");
   await expect(interview.question("Familia")).toContainText("· 6");
 });

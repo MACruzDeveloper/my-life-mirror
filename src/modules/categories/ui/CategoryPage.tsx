@@ -1,21 +1,23 @@
+import { useId, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
-import { PALETTE } from "@shared/ui/theme";
+import { PALE_TINT, PALETTE } from "@shared/ui/theme";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, useParams } from "react-router";
 import { useExperiences, useLatestScores } from "@modules/assessments/ui/queries";
 import { TripsSection } from "@modules/agenda/ui/trips/TripsSection";
 import { MilestonesSection } from "@modules/agenda/ui/milestones/MilestonesSection";
+import { isMilestoneCategory } from "@modules/agenda/domain/Milestone";
 import { ProtectedLayout } from "@shared/ui/components/ProtectedLayout";
 import { useCategoryLabel } from "./categoryLabels";
 import { hasCategoryPage } from "./categoryPages";
 import { CATEGORY_HEROES } from "./categoryHeroes";
 import { VideosSection } from "./landing/VideosSection";
-import { inspirationVideosFor } from "../domain/inspirationVideos";
+import { SECTION_SPACING } from "./landing/landingLayout";
 import { CommunitySection } from "./landing/CommunitySection";
 import { useCategories, useCategoryLabelsQuery } from "./queries";
 
@@ -36,13 +38,14 @@ export function CategoryPageRoute() {
 
 /** La altura de la imagen de cabecera (pedida por el autor: 740 px en escritorio). */
 const HERO_HEIGHT = { xs: 560, md: 740 };
-/** El mismo espacio arriba y abajo de cada bloque de la página. */
-const SECTION_SPACING = { xs: 4, md: 5 };
 
 /** Velo sobre la imagen: el azul noche de la paleta, más denso donde va el texto (arriba) que donde lo tapan las tarjetas (abajo). */
 const HERO_VEIL = `linear-gradient(180deg, ${alpha(PALETTE.midnight, 0.6)} 0%, ${alpha(PALETTE.midnight, 0.6)} 60%, ${alpha(PALETTE.midnight, 0.3)} 100%)`;
 
-const SECTION_SX = { p: 2.5, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper" };
+/** Las dos tarjetas de arriba (nota y experiencias), en un gris suave de la paleta en lugar de blanco (decisión del autor). */
+const SECTION_SX = { p: 2, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: PALE_TINT };
+/** Las experiencias que se ven sin desplegar: la tarjeta va encima de la imagen y no debe crecer sin control. */
+const EXPERIENCES_SHOWN = 2;
 
 /**
  * RF-49: la página de una categoría, con lo que la persona ha vivido en ella.
@@ -83,7 +86,9 @@ export function CategoryPage() {
   const label = categoryLabel(entry.catalogId);
   const hero = CATEGORY_HEROES[key];
   // La copia de la categoría de esta persona (activa o no): con ella se piden las experiencias compartidas.
-  const ownCategoryId = (categories.data ?? []).find((category) => category.catalogId === entry.catalogId)?.id;
+  const ownCategory = (categories.data ?? []).find((category) => category.catalogId === entry.catalogId);
+  const ownCategoryId = ownCategory?.id;
+  const isSensitive = ownCategory?.isSensitiveData === true;
   return (
     <>
     {/*
@@ -99,13 +104,21 @@ export function CategoryPage() {
           <Box component="img" src={hero.mobile} alt="" sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
         </picture>
         <Box aria-hidden sx={{ position: "absolute", inset: 0, background: HERO_VEIL }} />
+        {/*
+          Como en la portada: la imagen está generada con IA, y se dice. Abajo a la derecha de la imagen; en
+          móvil las tarjetas la tapan por abajo, así que va arriba.
+        */}
+        <Typography variant="caption" sx={{ position: "absolute", top: { xs: 68, md: "auto" }, bottom: { md: 8 }, right: 16, color: "common.white", opacity: 0.75 }}>
+          {t("landing.imagenIA")}
+          {hero.resemblesBrands && " *"}
+        </Typography>
       </Box>
-      {/* El título ocupa un alto fijo: las tarjetas empiezan siempre a la misma altura. */}
-      <Box sx={{ position: "relative", boxSizing: "border-box", height: { xs: 432, md: 516 }, maxWidth: 1100, mx: "auto", px: 2, pt: { xs: 16, md: 22 }, color: "common.white" }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: { xs: "2rem", md: "2.75rem" } }}>
+      {/* El título ocupa un alto fijo, abajo del todo, justo encima de las tarjetas: empiezan siempre a la misma altura. */}
+      <Box sx={{ position: "relative", boxSizing: "border-box", height: { xs: 432, md: 516 }, maxWidth: 1100, mx: "auto", px: 2, pb: { xs: 3, md: 4 }, display: "flex", flexDirection: "column", justifyContent: "flex-end", color: "common.white" }}>
+        <Typography variant="h4" component="h1" sx={{ fontSize: { xs: "2.75rem", md: "4rem" }, lineHeight: 1, mb: 1 }}>
           {label.name}
         </Typography>
-        <Typography variant="body1" sx={{ maxWidth: 640 }}>
+        <Typography variant="body1" sx={{ maxWidth: 640, fontSize: { md: "1.125rem" } }}>
           {label.description}
         </Typography>
       </Box>
@@ -120,19 +133,32 @@ export function CategoryPage() {
         <TripsSection />
       </Box>
     )}
-    {/* Los hitos: en Aventura, después de los viajes; en Deporte, lo propio de la página. */}
-    <Box sx={{ py: SECTION_SPACING }}>
-      <MilestonesSection categoryKey={key} />
-    </Box>
-    {/* Inspiración: vídeos curados por el autor y lo que comparten otras personas (RF-43). */}
-    {inspirationVideosFor(key).length > 0 && (
+    {/* Los hitos: en Aventura, después de los viajes; en Deporte, lo propio de la página. Las demás no tienen. */}
+    {isMilestoneCategory(key) && (
       <Box sx={{ py: SECTION_SPACING }}>
-        <VideosSection categoryKey={key} />
+        <MilestonesSection categoryKey={key} />
       </Box>
     )}
-    <Box sx={{ py: SECTION_SPACING }}>
-      <CommunitySection categoryId={ownCategoryId} />
-    </Box>
+    {/* Inspiración: vídeos curados por el autor y lo que comparten otras personas (RF-43). */}
+    {/* Con su propio espacio: sin vídeos, no ocupa sitio. */}
+    <VideosSection categoryKey={key} />
+    {/* Las categorías sensibles no comparten experiencias (RF-43): sin bloque de la comunidad. */}
+    {!isSensitive && (
+      <Box sx={{ py: SECTION_SPACING }}>
+        <CommunitySection categoryId={ownCategoryId} />
+      </Box>
+    )}
+    {hero.resemblesBrands && (
+      // Al pie: la imagen (generada con IA) tiene elementos que recuerdan a marcas reales, sin relación con la app.
+      <Box component="aside" aria-labelledby="aviso-marcas" sx={{ maxWidth: 1100, mx: "auto", px: 2, pb: 2 }}>
+        <Typography id="aviso-marcas" variant="caption" component="h2" sx={{ fontWeight: 700, display: "block" }}>
+          * {t("paginasCategoria.avisoMarcasTitulo")}
+        </Typography>
+        <Typography variant="caption" color="text.secondary" component="p">
+          {t("paginasCategoria.avisoMarcas")}
+        </Typography>
+      </Box>
+    )}
     </>
   );
 }
@@ -148,7 +174,7 @@ function LatestScore({ catalogId, categoryName }: { catalogId: string; categoryN
           {t("paginasCategoria.tuNota")}
         </Typography>
         {latest && (
-          <Typography variant="h2" component="p" sx={{ fontWeight: 700, lineHeight: 1, color: "secondary.main" }}>
+          <Typography variant="h3" component="p" sx={{ fontWeight: 700, lineHeight: 1, color: "secondary.main" }}>
             {latest.score}
           </Typography>
         )}
@@ -178,9 +204,14 @@ function LatestScore({ catalogId, categoryName }: { catalogId: string; categoryN
   );
 }
 
-/** Las experiencias del diario (RF-44) en esta categoría, de la más reciente a la más antigua. */
+/**
+ * Las experiencias del diario (RF-44) en esta categoría, de la más reciente a la más antigua.
+ * Se ven las dos últimas; "Ver todas" despliega el resto en la misma tarjeta.
+ */
 function DiaryEntries({ catalogId }: { catalogId: string }) {
   const { t, i18n } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const listId = useId();
   const categoryIds = new Set((useCategories().data ?? []).filter((category) => category.catalogId === catalogId).map((category) => category.id));
   const experiences = (useExperiences().data ?? []).filter((experience) => categoryIds.has(experience.categoryId)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return (
@@ -193,8 +224,9 @@ function DiaryEntries({ catalogId }: { catalogId: string }) {
           {t("paginasCategoria.sinExperiencias")}
         </Typography>
       ) : (
-        <Box component="ul" sx={{ listStyle: "none", m: 0, mt: 1, p: 0, display: "flex", flexDirection: "column", gap: 1.5 }}>
-          {experiences.slice(0, 5).map((experience) => (
+        <>
+        <Box component="ul" id={listId} sx={{ listStyle: "none", m: 0, mt: 1, p: 0, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {(expanded ? experiences : experiences.slice(0, EXPERIENCES_SHOWN)).map((experience) => (
             <Box component="li" key={experience.id} sx={{ borderLeft: 3, borderColor: "primary.main", pl: 1.5 }}>
               <Typography variant="caption" color="text.secondary" component="p">
                 {new Date(experience.createdAt).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" })}
@@ -205,6 +237,12 @@ function DiaryEntries({ catalogId }: { catalogId: string }) {
             </Box>
           ))}
         </Box>
+        {experiences.length > EXPERIENCES_SHOWN && (
+          <Button size="small" aria-expanded={expanded} aria-controls={listId} onClick={() => setExpanded((current) => !current)} sx={{ mt: 1, px: 0.5 }}>
+            {expanded ? t("paginasCategoria.verMenos") : t("paginasCategoria.verTodasExperiencias", { count: experiences.length })}
+          </Button>
+        )}
+        </>
       )}
     </Box>
   );

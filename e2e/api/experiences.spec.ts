@@ -8,9 +8,9 @@ test.describe("RF-41: experiencias por categoría", () => {
     await new AccountPages(page).register(newUser());
     const interview = new InterviewPage(page);
     await interview.open();
-    await interview.activate("Economía");
+    await interview.activate("Finanzas");
 
-    const helps = await interview.openHelps("Economía");
+    const helps = await interview.openHelps("Finanzas");
     // Esperar a que el servidor lo guarde antes de recargar (la espera se prepara antes del clic).
     const saved = page.waitForResponse((response) => response.url().endsWith("/api/categories/experience") && response.ok());
     await helps.getByRole("button", { name: "Llevar un presupuesto" }).click();
@@ -18,7 +18,7 @@ test.describe("RF-41: experiencias por categoría", () => {
     await saved;
 
     await page.reload();
-    const helpsAfter = await interview.openHelps("Economía");
+    const helpsAfter = await interview.openHelps("Finanzas");
     await expect(helpsAfter.getByRole("button", { name: "Llevar un presupuesto", pressed: true })).toBeVisible();
     await expect(helpsAfter.getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeVisible();
   });

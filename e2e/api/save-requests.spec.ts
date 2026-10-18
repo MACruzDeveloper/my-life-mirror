@@ -13,7 +13,7 @@ test.describe("PERF-01: menos llamadas al guardar en la entrevista", () => {
     // (No vale `waitForLoadState("networkidle")`: ese estado se alcanza una vez al cargar y luego no espera.)
     const isGet = (path: string) => (response: { url(): string; request(): { method(): string } }) => new URL(response.url()).pathname === path && response.request().method() === "GET";
     const refreshAfterActivating = Promise.all(["/api/assessments", "/api/assessments/history", "/api/recommendations"].map((path) => page.waitForResponse(isGet(path))));
-    await interview.activate("Economía");
+    await interview.activate("Finanzas");
     await refreshAfterActivating;
 
     // Las que se lanzan desde aquí, menos las abortadas: en desarrollo, StrictMode monta la ventana dos veces y
@@ -26,9 +26,9 @@ test.describe("PERF-01: menos llamadas al guardar en la entrevista", () => {
     });
     page.on("requestfailed", (request) => requests.delete(request));
     const historyAfterSaving = page.waitForResponse(isGet("/api/assessments/history"));
-    await interview.score("Economía", 2);
-    await interview.save("Economía");
-    await expect(interview.savedIdeaDialog()).toContainText(/tienes una idea para economía/i);
+    await interview.score("Finanzas", 2);
+    await interview.save("Finanzas");
+    await expect(interview.savedIdeaDialog()).toContainText(/tienes una idea para finanzas/i);
     await historyAfterSaving;
     await page.waitForTimeout(500); // margen por si saliera alguna petición más, que haría fallar el test
 

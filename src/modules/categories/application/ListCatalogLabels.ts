@@ -7,6 +7,8 @@ export interface CatalogLabel {
   key?: string;
   /** RF-45: fuera de la IA (la interfaz no ofrece sugerencias en ella). */
   aiExcluded?: boolean;
+  /** Retirada (ADM-02): no se ofrece, pero el historial la nombra. */
+  retired?: boolean;
   translations: Partial<Record<Locale, CategoryText>>;
 }
 
@@ -22,6 +24,8 @@ export function createListCatalogLabels(catalog: CategoryCatalogRepository) {
       catalogId: entry.id,
       ...(entry.key ? { key: entry.key } : {}),
       ...(entry.aiExcluded ? { aiExcluded: true } : {}),
+      // Retirada: no se ofrece (p. ej. en Categorías), pero el historial la sigue nombrando.
+      ...(entry.retiredAt ? { retired: true } : {}),
       translations: entry.translations,
     }));
   };

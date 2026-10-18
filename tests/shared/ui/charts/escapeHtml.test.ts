@@ -7,6 +7,6 @@ describe("escapeHtml (tooltips de ECharts, que se pintan como HTML)", () => {
   });
 
   it("deja el texto normal (con acentos) igual", () => {
-    expect(escapeHtml("Economía y Vida social")).toBe("Economía y Vida social");
+    expect(escapeHtml("Finanzas y Vida social")).toBe("Finanzas y Vida social");
   });
 });

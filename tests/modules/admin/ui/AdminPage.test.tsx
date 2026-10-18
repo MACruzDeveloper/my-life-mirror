@@ -60,7 +60,7 @@ describe("AdminPage (ADM-01)", () => {
           ok: true,
           status: 200,
           json: async () =>
-            url === "/api/admin/categories" ? [{ id: "k1", key: "economia", translations: { es: { name: "Economía", description: "d" }, en: { name: "Finances", description: "d" } }, isSensitiveData: false }] : [],
+            url === "/api/admin/categories" ? [{ id: "k1", key: "economia", translations: { es: { name: "Finanzas", description: "d" }, en: { name: "Finances", description: "d" } }, isSensitiveData: false }] : [],
         }),
       ),
     );
@@ -68,7 +68,7 @@ describe("AdminPage (ADM-01)", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
 
-    expect(await screen.findByText("Economía")).toBeInTheDocument();
+    expect(await screen.findByText("Finanzas")).toBeInTheDocument();
   });
 
   it("al volver a /admin no repite la llamada de usuarios ni la de categorías (caché)", async () => {
@@ -76,7 +76,7 @@ describe("AdminPage (ADM-01)", () => {
       Promise.resolve({
         ok: true,
         status: 200,
-        json: async () => (url === "/api/admin/categories" ? [{ id: "k1", key: "economia", translations: { es: { name: "Economía", description: "d" }, en: { name: "Finances", description: "d" } }, isSensitiveData: false }] : [{ id: "1", email: "ana@ejemplo.com", rol: "usuario", createdAt: "2026-09-18T10:00:00.000Z" }]),
+        json: async () => (url === "/api/admin/categories" ? [{ id: "k1", key: "economia", translations: { es: { name: "Finanzas", description: "d" }, en: { name: "Finances", description: "d" } }, isSensitiveData: false }] : [{ id: "1", email: "ana@ejemplo.com", rol: "usuario", createdAt: "2026-09-18T10:00:00.000Z" }]),
       }),
     );
     vi.stubGlobal("fetch", fetchMock);
@@ -84,7 +84,7 @@ describe("AdminPage (ADM-01)", () => {
     const first = renderPage(client);
     await screen.findByText("ana@ejemplo.com");
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
-    await screen.findByText("Economía");
+    await screen.findByText("Finanzas");
     fireEvent.click(screen.getByRole("tab", { name: "Usuarios" }));
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
     first.unmount();
@@ -92,7 +92,7 @@ describe("AdminPage (ADM-01)", () => {
     renderPage(client);
     fireEvent.click(screen.getByRole("tab", { name: "Categorías" }));
 
-    expect(screen.getByText("Economía")).toBeInTheDocument();
+    expect(screen.getByText("Finanzas")).toBeInTheDocument();
     expect(fetchMock.mock.calls.filter(([u]) => u === "/api/admin/categories")).toHaveLength(1);
     expect(fetchMock.mock.calls.filter(([u]) => u === "/api/admin/users")).toHaveLength(1);
   });

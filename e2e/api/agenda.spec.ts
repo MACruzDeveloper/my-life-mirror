@@ -34,9 +34,9 @@ test.describe("RF-47 y RF-48: fecha para una idea, eventos y calendario", () => 
     await new AccountPages(page).register(newUser());
     await new HomePage(page).startInterviewLink().click();
     const interview = new InterviewPage(page);
-    await interview.activate("Economía");
-    await interview.score("Economía", 2);
-    await interview.save("Economía");
+    await interview.activate("Finanzas");
+    await interview.score("Finanzas", 2);
+    await interview.save("Finanzas");
 
     const dialog = interview.savedIdeaDialog();
     await dialog.getByRole("button", { name: "Me gusta", exact: true }).click();
@@ -50,7 +50,7 @@ test.describe("RF-47 y RF-48: fecha para una idea, eventos y calendario", () => 
 
     // Un evento hoy, con categoría.
     await page.getByLabel("¿Qué tienes?").fill("Cena con amigos");
-    await page.getByRole("group", { name: /categorías/i }).getByRole("button", { name: "Economía" }).click();
+    await page.getByRole("group", { name: /categorías/i }).getByRole("button", { name: "Finanzas" }).click();
     await expect(page.getByText(/te invitará a revisar tu nota/i)).toBeVisible();
     await page.getByRole("button", { name: "Añadir" }).click();
     await expect(page.getByRole("listitem").filter({ hasText: "Cena con amigos" })).toBeVisible();
@@ -82,7 +82,7 @@ test.describe("RF-47 y RF-48: fecha para una idea, eventos y calendario", () => 
 
     await new AccountPages(page).register(newUser());
     const categories = (await (await page.request.get("/api/categories")).json()) as { id: string; name: string }[];
-    const economy = categories.find((category) => category.name === "Economía")!;
+    const economy = categories.find((category) => category.name === "Finanzas")!;
 
     expect((await page.request.post("/api/agenda/events", { data: { title: "Cena", day: "2026-11-05", categoryIds: [othersCategories[0].id] } })).status()).toBe(404);
     expect((await page.request.post("/api/agenda/events", { data: { title: "Cena", day: "2026-02-30" } })).status()).toBe(400);

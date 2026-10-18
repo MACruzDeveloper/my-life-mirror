@@ -30,7 +30,7 @@ function stub(ok: boolean, body: unknown, recommendations: unknown = []) {
   );
 }
 
-const HISTORY = [{ recordedAt: "2026-09-19T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, previousScore: 5 }] }];
+const HISTORY = [{ recordedAt: "2026-09-19T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 8, previousScore: 5 }] }];
 
 function renderPage() {
   return render(
@@ -50,15 +50,15 @@ const ideaItem = (name: string) => screen.queryAllByRole("listitem").find((item)
 describe("ResultsPage", () => {
   it("muestra la puntuación de cada categoría junto a su nombre", async () => {
     stub(true, [
-      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
       { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 2, note: "Poco", recordedAt: "2026-09-19T10:00:00.000Z" },
     ]);
     renderPage();
 
     // UX-13: un gráfico de barras, una por categoría puntuada, todas del color de los gráficos.
-    const chart = await screen.findByRole("img", { name: /Economía: 8 \(Bueno\).*Deporte: 2 \(Bajo\)/ });
+    const chart = await screen.findByRole("img", { name: /Finanzas: 8 \(Bueno\).*Deporte: 2 \(Bajo\)/ });
     expect(chart).toBeInTheDocument();
-    expect(lastOption().yAxis.data).toEqual(["Economía", "Deporte"]);
+    expect(lastOption().yAxis.data).toEqual(["Finanzas", "Deporte"]);
     expect(lastOption().series[0].data).toEqual([8, 2]);
     expect(lastOption().series[0].itemStyle.color).toBe(CHART_ACCENT);
     // El tooltip dice la banda y la fecha.
@@ -66,16 +66,16 @@ describe("ResultsPage", () => {
     // La tabla de datos, también con la banda.
     fireEvent.click(screen.getByRole("button", { name: "Ver datos" }));
     const table = screen.getByRole("table");
-    expect(within(table).getAllByRole("row")[1]).toHaveTextContent(/Economía[\s\S]*8[\s\S]*Bueno/);
+    expect(within(table).getAllByRole("row")[1]).toHaveTextContent(/Finanzas[\s\S]*8[\s\S]*Bueno/);
     // RF-44: la nota antigua de la evaluación ya no se enseña (está en el diario de experiencias).
     expect(screen.queryByText("Poco")).not.toBeInTheDocument();
   });
 
   it("indica las categorías sin puntuar", async () => {
-    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }]);
+    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas" }]);
     renderPage();
 
-    expect(await screen.findByText(/Sin puntuar todavía: Economía/)).toBeInTheDocument();
+    expect(await screen.findByText(/Sin puntuar todavía: Finanzas/)).toBeInTheDocument();
     // Sin ninguna puntuada, no hay gráfico.
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
@@ -99,7 +99,7 @@ describe("ResultsPage", () => {
     stub(
       true,
       [
-        { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
+        { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" },
         { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" },
       ],
       [{ id: "r1", categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", templateKey: "deporte.1", status: "pending" }],
@@ -108,7 +108,7 @@ describe("ResultsPage", () => {
 
     await waitFor(() => expect(ideaItem("Deporte")).toBeDefined());
     const ideaButton = within(ideaItem("Deporte")!).getByRole("button", { name: /una idea para ti/i });
-    expect(ideaItem("Economía")).toBeUndefined();
+    expect(ideaItem("Finanzas")).toBeUndefined();
     fireEvent.click(ideaButton);
     const dialog = screen.getByRole("dialog");
     // RF-42: el carrusel espera a tener las categorías (para quitar las ideas que chocan).
@@ -124,17 +124,17 @@ describe("ResultsPage", () => {
           ? Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() })
           : url === "/api/recommendations"
           ? Promise.resolve({ ok: false, status: 500, json: async () => ({}) })
-          : Promise.resolve({ ok: true, json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" }] }),
+          : Promise.resolve({ ok: true, json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" }] }),
       ),
     );
     renderPage();
 
-    expect(await screen.findByRole("img", { name: /Economía/ })).toBeInTheDocument();
+    expect(await screen.findByRole("img", { name: /Finanzas/ })).toBeInTheDocument();
     expect(screen.queryByText(/no sustituyen el asesoramiento/i)).not.toBeInTheDocument();
   });
 
   it("con puntuaciones guardadas ofrece actualizar las respuestas, no hacer otra entrevista", async () => {
-    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 6, recordedAt: "2026-09-19T10:00:00.000Z" }]);
     renderPage();
 
     expect(await screen.findByRole("link", { name: /actualizar mis respuestas/i })).toHaveAttribute("href", "/perfil/entrevista");
@@ -155,11 +155,11 @@ describe("ResultsPage", () => {
   });
 
   it("incluye el historial de cambios, plegado; al abrirlo se ven los cambios por día (UX-05)", async () => {
-    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+    stub(true, [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 8, recordedAt: "2026-09-19T10:00:00.000Z" }]);
     renderPage();
 
     const history = await screen.findByRole("region", { name: /historial de cambios/i });
     fireEvent.click(await within(history).findByRole("button", { name: /ver mi historial \(1\)/i }));
-    expect(within(history).getByText(/Economía: 5 → 8/)).toBeInTheDocument();
+    expect(within(history).getByText(/Finanzas: 5 → 8/)).toBeInTheDocument();
   });
 });
