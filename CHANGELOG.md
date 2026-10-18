@@ -5,7 +5,11 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
-### Añadido (UX-14: aviso ante errores)
+## [1.4.1] - 2026-10-18
+
+Revisión de calidad tras la entrega de la v1.4.0: estabilidad visual al cargar (Lighthouse), caché de los archivos estáticos, cobertura por niveles y un aviso en lugar de una pantalla en blanco. **Sin migraciones ni variables nuevas en Vercel.** El cambio de `vercel.json` (caché de `/assets/`) se aplica solo al desplegar.
+
+### Corregido (UX-14: aviso ante errores)
 
 - Si una pantalla falla al mostrarse, se ve "Algo ha fallado", con "Recargar" e "Ir al inicio", en lugar de una pantalla en blanco. El error queda en la consola del navegador; no se envía a ningún servicio.
 
