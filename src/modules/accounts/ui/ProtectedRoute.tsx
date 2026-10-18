@@ -1,20 +1,17 @@
 import type { ReactNode } from "react";
 import { Navigate, Outlet } from "react-router";
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import { SessionProvider, useSession } from "@shared/ui/context/SessionContext";
 import { HeaderExtrasProvider } from "@shared/ui/context/HeaderExtrasContext";
 import { NotificationsBell } from "@modules/panel/ui/notifications/NotificationsBell";
 import { SessionExpiredDialog } from "@shared/ui/components/SessionExpiredDialog";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 function Guard({ children }: { children: ReactNode }) {
   const { loading, authenticated } = useSession();
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 

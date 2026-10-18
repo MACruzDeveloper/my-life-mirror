@@ -3,7 +3,6 @@ import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useEffect } from "react";
@@ -16,6 +15,7 @@ import { resolveCategoryLabel } from "./categoryLabels";
 import { hasCategoryPage } from "./categoryPages";
 import { categoryIcon } from "./categoryIcons";
 import { useCategoryLabelsQuery } from "./queries";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 /**
  * RF-49: todas las categorías del catálogo en tarjetas. Cada una llevará a su
@@ -35,9 +35,7 @@ export function CategoriesPage() {
 
   if (labels.isPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 

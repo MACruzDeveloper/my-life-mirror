@@ -4,11 +4,9 @@ import { defineConfig, devices } from "@playwright/test";
  * V&V (04_Plan_Verificacion_Validacion.md apartado 1) + lección de apartado 1.1: Vitest no
  * puede detectar que un dato no sobrevive entre funciones serverless
  * distintas — solo un navegador real contra la app real lo hace. `webServer`
- * arranca `vite` (frontend puro) automáticamente antes de los tests; el
- * primer test (e2e/landing.spec.ts) solo necesita eso. Pruebas que toquen
- * de verdad `api/` (registro, login...) necesitan `vercel dev` en su lugar —
- * deliberadamente no configurado todavía, ver docs/user-stories o pregunta
- * al usuario antes de que un test cree cuentas reales en Supabase.
+ * arranca `vite` (frontend puro) automáticamente antes de los tests. Las
+ * pruebas que tocan `api/` van aparte, contra un Supabase local en Docker
+ * (playwright.api.config.ts, `npm run test:e2e:api`), nunca contra la base real.
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -20,6 +18,8 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
+    // Visibilidad (revisión de calidad del 18 oct.): la captura del momento del fallo, en test-results/.
+    screenshot: "only-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {

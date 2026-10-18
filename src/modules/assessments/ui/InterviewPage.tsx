@@ -10,7 +10,6 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import Fade from "@mui/material/Fade";
 import DialogActions from "@mui/material/DialogActions";
@@ -53,6 +52,7 @@ import {
 import { ScoreFeedbackToast, type ScoreFeedbackMessage } from "./interview/ScoreFeedbackToast";
 import { scoreFeedback } from "./scoreFeedback";
 import type { LatestScoreDto } from "./queries";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 /**
  * Lleva a la pregunta de una categoría y la hace aparecer con un fundido, para
@@ -615,9 +615,7 @@ export function InterviewPage() {
 
   if (categoriesQuery.isPending || latestScoresQuery.isPending || labelsPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 

@@ -2,7 +2,6 @@ import { useId, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -19,6 +18,7 @@ import { useIdeaReactions } from "@modules/recommendations/ui/ideaReactions";
 import { dayFromToday } from "@modules/recommendations/ui/planDates";
 import { type AgendaItem, type YearMonth, agendaItems, localDate, monthOf, monthWeeks, shiftMonth } from "./calendarMonth";
 import { useEventActions, useEvents } from "./queries";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 /** Un lunes cualquiera, para sacar los nombres de los días en el idioma de la interfaz. */
 const A_MONDAY = new Date(2024, 0, 1);
@@ -54,9 +54,7 @@ export function CalendarPage() {
 
   if (events.isPending || labelsPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 

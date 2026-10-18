@@ -59,4 +59,14 @@ describe("VerificarConsentimiento (RF-04)", () => {
       expect(result.error.code).toBe("VALIDATION_ERROR");
     }
   });
+
+  it("exige categoría y versión de la política (no se consulta con un dato vacío)", async () => {
+    const checkConsent = createCheckConsent(new InMemoryConsentRepository());
+
+    const withoutCategory = await checkConsent({ userId: "u1", categoryId: " ", policyVersion: "2026-01" });
+    const withoutPolicy = await checkConsent({ userId: "u1", categoryId: "salud", policyVersion: " " });
+
+    expect(!withoutCategory.ok && withoutCategory.error.code).toBe("VALIDATION_ERROR");
+    expect(!withoutPolicy.ok && withoutPolicy.error.code).toBe("VALIDATION_ERROR");
+  });
 });

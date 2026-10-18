@@ -5,7 +5,6 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -17,6 +16,7 @@ import { PROFILE_KEY, useProfile, type ProfileResponse } from "./queries";
 import { useSession } from "@shared/ui/context/SessionContext";
 import { AvatarPicker } from "./AvatarPicker";
 import { AiProfilePreview } from "./AiProfilePreview";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
 const DETECTED_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -43,9 +43,7 @@ export function ProfileForm({ avatarKeys }: { /** Para los tests; por defecto, l
 
   if (isPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 
