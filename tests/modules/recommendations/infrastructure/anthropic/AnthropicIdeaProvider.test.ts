@@ -56,6 +56,19 @@ describe("AnthropicIdeaWriter (RF-40b)", () => {
     });
   });
 
+  it("RF-46: con profesión y aficiones, van como dos campos de datos más, al escritor y al revisor", async () => {
+    const writerModel = new ScriptedModel({ text: "x".repeat(60) });
+    const reviewerModel = new ScriptedModel({ approved: true, reasons: [] });
+    const request: IdeaRequest = { ...REQUEST, occupation: "Desarrollo web", hobbies: ["Montaña", "Viajar"] };
+
+    await new AnthropicIdeaWriter(writerModel).write(request);
+    await new AnthropicIdeaReviewer(reviewerModel).review({ templateKey: "economia.1", text: "x".repeat(60) }, request);
+
+    expect(JSON.parse(writerModel.calls[0].user)).toMatchObject({ occupation: "Desarrollo web", hobbies: ["Montaña", "Viajar"] });
+    expect(JSON.parse(reviewerModel.calls[0].user)).toMatchObject({ occupation: "Desarrollo web", hobbies: ["Montaña", "Viajar"] });
+    expect(writerModel.calls[0].system).toMatch(/Never assume anything about the person from their occupation/);
+  });
+
   it("el prompt lleva las reglas: sin diagnósticos, sin consejo profesional o financiero, sin obligación ni juicio, sin citar la puntuación", async () => {
     const model = new ScriptedModel({ text: "x".repeat(60) });
 

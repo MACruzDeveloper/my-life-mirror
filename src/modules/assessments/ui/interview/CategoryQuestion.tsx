@@ -1,3 +1,6 @@
+import Tooltip from "@mui/material/Tooltip";
+import { Link as RouterLink } from "react-router";
+import { hasCategoryPage } from "@modules/categories/ui/categoryPages";
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -12,8 +15,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlineOutlin
 import TerrainOutlinedIcon from "@mui/icons-material/TerrainOutlined";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { useTranslation } from "react-i18next";
-import interviewerAvatar from "../../../../assets/avatars/interviewer.svg";
+import interviewerAvatar from "../../../../assets/avatars/interviewer.webp";
 import userAvatar from "../../../../assets/avatars/user.svg";
 import type { CategoryLabel } from "@modules/categories/ui/categoryLabels";
 import type { CategoryDto } from "@modules/categories/ui/queries";
@@ -28,6 +32,8 @@ import { PENDING_COLORS } from "./pendingColors";
 import { SHARE_MIN_SCORE } from "../../domain/Experience";
 import type { ExperienceDto, ShareOutcome } from "../queries";
 import { ExperienceJournal, type ExperienceSharing, type ExperienceSuggestions, type SuggestionsAnswer } from "./ExperienceJournal";
+import { avatarSrc } from "@shared/ui/components/UserAvatar";
+import { useOptionalSession } from "@shared/ui/context/SessionContext";
 import { ToggleRow } from "./ToggleRow";
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -122,6 +128,8 @@ export function CategoryQuestion({
   onUnshareExperience,
 }: CategoryQuestionProps) {
   const { t, i18n } = useTranslation();
+  // RF-26: si la persona eligió un avatar, es el suyo el que habla; si no, el dibujo genérico.
+  const chosenAvatarKey = useOptionalSession()?.avatarKey;
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [helpsOpen, setHelpsOpen] = useState(false);
   const [difficultiesOpen, setDifficultiesOpen] = useState(false);
@@ -141,7 +149,7 @@ export function CategoryQuestion({
   const sharing: ExperienceSharing | undefined =
     onShareExperience && onUnshareExperience
       ? {
-          canShare: !category.isSensitiveData && !label.aiExcluded && Boolean(label.key) && savedScore !== undefined && savedScore >= SHARE_MIN_SCORE,
+          canShare: !category.isSensitiveData && !label.aiExcluded && savedScore !== undefined && savedScore >= SHARE_MIN_SCORE,
           onShare: onShareExperience,
           onUnshare: onUnshareExperience,
         }
@@ -177,7 +185,8 @@ export function CategoryQuestion({
         flexDirection: "column",
         gap: 1.5,
         // Al saltar a una pregunta, que no quede bajo la cabecera fija (48 px compacta).
-        scrollMarginTop: 72,
+        // Bajo la cabecera compacta y la barra fija de accesos (UX-12).
+        scrollMarginTop: 112,
         pl: 1.5,
         // Mismo ancho de borde siempre, para que contestar no desplace nada.
         borderLeft: "3px solid",
@@ -192,6 +201,14 @@ export function CategoryQuestion({
             <IconButton size="small" aria-label={t("entrevista.verEjemplos", { categoria: label.name })} aria-expanded={examplesOpen} onClick={() => setExamplesOpen((open) => !open)}>
               <InfoOutlinedIcon fontSize="small" />
             </IconButton>
+          )}
+          {/* RF-49: si la categoría tiene su propia página (Aventura), un acceso a ella. */}
+          {hasCategoryPage(label.key) && (
+            <Tooltip title={t("entrevista.verPagina", { categoria: label.name })}>
+              <IconButton size="small" component={RouterLink} to={`/categorias/${label.key}`} aria-label={t("entrevista.verPagina", { categoria: label.name })} color="secondary">
+                <ArrowOutwardIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           )}
         </Box>
         {label.key && (
@@ -210,7 +227,7 @@ export function CategoryQuestion({
         )}
         {/* UX-05: lo último que se guardó de esta categoría (el historial completo está en Resultados). */}
         {lastUpdate && (
-          <Box data-last-update sx={{ mt: 1, pt: 1, borderTop: "1px dashed #D5DEDB" }}>
+          <Box data-last-update sx={{ mt: 1, pt: 1, borderTop: "1px dashed #CBD2D6" }}>
             <Typography variant="caption" color="text.secondary" component="p">
               {t("entrevista.ultimaActualizacion", {
                 fecha: formatDate(lastUpdate.recordedAt),
@@ -220,7 +237,7 @@ export function CategoryQuestion({
           </Box>
         )}
       </Bubble>
-      <Bubble side="right" avatar={userAvatar} alt={t("entrevista.tu")} band={isUnanswered ? undefined : scoreBand(score)}>
+      <Bubble side="right" avatar={chosenAvatarKey ? avatarSrc(chosenAvatarKey) : userAvatar} alt={t("entrevista.tu")} band={isUnanswered ? undefined : scoreBand(score)}>
         {/* UX-05: el "Guardar" de la categoría, a la derecha de su puntuación (debajo si no cabe). */}
         <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 2, rowGap: 1 }}>
           <Box role="group" aria-label={t("entrevista.puntuacionDe", { categoria: label.name })} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

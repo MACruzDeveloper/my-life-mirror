@@ -7,134 +7,211 @@ import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { ThemeProvider, alpha, useTheme, type Theme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import { Link as RouterLink } from "react-router";
-import { headerTheme } from "../theme";
+import { Link as RouterLink, useLocation } from "react-router";
+import { CHART_ACCENT, headerTheme } from "../theme";
+import { useHeaderExtras } from "../context/HeaderExtrasContext";
+import { UserAvatar } from "./UserAvatar";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export interface HeaderProps {
   /** Nombre del usuario con sesión activa (RF-03), o el email si aún no tiene perfil. Ausente mientras useSesion carga. */
   displayName?: string;
+  /** RF-26: el avatar elegido, junto al nombre. */
+  avatarKey?: string;
   onLogout: () => void;
   /** Solo muestra el enlace: la protección real de /admin está en el servidor (ADM-01). */
   isAdmin?: boolean;
+  /**
+   * Landings con imagen de cabecera (páginas de categoría): arriba del todo, sin
+   * fondo ni borde, encima de la imagen, y sin espaciador (la imagen empieza en
+   * el borde superior). Al bajar, al compactarse, recupera su fondo para que se lea.
+   */
+  overlay?: boolean;
+}
+
+/** Las páginas de la cabecera. Mi perfil y Administración van en el menú de la cuenta. */
+const PAGES = [
+  { path: "/inicio", labelKey: "breadcrumbs.inicio" },
+  { path: "/categorias", labelKey: "breadcrumbs.categorias" },
+  { path: "/perfil/entrevista", labelKey: "breadcrumbs.entrevista" },
+] as const;
+
+/** Separación entre grupos: una línea fina clara sobre el fondo oscuro. */
+const GROUP_BORDER = "rgba(242, 242, 242, 0.28)";
+
+/**
+ * Elementos de la cabecera que ocupan toda su altura y sin esquinas
+ * redondeadas: al pasar el ratón, el resaltado va de arriba abajo.
+ */
+const FULL_HEIGHT_SX = { alignSelf: "stretch", borderRadius: 0, px: 2, minWidth: 0 };
+
+/** La página en la que se está: el mismo fondo que al pasar el ratón (el de los botones de texto de MUI). */
+const CURRENT_PAGE_SX = { "&[aria-current='page']": { bgcolor: (theme: Theme) => alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity) } };
+/** Sobre la imagen de una landing, el fondo no queda bien: solo negrita. */
+const CURRENT_PAGE_OVERLAY_SX = { "&[aria-current='page']": { fontWeight: 700 } };
+
+/** Separador entre grupos: de arriba abajo con fondo; sobre la imagen de una landing, una línea corta, de la altura del texto. */
+function separatorSx(transparent: boolean, sides: ("left" | "right")[]) {
+  if (!transparent) return Object.fromEntries(sides.map((side) => [side === "left" ? "borderLeft" : "borderRight", `1px solid ${GROUP_BORDER}`]));
+  const line = (side: "left" | "right") => ({ content: '""', position: "absolute", [side]: 0, top: "50%", height: 18, transform: "translateY(-50%)", borderLeft: `1px solid ${GROUP_BORDER}` });
+  return { position: "relative", ...(sides.includes("left") ? { "&::before": line("left") } : {}), ...(sides.includes("right") ? { "&::after": line("right") } : {}) };
 }
 
 /**
- * Cabecera de las páginas protegidas (RF-39): logo (texto, sin imagen todavía),
- * enlaces de navegación ("Inicio" — el panel —, "Administración" solo para
- * admin, y "Mi perfil" — Perfil, Entrevista, Resultados y Privacidad viven
- * dentro, en el menú lateral de AccountPage), usuario con sesión activa,
- * selector de idioma (RNF-10) y cierre de sesión. Mobile-first (ADR-07 apartado 6,
- * UX-03): en móvil, logo + idioma + un menú con la navegación, el nombre y
- * cerrar sesión; desde `sm`, todo en línea. UX-06: oscura y fija arriba; al
- * bajar se compacta (menos altura y letra más pequeña) con una transición breve.
+ * Cabecera de las páginas protegidas (RF-39). En escritorio, cuatro grupos:
+ * páginas (Inicio, Categorías y Entrevista), la cuenta (avatar y nombre, que
+ * abren un menú con Mi perfil, Administración si es admin y Cerrar sesión),
+ * el idioma (ES | EN, como en la portada) y, a la derecha del todo, los
+ * avisos que le pase la ruta (`HeaderExtrasProvider`). Mobile-first (ADR-07
+ * apartado 6, UX-03): en móvil, logo, idioma, avisos y un menú con todo lo
+ * demás. UX-06: oscura y fija arriba; al bajar se compacta.
  */
-export function Header({ displayName, onLogout, isAdmin }: HeaderProps) {
+export function Header({ displayName, avatarKey, onLogout, isAdmin, overlay = false }: HeaderProps) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { notifications } = useHeaderExtras();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"), { noSsr: true });
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const closeMenu = () => setMenuAnchor(null);
   const isCompact = useScrollTrigger({ disableHysteresis: true, threshold: 16 });
+  const { pathname } = useLocation();
+  // Activa también dentro de la página (una categoría, dentro de Categorías).
+  const isCurrent = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
+  const transparent = overlay && !isCompact;
+
+  // Lo común a los dos menús (móvil y cuenta): Mi perfil, Administración y Cerrar sesión.
+  const accountItems = [
+    <MenuItem key="perfil" component={RouterLink} to="/perfil" onClick={closeMenu}>
+      <ListItemIcon>
+        <PersonOutlinedIcon fontSize="small" />
+      </ListItemIcon>
+      {t("breadcrumbs.miPerfil")}
+    </MenuItem>,
+    ...(isAdmin
+      ? [
+          <MenuItem key="admin" component={RouterLink} to="/admin" onClick={closeMenu}>
+            <ListItemIcon>
+              <AdminPanelSettingsOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            {t("breadcrumbs.administracion")}
+          </MenuItem>,
+        ]
+      : []),
+    <Divider key="divider" />,
+    <MenuItem
+      key="logout"
+      onClick={() => {
+        closeMenu();
+        onLogout();
+      }}
+    >
+      <ListItemIcon>
+        <LogoutIcon fontSize="small" />
+      </ListItemIcon>
+      {t("panel.cerrarSesion")}
+    </MenuItem>,
+  ];
 
   return (
     <ThemeProvider theme={headerTheme}>
-    <AppBar
-      position="sticky"
-      elevation={isCompact ? 4 : 0}
-      data-compact={isCompact}
-      sx={{
-        bgcolor: "background.default",
-        color: "text.primary",
-        transition: "box-shadow 200ms",
-        // Letra de los botones: más pequeña en compacto (el logo cambia aparte).
-        "& .MuiButton-root": { fontSize: isCompact ? "0.75rem" : "0.8125rem", transition: "font-size 200ms" },
-      }}
-    >
-      <Toolbar sx={{ justifyContent: "space-between", gap: 1, minHeight: { xs: isCompact ? 48 : 56, sm: isCompact ? 48 : 64 }, transition: "min-height 200ms ease" }}>
-        <Typography variant="h6" component="span" sx={{ fontWeight: 700, fontSize: isCompact ? "1.05rem" : "1.25rem", transition: "font-size 200ms ease" }}>
-          MyLifeMirror
-        </Typography>
-        {isMobile ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <LanguageSwitcher />
-            <IconButton
-              aria-label={t("comun.abrirMenu")}
-              aria-haspopup="menu"
-              aria-expanded={menuAnchor ? "true" : undefined}
-              onClick={(event) => setMenuAnchor(event.currentTarget)}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={closeMenu}>
-              {displayName ? (
-                <Typography variant="body2" color="text.secondary" sx={{ px: 2, py: 1 }}>
-                  {displayName}
-                </Typography>
-              ) : null}
-              {displayName ? <Divider /> : null}
-              <MenuItem component={RouterLink} to="/inicio" onClick={closeMenu}>
-                {t("breadcrumbs.inicio")}
-              </MenuItem>
-              {isAdmin ? (
-                <MenuItem component={RouterLink} to="/admin" onClick={closeMenu}>
-                  {t("breadcrumbs.administracion")}
-                </MenuItem>
-              ) : null}
-              <MenuItem component={RouterLink} to="/perfil" onClick={closeMenu}>
-                {t("breadcrumbs.miPerfil")}
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  closeMenu();
-                  onLogout();
-                }}
+      {/*
+        Fija (no "sticky"): al compactarse baja de altura, y si ocupara sitio en la página, el contenido subiría,
+        el desplazamiento volvería a menos de 16 px y la cabecera se agrandaría otra vez, sin parar (fallo visto
+        al bajar 1 o 2 px). Fija no ocupa sitio: el hueco lo guarda el espaciador de abajo, de altura constante.
+      */}
+      <AppBar
+        position="fixed"
+        elevation={isCompact ? 4 : 0}
+        data-compact={isCompact}
+        data-transparent={transparent}
+        sx={{
+          bgcolor: transparent ? "transparent" : "background.default",
+          color: "text.primary",
+          transition: "box-shadow 200ms, background-color 200ms, border-color 200ms",
+          borderBottom: `2px solid ${transparent ? "transparent" : CHART_ACCENT}`,
+          // Letra de los botones: más pequeña en compacto (el logo cambia aparte).
+          "& .MuiButton-root": { fontSize: isCompact ? "0.75rem" : "0.8125rem", transition: "font-size 200ms" },
+        }}
+      >
+        <Toolbar sx={{ justifyContent: "space-between", alignItems: "stretch", gap: 1, pr: { xs: 0, sm: 0 }, minHeight: { xs: isCompact ? 48 : 56, sm: isCompact ? 48 : 64 }, transition: "min-height 200ms ease" }}>
+          <Typography variant="h6" component="span" sx={{ alignSelf: "center", fontWeight: 700, fontSize: isCompact ? "1.05rem" : "1.25rem", transition: "font-size 200ms ease" }}>
+            MyLifeMirror
+          </Typography>
+          {isMobile ? (
+            <Box sx={{ display: "flex", alignItems: "stretch" }}>
+              <Box sx={{ display: "flex", alignItems: "center", pr: 1 }}>
+                <LanguageSwitcher variant="text" showLabel={false} />
+              </Box>
+              {notifications}
+              <IconButton
+                aria-label={t("comun.abrirMenu")}
+                aria-haspopup="menu"
+                aria-expanded={menuAnchor ? "true" : undefined}
+                onClick={(event) => setMenuAnchor(event.currentTarget)}
+                sx={{ ...FULL_HEIGHT_SX, color: "inherit" }}
               >
-                <ListItemIcon>
-                  <LogoutIcon fontSize="small" />
-                </ListItemIcon>
-                {t("panel.cerrarSesion")}
-              </MenuItem>
-            </Menu>
-          </Box>
-        ) : (
-          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 2 }}>
-            <Button size="small" component={RouterLink} to="/inicio">
-              {t("breadcrumbs.inicio")}
-            </Button>
-            {isAdmin ? (
-              <Button size="small" component={RouterLink} to="/admin">
-                {t("breadcrumbs.administracion")}
-              </Button>
-            ) : null}
-            <Button size="small" component={RouterLink} to="/perfil">
-              {t("breadcrumbs.miPerfil")}
-            </Button>
-            {displayName ? (
-              <Typography variant="body2" color="text.secondary">
-                {displayName}
-              </Typography>
-            ) : null}
-            <LanguageSwitcher />
-            <Tooltip title={t("panel.cerrarSesion")}>
-              <IconButton size="small" aria-label={t("panel.cerrarSesion")} onClick={onLogout}>
-                <LogoutIcon fontSize="small" />
+                <MenuIcon />
               </IconButton>
-            </Tooltip>
-          </Box>
-        )}
-      </Toolbar>
-    </AppBar>
+              <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={closeMenu}>
+                {displayName ? (
+                  <Typography variant="body2" color="text.secondary" sx={{ px: 2, py: 1 }}>
+                    {displayName}
+                  </Typography>
+                ) : null}
+                {displayName ? <Divider /> : null}
+                {PAGES.map((page) => (
+                  <MenuItem key={page.path} component={RouterLink} to={page.path} onClick={closeMenu} selected={isCurrent(page.path)} aria-current={isCurrent(page.path) ? "page" : undefined}>
+                    {t(page.labelKey)}
+                  </MenuItem>
+                ))}
+                <Divider />
+                {accountItems}
+              </Menu>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "stretch" }}>
+              <Box component="nav" aria-label={t("comun.paginas")} sx={{ display: "flex", alignItems: "stretch" }}>
+                {PAGES.map((page) => (
+                  <Button key={page.path} component={RouterLink} to={page.path} aria-current={isCurrent(page.path) ? "page" : undefined} sx={{ ...FULL_HEIGHT_SX, ...(transparent ? CURRENT_PAGE_OVERLAY_SX : CURRENT_PAGE_SX) }}>
+                    {t(page.labelKey)}
+                  </Button>
+                ))}
+              </Box>
+              <Box role="group" aria-label={t("comun.miCuenta")} sx={{ display: "flex", alignItems: "stretch", ml: 1, ...separatorSx(transparent, ["left", "right"]) }}>
+                <Button
+                  aria-haspopup="menu"
+                  aria-expanded={menuAnchor ? "true" : undefined}
+                  onClick={(event) => setMenuAnchor(event.currentTarget)}
+                  endIcon={<ExpandMoreIcon />}
+                  sx={{ ...FULL_HEIGHT_SX, gap: 1, textTransform: "none", color: "text.secondary" }}
+                >
+                  {avatarKey ? <UserAvatar avatarKey={avatarKey} size={32} /> : null}
+                  {displayName ?? ""}
+                </Button>
+                <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={closeMenu} anchorOrigin={{ vertical: "bottom", horizontal: "right" }} transformOrigin={{ vertical: "top", horizontal: "right" }}>
+                  {accountItems}
+                </Menu>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", px: 2 }}>
+                <LanguageSwitcher variant="text" showLabel={false} />
+              </Box>
+              {notifications ? <Box sx={{ display: "flex", alignItems: "stretch", ...separatorSx(transparent, ["left"]) }}>{notifications}</Box> : null}
+            </Box>
+          )}
+        </Toolbar>
+      </AppBar>
+      {!overlay && <Box aria-hidden data-testid="header-spacer" sx={{ height: { xs: 58, sm: 66 }, flexShrink: 0 }} />}
     </ThemeProvider>
   );
 }

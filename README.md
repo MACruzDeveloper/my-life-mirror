@@ -1,6 +1,6 @@
 # MyLifeMirror
 
-Aplicación web para evaluar cómo va tu vida por áreas (economía, familia, deporte…), ver tu equilibrio y su evolución, y recibir ideas concretas para mejorar lo que tú elijas, **sin juicios ni comparaciones**. Trabajo de Fin de Máster del Máster en Desarrollo con IA (BIG School).
+Aplicación web para evaluar cómo va tu vida por áreas (finanzas, familia, deporte…), ver tu equilibrio y su evolución, y recibir ideas concretas para mejorar lo que tú elijas, **sin juicios ni comparaciones**. Trabajo de Fin de Máster del Máster en Desarrollo con IA (BIG School).
 
 - **En producción:** https://my-life-mirror.vercel.app
 - **Arquitectura:** monolito modular con Clean Architecture en cada módulo (dominio / aplicación / infraestructura), TDD y especificación antes del código. Ver [docs/](docs/).
@@ -29,17 +29,20 @@ Capturas de la cuenta de prueba (ver [Usuario de prueba](#usuario-de-prueba)).
 
 ## Funcionalidades principales
 
-- **Entrevista por áreas.** Eliges qué áreas de tu vida quieres mirar (economía, vida social, pareja, deporte, aventura, familia, inversiones…) y puntúas cada una del 1 al 10, cuando quieras y solo las que quieras. La primera vez va guiada en tres pasos.
-- **Tu equilibrio y tu evolución.** Un radar con todas tus áreas y gráficos de cómo cambia cada una con el tiempo. Los colores son suaves y van siempre con número y texto: el color nunca es la única señal.
-- **Ideas concretas, sin juicios.** Para las áreas con puntuación baja, la app propone ideas de un catálogo curado (5 por área), con el aviso de que no sustituyen el consejo profesional.
+- **Entrevista por áreas.** Eliges qué áreas de tu vida quieres mirar (doce: finanzas, vida social, pareja, deporte, aventura, familia, formación, voluntariado…) y puntúas cada una del 1 al 10, cuando quieras y solo las que quieras. La primera vez va guiada en tres pasos; "Guardar todo" guarda varias de una vez.
+- **Tu equilibrio y tu evolución.** Un radar con todas tus áreas, gráficos de cómo cambia cada una con el tiempo y tus resultados en barras. El color nunca es la única señal: siempre va con número y texto.
+- **Ideas concretas, sin juicios.** Para las áreas con puntuación baja, la app propone ideas de un catálogo curado (5 por área), con el aviso de que no sustituyen el consejo profesional. Las guardas, las marcas como hechas o les pones fecha; y si todo te va bien, la app deja de empujarte a mejorar y te propone ideas para disfrutarlo.
 - **Ideas a tu medida.** Marcas qué te ayuda y qué te lo pone difícil (listas cerradas), y las ideas que chocan con tu situación dejan de proponerse.
 - **Diario de experiencias.** Apuntas, por área, lo que te ha pasado o te ha funcionado. Es privado.
 - **Compartir lo que funciona.** Si un área te va bien (8 o más), puedes compartir una experiencia de forma anónima. Quien busca ideas en esa área la lee junto a las de la app. Pasa unos filtros antes de publicarse y cualquiera puede reportarla.
-- **IA opcional y acotada.** Desactivada por defecto. Puede reescribir una idea del catálogo para ti, o proponerte opciones de las listas a partir de una experiencia que tú elijas. Nunca valora cómo estás ni escribe consejos libres. *El modelo real está implementado y evaluado; falta activarlo en producción (ver [Estado](#estado-del-proyecto)).*
+- **IA opcional y acotada.** Desactivada por defecto. Puede reescribir una idea del catálogo para ti, o proponerte opciones de las listas a partir de una experiencia que tú elijas. Nunca valora cómo estás ni escribe consejos libres. Funciona en producción con el modelo real (Claude Haiku), con un tope diario por persona.
+- **Páginas de categoría.** Aventura (tus viajes en un mapa y tus retos superados), Deporte (carreras y marcas), Espiritualidad y Voluntariado: tu nota, tu diario, vídeos de inspiración y lo que comparten otras personas. Lo que apuntas ahí no cambia tu nota.
+- **Calendario y avisos.** Tus eventos y las ideas con fecha, en un calendario; una campana avisa dentro de la app de lo pendiente (revisar una nota tras un evento, completar el perfil…).
+- **Tu perfil, a tu manera.** Un avatar de un catálogo cerrado (generado con IA en local y revisado), profesión y aficiones para ideas más a tu medida.
 - **Ayuda siempre a mano.** "¿Necesitas ayuda ahora?" en todas las pantallas, con líneas de ayuda reales. Igual para todo el mundo: la app no intenta detectar nada.
 - **Privacidad.** Consentimiento explícito para las áreas sensibles, exportación de todos tus datos en JSON y borrado completo de la cuenta.
-- **Administración.** Catálogo de áreas en varios idiomas, gestión de usuarios y registro de auditoría.
-- **Español e inglés**, y diseñada primero para móvil.
+- **Administración.** Catálogo de áreas en varios idiomas, vídeos de inspiración por categoría e idioma, gestión de usuarios y registro de auditoría.
+- **Español e inglés**, y diseñada primero para móvil. La portada tiene una presentación en audio (voz generada con IA, con transcripción).
 
 ## Stack tecnológico
 
@@ -113,7 +116,9 @@ Una cuenta en producción que ya tiene contenido, para ver la app sin tener que 
 **Qué probar:**
 
 - *Inicio*: el equilibrio, la evolución y "Ideas para ti".
-- *Mi perfil → Entrevista*: abre "Ideas para Economía" y mira las pestañas "De la app", "Con IA" y "De otras personas".
+- *Mi perfil → Entrevista*: abre "Ideas para Finanzas" y mira las pestañas "De la app", "Con IA" y "De otras personas".
+- *Mi perfil → Resultados*: tus áreas en barras.
+- *Categorías → Aventura*: añade un viaje en el mapa y un reto superado.
 - En Aventura, pulsa "Sugerir opciones con IA" en la experiencia del diario.
 - En Familia (un 8), "Compartir de forma anónima" una experiencia.
 - *Mi perfil → Privacidad y datos*: descargar los datos.
@@ -195,7 +200,7 @@ Solo para quien tenga acceso a los proyectos de Vercel y Supabase del autor.
 ## Despliegue
 
 - **Dónde:** [Vercel](https://vercel.com) sirve la interfaz y las funciones de `api/` (región de Dublín); [Supabase](https://supabase.com) aloja la base de datos y las cuentas. Los dos en su plan gratuito.
-- **Cómo:** cada fusión en `main` despliega producción. Cada entrega es una versión con su etiqueta (`v1.3.0`…) y su sección en el [CHANGELOG](CHANGELOG.md).
+- **Cómo:** cada fusión en `main` despliega producción. Cada entrega es una versión con su etiqueta (`v1.4.0`…) y su sección en el [CHANGELOG](CHANGELOG.md).
 - **Variables de entorno** (en Vercel; los nombres están en [.env.example](.env.example)): la URL y la clave de servicio de Supabase, la URL de la app y, para la IA, el proveedor y la clave de Anthropic. Las claves solo se usan en el servidor, nunca llegan al navegador.
 - **Base de datos:** las migraciones de `supabase/migrations/` se ejecutan a mano, en orden, antes de desplegar el código que las necesita. El plan gratuito no guarda copias: `npm run backup:db` hace una en local.
 - **Límites del plan gratuito:** 12 funciones como máximo (de ahí una función por capacidad, hoy 11) y pausa de Supabase tras 7 días sin uso (un workflow la evita).
@@ -223,15 +228,16 @@ El proyecto se ha construido con un asistente de IA (Claude Code) como compañer
 - **Especificación antes que código:** cada funcionalidad empieza por una historia de usuario con criterios Given/When/Then ([docs/user-stories/](docs/user-stories/)), y cada pieza por su test (TDD).
 - **Decisiones trazables:** [docs/Historial_Prompts.md](docs/Historial_Prompts.md) registra los prompts que fijaron una decisión de diseño, proceso o alcance, y qué se decidió.
 - **Controles automáticos:** nada se da por bueno sin lint, tipos, tests con umbral de cobertura, build y E2E (`npm run verify`), ni sin revisión de código.
+- **IA generativa de imagen, con revisión:** los avatares salen de un modelo ejecutado en local, tras un filtro de palabras, un paso de razonamiento contra estereotipos y la revisión del autor imagen a imagen. Por el camino apareció un sesgo real del modelo (dibujaba a todos con piel clara), documentado con sus pruebas en [ADR-05](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.1.1.
 - **Límites éticos de la IA dentro de la app:** [ADR-05](docs/architecture-decisions/05_Fundamentos_IA.md) explica dónde se usa IA, dónde no y por qué (sin detección de riesgo, sin consejo generado libremente).
 
 ---
 
 ## Estado del proyecto
 
-Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.3.0), con más de 800 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
+Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.4.0), con más de 1000 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
 
-- **IA:** el modelo real (RF-40b) funciona en producción desde esta versión, con crédito de prepago y un tope diario por usuario ([evaluación](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4). En local y en los tests se usa un proveedor simulado, para no gastar crédito.
+- **IA:** el modelo real (RF-40b) funciona en producción desde la v1.3.0, con crédito de prepago y un tope diario por usuario ([evaluación](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4). En local y en los tests se usa un proveedor simulado, para no gastar crédito.
 - **Para la entrega:** presentación y vídeo.
 - **Límites conocidos:** validación con una sola participante; política de privacidad sin revisión legal; contenido de ideas y líneas de ayuda pendiente de una última revisión.
 

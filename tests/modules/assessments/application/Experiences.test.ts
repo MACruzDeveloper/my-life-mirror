@@ -12,7 +12,7 @@ async function setup() {
   const clock: Clock = { now: () => now };
   const categoryRepository = new InMemoryCategoryRepository();
   await createListCategories(categoryRepository, new InMemoryCategoryCatalogRepository())("u1");
-  const finances = (await categoryRepository.findByUserId("u1")).find((category) => category.name === "Economía")!;
+  const finances = (await categoryRepository.findByUserId("u1")).find((category) => category.name === "Finanzas")!;
   const experienceRepository = new InMemoryExperienceRepository();
   const assessmentRepository = new InMemoryAssessmentRepository();
   return {

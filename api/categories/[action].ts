@@ -6,10 +6,11 @@ import difficulties from "#shared/infrastructure/http/handlers/categories/diffic
 import experience from "#shared/infrastructure/http/handlers/categories/experience.js";
 import shared from "#shared/infrastructure/http/handlers/categories/shared.js";
 import translations from "#shared/infrastructure/http/handlers/categories/translations.js";
+import videos from "#shared/infrastructure/http/handlers/categories/videos.js";
 
 /**
- * Función serverless de `/api/categories/activate|deactivate|experience|difficulties|diary|shared|translations`
+ * Función serverless de `/api/categories/activate|deactivate|experience|difficulties|diary|shared|translations|videos`
  * (`/api/categories` a secas sigue siendo `index.ts`). Ver createRouter sobre
  * el límite de 12 funciones.
  */
-export default createRouter("/api/categories/", { activate, deactivate, experience, difficulties, diary, shared, translations });
+export default createRouter("/api/categories/", { activate, deactivate, experience, difficulties, diary, shared, translations, videos });

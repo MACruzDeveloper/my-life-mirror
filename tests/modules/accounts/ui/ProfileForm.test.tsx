@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
+import { MemoryRouter } from "react-router";
 import { ProfileForm } from "@modules/accounts/ui/ProfileForm";
 import { SessionProvider } from "@shared/ui/context/SessionContext";
 import type { QueryClient } from "@tanstack/react-query";
@@ -17,7 +18,8 @@ function stubFetch(profile: unknown) {
     if (url === "/api/accounts/session") {
       return Promise.resolve({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com" }) });
     }
-    void init;
+    // Como el servidor de verdad: al guardar devuelve el perfil ya actualizado.
+    if (init?.method === "POST") return Promise.resolve({ ok: true, json: async () => ({ ...(profile as object), ...JSON.parse(init.body as string) }) });
     return Promise.resolve({ ok: true, json: async () => profile });
   });
   vi.stubGlobal("fetch", fetchMock);
@@ -27,9 +29,12 @@ function stubFetch(profile: unknown) {
 function renderProfileForm(client: QueryClient = createTestClient()) {
   return render(
     withClient(
-      <SessionProvider>
-        <ProfileForm />
-      </SessionProvider>,
+      // Con router: "Así te ve la IA" enlaza a Privacidad y datos.
+      <MemoryRouter>
+        <SessionProvider>
+          <ProfileForm />
+        </SessionProvider>
+      </MemoryRouter>,
       client,
     ),
   );
@@ -120,5 +125,104 @@ describe("ProfileForm (RF-03)", () => {
 
     expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana María");
     expect(fetchMock.mock.calls.filter(([u, i]) => u === "/api/accounts/profile" && !i?.method)).toHaveLength(1);
+  });
+
+  it("RF-26: guarda el avatar elegido junto al resto, y la caché conserva lo que el formulario no toca (la elección de IA)", async () => {
+    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+      if (url === "/api/accounts/session") return Promise.resolve({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com" }) });
+      if (init?.method === "POST") return Promise.resolve({ ok: true, json: async () => ({ userId: "u1", name: "Ana", timeZone: "Europe/Madrid", avatarKey: "longBraids", aiIdeasEnabled: true }) });
+      return Promise.resolve({ ok: true, json: async () => ({ name: "Ana", timeZone: "Europe/Madrid", aiIdeasEnabled: true }) });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const client = createTestClient();
+    render(
+      withClient(
+        <SessionProvider>
+          <ProfileForm avatarKeys={["roundGlasses", "longBraids"]} />
+        </SessionProvider>,
+        client,
+      ),
+    );
+
+    fireEvent.click(await screen.findByRole("radio", { name: /dos trenzas largas/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
+
+    await waitFor(() => expect(client.getQueryData(["profile"])).toMatchObject({ avatarKey: "longBraids", aiIdeasEnabled: true }));
+    const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST")!;
+    expect(JSON.parse(post[1]!.body as string)).toMatchObject({ name: "Ana", avatarKey: "longBraids" });
+  });
+
+  it("RF-46: precarga profesión y aficiones, y guarda lo que se elige; la profesión es un desplegable, no texto libre", async () => {
+    const fetchMock = stubFetch({ name: "Ana", occupation: "docencia", hobbies: ["lectura"] });
+    renderProfileForm();
+    await waitFor(() => expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana"));
+
+    expect(screen.getByRole("combobox", { name: /profesión/i })).toHaveTextContent("Docencia y educación");
+    const hobbies = within(screen.getByRole("group", { name: /aficiones/i }));
+    expect(hobbies.getByRole("button", { name: "Lectura" })).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: /profesión/i }));
+    fireEvent.click(await screen.findByRole("option", { name: "Desarrollo web" }));
+    fireEvent.click(hobbies.getByRole("button", { name: "Montaña" }));
+    fireEvent.click(hobbies.getByRole("button", { name: "Lectura" }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
+
+    await waitFor(() => expect(screen.getByText(/perfil guardado/i)).toBeInTheDocument());
+    const [, init] = fetchMock.mock.calls.find(([url, request]) => url === "/api/accounts/profile" && request?.method === "POST")!;
+    expect(JSON.parse(init!.body as string)).toMatchObject({ occupation: "desarrolloWeb", hobbies: ["montana"] });
+  });
+
+  it("RF-46: sin profesión ni aficiones, se envían vacías (así se pueden quitar)", async () => {
+    const fetchMock = stubFetch({ name: "Ana" });
+    renderProfileForm();
+    await waitFor(() => expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana"));
+
+    fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
+
+    await waitFor(() => expect(screen.getByText(/perfil guardado/i)).toBeInTheDocument());
+    const [, init] = fetchMock.mock.calls.find(([url, request]) => url === "/api/accounts/profile" && request?.method === "POST")!;
+    expect(JSON.parse(init!.body as string)).toMatchObject({ occupation: null, hobbies: [] });
+  });
+
+  describe("Así te ve la IA", () => {
+    function stubSession(aiIdeasAvailable: boolean, profile: unknown) {
+      const fetchMock = vi.fn((url: string) => {
+        if (url === "/api/accounts/session") return Promise.resolve({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com", aiIdeasAvailable }) });
+        return Promise.resolve({ ok: true, json: async () => profile });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+    }
+
+    it("con las ideas con IA activadas, dice qué recibe la IA de este perfil (al momento, según se edita) y qué nunca recibe", async () => {
+      stubSession(true, { name: "Ana", birthDate: "1990-01-01", occupation: "desarrolloWeb", hobbies: ["montana"], aiIdeasEnabled: true });
+      renderProfileForm();
+
+      const aside = await screen.findByRole("complementary", { name: /así te ve la ia/i });
+      expect(await within(aside).findByText(/están activadas/i)).toBeInTheDocument();
+      expect(within(aside).getByText("Desarrollo web")).toBeInTheDocument();
+      expect(within(aside).getByText("Montaña")).toBeInTheDocument();
+      expect(within(aside).getByText(/tu nombre, tu email, tu fecha de nacimiento/i)).toBeInTheDocument();
+
+      fireEvent.click(within(screen.getByRole("group", { name: /aficiones/i })).getByRole("button", { name: "Viajar" }));
+      expect(within(aside).getByText("Viajar")).toBeInTheDocument();
+      expect(within(aside).getByRole("link", { name: /privacidad y datos/i })).toHaveAttribute("href", "/perfil/datos");
+    });
+
+    it("con las ideas con IA desactivadas, dice que ahora no recibe nada y qué recibiría", async () => {
+      stubSession(true, { name: "Ana", occupation: "docencia" });
+      renderProfileForm();
+
+      const aside = await screen.findByRole("complementary", { name: /así te ve la ia/i });
+      expect(await within(aside).findByText(/ahora no se envía nada/i)).toBeInTheDocument();
+      expect(within(aside).getByText("Docencia y educación")).toBeInTheDocument();
+    });
+
+    it("si la IA no está disponible en esta instalación, lo dice", async () => {
+      stubSession(false, { name: "Ana" });
+      renderProfileForm();
+
+      const aside = await screen.findByRole("complementary", { name: /así te ve la ia/i });
+      expect(await within(aside).findByText(/no está disponible/i)).toBeInTheDocument();
+    });
   });
 });

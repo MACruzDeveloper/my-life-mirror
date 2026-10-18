@@ -20,13 +20,13 @@ test.describe("primer uso: registro → entrevista → panel", () => {
     await new HomePage(page).startInterviewLink().click();
 
     const interview = new InterviewPage(page);
-    for (const name of ["Economía", "Familia", "Vida social"]) await interview.activate(name);
-    await interview.score("Economía", 2);
+    for (const name of ["Finanzas", "Familia", "Vida social"]) await interview.activate(name);
+    await interview.score("Finanzas", 2);
     await interview.score("Familia", 8);
     await interview.score("Vida social", 6);
     // UX-05: cada área se guarda con su botón; la baja abre "Cambios guardados" con su idea.
-    await interview.save("Economía");
-    await expect(interview.savedIdeaDialog()).toContainText(/tienes una idea para economía/i);
+    await interview.save("Finanzas");
+    await expect(interview.savedIdeaDialog()).toContainText(/tienes una idea para finanzas/i);
     await expect(interview.savedIdeaDialog()).toContainText(/no sustituyen el asesoramiento/i);
     await interview.savedIdeaDialog().getByRole("button", { name: "Seguir aquí" }).click();
     await interview.save("Familia");
@@ -35,11 +35,11 @@ test.describe("primer uso: registro → entrevista → panel", () => {
 
     const home = new HomePage(page);
     await home.open();
-    await expect(home.categoryCard("Economía")).toContainText("2");
-    await expect(home.categoryCard("Economía")).toContainText("Bajo");
+    await expect(home.categoryCard("Finanzas")).toContainText("2");
+    await expect(home.categoryCard("Finanzas")).toContainText("Bajo");
     await expect(home.balanceCard()).toBeVisible();
 
-    const idea = home.ideasSummary().getByRole("button", { name: "Idea para Economía" });
+    const idea = home.ideasSummary().getByRole("button", { name: "Idea para Finanzas" });
     await expect(idea).toBeVisible();
     await expect(home.ideasSummary().getByRole("button", { name: /familia/i })).toHaveCount(0);
     await idea.click();
@@ -77,9 +77,12 @@ test.describe("primer uso: registro → entrevista → panel", () => {
   test("SEC-01: una contraseña débil no crea la cuenta y el formulario dice qué falta", async ({ page }) => {
     const account = new AccountPages(page);
     await page.goto("/registro");
-    await expect(page.getByRole("list", { name: /tu contraseña necesita/i })).toBeVisible();
+    // Plegados hasta que hacen falta (o se pulsa el botón de información).
+    await expect(page.getByRole("list", { name: /tu contraseña necesita/i })).toHaveCount(0);
 
     await account.tryToRegister({ ...newUser(), password: "Test1234!" });
+
+    await expect(page.getByRole("list", { name: /tu contraseña necesita/i })).toBeVisible();
 
     await expect(page.getByRole("alert")).toContainText(/no cumple los requisitos/i);
     await expect(page.getByText(/contraseña muy común/i)).toBeVisible();

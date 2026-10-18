@@ -11,9 +11,9 @@ test.describe("RF-05: exportar y eliminar mis datos", () => {
     await new AccountPages(page).register(user);
     const interview = new InterviewPage(page);
     await interview.open();
-    await interview.activate("Economía");
-    await interview.score("Economía", 4);
-    await interview.save("Economía");
+    await interview.activate("Finanzas");
+    await interview.score("Finanzas", 4);
+    await interview.save("Finanzas");
 
     const privacy = new DataPrivacyPage(page);
     await privacy.open();
@@ -21,7 +21,7 @@ test.describe("RF-05: exportar y eliminar mis datos", () => {
     const exported = await readFile(await download.path(), "utf8");
 
     expect(exported).toContain(user.email);
-    expect(exported).toContain("Economía");
+    expect(exported).toContain("Finanzas");
     expect(exported).toMatch(/"score":\s*4/);
   });
 

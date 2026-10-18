@@ -39,16 +39,17 @@ describe("RestablecerPasswordForm (RF-38)", () => {
     });
   });
 
-  it("enseña los requisitos y no envía una contraseña débil (SEC-01)", async () => {
+  it("no envía una contraseña débil y abre los requisitos para decir qué falta (SEC-01)", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
     renderConHash("#access_token=abc123&type=recovery");
-    expect(screen.getByRole("list", { name: /tu contraseña necesita/i })).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: /tu contraseña necesita/i })).not.toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/^nueva contraseña/i), { target: { value: "Test1234!" } });
     fireEvent.click(screen.getByRole("button", { name: /cambiar contraseña/i }));
 
     expect(await screen.findByText(/no cumple los requisitos/i)).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: /tu contraseña necesita/i })).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

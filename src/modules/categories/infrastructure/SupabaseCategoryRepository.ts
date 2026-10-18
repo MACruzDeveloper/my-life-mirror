@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { retryOnUniqueViolation } from "#shared/infrastructure/retryOnUniqueViolation.js";
 import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
 import type { Category, CategoryStatus, CategoryType } from "../domain/Category.js";
 import type { CategoryRepository, CategoryTags } from "../domain/CategoryRepository.js";
@@ -116,13 +117,14 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   /**
    * Ignora los duplicados por (user_id, name): dos listados a la vez del
    * mismo usuario intentan sembrar lo mismo y no deben chocar (ListCategories
-   * vuelve a leer después, así que da igual quién gane).
+   * vuelve a leer después, así que da igual quién gane). La tabla tiene además
+   * el índice único (user_id, catalog_id), que ese "ignorar" no cubre: si una
+   * petición simultánea gana por ahí, se repite (fallo real, 13 oct. 2026).
    */
   async saveMany(categories: Category[]): Promise<void> {
     if (categories.length === 0) return;
-    const { error } = await this.client
-      .from("categories")
-      .upsert(categories.map(rowFromCategory), { onConflict: "user_id,name", ignoreDuplicates: true });
+    const rows = categories.map(rowFromCategory);
+    const { error } = await retryOnUniqueViolation(() => this.client.from("categories").upsert(rows, { onConflict: "user_id,name", ignoreDuplicates: true }));
     if (error) {
       throw new Error(`No se pudieron guardar las categorías: ${error.message}`);
     }

@@ -13,6 +13,9 @@ import { ProtectedRoute } from '@modules/accounts/ui/ProtectedRoute'
 import { Home } from '@modules/panel/ui/home/Home'
 import { InterviewPage } from '@modules/assessments/ui/InterviewPage'
 import { ResultsPage } from '@modules/assessments/ui/ResultsPage'
+import { CalendarPage } from '@modules/agenda/ui/CalendarPage'
+import { CategoriesPage } from '@modules/categories/ui/CategoriesPage'
+import { CategoryPageRoute } from '@modules/categories/ui/CategoryPage'
 import { AdminPage } from '@modules/admin/ui/AdminPage'
 import { HelpRoute } from '@modules/wellbeing/ui/HelpPage'
 import { AdminRoute } from '@modules/admin/ui/AdminRoute'
@@ -26,8 +29,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Páginas públicas: selector de idioma disponible antes de tener cuenta (RNF-10). */}
-        <Route element={<PublicLayout />}>
+        {/* UX-08: la portada ocupa toda la pantalla; el selector de idioma va sobre la imagen. */}
+        <Route element={<PublicLayout overlay />}>
           <Route path="/" element={<Landing />} />
+        </Route>
+        <Route element={<PublicLayout />}>
           <Route path="/registro" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/olvide-password" element={<RequestPasswordResetForm />} />
@@ -50,21 +56,26 @@ function App() {
           <Route
             path="/perfil"
             element={
-              <ProtectedLayout
-                breadcrumbs={[
-                  { label: t('breadcrumbs.inicio'), path: '/inicio' },
-                  { label: t('breadcrumbs.miPerfil') },
-                ]}
-              >
-                <AccountPage />
+              <ProtectedLayout wide>
+                <AccountPage breadcrumbs={[{ label: t('breadcrumbs.inicio'), path: '/inicio' }, { label: t('breadcrumbs.miPerfil') }]} />
               </ProtectedLayout>
             }
           >
             <Route index element={<ProfileForm />} />
             <Route path="entrevista" element={<InterviewPage />} />
             <Route path="resultados" element={<ResultsPage />} />
+            <Route path="calendario" element={<CalendarPage />} />
             <Route path="datos" element={<DataPrivacyPage />} />
           </Route>
+          <Route
+            path="/categorias"
+            element={
+              <ProtectedLayout breadcrumbs={[{ label: t('breadcrumbs.inicio'), path: '/inicio' }, { label: t('breadcrumbs.categorias') }]}>
+                <CategoriesPage />
+              </ProtectedLayout>
+            }
+          />
+          <Route path="/categorias/:key" element={<CategoryPageRoute />} />
           <Route
             path="/admin"
             element={

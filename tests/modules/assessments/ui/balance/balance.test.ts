@@ -3,7 +3,7 @@ import { buildBalance, MIN_SCORED_CATEGORIES } from "@modules/assessments/ui/bal
 
 describe("buildBalance (RF-15)", () => {
   const latestScores = [
-    { categoryId: "c1", categoryName: "Economía", score: 7 },
+    { categoryId: "c1", categoryName: "Finanzas", score: 7 },
     { categoryId: "c2", categoryName: "Familia" },
     { categoryId: "c3", categoryName: "Deporte", score: 3 },
     { categoryId: "c4", categoryName: "Aventura", score: 9 },
@@ -13,7 +13,7 @@ describe("buildBalance (RF-15)", () => {
     const balance = buildBalance(latestScores);
 
     expect(balance.axes).toEqual([
-      { name: "Economía", value: 7 },
+      { name: "Finanzas", value: 7 },
       { name: "Deporte", value: 3 },
       { name: "Aventura", value: 9 },
     ]);

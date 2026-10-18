@@ -1,0 +1,8 @@
+# Solo para generar los avatares (RF-26) en el ordenador del autor. No forma parte de la app.
+# Se instalan en un entorno propio (scripts/avatars/.venv), nunca en el proyecto de Node.
+torch
+diffusers
+transformers
+accelerate
+safetensors
+pillow

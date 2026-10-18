@@ -35,12 +35,56 @@ test.describe("Landing pública", () => {
   });
 });
 
+test.describe("UX-08: portada con imagen", () => {
+  for (const [name, viewport, size, otherSize] of [
+    ["móvil", { width: 390, height: 844 }, "828", "1672"],
+    ["escritorio", { width: 1280, height: 800 }, "1672", "828"],
+  ] as const) {
+    test(`en ${name}, la primera vista es la imagen a pantalla completa; al bajar aparecen la segunda imagen y "Cómo funciona"`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      const images: string[] = [];
+      // Solo las descargas de imagen: en desarrollo, Vite sirve además cada import como un módulo.
+      page.on("response", (response) => /portada-[ab]-/.test(response.url()) && (response.headers()["content-type"] ?? "").startsWith("image/") && images.push(response.url()));
+      await page.goto("/");
+
+      // Primera vista: la imagen ocupa exactamente la pantalla, desde arriba del todo.
+      const hero = page.getByRole("region", { name: "MyLifeMirror" });
+      const box = (await hero.boundingBox())!;
+      expect(box.y).toBe(0);
+      expect(box.width).toBe(viewport.width);
+      expect(box.height).toBe(viewport.height);
+      await expect(hero.getByRole("heading", { level: 1 })).toBeInViewport();
+      await expect(hero.getByRole("link", { name: "Crear cuenta" })).toBeInViewport();
+      await expect(page.getByRole("button", { name: "English" })).toBeInViewport();
+      const howItWorks = page.getByRole("heading", { name: "Cómo funciona" });
+      await expect(howItWorks).not.toBeInViewport();
+
+      // La flecha lleva a la segunda parte, que sube sobre su propia imagen de fondo.
+      await hero.getByRole("link", { name: "Ver cómo funciona" }).click();
+      await expect(howItWorks).toBeInViewport();
+      // El idioma y el aviso de IA se quedan fijos al bajar: siguen a la vista sobre la segunda imagen, y el aviso no está repetido.
+      await expect(page.getByRole("button", { name: "English" })).toBeInViewport();
+      await expect(page.getByText("Imagen generada con IA")).toHaveCount(1);
+      await expect(page.getByText("Imagen generada con IA")).toBeInViewport();
+
+      // Las dos imágenes, cada una en el tamaño de esta pantalla y no en el otro.
+      await expect.poll(() => images.length).toBe(2);
+      for (const url of images) {
+        expect(url).toContain(`-${size}`);
+        expect(url).not.toContain(`-${otherSize}`);
+      }
+      // Nada se sale de la pantalla a lo ancho.
+      expect(await page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")).toBe(true);
+    });
+  }
+});
+
 test.describe("Idioma en las páginas públicas (RNF-10)", () => {
   test("se puede pasar la portada a inglés antes de tener cuenta, y la elección se recuerda", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "es");
 
-    await page.getByRole("switch", { name: "English" }).click();
+    await page.getByRole("button", { name: "English" }).click();
 
     await expect(page.getByRole("link", { name: "Create account" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
@@ -76,4 +120,30 @@ test.describe("Capas CSS: el CSS propio gana a Material UI sin !important", () =
 
     await expect(button).toHaveCSS("text-transform", "lowercase");
   });
+
+  // Fallo real en producción (11 oct.): un `* { box-sizing: border-box }` propio, sin capa, ganaba al
+  // `content-box` que MUI necesita en sus campos; quedaban en 33 px de alto y la etiqueta, descolocada.
+  test("el CSS propio no deforma los campos de texto de MUI: altura completa y etiqueta centrada", async ({ page }) => {
+    await page.goto("/olvide-password");
+    const field = page.locator(".MuiInputBase-root").filter({ has: page.getByLabel(/email/i) });
+
+    const box = await field.boundingBox();
+    const label = await page.locator("label", { hasText: /email/i }).boundingBox();
+
+    expect(box?.height).toBe(56);
+    // La etiqueta, sin escribir nada, queda dentro del campo y centrada en vertical.
+    const labelCentre = label!.y + label!.height / 2;
+    expect(Math.abs(labelCentre - (box!.y + box!.height / 2))).toBeLessThan(3);
+  });
+
+  test("las pantallas públicas de cuenta dan sitio al rastro de navegación en una sola línea (escritorio)", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 700 });
+    await page.goto("/olvide-password");
+
+    const breadcrumbs = page.getByRole("navigation", { name: "breadcrumb" });
+    await expect(breadcrumbs).toContainText("Recuperar contraseña");
+    // Una línea de texto: menos de dos alturas de línea.
+    expect((await breadcrumbs.locator("ol").boundingBox())!.height).toBeLessThan(40);
+  });
 });
+

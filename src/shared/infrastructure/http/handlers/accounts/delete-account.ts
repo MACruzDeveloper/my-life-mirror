@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { clearedSessionCookie } from "#shared/infrastructure/cookies.js";
+import { clearedSessionCookies } from "#shared/infrastructure/cookies.js";
 import { action, reply, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 import { MAX_PASSWORD_INPUT_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 
@@ -19,7 +19,7 @@ export default sessionHandler({
     schema: DeleteAccountSchema,
     execute: async ({ context, user, body }) => {
       const result = await context.deleteAccount({ userId: user.id, email: user.email, password: body.password });
-      return result.ok ? reply(200, { deleted: true }, { "Set-Cookie": clearedSessionCookie() }) : result;
+      return result.ok ? reply(200, { deleted: true }, { "Set-Cookie": clearedSessionCookies() }) : result;
     },
   }),
 });

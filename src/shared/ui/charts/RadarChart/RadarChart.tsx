@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { useEChart } from "../useEChart";
+import { CHART_ACCENT } from "@shared/ui/theme";
 import { buildRadarChartOption, type RadarAxis } from "./radarChartOption";
 
 export interface RadarChartProps {
@@ -12,7 +13,7 @@ export interface RadarChartProps {
   ariaLabel: string;
   /** Texto (HTML) del tooltip; escapar con `escapeHtml` lo que no controle el código. */
   formatTooltip: (axes: RadarAxis[]) => string;
-  /** Por defecto, el color principal del tema. */
+  /** Por defecto, el color de los gráficos de la app (`CHART_ACCENT`). */
   color?: string;
   height?: number | { xs: number; sm: number };
 }
@@ -26,7 +27,7 @@ export function RadarChart({ axes, scale, ariaLabel, formatTooltip, color, heigh
   const theme = useTheme();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const compact = useMediaQuery(theme.breakpoints.down("sm"));
-  const chartColor = color ?? theme.palette.primary.main;
+  const chartColor = color ?? CHART_ACCENT;
 
   const option = useMemo(
     () => buildRadarChartOption({ axes, scale, color: chartColor, reducedMotion, compact, formatTooltip }),

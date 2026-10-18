@@ -1,6 +1,7 @@
 import { createRouter } from "#shared/infrastructure/http/router.js";
 import audit from "#shared/infrastructure/http/handlers/admin/audit.js";
 import users from "#shared/infrastructure/http/handlers/admin/users.js";
+import videos from "#shared/infrastructure/http/handlers/admin/videos.js";
 import {
   changeRole,
   createUser,
@@ -20,6 +21,7 @@ import {
 export default createRouter("/api/admin/", {
   users,
   audit,
+  videos,
   "user-role": changeRole,
   "user-suspend": suspendUser,
   "user-reactivate": reactivateUser,

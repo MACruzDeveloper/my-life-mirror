@@ -22,6 +22,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { ADMIN_PANEL_SX, ADMIN_TABLE_HEAD_SX } from "./adminStyles";
 import { useTranslation } from "react-i18next";
 import { HttpError } from "@shared/ui/api/getJson";
 import { useOptionalSession } from "@shared/ui/context/SessionContext";
@@ -176,7 +177,7 @@ export function AdminUsers() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
-        <Typography variant="subtitle1">
+        <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700 }}>
           {t("admin.usuarios")} · {t("admin.total", { count: list.length })}
         </Typography>
         <Button variant="contained" size="small" onClick={() => setCreating(true)}>
@@ -185,9 +186,9 @@ export function AdminUsers() {
       </Box>
       {listError && <Alert severity="error">{listError}</Alert>}
 
-      <TableContainer sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
+      <TableContainer sx={ADMIN_PANEL_SX}>
         <Table size="small">
-          <TableHead>
+          <TableHead sx={ADMIN_TABLE_HEAD_SX}>
             <TableRow>
               <TableCell>{t("admin.nombre")}</TableCell>
               <TableCell>{t("admin.email")}</TableCell>
@@ -195,7 +196,7 @@ export function AdminUsers() {
               <TableCell>{t("admin.estado")}</TableCell>
               <TableCell>{t("admin.alta")}</TableCell>
               <TableCell>{t("admin.ultimoAcceso")}</TableCell>
-              <TableCell>{t("admin.acciones")}</TableCell>
+              <TableCell align="center">{t("admin.acciones")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -209,7 +210,7 @@ export function AdminUsers() {
                 </TableCell>
                 <TableCell>{date(user.createdAt)}</TableCell>
                 <TableCell>{date(user.lastSignInAt)}</TableCell>
-                <TableCell>
+                <TableCell align="center">
                   <IconButton size="small" aria-label={t("admin.accionesDe", { email: user.email })} onClick={(e) => setMenu({ anchor: e.currentTarget, user: user })}>
                     <MoreVertIcon fontSize="small" />
                   </IconButton>

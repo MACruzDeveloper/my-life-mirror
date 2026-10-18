@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { clearedSessionCookie } from "#shared/infrastructure/cookies.js";
+import { clearedSessionCookies } from "#shared/infrastructure/cookies.js";
 
-/** Borra la cookie de sesión — no hace falta invalidar el token en Supabase para el Ciclo 1. */
+/** Borra las dos cookies de sesión (SEC-05). El token de acceso caduca solo en una hora y, sin su cookie, el de renovación ya no llega a usarse. */
 export default function handler(req: IncomingMessage, res: ServerResponse) {
   if (req.method !== "POST") {
     res.writeHead(405, { "Content-Type": "application/json", "Cache-Control": "no-store" });
@@ -9,6 +9,6 @@ export default function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
-  res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store", "Set-Cookie": clearedSessionCookie() });
+  res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store", "Set-Cookie": clearedSessionCookies() });
   res.end(JSON.stringify({ ok: true }));
 }

@@ -4,16 +4,22 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router";
 import { useAssessmentHistory } from "@modules/assessments/ui/queries";
-import type { LatestScoreDto } from "@modules/assessments/ui/ScoreCards";
+import type { LatestScoreDto } from "@modules/assessments/ui/queries";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { RecommendationButton } from "@modules/recommendations/ui/RecommendationButton";
 import { useRecommendations } from "@modules/recommendations/ui/queries";
+import { AgendaSummary } from "./AgendaSummary";
+import { CheckInReminder } from "./CheckInReminder";
 import { DashboardGuide } from "./DashboardGuide";
 import { IdeasSummary } from "./IdeasSummary";
-import { useAiIdeasActive } from "@modules/accounts/ui/queries";
+import { LeisureIdeas } from "./LeisureIdeas";
+import { SavedIdeas } from "./SavedIdeas";
+import { useAiIdeasActive, useProfile } from "@modules/accounts/ui/queries";
 
 /**
  * Los gráficos (Apache ECharts) se cargan solo al llegar al panel: son la mayor
@@ -43,23 +49,38 @@ export function Dashboard({ latestScores }: { latestScores: LatestScoreDto[] }) 
   const recommendations = useRecommendations().data ?? [];
   const history = useAssessmentHistory();
   const personalize = useAiIdeasActive();
+  // Para saludar por su nombre (y en femenino o masculino si lo ha indicado).
+  const profileData = useProfile().data;
+  const profile = profileData && !Array.isArray(profileData) ? profileData : undefined;
   const { categoryLabel, isPending: labelsPending } = useCategoryLabel();
   // Los gráficos reciben el nombre ya en el idioma de la interfaz: no saben nada de traducciones.
   const displayedScores = latestScores.map((latestScore) => ({ ...latestScore, categoryName: categoryLabel(latestScore.catalogId).name }));
 
   if (labelsPending) return <ChartsFallback />;
+  const categoryNames = Object.fromEntries(displayedScores.map((latestScore) => [latestScore.categoryId, latestScore.categoryName]));
 
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", mt: 3, px: 2, display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
         <Typography variant="h5" component="h1">
-          {t("panel.bienvenida")}
+          {profile?.name ? t("panel.bienvenidaNombre", { nombre: profile.name, context: profile.gender }) : t("panel.bienvenidaSinNombre")}
         </Typography>
-        <Button component={RouterLink} to="/perfil/entrevista" variant="contained">
-          {t("entrevista.actualizarRespuestas")}
-        </Button>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {/* El de acción, en el color de acento: el negro azulado es el de la cabecera y no se distinguía. */}
+          <Button component={RouterLink} to="/perfil/calendario" variant="outlined" color="secondary" startIcon={<CalendarMonthOutlinedIcon />}>
+            {t("cuenta.calendario")}
+          </Button>
+          <Button component={RouterLink} to="/perfil/entrevista" variant="contained" color="secondary" startIcon={<EditNoteIcon />}>
+            {t("entrevista.actualizarRespuestas")}
+          </Button>
+        </Box>
       </Box>
       <DashboardGuide />
+      <AgendaSummary categoryNames={categoryNames} />
+      <SavedIdeas categoryNames={categoryNames} />
+      <CheckInReminder latestScores={displayedScores} />
+      {/* RF-50: con todo en verde, ideas para disfrutar en lugar de mejoras. */}
+      <LeisureIdeas scores={latestScores.map((latestScore) => latestScore.score)} />
       <IdeasSummary
         personalize={personalize}
         ideas={recommendations.map((recommendation) => ({

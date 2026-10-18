@@ -42,3 +42,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Candidatas de avatares sin revisar (scripts/avatars/generate_avatars.py): solo lo publicado va a Git
+/scripts/avatars/out/
+/scripts/avatars/.venv/

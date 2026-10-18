@@ -14,7 +14,7 @@ El objetivo de este documento es responder a tres preguntas que se plantearon ju
 
 | Necesidad | Plataforma recomendada | Por qué |
 |---|---|---|
-| Generación de avatares (RF-26) | **HuggingFace** (modelo de texto-a-imagen preentrenado, p. ej. Stable Diffusion/FLUX) | Ya decidido como script Python offline en [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md) apartado 7. No hace falta entrenar nada — un modelo preentrenado + buen prompting basta. Capa gratuita suficiente para un lote único de ~10-20 imágenes. Google AI Studio/Imagen es alternativa válida si se prefiere el ecosistema Gemini. |
+| Generación de avatares (RF-26) | **HuggingFace** (modelo de texto-a-imagen preentrenado, p. ej. Stable Diffusion/FLUX). *Actualización del 12 oct.: el modelo es de HuggingFace (SDXL base), pero se ejecuta en local, no por su API; ver apartado 4.1.1.* | Ya decidido como script Python offline en [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md) apartado 7. No hace falta entrenar nada — un modelo preentrenado + buen prompting basta. Capa gratuita suficiente para un lote único de ~10-20 imágenes. Google AI Studio/Imagen es alternativa válida si se prefiere el ecosistema Gemini. |
 | Funciones de texto/razonamiento (RF-36, RF-37) | **API de Anthropic (Claude)** | Es la que mejor conozco de primera mano para ayudarte a integrarla, y tiene SDK oficial en TypeScript/Node — encaja directamente con [01_Stack_Tecnologico.md](01_Stack_Tecnologico.md) sin fricción añadida. |
 | Voz a texto (RF-35) | **Whisper** (API de OpenAI, o un modelo Whisper abierto vía HuggingFace) | Ni Anthropic ni el resto de plataformas de la tabla tienen un modelo de audio propio — esta elección es independiente de cuál se use para el resto de funciones de IA del proyecto. |
 | GitHub Models | — | Útil para comparar/probar varios modelos de texto en un mismo sitio durante la fase de exploración, pero no aporta nada específico que las opciones de arriba no den ya para las necesidades reales del proyecto. |
@@ -33,6 +33,68 @@ Punto de partida honesto: **ningún RF actual genera texto libre con un LLM** �
 
 ### 4.1 Chain-of-Thought en la construcción de prompts de RF-26
 Antes de enviar cada prompt de imagen al modelo de avatares, un paso de razonamiento explícito comprueba si la descripción evita estereotipos culturales, de género o de apariencia — el propio objetivo que ya exige RF-26. No es una demostración añadida sin propósito: es CoT aplicado al único punto del proyecto donde ya había un requisito de "verificar antes de generar".
+
+**Cómo quedó (11 oct. 2026, [historia RF-26](../user-stories/RF-26-avatares.md)).** El script `scripts/avatars/generate_avatars.py` pide a un modelo de lenguaje que razone en cuatro pasos sobre cada descripción (qué atributos nombra; si alguno implica género, origen, religión, edad, clase o profesión; si la combinación funciona como estereotipo o caricatura; si alguna palabra valora el aspecto) y que termine con un veredicto. Sin un "OK" explícito no se genera la imagen, y el razonamiento completo se guarda junto a las candidatas. No es la única barrera: antes va una lista de palabras prohibidas que comprueba un test (determinista), y después la revisión del autor, imagen a imagen. El razonamiento cubre lo que una lista no ve (una combinación de rasgos inocentes que juntos caricaturizan); la persona, lo que el modelo no ve (cómo ha quedado el dibujo).
+
+#### 4.1.1 Cómo se generan de verdad: un modelo de imagen en local (11-12 oct. 2026)
+
+El apartado 2 preveía generar los avatares con la API de HuggingFace, en su capa gratuita. Al hacerlo, tres cosas salieron distintas de lo planeado. Quedan aquí porque son lo que más se aprendió de esta tarea.
+
+**1. La API de HuggingFace ya no es gratuita para esto.** La cuenta nueva respondió "no remaining credits" en la primera llamada: hoy hay que comprar crédito de prepago o suscribirse. La decisión de septiembre se basaba en una capa gratuita que ya no cubre este uso.
+
+**2. Se genera en el ordenador del autor.** El modelo sigue siendo uno preentrenado de HuggingFace, como se decidió, pero se descarga (unos 7 GB) y se ejecuta en local, con la librería `diffusers` sobre un Mac M3 de 16 GB. Sin API, sin crédito y sin enviar nada a un tercero. El coste es tiempo: unos 100 segundos por imagen.
+
+**3. El primer modelo dibujaba a todo el mundo con piel clara.** Se empezó con SDXL-Turbo, la versión rápida (2 o 3 segundos por imagen). Con la descripción "piel marrón oscura" devolvía siempre un tono claro. Se probaron seis variantes del prompt (el rasgo al principio, repetido, con otras palabras, sin el estilo "pastel"): ninguna lo corrigió.
+
+![Seis intentos con el modelo rápido: se pide piel marrón oscura y sale clara](../images/avatares-sesgo-modelo-rapido.png)
+
+No era un fallo del script sino un sesgo del modelo: los modelos "turbo" ganan velocidad a costa de seguir peor el texto, y lo que sacrifican es justo lo menos frecuente en sus datos de entrenamiento. Con el modelo normal (SDXL base, con guía y 28 pasos) los tonos oscuros sí salen:
+
+![El modelo normal: seis avatares con dos estilos; los tonos de piel pedidos se respetan](../images/avatares-prueba-modelo-normal.png)
+
+Un catálogo de doce personas "variadas" con el mismo tono de piel habría incumplido RF-26 de la forma más visible posible. Lo detectó la revisión humana, antes de que nada llegara a la app.
+
+**Lo que tampoco hace bien el modelo normal.** Sigue el texto mejor, no al pie de la letra: en la primera tanda dibujó un pañuelo cubriendo la cabeza donde se pedía "al cuello", un turbante rosa donde se pedía "pelo corto teñido de rosa", y no dibujó el audífono. De siete imágenes, dos eran fieles y una aceptable. El estilo del dibujo, además, depende de la semilla aleatoria y no solo del texto: por eso todo el catálogo usa la misma.
+
+**Resultado.** Doce avatares publicados, con el mismo estilo. En cinco, la imagen no coincide con lo pedido; se publicaron igualmente porque el dibujo es bueno, el conjunto es variado y ninguno es una caricatura, y su clave y su texto alternativo describen lo que se ve. Una descripción la rechazó el razonamiento con motivo (pelo blanco, barba blanca, calva y chaqueta de punto: el "abuelo bonachón", un personaje tipo más que una persona): ningún rasgo era problemático por separado, que es justo lo que una lista de palabras no detecta. El mismo razonamiento también dio una señal dudosa ("piel oliva" como marca de origen, cuando había aceptado "piel marrón oscura"): su criterio no es del todo consistente, y por eso no decide solo.
+
+**El proceso, tal como quedó** (`scripts/avatars/generate_avatars.py`, Python; ADR-01, apartado 7):
+
+| Paso | Quién | Qué hace | Si falla |
+|---|---|---|---|
+| 1. Descripción | El autor | Escribe cada avatar con rasgos visibles (pelo, tono de piel, gafas, ropa) | — |
+| 2. Lista de palabras | Un test | Rechaza género, origen, religión, edad y valoraciones del aspecto | No se genera |
+| 3. Razonamiento | Claude Haiku, por la API | Razona en cuatro pasos si la descripción o la combinación de rasgos cae en un estereotipo, y da un veredicto | No se genera, y el motivo se guarda |
+| 4. Imagen | SDXL base, en local | Genera una candidata por semilla | Se descarta la candidata |
+| 5. Revisión | El autor | Mira cada candidata en una hoja de contactos y publica solo las que elige | No llega a la app |
+
+El paso 3 usa un modelo de lenguaje por la API (menos de un céntimo por las doce descripciones) en vez de otro modelo local, que habría sido otra descarga grande para doce llamadas cortas.
+
+**Dos errores propios en el camino, corregidos.** El script daba poco espacio a la respuesta del razonamiento: en 5 de 12 descripciones se cortó antes del veredicto y se contó como rechazo. Ahora distingue "rechazada" de "sin terminar" y lo reintenta. Y la primera versión del prompt llevaba negaciones ("sin texto") que el modelo rápido no entiende.
+
+**Límites que se asumen.** Doce avatares fijos no representan a todo el mundo: siempre habrá quien no se vea en ninguno. Lo que cubriría de verdad ese objetivo es un avatar componible (elegir por separado piel, pelo, gafas y ropa, como en Los Sims), hecho con dibujos por piezas y no con IA generativa; queda fuera de este proyecto. Y un modelo generativo no garantiza un resultado, ni gratis ni de pago: lo que lo garantiza es el proceso, con una persona al final.
+
+#### 4.1.2 La imagen de la portada: dónde el modelo local no llegó (12 oct. 2026)
+
+Para la portada ([UX-08](../user-stories/UX-08-portada-con-imagen.md)) se buscaba una escena concreta: una persona frente a su reflejo, con una línea de luz en medio, un lado en sombra fría y el otro en luz cálida. Se intentó primero con el mismo modelo local de los avatares, en cinco tandas:
+
+| Intento | Qué se pidió | Qué salió |
+|---|---|---|
+| 1. La escena entera en un texto | Dos figuras iguales frente a frente | Dos personas distintas, o tres, o una. El texto era largo y el modelo lo cortó por la mitad sin avisar (lee 77 unidades por lector) |
+| 2. Por composición | Una figura; su copia volteada y redibujada en cálido; la línea de luz, añadida por programa | Una sala vacía: el escenario iba en el lector de texto que más pesa y tapó a la persona |
+| 3. Lo mismo, con el sujeto en ese lector | — | La misma persona a los dos lados, por fin; pero de frente, o de espaldas una a la otra |
+| 4. Volteando las mitades y cambiando el fondo por programa | Marco de espejo y fondo oscuro | Correcto técnicamente; al autor no le convenció el resultado |
+| 5. Con el estilo de una prueba anterior que sí gustaba | Siluetas en un espacio de columnas | Ilustraciones cuidadas, sin llegar a la escena |
+
+Lo que funcionó fue **dividir el trabajo**: el modelo dibuja una figura, que es lo que hace bien, y un programa pequeño hace lo que el modelo no sabe (que sean la misma persona, que se miren, la simetría, la línea de luz). Lo que no se consiguió fue la calidad de una escena realista con dos figuras y gesto.
+
+**Decisión.** La imagen de la portada la generó el autor con el generador de imágenes de ChatGPT, que resolvió la escena a la primera. Es una herramienta de pago, externa al proyecto, y así consta. El modelo local se queda para lo que hace bien: los avatares.
+
+Dos cuidados que no dependen de la herramienta. La primera versión llevaba un pequeño dispositivo luminoso en la sien de las figuras, tomado de la imagen de referencia: es iconografía de una serie de televisión, y se quitó. Y la portada dice que la imagen está generada con IA.
+
+**Las cabeceras de las páginas de categoría** (Aventura, Deporte, Espiritualidad; RF-49) siguieron el mismo camino: las generó el autor con ChatGPT, esta vez en su plan gratuito, que según el autor permite unos cinco intentos al día. Son composiciones de varias escenas, justo lo que el modelo local no resuelve. Pasaron las mismas revisiones. La primera de Deporte mostraba marcas reales (UFC, Roland Garros, Red Bull, Nike): se pidió otra sin logotipos, dos veces. Difuminar los que quedaban se notaba (el autor lo descartó); en la última solo quedaban dos de Nike, pequeños, y se taparon con el color de la propia prenda con un programa pequeño (PIL). Los colores del coche de Fórmula 1 siguen recordando a una escudería, sin logotipo ni texto, así que esa página lleva al pie un breve disclaimer. Cada página dice que su imagen está generada con IA.
+
+El vídeo corto que se planteó queda sin hacer: las herramientas de imagen a vídeo probadas no tienen opción gratuita.
 
 ### 4.2 Chain-of-Thought + test-time compute en RF-37 (asistente de redacción)
 Este es el ejemplo más completo, porque cierra el círculo con una decisión ya tomada: RF-32 nació precisamente de rechazar un diseño que sonaba a "alarde" (ver el historial de decisiones de RN-08). RF-37 usa un paso de razonamiento estructurado que comprueba explícitamente, antes de mostrar cualquier borrador al usuario emisor: (1) ¿contiene lenguaje diagnóstico o clínico? (RES-09), (2) ¿suena a alarde en vez de a apoyo? (el motivo original del rediseño de RF-32). Aquí es donde el **test-time compute** gana su sitio, y no en todas partes: al ser una comprobación de seguridad con consecuencias reales si falla, repetir el juicio más de una vez (autoconsistencia) o usar un modelo con más capacidad de razonamiento específicamente en este punto está justificado — no como política general del proyecto, sino en el único checkpoint donde un falso negativo importa de verdad.
@@ -158,3 +220,10 @@ Durante esta misma conversación surgió una idea relacionada pero distinta: niv
 - **v1.11 (11 oct. 2026)** — apartado 4.3.4: RF-40b, el modelo real (Claude Haiku 5.5), el control del coste y la evaluación con el modelo, con el fallo que descubrió y su arreglo.
 - **v1.12 (11 oct. 2026)** — apartado 4.4.1: defensas frente a la inyección de instrucciones en RF-45 y casos de inyección en la evaluación (SEC-04).
 - **v1.13 (11 oct. 2026)** — apartado 4.4.1: resultado de la evaluación con el modelo real (5 de 5 inyecciones resistidas).
+- **v1.14 (11 oct. 2026)** — apartado 4.1: cómo se implementó el razonamiento previo de RF-26 y su lugar entre el filtro de palabras y la revisión humana.
+- **v1.15 (12 oct. 2026)** — apartado 4.1.1: cómo se generan los avatares en la práctica (modelo de imagen en local en vez de la API de HuggingFace), el sesgo de tono de piel del modelo rápido y su comprobación, el proceso en cinco pasos y los límites asumidos.
+- **v1.16 (12 oct. 2026)** — apartado 4.1.2: los cinco intentos de generar la imagen de la portada con el modelo local, lo que funcionó (componer por partes) y por qué se usó al final una herramienta externa.
+- **v1.17 (13 oct. 2026)** — RF-46: la petición de RF-40 puede llevar dos campos más, la profesión y las aficiones del perfil, siempre como textos de listas cerradas (nunca texto del usuario, así que no abren una vía de inyección, apartado 4.4.1). El prompt del escritor y el del revisor dicen cómo usarlos y prohíben suponer nada de la persona a partir de su profesión. La evaluación con el modelo real no se ha repetido todavía con estos campos.
+- **v1.18 (13 oct. 2026)** — evaluación con el modelo real tras RF-46 (`npm run eval:ai`, 83 llamadas, 1,6 céntimos de dólar). Escritor: 17 de 20 ideas llegarían al usuario; de las 10 peticiones con profesión y aficiones, 8, y en ellas usa una afición como ejemplo sin nombrar la profesión. Revisor: para 26 de 26 borradores malos, incluidos los tres nuevos (suponer cosas por la profesión, comentar que se busca empleo, nombrar una afición no indicada). Aprueba 4 de 6 buenos, por debajo del umbral de 0,8: rechaza un borrador escrito a mano que lleva un paseo de veinte minutos "a la montaña" (lo considera otra actividad) y una reescritura buena en inglés del conjunto anterior. El fallo va en la dirección segura (se enseña la idea original), pero el revisor es más estricto con el perfil de lo que pide su prompt; queda anotado sin ajustar.
+- **v1.19 (17 oct. 2026)** — **voz generada con IA (texto a voz):** la presentación de la portada, en español e inglés, generada una vez por el autor con ElevenLabs (plan gratuito, que exige citarlo) a partir de un texto fijo; dos MP3 dentro de la app, sin llamadas en tiempo de ejecución, sin claves y sin ningún dato de usuario. Se eligió esta de seis ideas de voz: las que reconocen la voz del usuario (aficiones, notas dictadas) enviarían su audio a terceros, en contra de la privacidad de la app; RF-35 (dictado con Whisper) sigue como trabajo futuro por el mismo motivo y por el límite de funciones serverless.
+- **v1.20 (18 oct. 2026)** — apartado 4.1.2: las cabeceras de las páginas de categoría, generadas por el autor con ChatGPT (plan gratuito); revisión de marcas en la de Deporte (regenerada y con los logotipos que quedaban difuminados).

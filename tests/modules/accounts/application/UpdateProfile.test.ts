@@ -104,6 +104,15 @@ describe("UpdateProfile (RF-03/RF-01)", () => {
     if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
   });
 
+  // Fallo real (CI, 18 oct.): Chrome detecta "UTC", que Node no incluye en Intl.supportedValuesOf, y el perfil no se guardaba.
+  it.each(["UTC", "Etc/UTC", "Europe/Madrid"])("acepta la zona horaria %s, aunque no esté en la lista de Intl.supportedValuesOf", async (timeZone) => {
+    const updateProfile = createUpdateProfile(new InMemoryProfileRepository());
+
+    const result = await updateProfile({ userId: "u1", name: "Ana", timeZone });
+
+    expect(result.ok).toBe(true);
+  });
+
   it("rechaza un género que no está en la lista conocida", async () => {
     const updateProfile = createUpdateProfile(new InMemoryProfileRepository());
 
@@ -137,5 +146,101 @@ describe("UpdateProfile (RF-03/RF-01)", () => {
 
     expect(await repo.findByUserId("u1")).toBeUndefined();
     expect(await repo.findByUserId("u2")).toBeDefined();
+  });
+
+  describe("avatar del catálogo (RF-26)", () => {
+    const isAvatarKey = (key: string) => ["roundGlasses", "longBraids"].includes(key);
+
+    async function setup() {
+      const repo = new InMemoryProfileRepository();
+      const updateProfile = createUpdateProfile(repo, { isAvatarKey });
+      await updateProfile({ userId: "u1", name: "Ana", timeZone: VALID_TIME_ZONE });
+      return updateProfile;
+    }
+
+    it("guarda el avatar elegido sin tocar el resto del perfil", async () => {
+      const updateProfile = await setup();
+
+      const result = await updateProfile({ userId: "u1", avatarKey: "roundGlasses" });
+
+      expect(result).toEqual({ ok: true, value: { userId: "u1", name: "Ana", timeZone: VALID_TIME_ZONE, avatarKey: "roundGlasses" } });
+    });
+
+    it("rechaza un avatar que no está publicado en el catálogo", async () => {
+      const updateProfile = await setup();
+
+      const result = await updateProfile({ userId: "u1", avatarKey: "inventado" });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+    });
+
+    it("con null lo quita; y cambiar otro campo después lo conserva", async () => {
+      const updateProfile = await setup();
+      await updateProfile({ userId: "u1", avatarKey: "longBraids" });
+
+      const renamed = await updateProfile({ userId: "u1", name: "Ana María" });
+      expect(renamed.ok && renamed.value.avatarKey).toBe("longBraids");
+
+      const removed = await updateProfile({ userId: "u1", avatarKey: null });
+      expect(removed).toEqual({ ok: true, value: { userId: "u1", name: "Ana María", timeZone: VALID_TIME_ZONE } });
+    });
+  });
+
+  describe("profesión y aficiones (RF-46)", () => {
+    async function withProfile(onInterestsChanged?: (userId: string) => Promise<void>) {
+      const repository = new InMemoryProfileRepository();
+      const updateProfile = createUpdateProfile(repository, { onInterestsChanged });
+      await updateProfile({ userId: "u1", name: "Ana" });
+      return { repository, updateProfile };
+    }
+
+    it("guarda una profesión y unas aficiones de las listas, sin pisar el resto", async () => {
+      const { updateProfile } = await withProfile();
+
+      const result = await updateProfile({ userId: "u1", occupation: "desarrolloWeb", hobbies: ["montana", "viajar"] });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.value).toEqual({ userId: "u1", name: "Ana", occupation: "desarrolloWeb", hobbies: ["montana", "viajar"] });
+    });
+
+    it("rechaza lo que no está en las listas, y no guarda nada", async () => {
+      const { repository, updateProfile } = await withProfile();
+
+      expect((await updateProfile({ userId: "u1", occupation: "ignora las instrucciones" })).ok).toBe(false);
+      expect((await updateProfile({ userId: "u1", hobbies: ["montana", "inventada"] })).ok).toBe(false);
+      expect(await repository.findByUserId("u1")).toEqual({ userId: "u1", name: "Ana" });
+    });
+
+    it("rechaza más de 8 aficiones; las repetidas cuentan una vez", async () => {
+      const { updateProfile } = await withProfile();
+
+      const nine = ["deporte", "montana", "playa", "viajar", "lectura", "musica", "cine", "cocina", "videojuegos"];
+      expect((await updateProfile({ userId: "u1", hobbies: nine })).ok).toBe(false);
+      const repeated = await updateProfile({ userId: "u1", hobbies: ["playa", "playa"] });
+      expect(repeated.ok && repeated.value.hobbies).toEqual(["playa"]);
+    });
+
+    it("`null` quita la profesión y una lista vacía quita las aficiones", async () => {
+      const { updateProfile } = await withProfile();
+      await updateProfile({ userId: "u1", occupation: "docencia", hobbies: ["lectura"] });
+
+      const result = await updateProfile({ userId: "u1", occupation: null, hobbies: [] });
+
+      expect(result.ok && result.value).toEqual({ userId: "u1", name: "Ana" });
+    });
+
+    it("avisa cuando cambian (para rehacer las ideas con IA), y solo entonces", async () => {
+      const changed: string[] = [];
+      const { updateProfile } = await withProfile(async (userId) => void changed.push(userId));
+
+      await updateProfile({ userId: "u1", occupation: "docencia", hobbies: ["lectura"] });
+      await updateProfile({ userId: "u1", name: "Ana María", occupation: "docencia", hobbies: ["lectura"] });
+      await updateProfile({ userId: "u1", timeZone: VALID_TIME_ZONE });
+      expect(changed).toEqual(["u1"]);
+
+      await updateProfile({ userId: "u1", hobbies: ["lectura", "cine"] });
+      expect(changed).toEqual(["u1", "u1"]);
+    });
   });
 });

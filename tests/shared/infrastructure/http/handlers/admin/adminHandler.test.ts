@@ -3,8 +3,8 @@ import type { ServerResponse } from "node:http";
 import { z } from "zod";
 import { err, ok } from "@shared/domain/Result";
 
-const verifySession = vi.fn(async () => ok({ id: "u1", email: "ana@ejemplo.com", rol: "usuario" }));
-vi.mock("@shared/infrastructure/container", () => ({ getAppContext: () => ({ verifySession }) }));
+const resumeSession = vi.fn(async () => ok({ user: { id: "u1", email: "ana@ejemplo.com", rol: "usuario" } }));
+vi.mock("@shared/infrastructure/container", () => ({ getAppContext: () => ({ resumeSession }) }));
 const warn = vi.fn();
 vi.mock("@shared/infrastructure/logger", () => ({ logger: { warn, error: vi.fn(), info: vi.fn() } }));
 

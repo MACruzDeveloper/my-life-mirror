@@ -41,7 +41,7 @@ export function CategoryEvolutionCard({ categoryName, currentScore, points, hist
     <Box
       component="section"
       aria-labelledby={titleId}
-      sx={{ p: 2, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper", display: "flex", flexDirection: "column", gap: 1, minWidth: 0 }}
+      sx={{ p: 2, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper", display: "flex", flexDirection: "column", gap: 1, minWidth: 0 }}
     >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 1 }}>
         <Typography id={titleId} variant="subtitle1" component="h3">

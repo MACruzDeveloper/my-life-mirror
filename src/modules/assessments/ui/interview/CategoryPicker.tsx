@@ -45,8 +45,8 @@ export function CategoryPicker({ categories, categoryLabel, pendingCategoryIds, 
           p: 1.5,
           borderRadius: 2,
           border: "1px solid",
-          borderColor: isActive ? "primary.main" : "#DDE3E1",
-          bgcolor: isActive ? "#E8F1FC" : "#FFFFFF",
+          borderColor: isActive ? "primary.main" : "#D5DBDF",
+          bgcolor: isActive ? "#E3E9ED" : "#FFFFFF",
           transition: "background-color 150ms, border-color 150ms",
           "&:hover, &:focus-visible": { borderColor: "primary.main" },
         }}
@@ -82,7 +82,7 @@ export function CategoryPicker({ categories, categoryLabel, pendingCategoryIds, 
         </Box>
         {optionsGrid(regularCategories)}
       </Box>
-      <Box sx={{ bgcolor: "#FBF8FF", borderRadius: 3, p: { xs: 1.5, sm: 2 } }}>
+      <Box sx={{ bgcolor: "#F8F7F9", borderRadius: 0, p: { xs: 1.5, sm: 2 } }}>
         <Typography variant="subtitle1" component="h3">
           {t("entrevista.sensiblesTitulo")}
         </Typography>

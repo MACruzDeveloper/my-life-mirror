@@ -5,6 +5,211 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.4.0] - 2026-10-18
+
+La versión de la entrega del TFM: páginas de categoría (Aventura con viajes y hitos, Deporte, Espiritualidad y Voluntariado), calendario y eventos, ideas para cuando todo va bien, "Guardar todo", Resultados en barras, vídeos de inspiración gestionados desde el panel, presentación en audio en la portada, sesión que se renueva sola y reorganización de categorías (Finanzas, Formación, Voluntariado). **Migraciones 0022 a 0034** (todas ya ejecutadas en producción). Sin variables nuevas en Vercel; la política de contenido de `vercel.json` admite ahora las miniaturas y el reproductor de YouTube sin cookies.
+
+### Corregido (perfil)
+
+- Un navegador que detecta la zona horaria "UTC" no podía guardar el perfil (400): el servidor solo aceptaba las zonas de `Intl.supportedValuesOf`, que en Node deja fuera alias como "UTC". Ahora acepta cualquier zona que reconozca `Intl`. Lo destapó el E2E con `api/` de la PR a `main`, cuando el Chrome de GitHub Actions empezó a detectar "UTC".
+
+### Cambiado (política de privacidad)
+
+- Nueva sección sobre los vídeos de YouTube (miniaturas al abrir la página, reproductor sin cookies solo al pulsar, sin datos de la app). Salud figura ya entre las categorías especialmente protegidas. Sin cambio de versión de la política: no se vuelve a pedir el consentimiento.
+
+### Cambiado (categorías)
+
+- **Economía pasa a llamarse Finanzas** e incluye la inversión; **Inversiones se retira** (deja de ofrecerse y se desactiva; sus puntuaciones se conservan en el historial).
+- **Formación**, categoría nueva (estudios, cursos, idiomas): la antigua Idiomas, creada desde el panel, pasa a ser esta y conserva sus puntuaciones.
+- **Voluntariado**, categoría nueva, con su página e imagen.
+- Cada una con sus ideas, opciones de "¿Qué te ayuda?", ejemplos e icono. Siguen siendo 12 categorías activas. **Migración 0034.**
+
+### Añadido (presentación en audio)
+
+- **Portada:** "Escuchar la presentación", un audio de unos 50 segundos que explica la app, en español o inglés según la interfaz. Voz generada con IA (ElevenLabs) a partir de un texto fijo, sin datos de nadie; no suena sola, el archivo solo se descarga al pulsar, tiene una barra para ver por dónde va e ir adelante o atrás, y su transcripción. Lo dice: "Voz generada con IA (ElevenLabs)".
+- **Portada:** título, descripción, audio y, después, los botones de crear cuenta e iniciar sesión (quien ya tiene cuenta entra desde la primera vista). Antes de pulsar, solo el botón de reproducir (icono y texto, un solo botón); la barra, el tiempo y el aviso de voz generada con IA aparecen al empezar, con una animación de un segundo, y un botón los recoge y vuelve al principio. "Cómo funciona", en una tarjeta más pequeña que en escritorio se desliza del centro a la izquierda al llegar a ella.
+
+### Cambiado (ajustes finales)
+
+- **Vídeos por idioma, desde administración (ADM-04, primera parte):** pestaña **"Vídeos"** en el panel para añadir, editar y borrar los de "Para inspirarte" por categoría e idioma, con el enlace de YouTube (se guarda solo el identificador, validado); la tabla se filtra por categoría y se pagina. La página enseña los del idioma de la interfaz y, si no hay ninguno, los de otro, cada uno con el icono de YouTube. Los vídeos pasan del código a la base de datos, con los seis de ejemplo. **Migración 0033.**
+- **Aventura, Deporte y Espiritualidad** con su imagen de cabecera (generadas con IA por el autor; la página lo dice). La de Deporte, regenerada sin logotipos (los dos de Nike que quedaban, tapados con el color de la prenda); como los colores del coche aún recuerdan a una escudería, lleva al pie un breve disclaimer.
+- **Página de Espiritualidad:** como las demás, sin hitos y, al ser una categoría sensible, sin "De la comunidad" (sus experiencias no se comparten).
+- **Vídeos en la página:** como mucho tres, los más recientes.
+- **Panel:** si la última página de una tabla se queda sin filas, vuelve a la anterior; al pulsar "Editar" en un vídeo, la página sube al formulario y pone el cursor en el título.
+- **Inicio, primera vez:** el botón "Empezar mi entrevista" lleva el color de acento.
+- **Landings de categoría:** título más grande y justo encima de las tarjetas, tarjetas de nota y experiencias en gris suave y más bajas, y menos espacio entre bloques. "Tus experiencias" enseña las dos más recientes y "Ver todas" despliega el resto en la misma tarjeta.
+- **Panel de administración:** pestañas con el mismo estilo que las de la ventana de ideas; todas las tablas y bloques con el mismo estilo (fondo blanco, cabecera gris azulada en negrita, títulos en negrita). Al añadir una categoría, se avisa de que su página saldrá como "Próximamente"; nombre (más estrecho) y descripción de cada idioma en una fila; los iconos de acciones, centrados en todas las tablas. "Retirar" y las acciones de los vídeos, con iconos.
+- **Completar el perfil:** aviso en la campana mientras el perfil no tenga avatar, profesión ni aficiones, y una frase en el registro que lo anuncia.
+- **Entrevista, paso 1:** más aire entre la explicación y los pasos.
+
+### Corregido (SEC-05: sesión renovada)
+
+- **La sesión ya no se corta a la hora.** Se renueva sola con un token de renovación guardado en una cookie httpOnly (solo para `/api`); la contraseña se pide tras **dos días sin usar la app**. Una cuenta suspendida no se renueva. Antes, pasada la hora, guardar fallaba con un "No autenticado" sin traducir.
+- Si aun así la sesión caduca, la app avisa ("Tu sesión ha caducado") y lleva a entrar.
+
+### Añadido (categoría Tecnología)
+
+- **Tecnología**, categoría nueva del catálogo: la relación con la tecnología (pantallas, desconexión, aprender herramientas). No sensible. Con cinco ideas curadas, seis opciones de "¿Qué te ayuda?", ejemplos para la entrevista y su icono. **Migración 0032.**
+
+### Añadido (RF-49: hitos y página de Deporte)
+
+- **Hitos** en las páginas de categoría: un título corto, un año y el mes si se recuerda. En Aventura, "Retos superados" (después de los viajes); y una **página nueva de Deporte**, con "Carreras, competiciones y marcas". Son privados, no cambian la nota y no van a la IA; se exportan y se borran con la cuenta. **Migración 0031.**
+- **Páginas de categoría con cabecera:** una imagen a todo lo ancho detrás del título (con un velo de la paleta para que se lea), y las tarjetas de la nota y las experiencias montadas sobre su parte baja. Por ahora, una imagen de la portada en todas, hasta tener las de cada categoría.
+- **"Para inspirarte"** en las páginas de Aventura y Deporte: tres vídeos elegidos por el autor (de ejemplo, charlas de TED), en tres columnas. Solo se carga la miniatura; el reproductor, de YouTube sin cookies, al pulsar. La política de contenido admite solo `i.ytimg.com` (imágenes) y `www.youtube-nocookie.com` (reproductor).
+- **"De la comunidad"** en las mismas páginas: hasta tres experiencias que comparten otras personas en esa categoría (RF-43), con su aviso y la opción de reportar.
+- **Categorías:** cada tarjeta lleva el icono de su categoría, del color de la flecha. Las páginas de categoría, sin migas de pan (son landings) y con la imagen más alta.
+- **Landings de categoría:** la cabecera de la app va transparente encima de la imagen, que empieza en el borde superior y es más alta; al bajar, la cabecera recupera su fondo.
+- **Entrevista:** el avatar que hace las preguntas es ahora un robot amable con cara humana, generado en local con el mismo modelo y estilo que los avatares de RF-26 y elegido por el autor.
+- **Cabecera:** Inicio, Categorías o Entrevista se marcan como página actual, con el mismo fondo que al pasar el ratón (también dentro de una categoría).
+
+### Cambiado (UX-13: resultados en barras)
+
+- **Resultados** pasa de tarjetas a un **gráfico de barras horizontales** (ECharts), en la misma escala de 0 a 10 y del color de los gráficos (algo transparente, más suave; entero al pasar por encima), con el número al final de cada barra. El tooltip (por fila) dice la banda y la fecha, y "Ver datos" abre la tabla. Debajo, las categorías sin puntuar y "Ideas para ti", con el botón de la idea junto a cada categoría.
+
+### Añadido (UX-12: guardar todo)
+
+- En la entrevista, una **barra fija** bajo la cabecera con los accesos a cada categoría y **"Guardar todo (N)"**: guarda de una vez todas las notas cambiadas, en una sola petición (todas o ninguna). El "Guardar" de cada categoría se queda. Al bajar, la barra pasa a una **versión compacta** pegada a la cabecera, a todo lo ancho. Si el guardado deja varios avisos (ideas nuevas, notas altas, todo en verde), **un solo resumen** los enumera todos y enlaza a Inicio, en lugar de abrir varias ventanas o quedarse con uno; si falla, lo dice junto al botón y las notas se conservan.
+
+### Añadido (RF-50: cuando todo va bien)
+
+- Si todas las categorías activas (al menos tres) están puntuadas con 8 o más, Inicio enseña **"Todo va bien"**: no hace falta mejorar nada, y propone ideas para disfrutar de un catálogo curado de ocho (un rato para ti, un capricho como un masaje, una escapada, incluso un descanso de la propia app), con "Otra idea" y el aviso de siempre. Sin IA y sin datos nuevos.
+- En la entrevista, al guardar la nota que deja todas las categorías en verde, un aviso de unos segundos lo dice y enlaza a esas ideas en Inicio (solo al llegar, no cada vez que se guarda otra nota alta).
+
+### Añadido (RF-49: páginas de categoría y viajes)
+
+- **"Categorías" en la cabecera:** todas las categorías del catálogo en tarjetas; por ahora solo Aventura tiene página, el resto sale como "Próximamente".
+- **Página de Aventura:** descripción, tu última nota, tus experiencias del diario y **Tus viajes**: un mapa a todo lo ancho (Leaflet) con los países visitados pintados, zoom con la rueda del ratón, y debajo el formulario y la lista. Un viaje es un país de una lista con búsqueda (o pulsado en el mapa) y un año, con el mes opcional; sin texto libre. Puede ser de cualquier año o un plan. No cambia ninguna nota y no va a la IA. **Migraciones 0029 y 0030.**
+- El mapa no usa recursos externos: las formas de los países (Natural Earth) van dentro de la app y la política de contenido no cambia.
+
+### Cambiado (séptima ronda de ajustes)
+
+- **Ventana de ideas:** las comillas de apertura van junto a la primera línea del texto en todas las pestañas (en "Con IA" quedaban lejos).
+- **Inicio:** "Actualizar mis respuestas" en el color de acento (en negro azulado no se distinguía de la cabecera) y "Calendario" con borde.
+
+- **Portada:** el selector de idioma y el aviso "Imagen generada con IA" se quedan fijos al bajar; el aviso sale una sola vez, no en cada imagen.
+- **Mapa de viajes:** más bajo y con más aire alrededor; la rueda sola desplaza la página y avisa de cómo hacer zoom (Ctrl/⌘ + rueda o pellizcando); en móvil se mueve con dos dedos. Zoom limitado: como mucho, el mundo entero; como poco, un país mediano.
+- **Ventana de ideas:** "Personalizada con IA" arriba a la derecha, "Idea 1 de 5" delante de las flechas y las comillas de cierre justo detrás del texto.
+- **Mi perfil:** el menú empieza a la altura del contenido, no de las migas.
+- **Entrevista:** la pregunta de Aventura enlaza a su página.
+
+### Cambiado (sexta ronda de ajustes)
+
+- **Paleta nueva, "Black Mirror"** (Midnight Black, Anti-Flash White, Loblolly, Country Blue y Rich Black): la cabecera y los botones principales en Rich Black, el fondo en Anti-Flash White y el acento en Country Blue (oscurecido donde lleva texto blanco, para el contraste AA). Un test comprueba los contrastes.
+- **Aventura:** el mapa a todo lo ancho de la página, entre dos líneas finas; la nota, solo el número en grande junto a su título; la flecha de la tarjeta con el color de acento.
+- **Ventana de ideas:** comillas de cierre, menos interlineado, título más abajo y en negrita, pestañas sin negrita, "Personalizada con IA" a la derecha y "Reportar" fuera de la cita, con una explicación de lo que hace.
+- **Mi perfil:** migas de pan a la altura del contenido, más aire sobre el botón del menú y títulos de bloque en negrita.
+
+### Añadido (quinta ronda de ajustes)
+
+- **"Así te ve la IA"** en Mi perfil: qué datos del perfil recibiría la IA para adaptar las ideas (al momento, según se rellena) y cuáles nunca, si la función está activada y el enlace para cambiarlo.
+- **Saludo con el nombre** en Inicio ("Bienvenida, Ana"; en femenino o masculino solo si se indicó el género, y si no, "Te damos la bienvenida").
+
+### Cambiado (quinta ronda de ajustes)
+
+- **Color de acento:** un verde azulado (el de los gráficos, oscurecido para que el texto blanco tenga contraste AA) en los botones de acción, los países visitados del mapa y una línea fina bajo la cabecera. Los colores con significado (bandas de puntuación, ideas, error, éxito) siguen reservados para lo suyo; la nota de la página de Aventura lleva el color y el texto de su banda.
+- **Secciones sin esquinas redondeadas** y bordes más suaves en toda la app; el contenido de Mi perfil, en blanco y más separado del menú; Privacidad y datos a la izquierda; títulos de página en negrita.
+- **Calendario** sin el botón "Hoy".
+- **Viajes:** se descargan (mapa y datos) desde Categorías antes de entrar en Aventura, y mientras llegan se reserva su sitio: sin saltos.
+
+### Corregido (quinta ronda de ajustes)
+
+- La cabecera parpadeaba sin parar al bajar 1 o 2 px desde arriba: al compactarse cambiaba la altura de la página y el desplazamiento volvía a quedar por debajo del umbral. Ahora es fija y su hueco tiene altura constante.
+
+### Añadido (UX-11: cabecera y avisos)
+
+- **Campana de avisos** en la cabecera: reúne los avisos que ya daba Inicio (revisar la nota tras un evento, ideas con fecha que ha llegado, categorías sin revisar), con el número de los nuevos. Solo dentro de la app.
+- **Cabecera reorganizada:** Inicio, Categorías y Entrevista; el avatar y el nombre abren un menú con Mi perfil, Administración y Cerrar sesión; idioma como "ES | EN"; resaltado a toda la altura, sin esquinas redondeadas.
+- Botón flotante **"Volver arriba"** en la entrevista, con un fundido.
+
+### Cambiado
+
+- **Ventana de ideas:** pestañas de verdad (subrayado y fondo suave de la marca), la idea como una cita (comillas, letra con serifa, azul marino), la misma letra en "De otras personas" y una X para cerrar arriba a la derecha.
+- **Mi perfil:** el formulario a la izquierda, con aficiones y avatares a todo lo ancho; el zoom del avatar tarda 1 segundo.
+- **Migas de pan** dentro del contenedor de cada página.
+- **Inicio:** botones con color e icono.
+- **Entrevista:** accesos a cada categoría también en escritorio (la pregunta aparece con un fundido) y menos espacio entre módulos.
+- Calendario: hoy en naranja y sin borde, los días con algo anotado en azul marino y el día elegido con un contorno; antes el azul tapaba el naranja.
+
+### Añadido (RF-46, RF-47 y RF-48: perfil, fecha para una idea y calendario)
+
+- **Profesión y aficiones en "Mi perfil" (RF-46):** opcionales y de listas cerradas, nunca texto libre. Con las ideas con IA activadas, se usan para adaptar la redacción; nunca en categorías sensibles. Al cambiarlas, las ideas ya personalizadas se rehacen. **Migración 0025.**
+- **Una fecha orientativa para una idea guardada (RF-47):** al pulsar "Me gusta" la app pregunta "¿Cuándo te apetece probarla?" (en una semana, en un mes, otra fecha o sin fecha). En Inicio, las ideas guardadas salen por fecha. Sin avisos fuera de la app. **Migración 0026** (después de la 0024).
+- **Eventos propios y calendario (RF-48):** pantalla "Calendario" en Mi perfil, con la vista de un mes, los días con eventos o ideas con fecha marcados y un formulario para añadir eventos (título, día y, si se quiere, varias categorías). En Inicio, "Próximamente" y, desde el día de un evento con categorías, una invitación a revisar la nota (la puntuación nunca cambia sola; el formulario lo explica). **Migraciones 0027 y 0028.**
+- Eventos y fechas entran en la exportación de datos y se borran con la cuenta.
+- `api/agenda/[action].ts` es la **duodécima función**: el plan Hobby no admite más.
+
+### Corregido
+
+- Dos peticiones simultáneas de una cuenta recién creada podían chocar al crearle sus categorías y una acababa en error: la escritura se repite cuando pasa.
+- Un "Me gusta" pulsado nada más abrirse la ventana de ideas podía perderse en pantalla (lo pisaba la carga de las reacciones): los botones salen ya con las reacciones cargadas.
+
+### Añadido (RF-19, guardar ideas)
+
+- En la ventana de ideas, cada idea lleva **"Me gusta"** (la guarda y lo dice) y **"No me gusta"** (deja de salir en esa categoría; se pueden recuperar). La ventana es más ancha, con la misma altura en todas las pestañas, y pestañas y flechas con aspecto de botón; explica cuántas ideas no se ven y por qué.
+- En Inicio, **"Tus ideas guardadas"**, con "Hecha" y "Quitar".
+- Las reacciones entran en la exportación de datos y se borran con la cuenta. **Migración 0024** (`idea_reactions`): ejecutarla antes de desplegar.
+
+### Cambiado
+
+- **Requisitos de la contraseña plegados:** en el registro y el cambio de contraseña se ven al pulsar un botón de información, con marcas pequeñas; se abren solos si la contraseña no cumple al enviar.
+
+### Añadido (categoría Salud)
+
+- Nueva categoría **Salud**, sensible: pide consentimiento y queda fuera de la IA y de las experiencias compartidas. Con cinco ideas genéricas y nada clínicas, seis opciones de "¿Qué te ayuda?" y sus ejemplos. **Migración 0023**: ejecutarla antes de desplegar.
+
+### Añadido (segunda prueba con una usuaria: UX-09 y UX-10)
+
+- Un mensaje al guardar una puntuación de 8 o más, en un aviso que se cierra solo a los 5 segundos: reconoce el momento e invita a anotar o compartir qué está ayudando; con 9 o 10 en una categoría no sensible, felicita con sobriedad.
+- "Cómo funciona" explica en un cuarto paso que se puede compartir de forma anónima lo que funciona. "Compartir de forma anónima" pasa a ser un botón.
+- En Inicio, una invitación a volver a mirar las categorías que llevan más de un mes sin actualizarse.
+- Los avatares del perfil crecen al señalarlos.
+
+### Corregido (RF-43, compartir experiencias)
+
+- Las categorías añadidas desde administración (como "Idiomas") no se podían compartir: no tienen clave de catálogo y la app las dejaba fuera sin avisar. Ahora cualquier categoría no sensible se puede compartir.
+
+### Cambiado (textos)
+
+- "Categorías" en toda la interfaz, en lugar de mezclarlo con "áreas".
+
+### Cambiado (paleta de la app)
+
+- La línea de los gráficos usa un verde azulado vivo propio, en lugar del color de marca.
+- Cabecera de escritorio en tres grupos separados: páginas, cuenta (avatar, nombre y salir) e idioma.
+- Colores nuevos en toda la app, a partir de cinco tonos elegidos por el autor (azul noche, gris azulado, gris muy claro, plata y casi negro), definidos en un solo sitio. Los colores con significado (puntuaciones, errores, avisos, ideas destacadas) no cambian.
+
+### Añadido (UX-08, portada con imagen)
+
+- La portada lleva de fondo una imagen generada con IA (una persona frente a su reflejo), con una capa oscura para que el título, la descripción y los botones se lean. Dos tamaños en WebP: el móvil descarga solo el suyo. La propia portada dice que la imagen está generada con IA.
+- La primera vista de la portada ocupa toda la pantalla; al bajar, "Cómo funciona" sube sobre una segunda imagen de fondo que no se mueve. Con "reducir movimiento" activado, la página se desplaza de forma normal. El texto va en la parte baja, para que la imagen se vea.
+- Al cerrar sesión se vuelve a la portada, no al formulario de inicio de sesión.
+- En la portada, selector de idioma de texto ("ES | EN") y una flecha que baja a "Cómo funciona".
+- Skill del proyecto para generar imágenes con el proceso de revisión (`.claude/skills/imagenes-con-ia/`).
+
+### Añadido (RF-26, avatares; en curso)
+
+- Catálogo de 12 avatares definido por descripciones de rasgos visibles, con un test que impide palabras de género, origen, religión, edad o valoración del aspecto.
+- `scripts/avatars/generate_avatars.py` (herramienta offline, Python): Claude Haiku razona si cada descripción cae en algún estereotipo antes de generar, un modelo de imagen de HuggingFace (SDXL base) ejecutado en local genera las candidatas, y el autor publica solo las que revisa. Por qué en local y qué sesgo se encontró por el camino: ADR-05, apartado 4.1.1.
+- El perfil admite un avatar del catálogo (solo los publicados; `null` lo quita). **Migración 0022** (`profiles.avatar_key`).
+- Selector de avatar en "Mi perfil"; el elegido se ve en la cabecera y en la entrevista. Sin avatares publicados, la app no cambia.
+
+### Corregido (perfil)
+
+- Al guardar el perfil, la caché perdía la elección de IA del usuario (ideas personalizadas y sugerencias) hasta recargar: ahora conserva el perfil tal como lo devuelve el servidor.
+
+### Corregido (RF-38, recuperar la contraseña)
+
+- El enlace del correo de recuperación podía dejar a la persona en la portada, sin explicación, en vez de en "Elegir nueva contraseña". La portada reconoce ahora un enlace de recuperación (o el aviso de que está caducado) y lleva a su pantalla; y la dirección de vuelta se construye tolerando una barra final o espacios en `APP_URL`.
+
+### Corregido (interfaz)
+
+- Todos los campos de texto medían 33 px de alto en vez de 56, y la etiqueta quedaba descolocada sobre el borde cuando el campo estaba vacío. Un `* { box-sizing: border-box }` propio, sin capa CSS, ganaba desde la v1.2.0 al valor que Material UI necesita en sus campos. Se quita (ya lo aplica el `CssBaseline` de MUI dentro de su capa) y un E2E vigila la altura.
+- Las pantallas públicas de cuenta (registro, inicio de sesión, recuperar y cambiar contraseña) pasan de 360 a 440 px de ancho en escritorio: el rastro de navegación cabe en una línea.
+
+### Cambiado (dependencias)
+
+- 17 actualizaciones menores y de parche (PR de Dependabot), entre ellas React 19.3, Vite 8.3 y zod 4.6.5.
+
 ## [1.3.0] - 2026-10-11
 
 El modelo real de IA, la cuenta de prueba para la entrega del TFM y la primera revisión completa de seguridad. **Migraciones 0020 y 0021** (las dos ya ejecutadas en producción). Variables nuevas en Vercel: `AI_IDEAS_PROVIDER`, `ANTHROPIC_API_KEY` y `DEMO_USER_EMAIL`.

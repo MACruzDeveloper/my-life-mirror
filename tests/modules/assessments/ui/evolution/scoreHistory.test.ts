@@ -3,20 +3,20 @@ import { buildCategoryTimeSeries } from "@modules/assessments/ui/evolution/score
 
 const SESSIONS = [
   // El endpoint las devuelve de la más reciente a la más antigua.
-  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Economía", score: 7, previousScore: 4 }] },
+  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Finanzas", score: 7, previousScore: 4 }] },
   {
     recordedAt: "2026-05-02T10:00:00.000Z",
     entries: [
-      { categoryId: "c1", categoryName: "Economía", score: 4, previousScore: 3 },
+      { categoryId: "c1", categoryName: "Finanzas", score: 4, previousScore: 3 },
       { categoryId: "cX", categoryName: "Pareja", score: 9 },
     ],
   },
-  { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Economía", score: 3 }, { categoryId: "c2", categoryName: "Deporte", score: 5 }] },
+  { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", categoryName: "Finanzas", score: 3 }, { categoryId: "c2", categoryName: "Deporte", score: 5 }] },
 ];
 
 const ACTIVE = [
   { categoryId: "c2", categoryName: "Deporte" },
-  { categoryId: "c1", categoryName: "Economía" },
+  { categoryId: "c1", categoryName: "Finanzas" },
   { categoryId: "c3", categoryName: "Familia" },
 ];
 
@@ -26,7 +26,7 @@ describe("buildCategoryTimeSeries (RF-16)", () => {
 
     expect(series.map((s) => s.categoryId)).toEqual(["c2", "c1", "c3"]);
     const finances = series[1];
-    expect(finances.categoryName).toBe("Economía");
+    expect(finances.categoryName).toBe("Finanzas");
     expect(finances.points.map((p) => p.score)).toEqual([3, 4, 7]);
     expect(finances.points[0].recordedAt).toEqual(new Date("2026-01-15T10:00:00.000Z"));
     expect(finances.points[2].recordedAt).toEqual(new Date("2026-09-18T10:00:00.000Z"));

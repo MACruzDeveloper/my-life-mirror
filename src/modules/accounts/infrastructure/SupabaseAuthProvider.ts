@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createServiceClient } from "#shared/infrastructure/supabaseServiceClient.js";
-import type { AuthProvider, LoggedInSession, AuthenticatedUser, UserSummary } from "../domain/AuthProvider.js";
+import type { AuthProvider, LoggedInSession, AuthenticatedUser, RenewedTokens, UserSummary } from "../domain/AuthProvider.js";
 import { DEFAULT_ROLE, readRoleFromMetadata, type UserRole } from "../domain/UserRole.js";
 import { AuthenticationError, ConflictError, ValidationError } from "#shared/domain/DomainError.js";
 
@@ -59,7 +59,15 @@ export class SupabaseAuthProvider implements AuthProvider {
       id: data.user.id,
       email: data.user.email ?? email,
       token: data.session.access_token,
+      refreshToken: data.session.refresh_token,
     };
+  }
+
+  async refreshSession(refreshToken: string): Promise<RenewedTokens> {
+    // En un cliente aparte que se descarta, como `logIn`: renovar deja al cliente actuando como ese usuario.
+    const { data, error } = await this.createSignInClient().auth.refreshSession({ refresh_token: refreshToken });
+    if (error || !data.session) throw new AuthenticationError("Sesión no válida");
+    return { token: data.session.access_token, refreshToken: data.session.refresh_token };
   }
 
   async verifySession(token: string): Promise<AuthenticatedUser> {

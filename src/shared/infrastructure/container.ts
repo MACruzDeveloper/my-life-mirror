@@ -6,6 +6,7 @@ import { SystemClock } from "./SystemClock.js";
 import type { AuthProvider } from "#modules/accounts/domain/AuthProvider.js";
 import { InMemoryAuthProvider } from "#modules/accounts/infrastructure/InMemoryAuthProvider.js";
 import { SupabaseAuthProvider } from "#modules/accounts/infrastructure/SupabaseAuthProvider.js";
+import { resetPasswordUrl } from "#modules/accounts/infrastructure/resetPasswordUrl.js";
 import { createRegisterUser } from "#modules/accounts/application/RegisterUser.js";
 import { createLogIn } from "#modules/accounts/application/LogIn.js";
 import { createDeleteAccount } from "#modules/accounts/application/DeleteAccount.js";
@@ -19,11 +20,31 @@ import { InMemoryRecommendationRepository } from "#modules/recommendations/infra
 import { SupabaseRecommendationRepository } from "#modules/recommendations/infrastructure/SupabaseRecommendationRepository.js";
 import { createPersonalizeRecommendation } from "#modules/recommendations/application/PersonalizeRecommendation.js";
 import type { IdeaReviewer, IdeaWriter } from "#modules/recommendations/domain/IdeaWriter.js";
+import type { IdeaReactionRepository } from "#modules/recommendations/domain/IdeaReaction.js";
+import { createListIdeaReactions, createSetIdeaReaction } from "#modules/recommendations/application/IdeaReactions.js";
+import { InMemoryIdeaReactionRepository } from "#modules/recommendations/infrastructure/InMemoryIdeaReactionRepository.js";
+import { SupabaseIdeaReactionRepository } from "#modules/recommendations/infrastructure/SupabaseIdeaReactionRepository.js";
 import type { PersonalizedIdeaRepository } from "#modules/recommendations/domain/PersonalizedIdea.js";
 import { FakeIdeaReviewer, FakeIdeaWriter } from "#modules/recommendations/infrastructure/FakeIdeaWriter.js";
 import { FakeOptionSuggester } from "#modules/recommendations/infrastructure/FakeOptionSuggester.js";
 import { AnthropicIdeaReviewer, AnthropicIdeaWriter, AnthropicOptionSuggester } from "#modules/recommendations/infrastructure/anthropic/AnthropicIdeaProvider.js";
 import { createAnthropicModel } from "#modules/recommendations/infrastructure/anthropic/AnthropicStructuredModel.js";
+import type { EventRepository } from "#modules/agenda/domain/UserEvent.js";
+import { createAddEvent, createDeleteEvent, createListEvents } from "#modules/agenda/application/Events.js";
+import { InMemoryEventRepository } from "#modules/agenda/infrastructure/InMemoryEventRepository.js";
+import { SupabaseEventRepository } from "#modules/agenda/infrastructure/SupabaseEventRepository.js";
+import type { TripRepository } from "#modules/agenda/domain/Trip.js";
+import { createAddTrip, createDeleteTrip, createListTrips } from "#modules/agenda/application/Trips.js";
+import { InMemoryTripRepository } from "#modules/agenda/infrastructure/InMemoryTripRepository.js";
+import { SupabaseTripRepository } from "#modules/agenda/infrastructure/SupabaseTripRepository.js";
+import type { InspirationVideoRepository } from "#modules/categories/domain/InspirationVideo.js";
+import { createAddInspirationVideo, createDeleteInspirationVideo, createListAllInspirationVideos, createListInspirationVideos, createUpdateInspirationVideo } from "#modules/categories/application/InspirationVideos.js";
+import { InMemoryInspirationVideoRepository } from "#modules/categories/infrastructure/InMemoryInspirationVideoRepository.js";
+import { SupabaseInspirationVideoRepository } from "#modules/categories/infrastructure/SupabaseInspirationVideoRepository.js";
+import type { MilestoneRepository } from "#modules/agenda/domain/Milestone.js";
+import { createAddMilestone, createDeleteMilestone, createListMilestones } from "#modules/agenda/application/Milestones.js";
+import { InMemoryMilestoneRepository } from "#modules/agenda/infrastructure/InMemoryMilestoneRepository.js";
+import { SupabaseMilestoneRepository } from "#modules/agenda/infrastructure/SupabaseMilestoneRepository.js";
 import type { AttemptLimiter } from "#shared/domain/AttemptLimiter.js";
 import { InMemoryAttemptLimiter, UnlimitedAttemptLimiter } from "#shared/infrastructure/InMemoryAttemptLimiter.js";
 import { SupabaseAttemptLimiter } from "#shared/infrastructure/SupabaseAttemptLimiter.js";
@@ -53,7 +74,7 @@ import type { AdminAuditRepository } from "#modules/accounts/domain/AdminAuditRe
 import { InMemoryAdminAuditRepository } from "#modules/accounts/infrastructure/InMemoryAdminAuditRepository.js";
 import { SupabaseAdminAuditRepository } from "#modules/accounts/infrastructure/SupabaseAdminAuditRepository.js";
 import { createListUsers } from "#modules/accounts/application/ListUsers.js";
-import { createVerifySession } from "#modules/accounts/application/VerifySession.js";
+import { createResumeSession } from "#modules/accounts/application/ResumeSession.js";
 import { createRequestPasswordReset } from "#modules/accounts/application/RequestPasswordReset.js";
 import { createResetPassword } from "#modules/accounts/application/ResetPassword.js";
 import type { ConsentRepository } from "#modules/consent/domain/ConsentRepository.js";
@@ -124,7 +145,7 @@ function createAuthProvider(environment: Environment): AuthProvider {
   if (!appUrl) {
     throw new Error("Falta APP_URL — ver .env.example");
   }
-  return new SupabaseAuthProvider(url, serviceRoleKey, `${appUrl}/restablecer-password`);
+  return new SupabaseAuthProvider(url, serviceRoleKey, resetPasswordUrl(appUrl));
 }
 
 /**
@@ -146,6 +167,37 @@ function createExperienceRepository(environment: Environment): ExperienceReposit
   }
   const { url, serviceRoleKey } = supabaseCredentials();
   return new SupabaseExperienceRepository(url, serviceRoleKey);
+}
+
+/** RF-19: se escribe desde la ventana de ideas y se lee en Inicio (funciones distintas): base de datos real fuera de los tests. */
+function createEventRepository(environment: Environment): EventRepository {
+  if (environment === "test") return new InMemoryEventRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseEventRepository(url, serviceRoleKey);
+}
+
+function createInspirationVideoRepository(environment: Environment): InspirationVideoRepository {
+  if (environment === "test") return new InMemoryInspirationVideoRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseInspirationVideoRepository(url, serviceRoleKey);
+}
+
+function createTripRepository(environment: Environment): TripRepository {
+  if (environment === "test") return new InMemoryTripRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseTripRepository(url, serviceRoleKey);
+}
+
+function createMilestoneRepository(environment: Environment): MilestoneRepository {
+  if (environment === "test") return new InMemoryMilestoneRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseMilestoneRepository(url, serviceRoleKey);
+}
+
+function createIdeaReactionRepository(environment: Environment): IdeaReactionRepository {
+  if (environment === "test") return new InMemoryIdeaReactionRepository();
+  const { url, serviceRoleKey } = supabaseCredentials();
+  return new SupabaseIdeaReactionRepository(url, serviceRoleKey);
 }
 
 function createPersonalizedIdeaRepository(environment: Environment): PersonalizedIdeaRepository {
@@ -289,7 +341,7 @@ export interface AppContext {
   authProvider: AuthProvider;
   registerUser: ReturnType<typeof createRegisterUser>;
   logIn: ReturnType<typeof createLogIn>;
-  verifySession: ReturnType<typeof createVerifySession>;
+  resumeSession: ReturnType<typeof createResumeSession>;
   listUsers: ReturnType<typeof createListUsers>;
   adminUsers: ReturnType<typeof createAdminUserActions>;
   exportUserData: ReturnType<typeof createExportUserData>;
@@ -307,6 +359,11 @@ export interface AppContext {
   categoryRepository: CategoryRepository;
   categoryCatalogRepository: CategoryCatalogRepository;
   listCatalog: ReturnType<typeof createListCatalog>;
+  listInspirationVideos: ReturnType<typeof createListInspirationVideos>;
+  listAllInspirationVideos: ReturnType<typeof createListAllInspirationVideos>;
+  addInspirationVideo: ReturnType<typeof createAddInspirationVideo>;
+  deleteInspirationVideo: ReturnType<typeof createDeleteInspirationVideo>;
+  updateInspirationVideo: ReturnType<typeof createUpdateInspirationVideo>;
   listCatalogLabels: ReturnType<typeof createListCatalogLabels>;
   addCatalogCategory: ReturnType<typeof createAddCatalogCategory>;
   retireCatalogCategory: ReturnType<typeof createRetireCatalogCategory>;
@@ -329,6 +386,18 @@ export interface AppContext {
   reportSharedExperience: ReturnType<typeof createReportSharedExperience>;
   recommendationRepository: RecommendationRepository;
   listRecommendations: ReturnType<typeof createListRecommendations>;
+  /** RF-19: guardar una idea, darla por hecha o descartarla. */
+  addEvent: ReturnType<typeof createAddEvent>;
+  listEvents: ReturnType<typeof createListEvents>;
+  deleteEvent: ReturnType<typeof createDeleteEvent>;
+  addTrip: ReturnType<typeof createAddTrip>;
+  listTrips: ReturnType<typeof createListTrips>;
+  deleteTrip: ReturnType<typeof createDeleteTrip>;
+  addMilestone: ReturnType<typeof createAddMilestone>;
+  listMilestones: ReturnType<typeof createListMilestones>;
+  deleteMilestone: ReturnType<typeof createDeleteMilestone>;
+  setIdeaReaction: ReturnType<typeof createSetIdeaReaction>;
+  listIdeaReactions: ReturnType<typeof createListIdeaReactions>;
   /** RF-40: si hay un proveedor de IA configurado (la interfaz solo ofrece la opción entonces). */
   aiIdeasAvailable: boolean;
   /** SEC-02: tope de intentos de los controladores públicos (inicio de sesión, registro…). */
@@ -344,14 +413,20 @@ export function createAppContext(environment: Environment = detectEnvironment())
   const clock = new SystemClock();
   const consentRepository = createConsentRepository(environment);
   const profileRepository = createProfileRepository(environment);
-  const updateProfile = createUpdateProfile(profileRepository);
   const categoryRepository = createCategoryRepository(environment);
   const categoryCatalogRepository = createCategoryCatalogRepository(environment);
   const checkConsent = createCheckConsent(consentRepository);
   const assessmentRepository = createAssessmentRepository(environment);
-  const registerUser = createRegisterUser(authProvider, updateProfile);
   const recommendationRepository = createRecommendationRepository(environment);
   const personalizedIdeaRepository = createPersonalizedIdeaRepository(environment);
+  // RF-46: si cambian la profesión o las aficiones, las ideas ya escritas con IA se rehacen.
+  const updateProfile = createUpdateProfile(profileRepository, { onInterestsChanged: (userId) => personalizedIdeaRepository.deleteByUserId(userId) });
+  const registerUser = createRegisterUser(authProvider, updateProfile);
+  const ideaReactionRepository = createIdeaReactionRepository(environment);
+  const eventRepository = createEventRepository(environment);
+  const tripRepository = createTripRepository(environment);
+  const inspirationVideoRepository = createInspirationVideoRepository(environment);
+  const milestoneRepository = createMilestoneRepository(environment);
   const experienceRepository = createExperienceRepository(environment);
   const ideaProvider = createIdeaProvider(environment, clock);
   // Umbral configurable (RF-18): variable de entorno, con el 5 por defecto si falta o no es válida.
@@ -371,7 +446,7 @@ export function createAppContext(environment: Environment = detectEnvironment())
     // inicial en la misma operación, RF-03) — de ahí construirlo después.
     registerUser,
     logIn: createLogIn(authProvider),
-    verifySession: createVerifySession(authProvider),
+    resumeSession: createResumeSession(authProvider),
     listUsers: createListUsers(authProvider, profileRepository),
     adminUsers: createAdminUserActions({
       authProvider,
@@ -381,15 +456,19 @@ export function createAppContext(environment: Environment = detectEnvironment())
       assessmentRepository,
       recommendationRepository,
       personalizedIdeaRepository,
+      ideaReactionRepository,
+      eventRepository,
+      tripRepository,
+      milestoneRepository,
       experienceRepository,
       auditRepository: createAdminAuditRepository(environment),
       registerUser,
       updateProfile,
       clock,
     }),
-    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, clock }),
-    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
-    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository }),
+    exportUserData: createExportUserData({ profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, milestoneRepository, clock }),
+    deleteAccount: createDeleteAccount({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, milestoneRepository, protectedEmail: process.env.DEMO_USER_EMAIL }),
+    eraseUser: createEraseUser({ authProvider, profileRepository, categoryRepository, consentRepository, assessmentRepository, recommendationRepository, personalizedIdeaRepository, experienceRepository, ideaReactionRepository, eventRepository, tripRepository, milestoneRepository }),
     requestPasswordReset: createRequestPasswordReset(authProvider),
     resetPassword: createResetPassword(authProvider),
     consentRepository,
@@ -401,6 +480,11 @@ export function createAppContext(environment: Environment = detectEnvironment())
     categoryRepository,
     categoryCatalogRepository,
     listCatalog: createListCatalog(categoryCatalogRepository),
+    listInspirationVideos: createListInspirationVideos(inspirationVideoRepository),
+    listAllInspirationVideos: createListAllInspirationVideos(inspirationVideoRepository),
+    addInspirationVideo: createAddInspirationVideo({ repository: inspirationVideoRepository, clock }),
+    deleteInspirationVideo: createDeleteInspirationVideo(inspirationVideoRepository),
+    updateInspirationVideo: createUpdateInspirationVideo(inspirationVideoRepository),
     listCatalogLabels: createListCatalogLabels(categoryCatalogRepository),
     addCatalogCategory: createAddCatalogCategory(categoryCatalogRepository),
     retireCatalogCategory: createRetireCatalogCategory(categoryCatalogRepository, categoryRepository, () => clock.now()),
@@ -433,6 +517,17 @@ export function createAppContext(environment: Environment = detectEnvironment())
     reportSharedExperience: createReportSharedExperience({ experienceRepository, clock }),
     recommendationRepository,
     listRecommendations: createListRecommendations({ recommendationRepository, categoryRepository, assessmentRepository }),
+    addEvent: createAddEvent({ eventRepository, categoryRepository, clock }),
+    listEvents: createListEvents(eventRepository),
+    deleteEvent: createDeleteEvent(eventRepository),
+    addTrip: createAddTrip({ tripRepository, clock }),
+    listTrips: createListTrips(tripRepository),
+    deleteTrip: createDeleteTrip(tripRepository),
+    addMilestone: createAddMilestone({ milestoneRepository, clock }),
+    listMilestones: createListMilestones(milestoneRepository),
+    deleteMilestone: createDeleteMilestone(milestoneRepository),
+    setIdeaReaction: createSetIdeaReaction({ ideaReactionRepository, categoryRepository, catalog: categoryCatalogRepository, clock }),
+    listIdeaReactions: createListIdeaReactions(ideaReactionRepository),
     aiIdeasAvailable: ideaProvider.writer !== undefined,
     attemptLimiter: createAttemptLimiter(environment, clock),
     setAiSuggestions: createSetAiSuggestions({ profileRepository, clock }),

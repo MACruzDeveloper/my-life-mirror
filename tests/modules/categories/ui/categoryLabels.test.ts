@@ -11,8 +11,8 @@ const labelsById = new Map(
 
 describe("resolveCategoryLabel (RNF-10: la categoría se nombra por su id, en el idioma de la interfaz)", () => {
   it("devuelve el nombre y la descripción en el idioma pedido, y la clave estable si es estándar", () => {
-    expect(resolveCategoryLabel(labelsById, catalogIdOf("economia"), "en")).toEqual({ name: "Finances", description: "Your personal finances: savings, spending, debts.", key: "economia" });
-    expect(resolveCategoryLabel(labelsById, catalogIdOf("economia"), "es").name).toBe("Economía");
+    expect(resolveCategoryLabel(labelsById, catalogIdOf("economia"), "en")).toEqual({ name: "Finances", description: "Your finances: savings, spending, debts and long-term investing.", key: "economia" });
+    expect(resolveCategoryLabel(labelsById, catalogIdOf("economia"), "es").name).toBe("Finanzas");
   });
 
   it("las categorías del admin se traducen igual que las estándar, sin clave", () => {
@@ -21,7 +21,7 @@ describe("resolveCategoryLabel (RNF-10: la categoría se nombra por su id, en el
 
   it("si falta el idioma pedido, usa el idioma por defecto (español)", () => {
     expect(resolveCategoryLabel(labelsById, "k-solo-es", "en").name).toBe("Solo español");
-    expect(resolveCategoryLabel(labelsById, catalogIdOf("economia"), "fr").name).toBe("Economía");
+    expect(resolveCategoryLabel(labelsById, catalogIdOf("economia"), "fr").name).toBe("Finanzas");
   });
 
   it("un id desconocido o ausente devuelve texto vacío, nunca un error", () => {

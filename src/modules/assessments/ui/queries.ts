@@ -1,6 +1,15 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getJson } from "@shared/ui/api/getJson";
-import type { LatestScoreDto } from "./ScoreCards";
+
+export interface LatestScoreDto {
+  categoryId: string;
+  categoryName: string;
+  /** Identidad en el catálogo: se muestra con `useCategoryLabel`. */
+  catalogId?: string;
+  score?: number;
+  note?: string;
+  recordedAt?: string;
+}
 
 export interface HistoryEntryDto {
   categoryId: string;
@@ -110,4 +119,19 @@ export function useSharedExperiences(categoryId: string | undefined, locale: str
     queryFn: ({ signal }) => getJson<SharedExperienceDto[]>(`/api/categories/shared?categoryId=${encodeURIComponent(categoryId ?? "")}&locale=${encodeURIComponent(locale)}`, signal),
     enabled: enabled && categoryId !== undefined,
   });
+}
+
+/** RF-43: reportar una experiencia de otra persona: deja de verse al momento (también en esta caché). Lo comparten la ventana de ideas y las páginas de categoría. */
+export function useReportSharedExperience(categoryId: string, locale: string) {
+  const queryClient = useQueryClient();
+  return async function report(experienceId: string): Promise<boolean> {
+    try {
+      const response = await fetch("/api/categories/shared", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: experienceId }) });
+      if (!response.ok) return false;
+      queryClient.setQueryData<SharedExperienceDto[]>(sharedExperiencesKey(categoryId, locale), (current) => current?.filter((candidate) => candidate.id !== experienceId));
+      return true;
+    } catch {
+      return false;
+    }
+  };
 }

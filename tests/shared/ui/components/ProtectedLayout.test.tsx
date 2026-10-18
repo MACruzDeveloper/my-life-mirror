@@ -29,7 +29,7 @@ describe("ProtectedLayout", () => {
 
     await waitFor(() => expect(screen.getByText("ana@ejemplo.com")).toBeInTheDocument());
     expect(screen.getByText("MyLifeMirror")).toBeInTheDocument();
-    const breadcrumbs = screen.getByRole("navigation");
+    const breadcrumbs = screen.getByRole("navigation", { name: "breadcrumb" });
     expect(within(breadcrumbs).getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/inicio");
     expect(within(breadcrumbs).getByText("Perfil")).toBeInTheDocument();
     expect(screen.getByText("Contenido de la página")).toBeInTheDocument();
@@ -73,10 +73,10 @@ describe("ProtectedLayout", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "breadcrumb" })).not.toBeInTheDocument();
   });
 
-  it("cerrar sesión llama a /api/logout y navega a /login", async () => {
+  it("cerrar sesión llama a /api/logout y vuelve a la portada (no al inicio de sesión)", async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce({ json: async () => ({ autenticado: true, email: "ana@ejemplo.com" }) })
@@ -96,16 +96,20 @@ describe("ProtectedLayout", () => {
               </SessionProvider>
             }
           />
+          <Route path="/" element={<div>La portada</div>} />
           <Route path="/login" element={<div>Pantalla de login</div>} />
         </Routes>
       </MemoryRouter>,
     );
 
     await waitFor(() => expect(screen.getByText("ana@ejemplo.com")).toBeInTheDocument());
-    fireEvent.click(screen.getByRole("button", { name: /cerrar sesión/i }));
+    // Cerrar sesión está en el menú de la cuenta (el nombre de la cabecera).
+    fireEvent.click(screen.getByRole("button", { name: /ana@ejemplo\.com/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /cerrar sesión/i }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/accounts/logout", { method: "POST" }));
-    await waitFor(() => expect(screen.getByText("Pantalla de login")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("La portada")).toBeInTheDocument());
+    expect(screen.queryByText("Pantalla de login")).not.toBeInTheDocument();
   });
 
   it("refresh() del contexto actualiza lo que muestra el Header sin desmontar la página", async () => {

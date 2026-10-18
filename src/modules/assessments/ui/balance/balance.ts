@@ -1,5 +1,5 @@
 import type { RadarAxis } from "@shared/ui/charts/RadarChart/radarChartOption";
-import type { LatestScoreDto } from "../ScoreCards";
+import type { LatestScoreDto } from "../queries";
 
 /** Con menos de tres ejes no hay polígono que leer. */
 export const MIN_SCORED_CATEGORIES = 3;

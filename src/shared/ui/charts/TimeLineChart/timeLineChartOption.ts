@@ -1,4 +1,5 @@
 import { monthLabel } from "../timeWindow";
+import { PALETTE, TEXT_SECONDARY } from "../../theme";
 
 export interface TimePoint {
   date: Date;
@@ -16,8 +17,8 @@ export interface TimeLineChartOptionInput {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const SECONDARY_INK = "#6B7672";
-const GRID_LINE = "#E4E8E6";
+const SECONDARY_INK = TEXT_SECONDARY;
+const GRID_LINE = "#DCDFE1";
 
 /**
  * Opción de ECharts de la plantilla `TimeLineChart`: una sola serie de línea
@@ -48,7 +49,7 @@ export function buildTimeLineChartOption({ points, window, yAxis, locale, color,
         color: SECONDARY_INK,
         fontSize: 10,
       },
-      axisLine: { lineStyle: { color: "#C9D1CE" } },
+      axisLine: { lineStyle: { color: PALETTE.loblolly } },
       axisTick: { show: false },
       splitLine: { show: false },
     },
@@ -63,7 +64,7 @@ export function buildTimeLineChartOption({ points, window, yAxis, locale, color,
     tooltip: {
       trigger: "axis",
       confine: true,
-      axisPointer: { type: "line", lineStyle: { color: "#9AA5A1" } },
+      axisPointer: { type: "line", lineStyle: { color: "#8E9BA3" } },
       formatter: (params: unknown) => {
         const [first] = params as { value: [number, number] }[];
         const [timestamp, value] = first.value;

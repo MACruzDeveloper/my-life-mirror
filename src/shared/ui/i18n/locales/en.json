@@ -1,5 +1,6 @@
 {
   "comun": {
+    "volverArriba": "Back to top",
     "email": "Email",
     "contrasena": "Password",
     "errorServidor": "Could not reach the server",
@@ -7,9 +8,16 @@
     "idioma": "Language",
     "abrirMenu": "Open menu",
     "cargando": "Loading…",
-    "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again."
+    "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again.",
+    "seleccionaIdioma": "Select language",
+    "paginas": "Pages",
+    "miCuenta": "My account",
+    "cerrar": "Close"
   },
   "breadcrumbs": {
+    "entrevista": "Interview",
+    "categorias": "Categories",
+    "categoria": "Category",
     "inicio": "Home",
     "crearCuenta": "Create account",
     "iniciarSesion": "Log in",
@@ -25,7 +33,26 @@
     "titulo": "MyLifeMirror",
     "descripcion": "Assess how your life is going by category, at your own pace, and get concrete suggestions for whatever you choose to improve — no judgment, no comparisons with anyone. An honest mirror, not an exam.",
     "crearCuenta": "Create account",
-    "iniciarSesion": "Log in"
+    "iniciarSesion": "Log in",
+    "imagenIA": "AI-generated image",
+    "verComoFunciona": "See how it works",
+    "audio": {
+      "escuchar": "Listen to the introduction",
+      "pausar": "Pause",
+      "vozIa": "AI-generated voice (ElevenLabs)",
+      "transcripcion": "Transcript",
+      "transcripcionTitulo": "Transcript of the introduction",
+      "texto": [
+        "Hi. This is MyLifeMirror: a mirror of your life, not an exam.",
+        "Here's how it works. You choose the areas you want to look at: your finances, your family, your health, sport, adventure… And in each one you give yourself a score from one to ten, without judgement and at your own pace.",
+        "You'll see your balance at a glance, how it changes over time and, wherever you want to improve, small and concrete ideas to get started. If something is going well, you can note what works for you and share it anonymously, in case it helps someone else.",
+        "Your data is yours: what you write is private, and you can download or delete it whenever you like.",
+        "MyLifeMirror doesn't replace any professional. It's a space to pause, look at yourself calmly and take the next step.",
+        "Shall we begin?"
+      ],
+      "posicion": "Audio position",
+      "cerrar": "Close the player"
+    }
   },
   "registro": {
     "titulo": "Create account",
@@ -34,7 +61,8 @@
     "exito": "Account created for {{email}}.",
     "irALogin": "Log in",
     "errorGenerico": "Could not complete the registration",
-    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password."
+    "errorEmail": "We couldn't create the account with this email. If you already have one, log in or reset your password.",
+    "despues": "We only ask for what's needed to get started. Later, in “My profile”, you can choose your avatar and, if you like, add your occupation and hobbies."
   },
   "login": {
     "titulo": "Log in",
@@ -45,6 +73,7 @@
     "errorCredenciales": "Wrong email or password"
   },
   "contrasena": {
+    "verRequisitos": "Password requirements",
     "requisitos": "Your password needs:",
     "reglas": {
       "length": "Between 12 and 72 characters",
@@ -83,6 +112,10 @@
     "errorGenerico": "Could not change the password"
   },
   "panel": {
+    "bienvenidaNombre": "Welcome, {{nombre}}",
+    "bienvenidaNombre_woman": "Welcome, {{nombre}}",
+    "bienvenidaNombre_man": "Welcome, {{nombre}}",
+    "bienvenidaSinNombre": "Welcome",
     "bienvenida": "Welcome",
     "cerrarSesion": "Log out",
     "bienvenidaTitulo": "Let's start by getting to know you",
@@ -104,7 +137,58 @@
     "botonEnviando": "Saving…",
     "exito": "Profile saved.",
     "errorGenerico": "Could not save the profile",
-    "errorCarga": "Could not load your profile"
+    "errorCarga": "Could not load your profile",
+    "profesion": "Occupation (optional)",
+    "profesionSinEspecificar": "Not set",
+    "aficionesTitulo": "Hobbies (optional)",
+    "aficionesAyuda": "Choose up to {{max}}. They are only used, together with your occupation, to adapt the AI ideas if you have them switched on.",
+    "ocupaciones": {
+      "desarrolloWeb": "Web development",
+      "informatica": "IT and technology",
+      "docencia": "Teaching and education",
+      "sanidad": "Healthcare",
+      "administracion": "Administration and office work",
+      "comercio": "Retail and customer service",
+      "hosteleria": "Hospitality and tourism",
+      "construccion": "Construction and trades",
+      "transporte": "Transport and logistics",
+      "industria": "Industry and manufacturing",
+      "ingenieria": "Engineering",
+      "diseno": "Design and creative work",
+      "comunicacion": "Marketing and communication",
+      "finanzas": "Banking and finance",
+      "derecho": "Law",
+      "investigacion": "Science and research",
+      "agricultura": "Farming",
+      "cuidados": "Care work",
+      "hogar": "Homemaking",
+      "estudiante": "Student",
+      "jubilacion": "Retired",
+      "buscandoEmpleo": "Looking for work",
+      "otra": "Other"
+    },
+    "aficiones": {
+      "deporte": "Sport",
+      "montana": "Mountains",
+      "playa": "Beach",
+      "viajar": "Travelling",
+      "naturaleza": "Nature",
+      "lectura": "Reading",
+      "musica": "Music",
+      "cine": "Films and series",
+      "cocina": "Cooking",
+      "videojuegos": "Video games",
+      "juegosDeMesa": "Board games",
+      "fotografia": "Photography",
+      "arte": "Drawing and painting",
+      "manualidades": "Crafts",
+      "escritura": "Writing",
+      "baile": "Dancing",
+      "plantas": "Plants and gardening",
+      "animales": "Animals",
+      "tecnologia": "Technology",
+      "voluntariado": "Volunteering"
+    }
   },
   "categorias": {
     "errorCarga": "Could not load your categories",
@@ -119,9 +203,9 @@
     "titulo": "Privacy policy",
     "version": "Version {{version}} — draft for the master's thesis, not written by legal counsel.",
     "queDatosTitulo": "What data we collect",
-    "queDatosTexto": "Your email, the name you give us when registering, and the entries you record in the categories you turn on (date of birth, gender if you provide it, time zone, and your per-category check-ins).",
+    "queDatosTexto": "Your email, the name you give us when registering, and the entries you record in the categories you turn on (date of birth, gender, occupation and hobbies if you provide them, time zone, and your per-category check-ins). If you add trips on the Adventure page, we store the country, the year and, if you give it, the month. The map is part of the app: it doesn't request anything from other servers.",
     "datosSensiblesTitulo": "Specially protected data categories",
-    "datosSensiblesTexto": "Some categories (sex, spirituality) count as special category data under GDPR (art. 9). They're only turned on and recorded with your explicit consent, which you can withdraw at any time by turning the category off.",
+    "datosSensiblesTexto": "Some categories (sex, spirituality, health) count as special category data under GDPR (art. 9). They're only turned on and recorded with your explicit consent, which you can withdraw at any time by turning the category off.",
     "paraQueTitulo": "What we use it for",
     "paraQueTexto": "Only to give you your own tracking dashboard and personalized suggestions inside the app. It is never shared with third parties or used for advertising.",
     "tusDerechosTitulo": "Your rights",
@@ -129,12 +213,14 @@
     "contactoTitulo": "Contact",
     "contactoTexto": "This is an academic project (master's thesis) — for any question about your data, contact the project's developer directly.",
     "iaTitulo": "AI-personalised ideas",
-    "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive area, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\" and the app's ideas for that category. For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted.",
+    "iaTexto": "It's optional and off by default. If you turn it on in Privacy & data, when you open an idea for a non-sensitive category, the following is sent to Anthropic, acting as data processor: the category, your latest score and whether it's going up or down, the options you ticked in \"What helps you?\", the occupation and hobbies in your profile if you set them (always options from a list, never your own text) and the app's ideas for that category. For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent. The resulting idea is saved in your account so it isn't requested again. You can turn it off at any time and personalised ideas are deleted.",
     "iaSugerenciasTitulo": "AI suggestions from your experiences",
     "iaSugerenciasTexto": "This is also optional, separate from the above and off by default. If you turn it on in Privacy and data, each experience in your diary shows “Suggest options with AI”: pressing it sends to Anthropic, as data processor, only the experience you ask to analyse, together with that category's possible options, so it can suggest which ones to mark in “What helps you?” or “What makes it hard?”. You accept or dismiss each suggestion; the AI writes nothing about you and doesn't assess how you are. Before sending it we remove emails, phone numbers, links and long numbers; names can't be removed reliably, so we ask you not to write other people's names if you don't want them sent. Your name, your email, your scores and the experiences you don't ask to analyse are never sent, and sensitive categories and the Couple category are never sent. You can turn it off whenever you like; only the options you accept remain from the AI.",
     "compartidasTitulo": "Experiences shared with other people",
-    "compartidasTexto": "If your latest score in an area is 8 or more, you can anonymously share an experience from your diary to help other people. Only the one you choose is shared, after you see how it will look. Other people using the app only read the text, among the ideas for that area and in your same language: never your name, your email, the date or your score. Before publishing it we check that it has no contact details, health or money advice, or insults. Experiences from sensitive categories or Relationship are never shared. Bear in mind that if you tell very personal details, someone who knows you might recognise you. You can stop sharing it whenever you like, in your diary or in Privacy and data; if someone reports it, it's hidden. It's deleted when you delete the experience or your account.",
-    "iaLimiteTexto": "To prevent abuse, we count how many times a day you use these AI features (only the number, not what you ask or what is answered), and there is a daily maximum per person. If you go over it, you'll see the app's original ideas until the next day. That counter is deleted with your account."
+    "compartidasTexto": "If your latest score in a category is 8 or more, you can anonymously share an experience from your diary to help other people. Only the one you choose is shared, after you see how it will look. Other people using the app only read the text, among the ideas for that category and in your same language: never your name, your email, the date or your score. Before publishing it we check that it has no contact details, health or money advice, or insults. Experiences from sensitive categories or Relationship are never shared. Bear in mind that if you tell very personal details, someone who knows you might recognise you. You can stop sharing it whenever you like, in your diary or in Privacy and data; if someone reports it, it's hidden. It's deleted when you delete the experience or your account.",
+    "iaLimiteTexto": "To prevent abuse, we count how many times a day you use these AI features (only the number, not what you ask or what is answered), and there is a daily maximum per person. If you go over it, you'll see the app's original ideas until the next day. That counter is deleted with your account.",
+    "videosTitulo": "YouTube videos",
+    "videosTexto": "Some category pages include YouTube videos chosen by the app's author. Their thumbnails load from YouTube (Google) servers when you open the page, and the video only when you press play, in its no-tracking-cookies mode. When they load, YouTube receives your IP address and your browser's technical data, under its own privacy policy. The app sends it none of your data."
   },
   "entrevista": {
     "titulo": "Your interview",
@@ -152,6 +238,7 @@
     "errorGenerico": "Could not save the interview",
     "entrevistador": "Interviewer",
     "tu": "You",
+    "verPagina": "See your {{categoria}} page",
     "verEjemplos": "See examples for {{categoria}}",
     "ejemplosTitulo": "To help you think:",
     "errorActivar": "Could not activate the category",
@@ -201,7 +288,7 @@
     "irAPreguntas": "Go to the questions",
     "atras": "Back",
     "queHablarTitulo": "What would you like to talk about?",
-    "queHablarTexto": "Choose the areas of your life you want to review. You can change them whenever you like.",
+    "queHablarTexto": "Choose the categories of your life you want to review. You can change them whenever you like.",
     "elegirTodas": "Choose all",
     "quitarTodas": "Remove all",
     "eligeUna": "Choose at least one to continue.",
@@ -244,8 +331,8 @@
     "avisoOfensivo": "This experience has words we'd rather not send to the AI. You can delete it and write it another way, or send it anyway.",
     "enviarIgualmente": "Send anyway",
     "compartir": "Share anonymously",
-    "compartirOferta": "You're doing well in this area: you can share an experience anonymously to help other people.",
-    "compartirVistaPrevia": "This is how other people who find this area harder will see it:",
+    "compartirOferta": "You're doing well in this category: you can share an experience anonymously to help other people.",
+    "compartirVistaPrevia": "This is how other people who find this category harder will see it:",
     "compartirAnonima": "Without your name, the date or your score.",
     "compartirRetirable": "You can stop sharing it whenever you like.",
     "compartirReportable": "Other people can report it; if they do, it's hidden.",
@@ -260,13 +347,26 @@
       "contact": "To share it, it can't contain emails, phone numbers, links or long numbers. Delete it and write another one without them.",
       "health": "To share it, it can't talk about health, medication, therapy or money (investments, loans…): the app doesn't pass on that kind of advice between people. Delete it and write another one without them.",
       "offensive": "To share it, it can't contain insults or offensive words. Delete it and write another one without them.",
-      "score": "You can only share with a score of 8 or more in this area.",
-      "category": "Experiences aren't shared in this area.",
+      "score": "You can only share with a score of 8 or more in this category.",
+      "category": "Experiences aren't shared in this category.",
       "reported": "This experience was removed after a report and can't be shared again.",
       "error": "We couldn't share it. Please try again."
     },
     "sugerenciasLimite": "You've reached today's maximum of AI uses. You can try again tomorrow.",
-    "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later."
+    "sugerenciasNoDisponibles": "We couldn't ask for suggestions right now. Please try again later.",
+    "guardarTodoConCuenta": "Save all ({{count}})",
+    "guardandoTodo": "Saving…",
+    "errorGuardarTodo": "We couldn't save your changes. Please try again.",
+    "ideaNuevaPara": "{{categoria}}: you have a new idea.",
+    "verEnInicio": "See on Home",
+    "todoEnVerde": "All green! Your categories are in the top band: on Home you'll find ideas to enjoy it.",
+    "verIdeasInicio": "See ideas on Home",
+    "puntuacionAlta": {
+      "recognizeCompartir": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary or share it anonymously.",
+      "recognize": "{{categoria}} is going well for you right now. What is helping? You can note it in your diary.",
+      "congratulateCompartir": "Well done: a {{puntuacion}} in {{categoria}}. What is helping? You can note it in your diary or share it anonymously.",
+      "congratulate": "Well done: a {{puntuacion}} in {{categoria}}. What is helping? You can note it in your diary."
+    }
   },
   "resultados": {
     "titulo": "Your results",
@@ -279,9 +379,17 @@
     "bandaLow": "Low",
     "bandaMediumLow": "Almost low",
     "bandaMedium": "Medium",
-    "bandaHigh": "Good"
+    "bandaHigh": "Good",
+    "grafico": "Latest score for each category: {{lista}}",
+    "puntuacionConBanda": "{{categoria}}: {{puntuacion}} ({{banda}})",
+    "tabla": "Latest score for each category",
+    "nivel": "Level",
+    "fecha": "Last time",
+    "sinPuntuarLista": "Not scored yet: {{lista}}",
+    "ideas": "Ideas for you"
   },
   "cuenta": {
+    "calendario": "Calendar",
     "menu": "My profile menu",
     "perfil": "Profile",
     "entrevista": "Interview",
@@ -336,6 +444,26 @@
       "Do you have investments or a long-term plan?",
       "Do you know how much you would need to retire?",
       "Do you understand where your money is?"
+    ],
+    "salud": [
+      "How are your energy levels day to day?",
+      "Do you get the rest you need?",
+      "Are you comfortable with how you look after yourself?"
+    ],
+    "tecnologia": [
+      "How much time do you spend on screens without noticing?",
+      "Does technology help you or overwhelm you day to day?",
+      "Do you feel comfortable with the tools you use?"
+    ],
+    "formacion": [
+      "Are you learning something that excites you?",
+      "Do you make time to study or learn languages?",
+      "Do you feel you keep growing in what you know?"
+    ],
+    "voluntariado": [
+      "Do you give some of your time to help other people or causes?",
+      "Would you like to join a charity project?",
+      "How do you feel when you help others?"
     ]
   },
   "admin": {
@@ -430,7 +558,36 @@
     "acciones_user_recovery_sent": "Recovery link sent",
     "acciones_reauth_failed": "Wrong confirmation password",
     "nombreEnIdioma": "Name ({{idioma}})",
-    "descripcionEnIdioma": "Description ({{idioma}})"
+    "descripcionEnIdioma": "Description ({{idioma}})",
+    "pestanaVideos": "Videos",
+    "videos": {
+      "intro": "The \"For inspiration\" videos on each category page, by language. The page shows those in the person's language; if there are none in that language, those in another one. At most 6 per category and language.",
+      "anadirTitulo": "Add a video",
+      "categoria": "Category",
+      "idioma": "Language",
+      "enlace": "YouTube link",
+      "titulo": "Title",
+      "anadir": "Add video",
+      "ninguno": "No videos yet.",
+      "lista": "Inspiration videos",
+      "quitar": "Delete “{{titulo}}”",
+      "errorRepetido": "That video is already on that page (same category and language).",
+      "errorDatos": "Couldn't save it. Check the YouTube link and the title (up to 120 characters), and that the page doesn't already have 6 videos.",
+      "errorQuitar": "Couldn't delete it. Please try again.",
+      "editarTitulo": "Edit the video",
+      "guardarCambios": "Save changes",
+      "cancelar": "Cancel",
+      "filtrar": "Filter by category",
+      "todas": "All",
+      "youtube": "YouTube",
+      "acciones": "Actions",
+      "verEnYoutube": "Watch “{{titulo}}” on YouTube",
+      "editar": "Edit “{{titulo}}”",
+      "porPagina": "Per page",
+      "mostrando": "{{from}}–{{to}} of {{count}}"
+    },
+    "anadirPagina": "Its page will appear in Categories as “Coming soon”.",
+    "retirarCategoria": "Retire “{{nombre}}”"
   },
   "datos": {
     "titulo": "Privacy & data",
@@ -452,7 +609,7 @@
     "errorUltimoAdmin": "You are the only administrator and there must always be one: you can't delete your account until you create another administrator (by granting the role to another account).",
     "iaTitulo": "AI-personalised ideas",
     "iaActivar": "AI-personalised ideas",
-    "iaQueSeEnvia": "If you turn this on, when you open an idea for an area, an AI service (Anthropic) is asked to rewrite the app's idea you're looking at based on your score, whether it's going up or down, and the options you ticked in \"What helps you?\".",
+    "iaQueSeEnvia": "If you turn this on, when you open an idea for a category, an AI service (Anthropic) is asked to rewrite the app's idea you're looking at based on your score, whether it's going up or down, the options you ticked in \"What helps you?\" and, if you set them in your profile, your occupation and hobbies.",
     "iaQueNunca": "For these ideas, your name, your email, your private experiences, sensitive categories and the Couple category are never sent.",
     "iaRevocable": "It's off by default. You can turn it off at any time: personalised ideas are deleted and you see the usual ideas again.",
     "iaError": "The change could not be saved",
@@ -467,6 +624,21 @@
     "errorCuentaDemo": "This is the project's demo account and it can't be deleted. If you'd like to try deleting an account, create your own: it is really deleted, with all its data."
   },
   "recomendaciones": {
+    "ocio": {
+      "titulo": "All is going well",
+      "texto": "All your categories are green. There's nothing you need to improve: these ideas are for enjoying it.",
+      "otra": "Another idea",
+      "ideas": {
+        "1": "Give yourself some time just for you, with no goal and no to-do list.",
+        "2": "Keep an afternoon for something you enjoy just because: a film, a walk, a book.",
+        "3": "Treat yourself to something small: a massage, a long bath or your favourite meal.",
+        "4": "Plan a getaway or a few days of rest, even close to home.",
+        "5": "Spend some good time with someone you love, for no other reason than enjoying it.",
+        "6": "Take a break from this app too: come back in a few weeks, whenever you feel like it.",
+        "7": "Write down three things that are going well, to have them at hand another day.",
+        "8": "Celebrate what you have built: what you have now is also something you have looked after."
+      }
+    },
     "ideaAnterior": "Previous idea",
     "ideaSiguiente": "Next idea",
     "ideaPosicion": "Idea {{actual}} of {{total}}",
@@ -477,7 +649,7 @@
         "1": "If you feel like it, note down where your money goes for a week, without judging yourself: just looking already helps.",
         "2": "Try setting aside a small amount as soon as you're paid, even a symbolic one. The habit is what matters.",
         "3": "Pick a small, recurring expense that doesn't give you much and try a week without it, just to see how it feels.",
-        "4": "Write down a concrete, near savings goal, like a small treat, and how much is left to reach it.",
+        "4": "Write down a concrete goal for your money, near or long term, and how far you are from it: knowing what it's for helps you decide calmly.",
         "5": "If talking about money helps you, share what worries you with someone you trust; putting it into words already clears things up."
       },
       "vidaSocial": {
@@ -540,12 +712,40 @@
         "1": "Pick one small action related to {{categoria}} that you can do this week and write it down.",
         "2": "Think about what weighs on you most in {{categoria}} and which small change would ease it.",
         "3": "Ask yourself what would help most right now in {{categoria}} and take a first step, however small."
+      },
+      "salud": {
+        "1": "This week, go to bed half an hour earlier one night and notice how you wake up.",
+        "2": "Step outside for ten minutes of daylight, unhurried and without your phone.",
+        "3": "Keep a bottle of water in sight in the place where you spend most of your time.",
+        "4": "For every hour you spend sitting, stand up and stretch for a minute.",
+        "5": "For three days, write down in a single word how you feel when you wake up."
+      },
+      "tecnologia": {
+        "1": "Pick a screen-free moment each day this week and see what you do with that time.",
+        "2": "Turn off notifications for an app that often interrupts you and see whether you miss it.",
+        "3": "Learn one new thing with a tool you already use: a shortcut or a feature you didn't know.",
+        "4": "Leave your phone outside the bedroom for one night and see how you wake up.",
+        "5": "Spend half an hour tidying your photos or files: less noise, and easier to find what matters."
+      },
+      "formacion": {
+        "1": "Pick something you'd like to learn and find a short course or tutorial to start this week.",
+        "2": "Set aside a regular time each week, even twenty minutes, to learn something new.",
+        "3": "If you're learning a language, try watching a series or listening to a podcast in it with subtitles.",
+        "4": "Learn with someone else: sharing what you study helps you keep going.",
+        "5": "Write down three things you've learned this month, however small: seeing them written down keeps you motivated."
+      },
+      "voluntariado": {
+        "1": "Look for an organisation near you and ask how you could help, even a few hours a month.",
+        "2": "Start with something one-off: a food drive, a beach clean-up or a charity event.",
+        "3": "Ask someone around you if they know a project to help with, and join them for a day.",
+        "4": "If you like animals, find out whether a nearby shelter needs help with walks or care.",
+        "5": "Think of something you're good at that could help other people: sometimes that's the best way to give."
       }
     },
     "dialogoTitulo": "An idea for {{categoria}}",
     "cerrar": "Close",
     "resumenTitulo": "Ideas for you",
-    "resumenTexto": "For the areas with the lowest scores. You decide whether they help.",
+    "resumenTexto": "For the categories with the lowest scores. You decide whether they help.",
     "ideaPara": "Idea for {{categoria}}",
     "personalizando": "Personalising your idea…",
     "personalizadaConIa": "Personalised with AI",
@@ -555,8 +755,19 @@
     "reportar": "Report",
     "reportada": "Thank you. We've hidden it.",
     "errorReportar": "We couldn't report it. Please try again.",
+    "reportarAyuda": "\"Report\" hides that experience straight away for everyone. Use it if it isn't respectful, gives away someone's details or has nothing to do with the category; nobody will know it was you.",
     "avisoOtros": "Other people's experiences: they aren't professional advice. If one doesn't seem appropriate, report it.",
-    "limiteIa": "You've reached today's maximum of AI uses: this is the original idea. You can try again tomorrow."
+    "limiteIa": "You've reached today's maximum of AI uses: this is the original idea. You can try again tomorrow.",
+    "meGusta": "I like it",
+    "noMeGusta": "Not for me",
+    "ideaGuardada": "The idea has been saved. You'll find it on Home.",
+    "apartadas_one": "You've set aside {{count}} idea.",
+    "apartadas_other": "You've set aside {{count}} ideas.",
+    "ocultasPorSituacion_one": "There is {{count}} more idea that isn't shown because of what you marked as hard in this category.",
+    "ocultasPorSituacion_other": "There are {{count}} more ideas that aren't shown because of what you marked as hard in this category.",
+    "sinIdeas": "You've set aside every idea for this category.",
+    "recuperar": "Show them again",
+    "errorReaccion": "We couldn't save that change. Please try again."
   },
   "evolucion": {
     "titulo": "Your evolution",
@@ -596,15 +807,16 @@
   "guia": {
     "comoFunciona": "How it works",
     "pasos": [
-      "Choose the areas of your life you want to look at.",
+      "Choose the categories of your life you want to look at.",
       "Rate each one from 1 to 10: it takes about two minutes, and you can leave some for another day.",
-      "See your balance, how it changes over time, and ideas for the areas you want to improve."
+      "See your balance, how it changes over time, and ideas for the categories you want to improve.",
+      "If a category is going well, you can anonymously share what works for you, and read what works for other people."
     ],
     "panelTitulo": "How to read this page",
     "panelPuntos": [
-      "“{{equilibrio}}”: your latest score in each area, all together on the same scale.",
-      "“{{evolucion}}”: how each area has changed every time you updated your answers.",
-      "“{{idea}}” appears on areas with a low score: tap it to see a suggestion.",
+      "“{{equilibrio}}”: your latest score in each category, all together on the same scale.",
+      "“{{evolucion}}”: how each category has changed every time you updated your answers.",
+      "“{{idea}}” appears on categories with a low score: tap it to see a suggestion.",
       "When something changes in your life, use “{{actualizar}}”."
     ],
     "entendido": "Got it"
@@ -616,7 +828,8 @@
       "apps": "Money apps",
       "hablarlo": "Talking it over with someone I trust",
       "aprender": "Learning about money",
-      "ingresosExtra": "Extra income"
+      "ingresosExtra": "Extra income",
+      "largoPlazo": "Thinking long term"
     },
     "vidaSocial": {
       "quedarEnPersona": "Meeting up in person",
@@ -680,6 +893,38 @@
       "consultarProfesional": "Asking a professional",
       "pocoAPoco": "Investing little by little",
       "revisarDeVezEnCuando": "Checking now and then"
+    },
+    "salud": {
+      "dormir": "Sleeping well",
+      "luzDelDia": "Daylight and fresh air",
+      "moverme": "Moving every day",
+      "comerConCalma": "Eating without rushing",
+      "descansos": "Taking breaks",
+      "rutinas": "Having routines"
+    },
+    "tecnologia": {
+      "limitarPantallas": "Setting screen limits",
+      "menosNotificaciones": "Fewer notifications",
+      "desconectar": "Switching off for a while",
+      "aprenderAlgoNuevo": "Learning something new",
+      "ordenDigital": "Digital tidiness",
+      "crearAlgoPropio": "Making something of my own"
+    },
+    "formacion": {
+      "cursoCorto": "A short course",
+      "ratoFijo": "A regular time to learn",
+      "aprenderConOtros": "Learning with others",
+      "practicarIdioma": "Practising a language",
+      "leer": "Reading",
+      "proyectoPropio": "A project of my own"
+    },
+    "voluntariado": {
+      "asociacionCerca": "An organisation nearby",
+      "pocoTiempo": "Even a little time",
+      "conAmigos": "With friends or family",
+      "animales": "Helping animals",
+      "entorno": "Caring for the environment",
+      "acompanarPersonas": "Keeping people company"
     }
   },
   "situaciones": {
@@ -718,5 +963,177 @@
         "disponibilidad": "international directory of verified helplines: choose your country."
       }
     }
+  },
+  "avatares": {
+    "titulo": "Your avatar",
+    "ayuda": "Pick the one you like best. You can change or remove it at any time.",
+    "quitar": "No avatar",
+    "generadosConIA": "Illustrations generated with AI and reviewed one by one.",
+    "descripciones": {
+      "roundGlasses": "Person with short dark curly hair, round glasses and a mustard sweater",
+      "tealScarf": "Person with white hair and a teal scarf over the head and shoulders",
+      "longBraids": "Person with dark skin, two long braids and a coral t-shirt",
+      "highBun": "Person with long black hair in a high bun and a lavender shirt",
+      "pinkWrap": "Person with straight black hair and a pink wrap tied on the head",
+      "woolBeanie": "Person wearing a wool beanie with a pompom and an orange jacket",
+      "stripedShirt": "Person with short brown hair, glasses and a striped shirt",
+      "longWaves": "Person with long, wavy, light-coloured hair and a blue blouse",
+      "blondBeard": "Person with short blond hair, a short beard and a green polo shirt",
+      "headphones": "Person with dark skin and short hair, wearing headphones and a yellow jacket",
+      "shavedHead": "Person with a shaved head, no beard, and a grey t-shirt",
+      "topKnotBeard": "Person with dark skin, hair tied up and a short beard, wearing a green hoodie"
+    }
+  },
+  "recordatorio": {
+    "titulo": "You haven't looked at these in a while",
+    "item_one": "{{categoria}}: {{count}} week ago",
+    "item_other": "{{categoria}}: {{count}} weeks ago",
+    "pregunta_one": "Is it still the same? Take another look whenever you like.",
+    "pregunta_other": "Are they still the same? Take another look whenever you like."
+  },
+  "ideasGuardadas": {
+    "titulo": "Your saved ideas",
+    "hecha": "Done",
+    "quitar": "Remove",
+    "error": "We couldn't save that change. Please try again."
+  },
+  "planIdea": {
+    "pregunta": "When would you like to try it?",
+    "unaSemana": "In a week",
+    "unMes": "In a month",
+    "otraFecha": "Another date",
+    "sinFecha": "No date",
+    "paraEl": "For {{fecha}}",
+    "poner": "Set a date",
+    "cambiar": "Change date",
+    "sinPresion": "It's only a reference for you: change it or remove it whenever you like."
+  },
+  "calendario": {
+    "titulo": "Calendar",
+    "intro": "What you have ahead and the ideas you gave a date to. The app takes your events into account without touching your scores: when the day comes, Home will invite you to review them yourself.",
+    "mesAnterior": "Previous month",
+    "mesSiguiente": "Next month",
+    "hoy": "Today",
+    "anotaciones_one": "{{count}} entry",
+    "anotaciones_other": "{{count}} entries",
+    "diaVacio": "Nothing noted for this day.",
+    "ideaGuardada": "Saved idea",
+    "anadirTitulo": "Add an event",
+    "queTienes": "What do you have on?",
+    "privado": "Only you can see it. It is never sent to the AI or shared.",
+    "dia": "Day",
+    "anadir": "Add",
+    "borrar": "Delete \"{{titulo}}\"",
+    "error": "We couldn't save that change. Please try again.",
+    "proximamente": "Coming up",
+    "verCalendario": "See the calendar",
+    "comoFue": "How did \"{{titulo}}\" go?",
+    "revisaNota": "If you like, review your score in {{categoria}}.",
+    "revisar": "Review",
+    "categorias": "Which categories does it relate to? (optional)",
+    "categoriasAyuda": "If you choose any, on the day of the event Home will invite you to review your score in it.",
+    "avisoRevision": "On the day of the event, Home will invite you to review your score in what you chose, whether it went well or not. The app never changes it for you."
+  },
+  "paginasCategoria": {
+    "titulo": "Categories",
+    "intro": "Each category will have its own page with what you have lived in it: memories and achievements to remember and to keep you going. Some are ready to explore; the rest are coming soon.",
+    "proximamente": "Coming soon",
+    "sinPagina": "This category doesn't have a page yet.",
+    "verTodas": "See all categories",
+    "tuNota": "Your score now",
+    "puntuadaEl": "Scored on {{fecha}}",
+    "sinNota": "You haven't scored it yet.",
+    "puntuar": "Score {{categoria}}",
+    "tusExperiencias": "Your experiences",
+    "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview.",
+    "verTodasExperiencias": "See all ({{count}})",
+    "verMenos": "See less",
+    "avisoMarcasTitulo": "Disclaimer",
+    "avisoMarcas": "The header image is AI-generated and used for illustrative purposes only in a non-profit academic project. Any colours or designs that may resemble real brands imply no affiliation with or endorsement by them."
+  },
+  "hitos": {
+    "titulo": {
+      "aventura": "Challenges you've overcome",
+      "deporte": "Races, competitions and personal bests"
+    },
+    "intro": {
+      "aventura": "What you've achieved: a summit, a long trek, that challenge that made you nervous. To remember it when things get hard.",
+      "deporte": "Your races, competitions and personal bests, from any year. To remember what you're capable of."
+    },
+    "ejemplo": {
+      "aventura": "E.g. Camino de Santiago",
+      "deporte": "E.g. Valencia half marathon"
+    },
+    "anadirTitulo": "Add a milestone",
+    "queConseguiste": "What you achieved",
+    "anadir": "Add milestone",
+    "tusHitos_one": "{{count}} milestone",
+    "tusHitos_other": "{{count}} milestones",
+    "ninguno": "You haven't added any milestones yet.",
+    "borrar": "Delete “{{titulo}}” ({{fecha}})",
+    "noCambianNota": "Your milestones are yours alone: they don't change your score, aren't sent to the AI and aren't shared."
+  },
+  "viajes": {
+    "titulo": "Your trips",
+    "intro": "The countries you have visited, or are planning to visit, from any year. A map of your memories and of what you still want to see.",
+    "mapaNoCarga": "The map couldn't be loaded. Your trips are still below; try reloading the page.",
+    "mapa": "Map of your trips",
+    "comoUsarMapa": "Visited countries are shown filled in. Hover to see when you went and click one to choose it below. Zoom with Ctrl + scroll (⌘ on Mac), by pinching or with + and −.",
+    "anadirTitulo": "Add a trip",
+    "pais": "Country",
+    "sinPaises": "No country with that name",
+    "anio": "Year",
+    "mes": "Month (optional)",
+    "sinMes": "I don't remember",
+    "anadir": "Add trip",
+    "tusViajes_one": "{{count}} trip",
+    "tusViajes_other": "{{count}} trips",
+    "ninguno": "You haven't added any trips yet.",
+    "borrar": "Delete the trip to {{pais}} ({{fecha}})",
+    "error": "We couldn't save that change. Please try again.",
+    "noCambianNota": "Your trips are only yours: they don't change your score, they are not sent to the AI and they are not shared.",
+    "avisoRueda": "Use Ctrl + scroll (⌘ + scroll on Mac) to zoom the map",
+    "avisoDosDedos": "Use two fingers to move the map"
+  },
+  "avisos": {
+    "titulo": "Notifications",
+    "botonNuevos_one": "Notifications: {{count}} new",
+    "botonNuevos_other": "Notifications: {{count}} new",
+    "ninguno": "You have no notifications.",
+    "evento": "How did \"{{titulo}}\" go? If you like, review your score in {{categorias}}.",
+    "idea": "You planned to try an idea for {{categoria}} on {{fecha}}.",
+    "revisar_one": "{{categoria}} hasn't been reviewed for {{count}} week. Is it still the same?",
+    "revisar_other": "{{categoria}} hasn't been reviewed for {{count}} weeks. Is it still the same?",
+    "perfil": "Complete your profile: choose an avatar and, if you like, your occupation and hobbies, so ideas fit you better."
+  },
+  "perfilIa": {
+    "titulo": "How the AI sees you",
+    "noDisponible": "AI isn't available in this installation: the ideas are always the app's own.",
+    "activadas": "AI ideas are on: the AI adapts the wording of the app's ideas with this data.",
+    "desactivadas": "AI ideas are off: nothing is sent to the AI right now.",
+    "recibe": "From your profile, it receives:",
+    "recibiria": "If you turn them on, from your profile it would receive:",
+    "nadaDelPerfil": "Nothing: you haven't set an occupation or hobbies.",
+    "ademas": "And, for each non-sensitive category, your score, whether it's going up or down and what you ticked in \"What helps you?\".",
+    "nunca": "It never receives:",
+    "nuncaLista": "Your name, your email, your date of birth, your gender, your written experiences or anything from sensitive categories.",
+    "cambiar": "Change it in Privacy and data",
+    "activar": "Turn them on in Privacy and data"
+  },
+  "videos": {
+    "titulo": "For inspiration",
+    "intro": "Video talks that might give you ideas or a push. Chosen by the app's author.",
+    "reproducir": "Play “{{titulo}}”",
+    "aviso": "Images and videos come from YouTube: when you play one, YouTube knows you visited (no tracking cookies until you press play)."
+  },
+  "comunidad": {
+    "titulo": "From the community",
+    "intro": "What other people who are doing well in this area share anonymously.",
+    "ninguna": "Nobody has shared anything in this category yet. When things go well for you, you can share an experience from your diary in the interview."
+  },
+  "sesion": {
+    "caducadaTitulo": "Your session has expired",
+    "caducadaTexto": "For your security, your session closes after two days without using the app. Sign in again to carry on; if you were saving something, please do it again afterwards.",
+    "volverAEntrar": "Sign in again"
   }
 }

@@ -86,7 +86,7 @@ export function DataPrivacyPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 560, mx: { xs: 0, md: "auto" }, mt: { xs: 1, sm: 3 }, display: "flex", flexDirection: "column", gap: 4 }}>
+    <Box sx={{ maxWidth: 640, mt: 1, display: "flex", flexDirection: "column", gap: 4 }}>
       <Typography variant="h5" component="h1">
         {t("datos.titulo")}
       </Typography>
@@ -109,7 +109,7 @@ export function DataPrivacyPage() {
         </Box>
       </Box>
 
-      <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5, p: 2, border: 1, borderColor: "error.light", borderRadius: 3 }}>
+      <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5, p: 2, border: 1, borderColor: "error.light", borderRadius: 0 }}>
         <Typography variant="subtitle1" component="h2">
           {t("datos.eliminarTitulo")}
         </Typography>

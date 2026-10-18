@@ -25,7 +25,7 @@ describe("PrivacyPolicyPage (RNF-05)", () => {
     );
 
     expect(screen.getByRole("heading", { name: /ideas personalizadas con ia/i })).toBeInTheDocument();
-    const text = screen.getByText(/al abrir una idea para un área no sensible/i).textContent ?? "";
+    const text = screen.getByText(/al abrir una idea para una categoría no sensible/i).textContent ?? "";
     expect(text).toMatch(/anthropic/i);
     expect(text).toMatch(/nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles/i);
   });

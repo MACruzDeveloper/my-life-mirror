@@ -12,3 +12,12 @@
  * Lo global (colores, tipografía, bordes redondeados) va mejor en el tema
  * (`src/shared/ui/theme.ts`), para que lo hereden todos los componentes.
  */
+
+/* UX-08: la portada no enseña la barra de desplazamiento (se sigue pudiendo bajar con la rueda,
+   el dedo, el teclado y la flecha). La clase la pone la propia portada mientras está abierta. */
+.mlm-no-scrollbar {
+  scrollbar-width: none;
+}
+.mlm-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

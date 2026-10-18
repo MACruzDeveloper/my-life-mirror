@@ -8,7 +8,7 @@ describe("ChartDataTable (alternativa accesible a un gráfico)", () => {
   it("está plegada y se despliega con su botón, mostrando cabeceras y filas", () => {
     render(
       <ChartDataTable
-        caption="Puntuaciones de Economía"
+        caption="Puntuaciones de Finanzas"
         headers={["Fecha", "Puntuación"]}
         rows={[
           { key: "a", cells: ["15 ene 2026", 3] },
@@ -24,7 +24,7 @@ describe("ChartDataTable (alternativa accesible a un gráfico)", () => {
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(toggle);
 
-    const table = screen.getByRole("table", { name: "Puntuaciones de Economía" });
+    const table = screen.getByRole("table", { name: "Puntuaciones de Finanzas" });
     const rows = within(table).getAllByRole("row");
     expect(rows).toHaveLength(3);
     expect(rows[2]).toHaveTextContent(/18 sept 2026[\s\S]*7/);

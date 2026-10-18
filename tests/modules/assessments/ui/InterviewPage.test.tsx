@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // solo; con toda la batería en paralelo puede multiplicarse y rozar los 5 s por defecto. Medido el 5 oct.:
 // no es una regresión (antes de RF-44 ya iba a ~0,64 s por test), así que se ajusta el límite solo aquí.
 vi.setConfig({ testTimeout: 15_000 });
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 import { InterviewPage } from "@modules/assessments/ui/InterviewPage";
@@ -16,20 +16,20 @@ import type { QueryClient } from "@tanstack/react-query";
 import { categoryLabelsFixture } from "../../../helpers/categoryLabels";
 
 const CATEGORIES = [
-  { id: "c1", catalogId: "k-economia", name: "Economía", description: "...", status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"] },
+  { id: "c1", catalogId: "k-economia", name: "Finanzas", description: "...", status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"] },
   { id: "c2", catalogId: "k-deporte", name: "Deporte", description: "...", status: "active", isSensitiveData: true },
   { id: "c3", catalogId: "k-pareja", name: "Pareja", description: "...", status: "inactive", isSensitiveData: false },
   { id: "c4", catalogId: "k-sexo", name: "Sexo", description: "...", status: "inactive", isSensitiveData: true },
 ];
 
 const LATEST = [
-  { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, recordedAt: "2026-09-18T10:00:00.000Z" },
+  { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 6, recordedAt: "2026-09-18T10:00:00.000Z" },
   { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte" },
 ];
 
 const HISTORY = [
-  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 4, previousScore: 6, note: "Este mes he ahorrado un poco" }] },
-  { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 6, note: "Mes justo" }] },
+  { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 4, previousScore: 6, note: "Este mes he ahorrado un poco" }] },
+  { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 6, note: "Mes justo" }] },
 ];
 
 // RF-44: el diario de experiencias (la más reciente primero, como lo devuelve el servidor).
@@ -41,6 +41,7 @@ const EXPERIENCES = [
 ];
 
 interface StubOptions {
+  categories?: unknown[];
   latest?: unknown;
   history?: unknown;
   recommendations?: unknown;
@@ -55,9 +56,9 @@ interface StubOptions {
 
 // Por defecto, el diario vacío: cada experiencia añade botones a la página y encarece todas las búsquedas por rol.
 
-function stubFetch({ latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [], shareRejection }: StubOptions = {}) {
+function stubFetch({ categories = CATEGORIES, latest = LATEST, history = HISTORY, recommendations = [], recommendationsAfterSave, saveResponse, experiences = [], shareRejection }: StubOptions = {}) {
   const fetchMock: ReturnType<typeof vi.fn> = vi.fn((url: string, init?: RequestInit) => {
-    if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => CATEGORIES });
+    if (url === "/api/categories") return Promise.resolve({ ok: true, json: async () => categories });
     if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
     if (url === "/api/assessments/history") return Promise.resolve({ ok: true, json: async () => history });
     if (url === "/api/recommendations") {
@@ -140,7 +141,7 @@ function openCategoryAccordions() {
 async function waitUntilLoaded() {
   await screen.findByRole("heading", { level: 1 });
   openCategoryAccordions();
-  await waitFor(() => expect(screen.getByRole("checkbox", { name: /economía/i })).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByRole("checkbox", { name: /finanzas/i })).toBeInTheDocument());
 }
 
 function toggleCategory(categoryName: string) {
@@ -160,7 +161,7 @@ function question(categoryId: string) {
   return document.getElementById(`pregunta-${categoryId}`)!;
 }
 
-const LOW_ECONOMY_IDEA = { id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", templateKey: "economia.1", status: "pending" };
+const LOW_ECONOMY_IDEA = { id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", templateKey: "economia.1", status: "pending" };
 
 function postCalls(fetchMock: ReturnType<typeof vi.fn>, url: string) {
   return fetchMock.mock.calls.filter(([urlCalled, init]) => urlCalled === url && init?.method === "POST");
@@ -184,7 +185,7 @@ describe("InterviewPage (RF-10)", () => {
       expect(sensitive).toHaveAttribute("aria-expanded", "false");
       expect(sensitive).toHaveTextContent("1 de 2 activas");
       expect(screen.queryByRole("checkbox", { name: /pareja/i })).not.toBeInTheDocument();
-      expect(screen.getByText("¿Cómo te sientes con Economía?")).toBeInTheDocument();
+      expect(screen.getByText("¿Cómo te sientes con Finanzas?")).toBeInTheDocument();
 
       fireEvent.click(regular);
       expect(await screen.findByRole("checkbox", { name: /pareja/i })).not.toBeChecked();
@@ -193,9 +194,9 @@ describe("InterviewPage (RF-10)", () => {
   });
 
   describe("primera entrevista por pasos (UX-07)", () => {
-    // Sin respuestas guardadas: Economía y Deporte activas pero sin puntuar.
+    // Sin respuestas guardadas: Finanzas y Deporte activas pero sin puntuar.
     const FIRST_TIME = [
-      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" },
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas" },
       { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte" },
     ];
 
@@ -222,7 +223,7 @@ describe("InterviewPage (RF-10)", () => {
       expect(screen.getByRole("button", { name: "Empezar" })).toBeInTheDocument();
       expect(screen.queryByRole("checkbox", { name: /pareja/i })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /^pareja/i })).not.toBeInTheDocument();
-      expect(screen.queryByText("¿Cómo te sientes con Economía?")).not.toBeInTheDocument();
+      expect(screen.queryByText("¿Cómo te sientes con Finanzas?")).not.toBeInTheDocument();
     });
 
     it("paso 2: cada categoría es un botón que se marca al tocarlo y la activa al momento", async () => {
@@ -231,7 +232,7 @@ describe("InterviewPage (RF-10)", () => {
 
       expect(screen.getByRole("heading", { name: "¿De qué quieres hablar?" })).toBeInTheDocument();
       expect(currentStep()).toHaveTextContent("Categorías");
-      expect(categoryButton("economía")).toHaveAttribute("aria-pressed", "true");
+      expect(categoryButton("finanzas")).toHaveAttribute("aria-pressed", "true");
       expect(categoryButton("pareja")).toHaveAttribute("aria-pressed", "false");
 
       fireEvent.click(categoryButton("pareja"));
@@ -245,7 +246,7 @@ describe("InterviewPage (RF-10)", () => {
       await openFirstTime();
       fireEvent.click(screen.getByRole("button", { name: "Empezar" }));
 
-      fireEvent.click(categoryButton("economía"));
+      fireEvent.click(categoryButton("finanzas"));
       fireEvent.click(categoryButton("deporte"));
 
       await waitFor(() => expect(screen.getByRole("button", { name: "Ir a las preguntas" })).toBeDisabled());
@@ -266,7 +267,7 @@ describe("InterviewPage (RF-10)", () => {
       fireEvent.click(screen.getByRole("button", { name: "Ir a las preguntas" }));
 
       expect(currentStep()).toHaveTextContent("Preguntas");
-      expect(screen.getByText("¿Cómo te sientes con Economía?")).toBeInTheDocument();
+      expect(screen.getByText("¿Cómo te sientes con Finanzas?")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /^tus categorías/i })).toHaveAttribute("aria-expanded", "false");
       expect(screen.getByText("Releer la introducción").closest("[aria-expanded]")).toHaveAttribute("aria-expanded", "false");
       expect(screen.queryByRole("button", { name: "Empezar" })).not.toBeInTheDocument();
@@ -277,8 +278,8 @@ describe("InterviewPage (RF-10)", () => {
       fireEvent.click(screen.getByRole("button", { name: "Empezar" }));
       fireEvent.click(screen.getByRole("button", { name: "Ir a las preguntas" }));
 
-      chooseScore("economía", 7);
-      fireEvent.click(saveButton("Economía"));
+      chooseScore("finanzas", 7);
+      fireEvent.click(saveButton("Finanzas"));
 
       expect(await within(question("c1")).findByRole("status")).toHaveTextContent(/guardado ahora/i);
       expect(screen.getByRole("heading", { level: 1, name: /tu entrevista/i })).toBeInTheDocument();
@@ -319,9 +320,9 @@ describe("InterviewPage (RF-10)", () => {
     renderPage();
     await waitUntilLoaded();
 
-    expect(screen.getByRole("checkbox", { name: /economía/i })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: /finanzas/i })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: /pareja/i })).not.toBeChecked();
-    expect(screen.getByText("¿Cómo te sientes con Economía?")).toBeInTheDocument();
+    expect(screen.getByText("¿Cómo te sientes con Finanzas?")).toBeInTheDocument();
     expect(screen.queryByRole("group", { name: /pareja/i })).not.toBeInTheDocument();
   });
 
@@ -330,9 +331,9 @@ describe("InterviewPage (RF-10)", () => {
     renderPage();
     await waitUntilLoaded();
 
-    const group = screen.getByRole("group", { name: /economía/i });
+    const group = screen.getByRole("group", { name: /finanzas/i });
     expect(within(group).getByRole("button", { name: "6" })).toHaveAttribute("aria-pressed", "true");
-    expect(saveButton("Economía")).toBeDisabled();
+    expect(saveButton("Finanzas")).toBeDisabled();
     expect(saveButton("Deporte")).toBeDisabled();
   });
 
@@ -341,15 +342,15 @@ describe("InterviewPage (RF-10)", () => {
     renderPage();
     await waitUntilLoaded();
 
-    chooseScore("economía", 4);
+    chooseScore("finanzas", 4);
     chooseScore("deporte", 8);
-    expect(saveButton("Economía")).toBeEnabled();
-    fireEvent.click(saveButton("Economía"));
+    expect(saveButton("Finanzas")).toBeEnabled();
+    fireEvent.click(saveButton("Finanzas"));
 
     expect(await within(question("c1")).findByRole("status")).toHaveTextContent(/guardado ahora/i);
     const [call] = postCalls(fetchMock, "/api/assessments");
     expect(JSON.parse(call[1].body as string)).toEqual({ entries: [{ categoryId: "c1", score: 4 }] });
-    expect(saveButton("Economía")).toBeDisabled();
+    expect(saveButton("Finanzas")).toBeDisabled();
     expect(saveButton("Deporte")).toBeEnabled();
     expect(within(screen.getByRole("group", { name: /puntuación de deporte/i })).getByRole("button", { name: "8" })).toHaveAttribute("aria-pressed", "true");
   });
@@ -391,13 +392,13 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      chooseScore("economía", 7);
-      fireEvent.click(saveButton("Economía"));
+      chooseScore("finanzas", 7);
+      fireEvent.click(saveButton("Finanzas"));
 
       expect(await within(question("c1")).findByRole("status")).toHaveTextContent(/guardado ahora/i);
       await new Promise((resolve) => setTimeout(resolve, 50));
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-      chooseScore("economía", 8);
+      chooseScore("finanzas", 8);
       expect(within(question("c1")).queryByRole("status")).not.toBeInTheDocument();
     });
 
@@ -406,11 +407,11 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      chooseScore("economía", 2);
-      fireEvent.click(saveButton("Economía"));
+      chooseScore("finanzas", 2);
+      fireEvent.click(saveButton("Finanzas"));
 
       const dialog = await screen.findByRole("dialog", { name: /cambios guardados/i });
-      expect(within(dialog).getByText(/tienes una idea para economía/i)).toBeInTheDocument();
+      expect(within(dialog).getByText(/tienes una idea para finanzas/i)).toBeInTheDocument();
       expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
       expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
       expect(within(dialog).getByRole("link", { name: /ver mis resultados/i })).toHaveAttribute("href", "/perfil/resultados");
@@ -425,8 +426,8 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      chooseScore("economía", 3);
-      fireEvent.click(saveButton("Economía"));
+      chooseScore("finanzas", 3);
+      fireEvent.click(saveButton("Finanzas"));
 
       expect(await within(question("c1")).findByRole("status")).toHaveTextContent(/guardado ahora/i);
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -437,12 +438,12 @@ describe("InterviewPage (RF-10)", () => {
       stubFetch({ saveResponse: () => Promise.resolve({ ok: false, json: async () => ({ error: "Only active categories can be scored" }) }) });
       renderPage();
       await waitUntilLoaded();
-      chooseScore("economía", 4);
-      fireEvent.click(saveButton("Economía"));
+      chooseScore("finanzas", 4);
+      fireEvent.click(saveButton("Finanzas"));
 
       expect(await within(question("c1")).findByText(/only active categories/i)).toBeInTheDocument();
-      expect(saveButton("Economía")).toBeEnabled();
-      expect(within(screen.getByRole("group", { name: /puntuación de economía/i })).getByRole("button", { name: "4" })).toHaveAttribute("aria-pressed", "true");
+      expect(saveButton("Finanzas")).toBeEnabled();
+      expect(within(screen.getByRole("group", { name: /puntuación de finanzas/i })).getByRole("button", { name: "4" })).toHaveAttribute("aria-pressed", "true");
     });
 
     it("tras guardar usa lo que devuelve el servidor: no vuelve a pedir las puntuaciones ni las recomendaciones (PERF-01)", async () => {
@@ -452,15 +453,15 @@ describe("InterviewPage (RF-10)", () => {
       const gets = (url: string) => fetchMock.mock.calls.filter(([urlCalled, init]) => urlCalled === url && !init?.method).length;
       const before = { latest: gets("/api/assessments"), recommendations: gets("/api/recommendations"), history: gets("/api/assessments/history") };
 
-      chooseScore("economía", 2);
-      fireEvent.click(saveButton("Economía"));
+      chooseScore("finanzas", 2);
+      fireEvent.click(saveButton("Finanzas"));
 
       expect(await screen.findByRole("dialog", { name: /cambios guardados/i })).toBeInTheDocument();
       await waitFor(() => expect(gets("/api/assessments/history")).toBe(before.history + 1));
       expect(gets("/api/assessments")).toBe(before.latest);
       expect(gets("/api/recommendations")).toBe(before.recommendations);
       // Con el modal abierto, el resto de la página está oculto a la accesibilidad: `hidden` para mirar debajo.
-      const group = screen.getByRole("group", { name: /puntuación de economía/i, hidden: true });
+      const group = screen.getByRole("group", { name: /puntuación de finanzas/i, hidden: true });
       expect(within(group).getByRole("button", { name: "2", hidden: true })).toHaveAttribute("aria-pressed", "true");
     });
 
@@ -470,8 +471,8 @@ describe("InterviewPage (RF-10)", () => {
       await waitUntilLoaded();
       const callsBefore = fetchMock.mock.calls.filter(([urlCalled]) => urlCalled === "/api/assessments/history").length;
 
-      chooseScore("economía", 4);
-      fireEvent.click(saveButton("Economía"));
+      chooseScore("finanzas", 4);
+      fireEvent.click(saveButton("Finanzas"));
 
       await waitFor(() =>
         expect(fetchMock.mock.calls.filter(([urlCalled]) => urlCalled === "/api/assessments/history").length).toBeGreaterThan(callsBefore),
@@ -483,7 +484,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Economía (5)" }));
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: "Ideas para Finanzas (5)" }));
 
       const dialog = screen.getByRole("dialog");
       expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
@@ -506,7 +507,7 @@ describe("InterviewPage (RF-10)", () => {
         await waitUntilLoaded();
 
         expect(progressPanel()).toHaveTextContent("1 de 2 respondidas");
-        expect(progressItem("economía")).toHaveTextContent(/guardada el 18 de septiembre/i);
+        expect(progressItem("finanzas")).toHaveTextContent(/guardada el 18 de septiembre/i);
         expect(progressItem("deporte")).toHaveTextContent(/sin responder/i);
         expect(within(progressPanel()).queryByRole("button", { name: /pareja/i })).not.toBeInTheDocument();
       });
@@ -516,12 +517,12 @@ describe("InterviewPage (RF-10)", () => {
         renderPage();
         await waitUntilLoaded();
 
-        chooseScore("economía", 4);
-        expect(progressItem("economía")).toHaveTextContent(/sin guardar/i);
+        chooseScore("finanzas", 4);
+        expect(progressItem("finanzas")).toHaveTextContent(/sin guardar/i);
 
-        fireEvent.click(saveButton("Economía"));
+        fireEvent.click(saveButton("Finanzas"));
 
-        await waitFor(() => expect(progressItem("economía")).toHaveTextContent(/guardada hoy/i));
+        await waitFor(() => expect(progressItem("finanzas")).toHaveTextContent(/guardada hoy/i));
       });
 
       it("es un acordeón, abierto por defecto, que conserva el resumen al plegarlo (UX-06)", async () => {
@@ -574,7 +575,7 @@ describe("InterviewPage (RF-10)", () => {
       expect(toggle).toHaveAttribute("aria-expanded", "false");
       fireEvent.click(toggle);
 
-      const group = helpsGroup("economía");
+      const group = helpsGroup("finanzas");
       expect(within(group).getByRole("button", { name: "Llevar un presupuesto", pressed: true })).toBeInTheDocument();
       expect(within(group).getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeInTheDocument();
       expect(within(group).queryByRole("button", { name: "Gimnasio" })).not.toBeInTheDocument();
@@ -586,12 +587,12 @@ describe("InterviewPage (RF-10)", () => {
       await waitUntilLoaded();
 
       fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
-      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
+      fireEvent.click(within(helpsGroup("finanzas")).getByRole("button", { name: "Apps de finanzas" }));
 
-      expect(await within(helpsGroup("economía")).findByRole("button", { name: "Apps de finanzas", pressed: true })).toBeInTheDocument();
+      expect(await within(helpsGroup("finanzas")).findByRole("button", { name: "Apps de finanzas", pressed: true })).toBeInTheDocument();
       await waitFor(() => expect(postCalls(fetchMock, "/api/categories/experience")).toHaveLength(1));
       expect(JSON.parse(postCalls(fetchMock, "/api/categories/experience")[0][1].body as string)).toEqual({ categoryId: "c1", tags: ["economia.presupuesto", "economia.apps"] });
-      expect(saveButton("Economía")).toBeDisabled();
+      expect(saveButton("Finanzas")).toBeDisabled();
     });
 
     it("cuando el servidor confirma la opción, las ideas personalizadas se vuelven a pedir (RF-40 v1.1)", async () => {
@@ -603,7 +604,7 @@ describe("InterviewPage (RF-10)", () => {
       await waitUntilLoaded();
 
       fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
-      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
+      fireEvent.click(within(helpsGroup("finanzas")).getByRole("button", { name: "Apps de finanzas" }));
 
       await waitFor(() => expect(client.getQueryState(["personalized-ideas", "r1", "economia.1", "es", "economia.apps|economia.presupuesto"])?.isInvalidated).toBe(true));
     });
@@ -637,8 +638,8 @@ describe("InterviewPage (RF-10)", () => {
       const personalizeCalls = () => fetchMock.mock.calls.filter(([urlCalled]) => urlCalled === "/api/recommendations/personalize").length;
 
       fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
-      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
-      fireEvent.click(await within(question("c1")).findByRole("button", { name: /^Ideas para Economía/ }));
+      fireEvent.click(within(helpsGroup("finanzas")).getByRole("button", { name: "Apps de finanzas" }));
+      fireEvent.click(await within(question("c1")).findByRole("button", { name: /^Ideas para Finanzas/ }));
       await waitFor(() => expect(personalizeCalls()).toBe(1));
       confirmExperience();
 
@@ -658,9 +659,9 @@ describe("InterviewPage (RF-10)", () => {
       await waitUntilLoaded();
 
       fireEvent.click(screen.getByRole("button", { name: /qué te ayuda\? \(1\)/i }));
-      fireEvent.click(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas" }));
+      fireEvent.click(within(helpsGroup("finanzas")).getByRole("button", { name: "Apps de finanzas" }));
 
-      await waitFor(() => expect(within(helpsGroup("economía")).getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeInTheDocument());
+      await waitFor(() => expect(within(helpsGroup("finanzas")).getByRole("button", { name: "Apps de finanzas", pressed: false })).toBeInTheDocument());
       expect(screen.getByText(/no se pudo guardar tu elección/i)).toBeInTheDocument();
     });
 
@@ -668,7 +669,7 @@ describe("InterviewPage (RF-10)", () => {
       stubFetch();
       renderPage();
       await waitUntilLoaded();
-      chooseScore("economía", 3);
+      chooseScore("finanzas", 3);
 
       for (const name of [/qué te ayuda/i, /qué te lo pone difícil/i, /tus experiencias/i]) {
         expect(within(question("c1")).getByRole("button", { name })).toHaveAttribute("aria-expanded", "false");
@@ -714,7 +715,7 @@ describe("InterviewPage (RF-10)", () => {
       fireEvent.click(within(question("c1")).getByRole("button", { name: /tus experiencias/i }));
 
       fireEvent.change(within(question("c1")).getByLabelText("Nueva experiencia"), { target: { value: "Hoy he cobrado" } });
-      expect(saveButton("Economía")).toBeDisabled();
+      expect(saveButton("Finanzas")).toBeDisabled();
       fireEvent.click(within(question("c1")).getByRole("button", { name: "Añadir" }));
 
       expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Guardada");
@@ -997,7 +998,7 @@ describe("InterviewPage (RF-10)", () => {
       renderPage();
       await waitUntilLoaded();
 
-      chooseScore("economía", 3);
+      chooseScore("finanzas", 3);
       const toggle = difficultiesToggle("c1")!;
       expect(toggle).toHaveAttribute("aria-expanded", "false");
       fireEvent.click(toggle);
@@ -1018,7 +1019,7 @@ describe("InterviewPage (RF-10)", () => {
       const fetchMock = stubFetch();
       renderPage();
       await waitUntilLoaded();
-      chooseScore("economía", 3);
+      chooseScore("finanzas", 3);
       fireEvent.click(difficultiesToggle("c1")!);
 
       fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
@@ -1033,21 +1034,21 @@ describe("InterviewPage (RF-10)", () => {
         stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
         renderPage();
         await waitUntilLoaded();
-        const ideasButton = await within(question("c1")).findByRole("button", { name: "Ideas para Economía (5)" });
+        const ideasButton = await within(question("c1")).findByRole("button", { name: "Ideas para Finanzas (5)" });
         expect(ideasButton).not.toHaveAttribute("data-pulse");
         fireEvent.click(difficultiesToggle("c1")!);
 
         fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
 
         expect(await within(question("c1")).findByRole("status")).toHaveTextContent("Ideas actualizadas");
-        expect(within(question("c1")).getByRole("button", { name: "Ideas para Economía (4)" })).toHaveAttribute("data-pulse", "true");
+        expect(within(question("c1")).getByRole("button", { name: "Ideas para Finanzas (4)" })).toHaveAttribute("data-pulse", "true");
       });
 
       it("sin idea abierta: 'Para tus próximas ideas'", async () => {
         stubFetch();
         renderPage();
         await waitUntilLoaded();
-        chooseScore("economía", 3);
+        chooseScore("finanzas", 3);
         fireEvent.click(difficultiesToggle("c1")!);
 
         fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
@@ -1059,14 +1060,14 @@ describe("InterviewPage (RF-10)", () => {
         stubFetch({ recommendations: [LOW_ECONOMY_IDEA] });
         renderPage();
         await waitUntilLoaded();
-        await within(question("c1")).findByRole("button", { name: /^Ideas para Economía/ });
+        await within(question("c1")).findByRole("button", { name: /^Ideas para Finanzas/ });
         fireEvent.click(within(question("c1")).getByRole("button", { name: /qué te ayuda/i }));
 
         fireEvent.click(within(question("c1")).getByRole("button", { name: "Apps de finanzas" }));
 
         const status = await within(question("c1")).findByRole("status");
         expect(status.textContent?.trim()).toBe("Guardado");
-        expect(within(question("c1")).getByRole("button", { name: /^Ideas para Economía/ })).toHaveAttribute("data-pulse", "true");
+        expect(within(question("c1")).getByRole("button", { name: /^Ideas para Finanzas/ })).toHaveAttribute("data-pulse", "true");
       });
 
       it("en pantallas anchas, el mensaje sale a la derecha del título de su lista, en la misma línea (no hace saltar nada al irse)", async () => {
@@ -1108,7 +1109,7 @@ describe("InterviewPage (RF-10)", () => {
       );
       renderPage();
       await waitUntilLoaded();
-      chooseScore("economía", 3);
+      chooseScore("finanzas", 3);
       fireEvent.click(difficultiesToggle("c1")!);
 
       fireEvent.click(within(question("c1")).getByRole("button", { name: "Mirar mis cuentas" }));
@@ -1162,13 +1163,13 @@ describe("InterviewPage (RF-10)", () => {
       const callsBefore = latestCalls();
 
       economyActive = false;
-      toggleCategory("economía");
+      toggleCategory("finanzas");
       await waitFor(() => expect(latestCalls()).toBeGreaterThan(callsBefore));
-      await waitFor(() => expect(screen.queryByRole("group", { name: /puntuación de economía/i })).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByRole("group", { name: /puntuación de finanzas/i })).not.toBeInTheDocument());
       economyActive = true;
-      toggleCategory("economía");
+      toggleCategory("finanzas");
 
-      const group = screen.getByRole("group", { name: /puntuación de economía/i });
+      const group = screen.getByRole("group", { name: /puntuación de finanzas/i });
       expect(within(group).getByRole("button", { name: "6" })).toHaveAttribute("aria-pressed", "true");
       expect(within(question("c1")).queryByText(/sin responder/i)).not.toBeInTheDocument();
     });
@@ -1193,11 +1194,11 @@ describe("InterviewPage (RF-10)", () => {
     renderPage();
     await waitUntilLoaded();
 
-    toggleCategory("economía");
+    toggleCategory("finanzas");
 
-    await waitFor(() => expect(screen.getByRole("checkbox", { name: /economía/i })).not.toBeChecked());
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /finanzas/i })).not.toBeChecked());
     expect(postCalls(fetchMock, "/api/categories/deactivate")).toHaveLength(1);
-    expect(screen.queryByRole("group", { name: /economía/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: /finanzas/i })).not.toBeInTheDocument();
   });
 
   it("una categoría sensible pide consentimiento (con enlace a la política) y se activa al aceptar", async () => {
@@ -1255,7 +1256,7 @@ describe("InterviewPage (RF-10)", () => {
     expect(screen.queryByText(/se necesita tu consentimiento/i)).not.toBeInTheDocument();
 
     fireEvent.click(selectAll);
-    await waitFor(() => expect(screen.getByRole("checkbox", { name: /economía/i })).not.toBeChecked());
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /finanzas/i })).not.toBeChecked());
     expect(screen.getByRole("checkbox", { name: /pareja/i })).not.toBeChecked();
     expect(screen.getByRole("checkbox", { name: /deporte/i })).toBeChecked();
   });
@@ -1265,7 +1266,7 @@ describe("InterviewPage (RF-10)", () => {
     renderPage();
     await waitUntilLoaded();
 
-    const info = screen.getByRole("button", { name: /ver ejemplos de economía/i });
+    const info = screen.getByRole("button", { name: /ver ejemplos de finanzas/i });
     expect(info).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(info);
 
@@ -1273,14 +1274,184 @@ describe("InterviewPage (RF-10)", () => {
     expect(screen.getByText(/salario/i)).toBeVisible();
   });
 
+  describe("guardar todo (UX-12)", () => {
+    const THREE = [
+      { id: "c1", catalogId: "k-economia", name: "Finanzas", description: "...", status: "active", isSensitiveData: false },
+      { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false },
+      { id: "c6", catalogId: "k-familia", name: "Familia", description: "...", status: "active", isSensitiveData: false },
+    ];
+    const LATEST_THREE = [
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 6, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c5", catalogId: "k-aventura", categoryName: "Aventura", score: 6, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c6", catalogId: "k-familia", categoryName: "Familia", score: 6, recordedAt: "2026-10-01T10:00:00.000Z" },
+    ];
+    const idea = (id: string, categoryId: string, catalogId: string, templateKey: string) => ({ id, categoryId, catalogId, categoryName: "", templateKey, status: "pending" });
+    const saveAllButton = () => screen.getByRole("button", { name: /guardar todo/i });
+
+    it("sin cambios está desactivado; con dos notas cambiadas, una sola petición con las dos, y las dos quedan guardadas", async () => {
+      const fetchMock = stubFetch({ categories: THREE, latest: LATEST_THREE, history: [] });
+      renderPage();
+      await waitUntilLoaded();
+      expect(saveAllButton()).toBeDisabled();
+
+      chooseScore("finanzas", 7);
+      chooseScore("familia", 7);
+      expect(saveAllButton()).toHaveAccessibleName("Guardar todo (2)");
+      fireEvent.click(saveAllButton());
+
+      await waitFor(() => expect(within(question("c1")).getByText("Guardado ahora")).toBeInTheDocument());
+      expect(within(question("c6")).getByText("Guardado ahora")).toBeInTheDocument();
+      const posts = postCalls(fetchMock, "/api/assessments");
+      expect(posts).toHaveLength(1);
+      expect(JSON.parse(posts[0][1].body as string).entries).toEqual([
+        { categoryId: "c1", score: 7 },
+        { categoryId: "c6", score: 7 },
+      ]);
+      expect(saveAllButton()).toBeDisabled();
+    });
+
+    it("si se abren ideas nuevas en varias categorías, un aviso las nombra y enlaza a Inicio, sin abrir ventanas", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], recommendationsAfterSave: [idea("r1", "c1", "k-economia", "economia.1"), idea("r6", "c6", "k-familia", "familia.1")] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("finanzas", 2);
+      chooseScore("familia", 2);
+      fireEvent.click(saveAllButton());
+
+      // Hay más "status" en la página ("Guardado ahora" en cada categoría): el resumen, por su texto.
+      const summary = (await screen.findByText(/finanzas: tienes una idea nueva/i)).closest("[role='status']") as HTMLElement;
+      expect(summary).toHaveTextContent(/finanzas: tienes una idea nueva/i);
+      expect(summary).toHaveTextContent(/familia: tienes una idea nueva/i);
+      expect(within(summary).getByRole("link", { name: /ver en inicio/i })).toHaveAttribute("href", "/inicio");
+      expect(screen.queryByRole("dialog", { name: /cambios guardados/i })).not.toBeInTheDocument();
+    });
+
+    it("no se pierde ningún aviso: una idea nueva en una y una nota alta en otra salen las dos, en un solo resumen", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], recommendationsAfterSave: [idea("r1", "c1", "k-economia", "economia.1")] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("finanzas", 2);
+      chooseScore("aventura", 9);
+      fireEvent.click(saveAllButton());
+
+      // Hay más "status" en la página ("Guardado ahora" en cada categoría): el resumen, por su texto.
+      const summary = (await screen.findByText(/finanzas: tienes una idea nueva/i)).closest("[role='status']") as HTMLElement;
+      expect(summary).toHaveTextContent(/finanzas: tienes una idea nueva/i);
+      expect(summary).toHaveTextContent(/enhorabuena.*un 9 en aventura/i);
+      expect(screen.queryByRole("dialog", { name: /cambios guardados/i })).not.toBeInTheDocument();
+    });
+
+    it("si lo único que pasa es una idea nueva, la ventana de siempre", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], recommendationsAfterSave: [idea("r1", "c1", "k-economia", "economia.1")] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("finanzas", 2);
+      chooseScore("familia", 7);
+      fireEvent.click(saveAllButton());
+
+      expect(await screen.findByRole("dialog", { name: /cambios guardados/i })).toBeInTheDocument();
+    });
+
+    it("si falla, lo dice junto al botón y las notas siguen cambiadas", async () => {
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [], saveResponse: () => Promise.resolve({ ok: false, json: async () => ({ error: "Algo ha fallado" }) }) });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("finanzas", 7);
+      fireEvent.click(saveAllButton());
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(/no se han podido guardar/i);
+      expect(saveAllButton()).toHaveAccessibleName("Guardar todo (1)");
+      expect(saveAllButton()).toBeEnabled();
+    });
+
+    it("al bajar y salir la barra de la vista, aparece una versión compacta fija con un solo \"Guardar todo\"", async () => {
+      // jsdom no tiene IntersectionObserver: uno simulado, que se dispara a mano.
+      let report: (entry: Partial<IntersectionObserverEntry>) => void = () => {};
+      class FakeObserver {
+        constructor(callback: IntersectionObserverCallback) {
+          report = (entry) => callback([entry as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+        }
+        observe() {}
+        disconnect() {}
+      }
+      vi.stubGlobal("IntersectionObserver", FakeObserver);
+      stubFetch({ categories: THREE, latest: LATEST_THREE, history: [] });
+      renderPage();
+      await waitUntilLoaded();
+      expect(screen.queryByTestId("questions-bar-compact")).not.toBeInTheDocument();
+
+      act(() => report({ isIntersecting: false, boundingClientRect: { top: -40 } as DOMRectReadOnly }));
+
+      const compact = await screen.findByTestId("questions-bar-compact");
+      chooseScore("finanzas", 7);
+      // La normal queda oculta mientras tanto: para el lector de pantalla hay un solo botón.
+      expect(screen.getAllByRole("button", { name: /guardar todo/i })).toHaveLength(1);
+      expect(within(compact).getByRole("button", { name: "Guardar todo (1)" })).toBeEnabled();
+
+      act(() => report({ isIntersecting: true, boundingClientRect: { top: 200 } as DOMRectReadOnly }));
+      await waitFor(() => expect(screen.queryByTestId("questions-bar-compact")).not.toBeInTheDocument());
+      vi.unstubAllGlobals();
+    });
+  });
+
+  describe("todo en verde (RF-50)", () => {
+    const THREE = [
+      { id: "c1", catalogId: "k-economia", name: "Finanzas", description: "...", status: "active", isSensitiveData: false },
+      { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false },
+      { id: "c6", catalogId: "k-familia", name: "Familia", description: "...", status: "active", isSensitiveData: false },
+    ];
+    const latestWith = (familia: number) => [
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 8, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c5", catalogId: "k-aventura", categoryName: "Aventura", score: 8, recordedAt: "2026-10-01T10:00:00.000Z" },
+      { categoryId: "c6", catalogId: "k-familia", categoryName: "Familia", score: familia, recordedAt: "2026-10-01T10:00:00.000Z" },
+    ];
+
+    it("al subir la última categoría a 8 y guardar, avisa de que todo está en verde y enlaza a Inicio", async () => {
+      stubFetch({ categories: THREE, latest: latestWith(5), history: [] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("familia", 8);
+      fireEvent.click(saveButton("Familia"));
+
+      expect(await screen.findByText(/todo en verde/i)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /ver ideas en inicio/i })).toHaveAttribute("href", "/inicio");
+    });
+
+    it("si ya estaba todo en verde, guardar otra nota alta no lo repite (sale el mensaje de siempre)", async () => {
+      stubFetch({ categories: THREE, latest: latestWith(8), history: [] });
+      renderPage();
+      await waitUntilLoaded();
+
+      chooseScore("familia", 9);
+      fireEvent.click(saveButton("Familia"));
+
+      expect(await screen.findByText(/enhorabuena/i)).toBeInTheDocument();
+      expect(screen.queryByText(/todo en verde/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it("RF-49: la pregunta de una categoría con página (Aventura) enlaza a ella; las demás, no", async () => {
+    stubFetch({ categories: [...CATEGORIES, { id: "c5", catalogId: "k-aventura", name: "Aventura", description: "...", status: "active", isSensitiveData: false }] });
+    renderPage();
+    await waitUntilLoaded();
+
+    expect(await screen.findByRole("link", { name: "Ver tu página de Aventura" })).toHaveAttribute("href", "/categorias/aventura");
+    expect(screen.queryByRole("link", { name: /ver tu página de finanzas/i })).not.toBeInTheDocument();
+  });
+
   it("la respuesta recibe un fondo suave según la banda (sin colorear el número)", async () => {
     stubFetch();
     renderPage();
     await waitUntilLoaded();
 
-    const group = screen.getByRole("group", { name: /economía/i });
+    const group = screen.getByRole("group", { name: /finanzas/i });
     expect(group.closest("[data-band]")).toHaveAttribute("data-band", "medium");
-    chooseScore("economía", 2);
+    chooseScore("finanzas", 2);
     expect(group.closest("[data-band]")).toHaveAttribute("data-band", "low");
   });
 
@@ -1367,7 +1538,7 @@ describe("InterviewPage (RF-10)", () => {
 
     const shortcuts = screen.getByRole("navigation", { name: /ir a una categoría/i });
     expect(within(shortcuts).getByRole("link", { name: /deporte/i })).toHaveTextContent(/sin responder/i);
-    expect(within(shortcuts).getByRole("link", { name: /economía/i })).not.toHaveTextContent(/sin responder/i);
+    expect(within(shortcuts).getByRole("link", { name: /finanzas/i })).not.toHaveTextContent(/sin responder/i);
     const sportQuestion = document.getElementById("pregunta-c2")!;
     expect(within(sportQuestion).getByText(/sin responder/i)).toBeInTheDocument();
     expect(within(document.getElementById("pregunta-c1")!).queryByText(/sin responder/i)).not.toBeInTheDocument();
@@ -1394,7 +1565,7 @@ describe("InterviewPage (RF-10)", () => {
   });
 
   it("la primera vez es una entrevista; con respuestas guardadas se presenta como actualizarlas", async () => {
-    stubFetch({ latest: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }, { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte" }] });
+    stubFetch({ latest: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas" }, { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte" }] });
     const firstRender = renderPage();
     expect(await screen.findByRole("heading", { level: 1, name: /tu entrevista/i })).toBeInTheDocument();
     firstRender.unmount();
@@ -1405,7 +1576,7 @@ describe("InterviewPage (RF-10)", () => {
   });
 
   it("la primera vez, el entrevistador explica los pasos de la pantalla con el nombre real del botón (UX-01)", async () => {
-    stubFetch({ latest: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }] });
+    stubFetch({ latest: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas" }] });
     renderPage();
 
     const steps = await screen.findByRole("list", { name: /qué vamos a hacer/i });
@@ -1432,7 +1603,7 @@ describe("InterviewPage (RF-10)", () => {
       expect(await screen.findByRole("checkbox", { name: /finances/i })).toBeInTheDocument();
       expect(screen.getByText("How are you feeling about Finances?")).toBeInTheDocument();
       expect(screen.getByRole("group", { name: "Score for Finances" })).toBeInTheDocument();
-      expect(screen.queryByText(/economía/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/finanzas/i)).not.toBeInTheDocument();
       // Los ejemplos siguen funcionando: se buscan por el nombre guardado, no por el traducido.
       expect(screen.getByRole("button", { name: /see examples for finances/i })).toBeInTheDocument();
     } finally {

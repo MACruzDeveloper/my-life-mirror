@@ -12,7 +12,9 @@ export default defineConfig({
   fullyParallel: true,
   retries: 0,
   reporter: "list",
-  timeout: 30_000,
+  // En GitHub Actions, 60 s: los recorridos largos (ideas con IA, compartir experiencias) rondan los 26 s
+  // y, en un runner lento, pasaban de 30 sin que fallara nada (PR a main del 18 oct.).
+  timeout: process.env.CI ? 60_000 : 30_000,
   use: {
     baseURL: "http://localhost:5174",
     trace: "retain-on-failure",

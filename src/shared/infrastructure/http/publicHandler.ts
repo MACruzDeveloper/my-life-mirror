@@ -43,7 +43,7 @@ const digest = (value: string) => createHash("sha256").update(value).digest("hex
 export function publicHandler<S extends z.ZodTypeAny>(options: PublicHandlerOptions<S>): HttpHandler {
   const getContext = options.getContext ?? getAppContext;
 
-  function send(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}) {
+  function send(res: ServerResponse, status: number, body: unknown, headers: Record<string, string | string[]> = {}) {
     res.writeHead(status, { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers });
     res.end(JSON.stringify(body));
   }

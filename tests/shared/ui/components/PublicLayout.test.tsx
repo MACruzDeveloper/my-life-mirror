@@ -11,7 +11,8 @@ function renderPublic() {
   return render(
     <MemoryRouter initialEntries={["/"]}>
       <Routes>
-        <Route element={<PublicLayout />}>
+        {/* Como en la app: la portada ocupa toda la pantalla y pone ella el pie (UX-08). */}
+        <Route element={<PublicLayout overlay />}>
           <Route path="/" element={<Landing />} />
         </Route>
       </Routes>
@@ -27,7 +28,7 @@ describe("PublicLayout (páginas públicas)", () => {
   it("las páginas públicas tienen selector de idioma y pintan su contenido", () => {
     renderPublic();
 
-    expect(screen.getByRole("switch", { name: "English" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "English" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Crear cuenta" })).toBeInTheDocument();
   });
 
@@ -37,10 +38,31 @@ describe("PublicLayout (páginas públicas)", () => {
     expect(screen.getByRole("link", { name: "¿Necesitas ayuda ahora?" })).toHaveAttribute("href", "/ayuda");
   });
 
+  it("en las demás páginas públicas, el pie lo pone la envoltura; a pantalla completa, la propia página (UX-08)", () => {
+    const { unmount } = render(
+      <MemoryRouter>
+        <PublicLayout>
+          <p>Un formulario</p>
+        </PublicLayout>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("link", { name: "¿Necesitas ayuda ahora?" })).toBeInTheDocument();
+    unmount();
+
+    render(
+      <MemoryRouter>
+        <PublicLayout overlay>
+          <p>Una página a pantalla completa</p>
+        </PublicLayout>
+      </MemoryRouter>,
+    );
+    expect(screen.queryByRole("link", { name: "¿Necesitas ayuda ahora?" })).not.toBeInTheDocument();
+  });
+
   it("se puede pasar la portada a inglés antes de tener cuenta", async () => {
     renderPublic();
 
-    fireEvent.click(screen.getByRole("switch", { name: "English" }));
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
 
     expect(await screen.findByRole("link", { name: /create account/i })).toBeInTheDocument();
   });

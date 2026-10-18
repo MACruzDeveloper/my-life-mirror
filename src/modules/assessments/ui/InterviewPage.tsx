@@ -1,4 +1,8 @@
-import { useRef, useState } from "react";
+import { isBalanced } from "@modules/recommendations/domain/leisureIdeas";
+import { PALE_TINT } from "@shared/ui/theme";
+import { ScrollToTopButton } from "@shared/ui/components/ScrollToTopButton";
+import { prefersReducedMotion } from "@shared/ui/motion";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -8,6 +12,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
+import Fade from "@mui/material/Fade";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -18,14 +23,15 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import interviewerAvatar from "../../../assets/avatars/interviewer.svg";
+import interviewerAvatar from "../../../assets/avatars/interviewer.webp";
 import { useCategoryLabel } from "@modules/categories/ui/categoryLabels";
 import { CATEGORIES_KEY, useCategories, type CategoryDto } from "@modules/categories/ui/queries";
 import { useAiIdeasActive, useAiSuggestionsActive } from "@modules/accounts/ui/queries";
 import { useOptionalSession } from "@shared/ui/context/SessionContext";
 import { PERSONALIZED_IDEAS_KEY, RECOMMENDATIONS_KEY, useRecommendations, type RecommendationDto } from "@modules/recommendations/ui/queries";
 import { Bubble } from "./interview/Bubble";
-import { PENDING_COLORS } from "./interview/pendingColors";
+import { QuestionsBar } from "./interview/QuestionsBar";
+import { WIDE_PAGE_MAX_WIDTH } from "@shared/ui/components/Breadcrumbs";
 import { CategoryPicker } from "./interview/CategoryPicker";
 import { CategorySelection } from "./interview/CategorySelection";
 import { InterviewSteps, type InterviewStep } from "./interview/InterviewSteps";
@@ -44,12 +50,19 @@ import {
   useLatestScores,
   type ExperienceDto,
 } from "./queries";
-import type { LatestScoreDto } from "./ScoreCards";
+import { ScoreFeedbackToast, type ScoreFeedbackMessage } from "./interview/ScoreFeedbackToast";
+import { scoreFeedback } from "./scoreFeedback";
+import type { LatestScoreDto } from "./queries";
 
-/** Lleva a la pregunta de una categoría; sin animación si el usuario prefiere menos movimiento. */
+/**
+ * Lleva a la pregunta de una categoría y la hace aparecer con un fundido, para
+ * que se vea a dónde se ha llegado. Sin animación si se prefiere menos movimiento.
+ */
 function scrollToQuestion(categoryId: string) {
-  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-  document.getElementById(`pregunta-${categoryId}`)?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  const reduced = prefersReducedMotion();
+  const question = document.getElementById(`pregunta-${categoryId}`);
+  question?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  if (!reduced) question?.animate?.([{ opacity: 0.25 }, { opacity: 1 }], { duration: 700, easing: "ease-out", delay: 250, fill: "backwards" });
 }
 
 function omitKey<T>(record: Record<string, T>, key: string): Record<string, T> {
@@ -69,7 +82,7 @@ const SOFT_SCROLLBAR = {
 } as const;
 
 /** Cada bloque de la columna principal (introducción, preguntas): mismo marco, distinto fondo. */
-const MODULE_STYLES = { p: { xs: 2, sm: 4 }, borderRadius: 4, display: "flex", flexDirection: "column", gap: 3 } as const;
+const MODULE_STYLES = { p: { xs: 2, sm: 4 }, borderRadius: 0, display: "flex", flexDirection: "column", gap: 3 } as const;
 
 const isOpenRecommendation = (recommendation: RecommendationDto) => recommendation.status === "pending" || recommendation.status === "postponed";
 
@@ -128,6 +141,7 @@ export function InterviewPage() {
   const [saveStatuses, setSaveStatuses] = useState<Record<string, CategorySaveStatus>>({});
   // UX-05: la idea nueva que ha abierto el último guardado (abre "Cambios guardados").
   const [newIdea, setNewIdea] = useState<RecommendationDto | null>(null);
+  const [highScoreFeedback, setHighScoreFeedback] = useState<ScoreFeedbackMessage | undefined>(undefined);
   const historyQuery = useAssessmentHistory();
   const recommendations = useRecommendations().data ?? [];
   const experiences = useExperiences().data ?? [];
@@ -463,31 +477,88 @@ export function InterviewPage() {
    * "Guardado ahora".
    */
   async function saveCategory(categoryId: string): Promise<boolean> {
-    const score = scores[categoryId];
-    setSaveStatus(categoryId, { kind: "saving" });
+    return saveScores([categoryId]);
+  }
+
+  /** UX-12: las categorías con una nota cambiada sin guardar, en el orden de la página. */
+  const unsavedIds = activeCategories.filter((category) => scores[category.id] !== undefined && scores[category.id] !== savedScores[category.id]).map((category) => category.id);
+  const [savingAll, setSavingAll] = useState(false);
+  const [saveAllError, setSaveAllError] = useState<string>();
+
+  /** UX-12: "Guardar todo": todas las notas cambiadas en una sola petición (el servidor guarda todas o ninguna). */
+  async function saveAll() {
+    setSavingAll(true);
+    setSaveAllError(undefined);
+    const saved = await saveScores(unsavedIds, (message) => setSaveAllError(message));
+    setSavingAll(false);
+    return saved;
+  }
+
+  // UX-12: la barra de accesos queda "pegada" cuando sale por arriba, bajo la cabecera compactada (50 px):
+  // entonces se pinta la compacta fija. Sin IntersectionObserver (jsdom), nunca se pega.
+  const [questionsBar, setQuestionsBar] = useState<HTMLElement | null>(null);
+  const [isBarStuck, setIsBarStuck] = useState(false);
+  useEffect(() => {
+    if (!questionsBar || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => setIsBarStuck(!entry.isIntersecting && entry.boundingClientRect.top < 50), { rootMargin: "-50px 0px 0px 0px" });
+    observer.observe(questionsBar);
+    return () => {
+      observer.disconnect();
+      setIsBarStuck(false);
+    };
+  }, [questionsBar]);
+  const questionsBarProps = {
+    items: activeCategories.map((category) => ({ id: category.id, name: categoryLabel(category.catalogId).name, isUnanswered: scores[category.id] === undefined })),
+    unsavedCount: unsavedIds.length,
+    saving: savingAll,
+    error: saveAllError ?? null,
+    onGoTo: scrollToQuestion,
+    onSaveAll: () => void saveAll(),
+  };
+
+  /**
+   * Guarda una o varias categorías en un solo POST. El resultado se ve en cada
+   * una ("Guardado ahora"). Si abre una idea nueva, "Cambios guardados"; si abre
+   * varias, un aviso con enlace a Inicio (no varias ventanas seguidas). Si deja
+   * todo en verde (y antes no lo estaba), el aviso de RF-50. `onError`: dónde
+   * decir que falló (por defecto, en la propia categoría).
+   */
+  async function saveScores(categoryIds: readonly string[], onError?: (message: string) => void): Promise<boolean> {
+    const entries = categoryIds.flatMap((categoryId) => (scores[categoryId] !== undefined ? [{ categoryId, score: scores[categoryId] }] : []));
+    if (entries.length === 0) return false;
+    const savedIds = entries.map((entry) => entry.categoryId);
+    for (const categoryId of savedIds) setSaveStatus(categoryId, { kind: "saving" });
     const openBefore = new Set((queryClient.getQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY) ?? []).filter(isOpenRecommendation).map((recommendation) => recommendation.id));
+    // RF-50: ¿estaba ya todo en verde antes de guardar? Solo se avisa cuando se llega, no cada vez.
+    const balancedBefore = isBalanced(activeCategories.map((category) => savedScores[category.id]));
+    const fail = (message: string) => {
+      if (onError) {
+        onError(message);
+        setSaveStatuses((current) => savedIds.reduce((statuses, categoryId) => omitKey(statuses, categoryId), current));
+      } else {
+        for (const categoryId of savedIds) setSaveStatus(categoryId, { kind: "error", message });
+      }
+      return false;
+    };
 
     try {
       const response = await fetch("/api/assessments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ entries: [{ categoryId, score }] }),
+        body: JSON.stringify({ entries }),
       });
       const data = await response.json();
-
-      if (!response.ok) {
-        setSaveStatus(categoryId, { kind: "error", message: data.error ?? t("entrevista.errorGenerico") });
-        return false;
-      }
+      if (!response.ok) return fail(onError ? t("entrevista.errorGuardarTodo") : (data.error ?? t("entrevista.errorGenerico")));
 
       // PERF-01: el servidor devuelve las últimas puntuaciones y las recomendaciones; van directas a la
       // caché y solo se vuelve a pedir el historial. Sin ellas (un servidor anterior), como antes.
       const latest = Array.isArray(data.latest) ? (data.latest as LatestScoreDto[]) : undefined;
       const updatedRecommendations = Array.isArray(data.recommendations) ? (data.recommendations as RecommendationDto[]) : undefined;
+      const savedScore = (categoryId: string) => entries.find((entry) => entry.categoryId === categoryId)?.score;
       if (latest) queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, latest);
-      else queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (current) => current?.map((latestScore) => (latestScore.categoryId === categoryId ? { ...latestScore, score } : latestScore)));
-      setDraftScores((current) => omitKey(current, categoryId));
-      setSaveStatus(categoryId, { kind: "saved" });
+      else queryClient.setQueryData<LatestScoreDto[]>(LATEST_SCORES_KEY, (current) => current?.map((latestScore) => (savedIds.includes(latestScore.categoryId) ? { ...latestScore, score: savedScore(latestScore.categoryId) } : latestScore)));
+      setDraftScores((current) => savedIds.reduce((drafts, categoryId) => omitKey(drafts, categoryId), current));
+      for (const categoryId of savedIds) setSaveStatus(categoryId, { kind: "saved" });
 
       if (updatedRecommendations) {
         queryClient.setQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY, updatedRecommendations);
@@ -495,14 +566,46 @@ export function InterviewPage() {
       } else {
         await queryClient.invalidateQueries({ queryKey: ASSESSMENTS_KEY });
       }
-      const idea = (queryClient.getQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY) ?? []).find(
-        (recommendation) => recommendation.categoryId === categoryId && isOpenRecommendation(recommendation) && !openBefore.has(recommendation.id),
+      const newIdeas = (queryClient.getQueryData<RecommendationDto[]>(RECOMMENDATIONS_KEY) ?? []).filter(
+        (recommendation) => savedIds.includes(recommendation.categoryId) && isOpenRecommendation(recommendation) && !openBefore.has(recommendation.id),
       );
-      if (idea) setNewIdea(idea);
+      const nameOf = (categoryId: string) => {
+        const category = categories.find((candidate) => candidate.id === categoryId);
+        return category ? categoryLabel(category.catalogId).name : "";
+      };
+      /** UX-09: el mensaje de nota alta de una categoría (si le toca uno). */
+      const highScoreOf = (entry: { categoryId: string; score: number }) => {
+        const savedCategory = categories.find((category) => category.id === entry.categoryId);
+        if (!savedCategory) return undefined;
+        const label = categoryLabel(savedCategory.catalogId);
+        const isSensitive = savedCategory.isSensitiveData === true;
+        const feedback = scoreFeedback({ score: entry.score, isSensitive, canShare: !isSensitive && !label.aiExcluded });
+        return feedback ? { ...feedback, categoryName: label.name, score: entry.score } : undefined;
+      };
+      const reachedBalance = !balancedBefore && isBalanced(activeCategories.map((category) => savedScore(category.id) ?? savedScores[category.id]));
+
+      if (entries.length === 1) {
+        // Una sola categoría (su "Guardar"): la ventana si abre una idea; si no, el aviso de todo en verde o el de nota alta.
+        if (newIdeas.length === 1) setNewIdea(newIdeas[0]);
+        const highScore = highScoreOf(entries[0]);
+        setHighScoreFeedback(reachedBalance ? { kind: "balanced" } : highScore);
+        return true;
+      }
+
+      // UX-12, "Guardar todo": ningún aviso se pierde. Todo en verde, cada idea nueva y cada nota alta, juntos.
+      const highScores = entries.flatMap((entry) => highScoreOf(entry) ?? []);
+      const items = [
+        ...(reachedBalance ? [t("entrevista.todoEnVerde")] : []),
+        ...newIdeas.map((recommendation) => t("entrevista.ideaNuevaPara", { categoria: nameOf(recommendation.categoryId) })),
+        ...highScores.map((feedback) => t(`entrevista.puntuacionAlta.${feedback.tone}${feedback.inviteToShare ? "Compartir" : ""}`, { categoria: feedback.categoryName, puntuacion: feedback.score })),
+      ];
+      if (items.length === 1 && newIdeas.length === 1) setNewIdea(newIdeas[0]);
+      else if (items.length === 1 && reachedBalance) setHighScoreFeedback({ kind: "balanced" });
+      else if (items.length > 0) setHighScoreFeedback({ kind: "summary", items, linkToHome: newIdeas.length > 0 || reachedBalance, centered: reachedBalance });
+      else setHighScoreFeedback(undefined);
       return true;
     } catch {
-      setSaveStatus(categoryId, { kind: "error", message: t("comun.errorServidor") });
-      return false;
+      return fail(onError ? t("entrevista.errorGuardarTodo") : t("comun.errorServidor"));
     }
   }
 
@@ -536,7 +639,7 @@ export function InterviewPage() {
       <Typography variant="body1">{isFirstInterview ? t("entrevista.descripcion") : t("entrevista.descripcionActualizar")}</Typography>
       {/* UX-01: la primera vez, los pasos concretos de esta pantalla; al actualizar ya se conocen. */}
       {isFirstInterview && (
-        <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ my: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+        <Box component="ol" aria-label={t("entrevista.pasosTitulo")} sx={{ mt: 1.5, mb: 0, pl: 2.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
           {(t("entrevista.pasosPrimeraVez", { returnObjects: true, boton: t("entrevista.guardar") }) as string[]).map((text) => (
             <Typography component="li" variant="body2" key={text}>
               {text}
@@ -544,7 +647,7 @@ export function InterviewPage() {
           ))}
         </Box>
       )}
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
         {t("entrevista.escala")}
       </Typography>
     </Bubble>
@@ -553,8 +656,8 @@ export function InterviewPage() {
   return (
     <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", lg: showQuestions ? "minmax(0, 1fr) 280px" : "minmax(0, 1fr)" }, alignItems: "start" }}>
     {/* Dos bloques con fondo distinto (UX-06): la introducción y, debajo, las preguntas. */}
-    <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 2, sm: 3 }, minWidth: 0 }}>
-    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: "#E6F2EE", scrollMarginTop: 72 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 1.5, sm: 2 }, minWidth: 0 }}>
+    <Box component="section" aria-labelledby="entrevista-titulo" sx={{ ...MODULE_STYLES, bgcolor: PALE_TINT, scrollMarginTop: 72 }}>
       {/* La entrevista es la primera vez; con respuestas guardadas, la misma pantalla se presenta como "actualizarlas". */}
       <Typography id="entrevista-titulo" variant="h5" component="h1">
         {isFirstInterview ? t("entrevista.titulo") : t("entrevista.tituloActualizar")}
@@ -624,7 +727,7 @@ export function InterviewPage() {
       {showQuestions &&
         (isFirstInterview ? (
           // En la primera entrevista ya se leyó en el paso 1: queda plegada, por si se quiere releer.
-          <Accordion disableGutters elevation={0} sx={{ bgcolor: "rgba(255, 255, 255, 0.6)", borderRadius: 3, "&::before": { display: "none" } }}>
+          <Accordion disableGutters elevation={0} sx={{ bgcolor: "rgba(255, 255, 255, 0.6)", borderRadius: 0, "&::before": { display: "none" } }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1" component="span">
                 {t("entrevista.releerIntro")}
@@ -639,7 +742,7 @@ export function InterviewPage() {
     </Box>
 
     {showQuestions && (
-    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "#F5F7F6" }}>
+    <Box component="section" aria-labelledby="entrevista-preguntas" sx={{ ...MODULE_STYLES, bgcolor: "background.default", pt: { xs: 1, sm: 1.5 } }}>
       {activeCategories.length > 0 && (
         <Typography id="entrevista-preguntas" variant="h6" component="h2">
           {t("entrevista.preguntasTitulo")}
@@ -647,45 +750,34 @@ export function InterviewPage() {
       )}
 
       {activeCategories.length > 0 && (
-        // En escritorio, el panel de progreso de la derecha hace de accesos directos.
-        <Box component="nav" aria-label={t("entrevista.irA")} sx={{ display: { xs: "flex", lg: "none" }, flexWrap: "wrap", gap: 1 }}>
-          {activeCategories.map((category) => {
-            const isUnanswered = scores[category.id] === undefined;
-            return (
-              <Box
-                key={category.id}
-                component="a"
-                href={`#pregunta-${category.id}`}
-                onClick={(event: React.MouseEvent) => {
-                  event.preventDefault();
-                  scrollToQuestion(category.id);
-                }}
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.75,
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 999,
-                  border: "1px solid",
-                  borderColor: isUnanswered ? PENDING_COLORS.border : "#DDE3E1",
-                  bgcolor: isUnanswered ? PENDING_COLORS.bg : "#FFFFFF",
-                  color: isUnanswered ? PENDING_COLORS.fg : "text.primary",
-                  fontSize: "0.875rem",
-                  textDecoration: "none",
-                  "&:hover, &:focus-visible": { borderColor: isUnanswered ? PENDING_COLORS.fg : "text.secondary" },
-                }}
-              >
-                {categoryLabel(category.catalogId).name}
-                {isUnanswered && (
-                  <Box component="span" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
-                    · {t("entrevista.sinResponder")}
-                  </Box>
-                )}
-              </Box>
-            );
-          })}
+        // UX-12: los accesos a cada pregunta y "Guardar todo". Al bajar, cuando esta barra queda bajo la
+        // cabecera, la sustituye una compacta fija (abajo); esta se oculta para que no haya dos botones.
+        <Box ref={setQuestionsBar} sx={{ mx: { xs: -2, sm: -4 }, px: { xs: 2, sm: 4 }, py: 1.5, borderBottom: 1, borderColor: "divider", visibility: isBarStuck ? "hidden" : "visible" }}>
+          <QuestionsBar {...questionsBarProps} />
         </Box>
+      )}
+      {activeCategories.length > 0 && (
+        <Fade in={isBarStuck} unmountOnExit>
+          <Box
+            data-testid="questions-bar-compact"
+            sx={{
+              position: "fixed",
+              // Debajo de la cabecera ya compactada (48 px más su borde de 2), de lado a lado.
+              top: 50,
+              left: 0,
+              right: 0,
+              zIndex: (theme) => theme.zIndex.appBar - 1,
+              bgcolor: "background.default",
+              borderBottom: 1,
+              borderColor: "divider",
+              boxShadow: 2,
+            }}
+          >
+            <Box sx={{ maxWidth: WIDE_PAGE_MAX_WIDTH, mx: "auto", px: 2, py: 0.75 }}>
+              <QuestionsBar {...questionsBarProps} compact />
+            </Box>
+          </Box>
+        </Fade>
       )}
 
       {activeCategories.map((category) => (
@@ -735,6 +827,7 @@ export function InterviewPage() {
       onClose={() => setNewIdea(null)}
     />
 
+    <ScoreFeedbackToast feedback={highScoreFeedback} onClose={() => setHighScoreFeedback(undefined)} />
     <Dialog open={categoryAwaitingConsent !== null} onClose={() => setCategoryAwaitingConsent(null)}>
       <DialogTitle>{t("categorias.modalTitulo")}</DialogTitle>
       <DialogContent>
@@ -766,6 +859,7 @@ export function InterviewPage() {
       </Box>
     </Box>
     )}
+    {showQuestions && <ScrollToTopButton />}
     </Box>
   );
 }

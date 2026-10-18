@@ -98,7 +98,7 @@ export function HistoryTimeline() {
   const visibleDays = showAll ? allDays : allDays.slice(0, INITIAL_VISIBLE);
 
   return (
-    <Box component="section" aria-labelledby={titleId} sx={{ bgcolor: "#FFFFFF", border: "1px solid #E4EAE8", borderRadius: 3, p: 2 }}>
+    <Box component="section" aria-labelledby={titleId} sx={{ bgcolor: "#FFFFFF", border: 1, borderColor: "divider", borderRadius: 0, p: 2 }}>
       <Typography id={titleId} variant="subtitle1" component="h2" sx={{ mb: 1 }}>
         {t("entrevista.historialTitulo")}
       </Typography>
@@ -118,7 +118,7 @@ export function HistoryTimeline() {
             {visibleDays.map((day, index) => {
               const startsMonth = index === 0 || monthOf(visibleDays[index - 1].recordedAt) !== monthOf(day.recordedAt);
               return (
-                <Box component="li" key={day.recordedAt} sx={{ borderLeft: "2px solid #E4EAE8", pl: 1.5 }}>
+                <Box component="li" key={day.recordedAt} sx={{ borderLeft: "2px solid #DCDFE1", pl: 1.5 }}>
                   {startsMonth && (
                     <Typography variant="overline" component="h3" sx={{ display: "block", lineHeight: 1.6, color: "text.secondary", ml: -1.75, mb: 0.5 }}>
                       {monthOf(day.recordedAt)}

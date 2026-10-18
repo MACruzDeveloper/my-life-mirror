@@ -295,7 +295,7 @@ describe("DataPrivacyPage (RF-05)", () => {
 
       const section = (await screen.findByRole("heading", { name: "Experiencias compartidas" })).closest("section") as HTMLElement;
       const item = (await within(section).findByText("Apunto los gastos cada domingo")).closest("li") as HTMLElement;
-      expect(await within(item).findByText("Economía")).toBeInTheDocument();
+      expect(await within(item).findByText("Finanzas")).toBeInTheDocument();
       expect(within(section).queryByText("Esta es privada")).not.toBeInTheDocument();
 
       fireEvent.click(within(item).getByRole("button", { name: "Dejar de compartir" }));

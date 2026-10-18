@@ -8,7 +8,7 @@ import { AdminCategories } from "@modules/admin/ui/AdminCategories";
 const text = (name: string, description = "d") => ({ name, description });
 
 const CATALOG = [
-  { id: "k1", key: "economia", translations: { es: text("Economía", "Tus finanzas."), en: text("Finances", "Your finances.") }, isSensitiveData: false },
+  { id: "k1", key: "economia", translations: { es: text("Finanzas", "Tus finanzas."), en: text("Finances", "Your finances.") }, isSensitiveData: false },
   { id: "k2", key: "sexo", translations: { es: text("Sexo", "Tu vida sexual."), en: text("Sex", "Your sex life.") }, isSensitiveData: true },
   { id: "k3", translations: { es: text("Antigua", "Ya no se usa.") }, isSensitiveData: false, retiredAt: "2026-09-01T10:00:00.000Z" },
 ];
@@ -49,8 +49,8 @@ describe("AdminCategories (ADM-02)", () => {
     stubFetch();
     render(withClient(<AdminCategories />));
 
-    await screen.findByText("Economía");
-    const finances = rowOf("Economía");
+    await screen.findByText("Finanzas");
+    const finances = rowOf("Finanzas");
     expect(within(finances).getByText("Finances")).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Nombre (español)" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Nombre (inglés)" })).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe("AdminCategories (ADM-02)", () => {
       url === "/api/admin/categories" && init?.method === "POST" ? { ok: true, status: 201, json: async () => ({}) } : undefined,
     );
     render(withClient(<AdminCategories />));
-    await screen.findByText("Economía");
+    await screen.findByText("Finanzas");
 
     fillForm({ esName: "Creatividad", esDescription: "Arte y hobbies.", enName: "Creativity", enDescription: "Art and hobbies." });
     fireEvent.click(screen.getByRole("checkbox", { name: /datos sensibles/i }));
@@ -86,7 +86,7 @@ describe("AdminCategories (ADM-02)", () => {
   it("el botón de añadir sigue desactivado hasta que están el nombre y la descripción en todos los idiomas", async () => {
     stubFetch();
     render(withClient(<AdminCategories />));
-    await screen.findByText("Economía");
+    await screen.findByText("Finanzas");
     const addButton = screen.getByRole("button", { name: /añadir categoría/i });
 
     fillForm({ esName: "Creatividad", esDescription: "Arte." });
@@ -103,9 +103,9 @@ describe("AdminCategories (ADM-02)", () => {
         : undefined,
     );
     render(withClient(<AdminCategories />));
-    await screen.findByText("Economía");
+    await screen.findByText("Finanzas");
 
-    fillForm({ esName: "Economía", esDescription: "x", enName: "Money", enDescription: "x" });
+    fillForm({ esName: "Finanzas", esDescription: "x", enName: "Money", enDescription: "x" });
     fireEvent.click(screen.getByRole("button", { name: /añadir categoría/i }));
 
     expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
@@ -114,12 +114,12 @@ describe("AdminCategories (ADM-02)", () => {
   it("retirar pide confirmación y solo entonces llama a la API", async () => {
     const fetchMock = stubFetch();
     render(withClient(<AdminCategories />));
-    await screen.findByText("Economía");
+    await screen.findByText("Finanzas");
 
-    fireEvent.click(within(rowOf("Economía")).getByRole("button", { name: /retirar/i }));
+    fireEvent.click(within(rowOf("Finanzas")).getByRole("button", { name: /retirar/i }));
     expect(fetchMock.mock.calls.some(([url]) => url === "/api/admin/categories/retire")).toBe(false);
     const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByText(/economía/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/finanzas/i)).toBeInTheDocument();
     expect(within(dialog).getByText(/las puntuaciones ya guardadas se conservan/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /confirmar retirada/i }));
@@ -133,9 +133,9 @@ describe("AdminCategories (ADM-02)", () => {
   it("cancelar la confirmación no retira nada", async () => {
     const fetchMock = stubFetch();
     render(withClient(<AdminCategories />));
-    await screen.findByText("Economía");
+    await screen.findByText("Finanzas");
 
-    fireEvent.click(within(rowOf("Economía")).getByRole("button", { name: /retirar/i }));
+    fireEvent.click(within(rowOf("Finanzas")).getByRole("button", { name: /retirar/i }));
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
 
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());

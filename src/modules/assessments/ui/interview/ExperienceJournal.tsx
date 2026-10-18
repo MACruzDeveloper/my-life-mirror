@@ -160,7 +160,7 @@ function ShareControls({ experience, sharing, onShare }: { experience: Experienc
   }
   if (!sharing.canShare) return null;
   return (
-    <Button size="small" startIcon={<VolunteerActivismOutlinedIcon fontSize="small" />} onClick={onShare} sx={{ mt: 0.5, textTransform: "none", px: 0.5 }}>
+    <Button size="small" variant="outlined" startIcon={<VolunteerActivismOutlinedIcon fontSize="small" />} onClick={onShare} sx={{ mt: 0.75, textTransform: "none" }}>
       {t("entrevista.compartir")}
     </Button>
   );

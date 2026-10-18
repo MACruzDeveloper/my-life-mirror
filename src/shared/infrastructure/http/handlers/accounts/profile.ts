@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ok } from "#shared/domain/Result.js";
 import { GENDERS } from "#modules/accounts/domain/Profile.js";
+import { MAX_HOBBIES } from "#modules/accounts/domain/profileInterests.js";
 import { MAX_ID_LENGTH, MAX_NAME_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { action, sessionHandler } from "#shared/infrastructure/http/sessionHandler.js";
 
@@ -9,6 +10,11 @@ const UpdateProfileSchema = z.object({
   birthDate: z.string().max(MAX_ID_LENGTH).optional(),
   gender: z.enum(GENDERS).optional(),
   timeZone: z.string().max(MAX_ID_LENGTH).optional(),
+  // RF-26: la clave de un avatar del catálogo; `null` lo quita. El caso de uso comprueba que esté publicado.
+  avatarKey: z.string().max(MAX_ID_LENGTH).nullable().optional(),
+  // RF-46: claves de las listas cerradas; el caso de uso comprueba que existan.
+  occupation: z.string().max(MAX_ID_LENGTH).nullable().optional(),
+  hobbies: z.array(z.string().max(MAX_ID_LENGTH)).max(MAX_HOBBIES).optional(),
 });
 
 /**

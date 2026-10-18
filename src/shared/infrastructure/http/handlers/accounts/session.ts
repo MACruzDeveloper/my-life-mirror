@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { getAppContext } from "#shared/infrastructure/container.js";
-import { readCookie } from "#shared/infrastructure/cookies.js";
+import { REFRESH_COOKIE, SESSION_COOKIE, readCookie, sessionCookies } from "#shared/infrastructure/cookies.js";
 import { logger } from "#shared/infrastructure/logger.js";
 
 /**
@@ -12,9 +12,11 @@ import { logger } from "#shared/infrastructure/logger.js";
  */
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
-    const token = readCookie(req.headers.cookie, "sesion");
-    const { verifySession, getProfile, aiIdeasAvailable } = getAppContext();
-    const result = await verifySession(token);
+    const { resumeSession, getProfile, aiIdeasAvailable } = getAppContext();
+    // SEC-05: si el token de acceso caducó, se renueva aquí también (es lo primero que pide cada pantalla protegida).
+    const resumed = await resumeSession({ token: readCookie(req.headers.cookie, SESSION_COOKIE), refreshToken: readCookie(req.headers.cookie, REFRESH_COOKIE) });
+    const result = resumed.ok ? { ok: true as const, value: resumed.value.user } : resumed;
+    const renewed = resumed.ok && resumed.value.renewed ? { "Set-Cookie": sessionCookies(resumed.value.renewed) } : {};
 
     if (!result.ok) {
       res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
@@ -28,17 +30,20 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     // que en RegisterUser (ver su nota de diseño): se degrada a "sin
     // nombre todavía", nunca a "no sé si hay sesión".
     let name: string | undefined;
+    // RF-26: el avatar elegido, para la cabecera (misma lógica que el nombre: si falla, sin él).
+    let avatarKey: string | undefined;
     try {
       const profile = await getProfile(result.value.id);
       name = profile.ok ? profile.value?.name : undefined;
+      avatarKey = profile.ok ? profile.value?.avatarKey : undefined;
     } catch (error) {
       logger.error("No se pudo obtener el perfil en /api/accounts/session (se ignora, no es crítico)", error, {
         route: "/api/accounts/session",
       });
     }
 
-    res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-    res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, rol: result.value.rol, aiIdeasAvailable }));
+    res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store", ...renewed });
+    res.end(JSON.stringify({ autenticado: true, email: result.value.email, name, avatarKey, rol: result.value.rol, aiIdeasAvailable }));
   } catch (error) {
     logger.error("Error inesperado en /api/accounts/session", error, { route: "/api/accounts/session" });
     res.writeHead(500, { "Content-Type": "application/json", "Cache-Control": "no-store" });

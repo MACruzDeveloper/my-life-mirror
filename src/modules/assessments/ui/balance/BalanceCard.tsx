@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ChartDataTable } from "@shared/ui/charts/ChartDataTable";
 import { escapeHtml } from "@shared/ui/charts/escapeHtml";
 import { RadarChart } from "@shared/ui/charts/RadarChart/RadarChart";
-import type { LatestScoreDto } from "../ScoreCards";
+import type { LatestScoreDto } from "../queries";
 import { buildBalance } from "./balance";
 
 /**
@@ -30,7 +30,7 @@ export function BalanceCard({ latestScores }: { latestScores: LatestScoreDto[] }
     <Box
       component="section"
       aria-labelledby="balance-title"
-      sx={{ p: 2, borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "background.paper", display: "flex", flexDirection: "column", gap: 1 }}
+      sx={{ p: 2, borderRadius: 0, border: 1, borderColor: "divider", bgcolor: "background.paper", display: "flex", flexDirection: "column", gap: 1 }}
     >
       <Typography id="balance-title" variant="h6" component="h2">
         {t("equilibrio.titulo")}

@@ -15,8 +15,8 @@ describe("ListCategories (RF-06)", () => {
       expect(result.value).toHaveLength(STANDARD_CATEGORIES.length);
       expect(result.value.every((c) => c.status === "inactive")).toBe(true);
       expect(result.value.every((c) => c.type === "standard")).toBe(true);
-      // Sensibles (RGPD art. 9): sexo y espiritualidad. Deporte dejó de serlo el 6 oct. (decisión del autor).
-      expect(result.value.filter((c) => c.isSensitiveData).map((c) => c.name).sort()).toEqual(["Espiritualidad", "Sexo"]);
+      // Sensibles (RGPD art. 9): sexo, espiritualidad y salud (añadida el 12 oct.). Deporte dejó de serlo el 6 oct. (decisión del autor).
+      expect(result.value.filter((c) => c.isSensitiveData).map((c) => c.name).sort()).toEqual(["Espiritualidad", "Salud", "Sexo"]);
     }
   });
 
@@ -73,8 +73,8 @@ describe("ListCategories (RF-06)", () => {
 
     const result = await listCategories("u1");
 
-    expect(result.ok && result.value.some((c) => c.name === "Economía")).toBe(false);
-    expect((await repo.findByUserId("u1")).some((c) => c.name === "Economía")).toBe(true);
+    expect(result.ok && result.value.some((c) => c.name === "Finanzas")).toBe(false);
+    expect((await repo.findByUserId("u1")).some((c) => c.name === "Finanzas")).toBe(true);
   });
 
   it("cada copia apunta a su entrada del catálogo por id (no por nombre) y guarda el texto del idioma por defecto", async () => {
@@ -85,7 +85,7 @@ describe("ListCategories (RF-06)", () => {
 
     const financesCatalogEntry = (await catalog.findAll()).find((entry) => entry.key === "economia")!;
     const finances = result.ok ? result.value.find((category) => category.catalogId === financesCatalogEntry.id) : undefined;
-    expect(finances).toMatchObject({ name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas." });
+    expect(finances).toMatchObject({ name: "Finanzas", description: "Tus finanzas: ahorro, gasto, deudas e inversión a largo plazo." });
   });
 
   it("si cambia el texto de una entrada del catálogo, no se crea una copia duplicada (la identidad es el id)", async () => {

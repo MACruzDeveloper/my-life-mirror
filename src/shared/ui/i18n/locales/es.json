@@ -1,5 +1,6 @@
 {
   "comun": {
+    "volverArriba": "Volver arriba",
     "email": "Email",
     "contrasena": "Contraseña",
     "errorServidor": "No se pudo contactar con el servidor",
@@ -7,9 +8,16 @@
     "idioma": "Idioma",
     "abrirMenu": "Abrir menú",
     "cargando": "Cargando…",
-    "demasiadosIntentos": "Demasiados intentos. Espera unos minutos y vuelve a probar."
+    "demasiadosIntentos": "Demasiados intentos. Espera unos minutos y vuelve a probar.",
+    "seleccionaIdioma": "Selecciona idioma",
+    "paginas": "Páginas",
+    "miCuenta": "Mi cuenta",
+    "cerrar": "Cerrar"
   },
   "breadcrumbs": {
+    "entrevista": "Entrevista",
+    "categorias": "Categorías",
+    "categoria": "Categoría",
     "inicio": "Inicio",
     "crearCuenta": "Crear cuenta",
     "iniciarSesion": "Iniciar sesión",
@@ -25,7 +33,26 @@
     "titulo": "MyLifeMirror",
     "descripcion": "Evalúa cómo va tu vida por categorías, a tu ritmo, y recibe sugerencias concretas para lo que tú decidas mejorar — sin juicios, sin comparaciones con nadie. Un espejo honesto, no un examen.",
     "crearCuenta": "Crear cuenta",
-    "iniciarSesion": "Iniciar sesión"
+    "iniciarSesion": "Iniciar sesión",
+    "imagenIA": "Imagen generada con IA",
+    "verComoFunciona": "Ver cómo funciona",
+    "audio": {
+      "escuchar": "Escuchar la presentación",
+      "pausar": "Pausar",
+      "vozIa": "Voz generada con IA (ElevenLabs)",
+      "transcripcion": "Transcripción",
+      "transcripcionTitulo": "Transcripción de la presentación",
+      "texto": [
+        "Hola. Esto es MyLifeMirror: un espejo de tu vida, no un examen.",
+        "Funciona así. Eliges las áreas que quieres mirar: tu economía, tu familia, tu salud, el deporte, la aventura… Y en cada una te pones una nota del uno al diez, sin juicios y a tu ritmo.",
+        "Con eso verás tu equilibrio de un vistazo, cómo cambia con el tiempo y, donde quieras mejorar, ideas pequeñas y concretas para empezar. Si te va bien en algo, puedes anotar qué te funciona y compartirlo de forma anónima, por si a otra persona le sirve.",
+        "Tus datos son tuyos: lo que escribes es privado, y puedes descargarlo o borrarlo cuando quieras.",
+        "MyLifeMirror no sustituye a ningún profesional. Es un espacio para pararte, mirarte con calma y dar el siguiente paso.",
+        "¿Empezamos?"
+      ],
+      "posicion": "Posición del audio",
+      "cerrar": "Cerrar el reproductor"
+    }
   },
   "registro": {
     "titulo": "Crear cuenta",
@@ -34,7 +61,8 @@
     "exito": "Cuenta creada para {{email}}.",
     "irALogin": "Iniciar sesión",
     "errorGenerico": "No se pudo completar el registro",
-    "errorEmail": "No se ha podido crear la cuenta con este email. Si ya tienes una, inicia sesión o recupera tu contraseña."
+    "errorEmail": "No se ha podido crear la cuenta con este email. Si ya tienes una, inicia sesión o recupera tu contraseña.",
+    "despues": "Solo te pedimos lo justo para empezar. Después, en «Mi perfil», podrás elegir tu avatar y, si quieres, añadir tu profesión y tus aficiones."
   },
   "login": {
     "titulo": "Iniciar sesión",
@@ -45,6 +73,7 @@
     "errorCredenciales": "Email o contraseña incorrectos"
   },
   "contrasena": {
+    "verRequisitos": "Requisitos de la contraseña",
     "requisitos": "Tu contraseña necesita:",
     "reglas": {
       "length": "Entre 12 y 72 caracteres",
@@ -83,6 +112,10 @@
     "errorGenerico": "No se pudo cambiar la contraseña"
   },
   "panel": {
+    "bienvenidaNombre": "Te damos la bienvenida, {{nombre}}",
+    "bienvenidaNombre_woman": "Bienvenida, {{nombre}}",
+    "bienvenidaNombre_man": "Bienvenido, {{nombre}}",
+    "bienvenidaSinNombre": "Te damos la bienvenida",
     "bienvenida": "Bienvenido",
     "cerrarSesion": "Cerrar sesión",
     "bienvenidaTitulo": "Empecemos por conocerte",
@@ -104,7 +137,58 @@
     "botonEnviando": "Guardando…",
     "exito": "Perfil guardado.",
     "errorGenerico": "No se pudo guardar el perfil",
-    "errorCarga": "No se pudo cargar tu perfil"
+    "errorCarga": "No se pudo cargar tu perfil",
+    "profesion": "Profesión (opcional)",
+    "profesionSinEspecificar": "Sin indicar",
+    "aficionesTitulo": "Aficiones (opcional)",
+    "aficionesAyuda": "Marca hasta {{max}}. Solo se usan, junto a tu profesión, para adaptar las ideas con IA si las tienes activadas.",
+    "ocupaciones": {
+      "desarrolloWeb": "Desarrollo web",
+      "informatica": "Informática y tecnología",
+      "docencia": "Docencia y educación",
+      "sanidad": "Sanidad",
+      "administracion": "Administración y oficina",
+      "comercio": "Comercio y atención al público",
+      "hosteleria": "Hostelería y turismo",
+      "construccion": "Construcción y oficios",
+      "transporte": "Transporte y logística",
+      "industria": "Industria y fabricación",
+      "ingenieria": "Ingeniería",
+      "diseno": "Diseño y creatividad",
+      "comunicacion": "Marketing y comunicación",
+      "finanzas": "Banca y finanzas",
+      "derecho": "Derecho",
+      "investigacion": "Ciencia e investigación",
+      "agricultura": "Agricultura y ganadería",
+      "cuidados": "Cuidado de personas",
+      "hogar": "Trabajo en el hogar",
+      "estudiante": "Estudiante",
+      "jubilacion": "Jubilación",
+      "buscandoEmpleo": "Buscando empleo",
+      "otra": "Otra"
+    },
+    "aficiones": {
+      "deporte": "Deporte",
+      "montana": "Montaña",
+      "playa": "Playa",
+      "viajar": "Viajar",
+      "naturaleza": "Naturaleza",
+      "lectura": "Lectura",
+      "musica": "Música",
+      "cine": "Cine y series",
+      "cocina": "Cocina",
+      "videojuegos": "Videojuegos",
+      "juegosDeMesa": "Juegos de mesa",
+      "fotografia": "Fotografía",
+      "arte": "Dibujo y pintura",
+      "manualidades": "Manualidades",
+      "escritura": "Escritura",
+      "baile": "Baile",
+      "plantas": "Plantas y jardinería",
+      "animales": "Animales",
+      "tecnologia": "Tecnología",
+      "voluntariado": "Voluntariado"
+    }
   },
   "categorias": {
     "errorCarga": "No se pudieron cargar tus categorías",
@@ -119,9 +203,9 @@
     "titulo": "Política de privacidad",
     "version": "Versión {{version}} — borrador para el TFM, no redactado por asesoría legal.",
     "queDatosTitulo": "Qué datos recopilamos",
-    "queDatosTexto": "Tu email, el nombre que nos das al registrarte, y las respuestas que registras en las categorías que actives (fecha de nacimiento, género si lo indicas, zona horaria, y tus evaluaciones por categoría).",
+    "queDatosTexto": "Tu email, el nombre que nos das al registrarte, y las respuestas que registras en las categorías que actives (fecha de nacimiento, género, profesión y aficiones si los indicas, zona horaria, y tus evaluaciones por categoría). Si añades viajes en la página de Aventura, guardamos el país, el año y, si lo indicas, el mes. El mapa está incluido en la app: no pide nada a otros servidores.",
     "datosSensiblesTitulo": "Categorías de datos especialmente protegidas",
-    "datosSensiblesTexto": "Algunas categorías (sexo, espiritualidad) se consideran datos de categoría especial según el RGPD (art. 9). Solo se activan y registran con tu consentimiento explícito, que puedes retirar en cualquier momento desactivando la categoría.",
+    "datosSensiblesTexto": "Algunas categorías (sexo, espiritualidad, salud) se consideran datos de categoría especial según el RGPD (art. 9). Solo se activan y registran con tu consentimiento explícito, que puedes retirar en cualquier momento desactivando la categoría.",
     "paraQueTitulo": "Para qué los usamos",
     "paraQueTexto": "Únicamente para ofrecerte tu propio panel de seguimiento y sugerencias personalizadas dentro de la app. No se comparten con terceros ni se usan con fines publicitarios.",
     "tusDerechosTitulo": "Tus derechos",
@@ -129,12 +213,14 @@
     "contactoTitulo": "Contacto",
     "contactoTexto": "Este es un proyecto académico (TFM) — para cualquier duda sobre tus datos, contacta directamente con quien desarrolla el proyecto.",
     "iaTitulo": "Ideas personalizadas con IA",
-    "iaTexto": "Es opcional y está desactivado por defecto. Si lo activas en Privacidad y datos, al abrir una idea para un área no sensible se envían a Anthropic, que actúa como encargado del tratamiento: la categoría, tu última puntuación y si va a mejor o a peor, las opciones que hayas marcado en \"¿Qué te ayuda?\" y las ideas de la app para esa categoría. Para estas ideas, nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles, ni la de Pareja. La idea resultante se guarda en tu cuenta para no volver a pedirla. Puedes desactivarlo cuando quieras y se borran las ideas personalizadas.",
+    "iaTexto": "Es opcional y está desactivado por defecto. Si lo activas en Privacidad y datos, al abrir una idea para una categoría no sensible se envían a Anthropic, que actúa como encargado del tratamiento: la categoría, tu última puntuación y si va a mejor o a peor, las opciones que hayas marcado en \"¿Qué te ayuda?\", la profesión y las aficiones de tu perfil si las has indicado (siempre opciones de una lista, nunca texto tuyo) y las ideas de la app para esa categoría. Para estas ideas, nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles, ni la de Pareja. La idea resultante se guarda en tu cuenta para no volver a pedirla. Puedes desactivarlo cuando quieras y se borran las ideas personalizadas.",
     "iaSugerenciasTitulo": "Sugerencias de la IA a partir de tus experiencias",
     "iaSugerenciasTexto": "También es opcional, aparte de lo anterior y desactivado por defecto. Si lo activas en Privacidad y datos, en cada experiencia de tu diario aparece «Sugerir opciones con IA»: al pulsarlo se envía a Anthropic, como encargado del tratamiento, solo la experiencia que tú le pidas analizar, junto con las opciones posibles de esa categoría, para que te proponga cuáles marcar en «¿Qué te ayuda?» o «¿Qué te lo pone difícil?». Tú aceptas o descartas cada propuesta; la IA no escribe nada sobre ti ni valora tu estado. Antes de enviarla quitamos emails, teléfonos, enlaces y números largos; los nombres no se pueden quitar con seguridad, así que te pedimos que no escribas nombres de otras personas si no quieres que se envíen. Nunca se envían tu nombre, tu email, tus puntuaciones ni las experiencias que no pidas analizar, y nunca se envían las categorías sensibles ni la de Pareja. Puedes desactivarlo cuando quieras; de la IA solo quedan las opciones que aceptes.",
     "compartidasTitulo": "Experiencias compartidas con otras personas",
-    "compartidasTexto": "Si tu última puntuación en un área es de 8 o más, puedes compartir de forma anónima una experiencia de tu diario para ayudar a otras personas. Solo se comparte la que tú elijas, después de ver cómo la verán. Las demás personas usuarias de la app leen solo el texto, entre las ideas de esa área y en tu mismo idioma: nunca tu nombre, tu email, la fecha ni tu puntuación. Antes de publicarla comprobamos que no lleve datos de contacto, consejos de salud o de dinero ni insultos. Nunca se comparten experiencias de las categorías sensibles ni de Pareja. Ten en cuenta que, si cuentas detalles muy personales, alguien que te conozca podría reconocerte. Puedes dejar de compartirla cuando quieras, en tu diario o en Privacidad y datos; si alguien la reporta, deja de verse. Se borra al borrar la experiencia o tu cuenta.",
-    "iaLimiteTexto": "Para evitar abusos, contamos cuántas veces al día usas estas funciones de IA (solo el número, no lo que pides ni lo que se responde) y hay un máximo diario por persona. Si lo superas, verás las ideas originales de la app hasta el día siguiente. Ese contador se borra con tu cuenta."
+    "compartidasTexto": "Si tu última puntuación en una categoría es de 8 o más, puedes compartir de forma anónima una experiencia de tu diario para ayudar a otras personas. Solo se comparte la que tú elijas, después de ver cómo la verán. Las demás personas usuarias de la app leen solo el texto, entre las ideas de esa categoría y en tu mismo idioma: nunca tu nombre, tu email, la fecha ni tu puntuación. Antes de publicarla comprobamos que no lleve datos de contacto, consejos de salud o de dinero ni insultos. Nunca se comparten experiencias de las categorías sensibles ni de Pareja. Ten en cuenta que, si cuentas detalles muy personales, alguien que te conozca podría reconocerte. Puedes dejar de compartirla cuando quieras, en tu diario o en Privacidad y datos; si alguien la reporta, deja de verse. Se borra al borrar la experiencia o tu cuenta.",
+    "iaLimiteTexto": "Para evitar abusos, contamos cuántas veces al día usas estas funciones de IA (solo el número, no lo que pides ni lo que se responde) y hay un máximo diario por persona. Si lo superas, verás las ideas originales de la app hasta el día siguiente. Ese contador se borra con tu cuenta.",
+    "videosTitulo": "Vídeos de YouTube",
+    "videosTexto": "En algunas páginas de categoría hay vídeos de YouTube elegidos por quien hace la app. Sus miniaturas se cargan desde los servidores de YouTube (Google) al abrir la página, y el vídeo solo cuando pulsas reproducir, en su modo sin cookies de seguimiento. Al cargarlos, YouTube recibe tu dirección IP y los datos técnicos de tu navegador, según su propia política de privacidad. La app no le envía ningún dato tuyo."
   },
   "entrevista": {
     "titulo": "Tu entrevista",
@@ -152,6 +238,7 @@
     "errorGenerico": "No se pudo guardar la entrevista",
     "entrevistador": "Entrevistador",
     "tu": "Tú",
+    "verPagina": "Ver tu página de {{categoria}}",
     "verEjemplos": "Ver ejemplos de {{categoria}}",
     "ejemplosTitulo": "Para ayudarte a pensar:",
     "errorActivar": "No se pudo activar la categoría",
@@ -201,7 +288,7 @@
     "irAPreguntas": "Ir a las preguntas",
     "atras": "Atrás",
     "queHablarTitulo": "¿De qué quieres hablar?",
-    "queHablarTexto": "Elige las áreas de tu vida que quieres revisar. Podrás cambiarlas cuando quieras.",
+    "queHablarTexto": "Elige las categorías de tu vida que quieres revisar. Podrás cambiarlas cuando quieras.",
     "elegirTodas": "Elegir todas",
     "quitarTodas": "Quitar todas",
     "eligeUna": "Elige al menos una para seguir.",
@@ -244,8 +331,8 @@
     "avisoOfensivo": "Esta experiencia tiene palabras que preferimos no enviar a la IA. Puedes borrarla y escribirla de otra forma, o enviarla igualmente.",
     "enviarIgualmente": "Enviar igualmente",
     "compartir": "Compartir de forma anónima",
-    "compartirOferta": "Te va bien en esta área: puedes compartir una experiencia de forma anónima para ayudar a otras personas.",
-    "compartirVistaPrevia": "Así la verán otras personas a las que les cuesta más esta área:",
+    "compartirOferta": "Te va bien en esta categoría: puedes compartir una experiencia de forma anónima para ayudar a otras personas.",
+    "compartirVistaPrevia": "Así la verán otras personas a las que les cuesta más esta categoría:",
     "compartirAnonima": "Sin tu nombre, la fecha ni tu puntuación.",
     "compartirRetirable": "Puedes dejar de compartirla cuando quieras.",
     "compartirReportable": "Otras personas pueden reportarla; si lo hacen, deja de verse.",
@@ -260,13 +347,26 @@
       "contact": "Para compartirla no puede llevar emails, teléfonos, enlaces ni números largos. Bórrala y escribe otra sin ellos.",
       "health": "Para compartirla no puede hablar de salud, medicación, terapia o dinero (inversiones, préstamos…): la app no difunde consejos de ese tipo entre personas. Bórrala y escribe otra sin ellos.",
       "offensive": "Para compartirla no puede llevar insultos ni palabras ofensivas. Bórrala y escribe otra sin ellos.",
-      "score": "Solo se puede compartir con una puntuación de 8 o más en esta área.",
-      "category": "En esta área no se comparten experiencias.",
+      "score": "Solo se puede compartir con una puntuación de 8 o más en esta categoría.",
+      "category": "En esta categoría no se comparten experiencias.",
       "reported": "Esta experiencia se retiró tras un reporte y no se puede volver a compartir.",
       "error": "No se ha podido compartir. Inténtalo de nuevo."
     },
     "sugerenciasLimite": "Has llegado al máximo de usos de IA por hoy. Mañana puedes volver a probar.",
-    "sugerenciasNoDisponibles": "Ahora no se han podido pedir sugerencias. Prueba más tarde."
+    "sugerenciasNoDisponibles": "Ahora no se han podido pedir sugerencias. Prueba más tarde.",
+    "guardarTodoConCuenta": "Guardar todo ({{count}})",
+    "guardandoTodo": "Guardando…",
+    "errorGuardarTodo": "No se han podido guardar los cambios. Inténtalo de nuevo.",
+    "ideaNuevaPara": "{{categoria}}: tienes una idea nueva.",
+    "verEnInicio": "Ver en Inicio",
+    "todoEnVerde": "¡Todo en verde! Tus categorías están en la banda alta: en Inicio tienes ideas para disfrutarlo.",
+    "verIdeasInicio": "Ver ideas en Inicio",
+    "puntuacionAlta": {
+      "recognizeCompartir": "{{categoria}} te va bien ahora. ¿Qué te está ayudando? Puedes anotarlo en tu diario o compartirlo de forma anónima.",
+      "recognize": "{{categoria}} te va bien ahora. ¿Qué te está ayudando? Puedes anotarlo en tu diario.",
+      "congratulateCompartir": "Enhorabuena: un {{puntuacion}} en {{categoria}}. ¿Qué te está ayudando? Puedes anotarlo en tu diario o compartirlo de forma anónima.",
+      "congratulate": "Enhorabuena: un {{puntuacion}} en {{categoria}}. ¿Qué te está ayudando? Puedes anotarlo en tu diario."
+    }
   },
   "resultados": {
     "titulo": "Tus resultados",
@@ -279,9 +379,17 @@
     "bandaLow": "Bajo",
     "bandaMediumLow": "Casi bajo",
     "bandaMedium": "Medio",
-    "bandaHigh": "Bueno"
+    "bandaHigh": "Bueno",
+    "grafico": "Última puntuación de cada categoría: {{lista}}",
+    "puntuacionConBanda": "{{categoria}}: {{puntuacion}} ({{banda}})",
+    "tabla": "Última puntuación de cada categoría",
+    "nivel": "Nivel",
+    "fecha": "Última vez",
+    "sinPuntuarLista": "Sin puntuar todavía: {{lista}}",
+    "ideas": "Ideas para ti"
   },
   "cuenta": {
+    "calendario": "Calendario",
     "menu": "Menú de mi perfil",
     "perfil": "Perfil",
     "entrevista": "Entrevista",
@@ -336,6 +444,26 @@
       "¿Tienes inversiones o un plan para el largo plazo?",
       "¿Sabes cuánto necesitarías para tu jubilación?",
       "¿Entiendes bien dónde está tu dinero?"
+    ],
+    "salud": [
+      "¿Cómo andas de energía en tu día a día?",
+      "¿Descansas lo que necesitas?",
+      "¿Te sientes a gusto con cómo cuidas de ti?"
+    ],
+    "tecnologia": [
+      "¿Cuánto tiempo pasas con pantallas sin darte cuenta?",
+      "¿La tecnología te ayuda o te agobia en tu día a día?",
+      "¿Te sientes a gusto con las herramientas que usas?"
+    ],
+    "formacion": [
+      "¿Estás aprendiendo algo que te ilusione?",
+      "¿Te das tiempo para formarte o aprender idiomas?",
+      "¿Sientes que sigues creciendo en lo que sabes?"
+    ],
+    "voluntariado": [
+      "¿Dedicas algo de tu tiempo a ayudar a otras personas o causas?",
+      "¿Te gustaría colaborar con algún proyecto solidario?",
+      "¿Cómo te sientes cuando ayudas a los demás?"
     ]
   },
   "admin": {
@@ -430,7 +558,36 @@
     "acciones_user_recovery_sent": "Enlace de recuperación enviado",
     "acciones_reauth_failed": "Contraseña de confirmación incorrecta",
     "nombreEnIdioma": "Nombre ({{idioma}})",
-    "descripcionEnIdioma": "Descripción ({{idioma}})"
+    "descripcionEnIdioma": "Descripción ({{idioma}})",
+    "pestanaVideos": "Vídeos",
+    "videos": {
+      "intro": "Los vídeos de \"Para inspirarte\" de cada página de categoría, por idioma. La página enseña los del idioma de la persona; si no hay ninguno en ese idioma, los de otro. Como mucho 6 por categoría e idioma.",
+      "anadirTitulo": "Añadir un vídeo",
+      "categoria": "Categoría",
+      "idioma": "Idioma",
+      "enlace": "Enlace de YouTube",
+      "titulo": "Título",
+      "anadir": "Añadir vídeo",
+      "ninguno": "Todavía no hay vídeos.",
+      "lista": "Vídeos de inspiración",
+      "quitar": "Borrar «{{titulo}}»",
+      "errorRepetido": "Ese vídeo ya está en esa página (misma categoría e idioma).",
+      "errorDatos": "No se ha podido guardar. Revisa el enlace de YouTube y el título (hasta 120 caracteres), y que no haya ya 6 vídeos en esa página.",
+      "errorQuitar": "No se ha podido borrar. Inténtalo de nuevo.",
+      "editarTitulo": "Editar el vídeo",
+      "guardarCambios": "Guardar cambios",
+      "cancelar": "Cancelar",
+      "filtrar": "Filtrar por categoría",
+      "todas": "Todas",
+      "youtube": "YouTube",
+      "acciones": "Acciones",
+      "verEnYoutube": "Ver en YouTube «{{titulo}}»",
+      "editar": "Editar «{{titulo}}»",
+      "porPagina": "Por página",
+      "mostrando": "{{from}}–{{to}} de {{count}}"
+    },
+    "anadirPagina": "Su página aparecerá en Categorías como «Próximamente».",
+    "retirarCategoria": "Retirar «{{nombre}}»"
   },
   "datos": {
     "titulo": "Privacidad y datos",
@@ -452,7 +609,7 @@
     "errorUltimoAdmin": "Eres el único administrador y siempre debe existir uno: no puedes eliminar tu cuenta hasta que crees otro administrador (concediendo el rol a otra cuenta).",
     "iaTitulo": "Ideas personalizadas con IA",
     "iaActivar": "Ideas personalizadas con IA",
-    "iaQueSeEnvia": "Si lo activas, cuando abras una idea para un área se pide a un servicio de IA (Anthropic) que reescriba la idea de la app que estés viendo teniendo en cuenta tu puntuación, si va a mejor o a peor y las opciones que hayas marcado en \"¿Qué te ayuda?\".",
+    "iaQueSeEnvia": "Si lo activas, cuando abras una idea para una categoría se pide a un servicio de IA (Anthropic) que reescriba la idea de la app que estés viendo teniendo en cuenta tu puntuación, si va a mejor o a peor, las opciones que hayas marcado en \"¿Qué te ayuda?\" y, si las has indicado en tu perfil, tu profesión y tus aficiones.",
     "iaQueNunca": "Para estas ideas, nunca se envían tu nombre, tu email, tus experiencias privadas ni las categorías sensibles, ni la de Pareja.",
     "iaRevocable": "Está desactivado por defecto. Puedes desactivarlo cuando quieras: se borran las ideas personalizadas y vuelves a ver las ideas de siempre.",
     "iaError": "No se pudo guardar el cambio",
@@ -467,6 +624,21 @@
     "errorCuentaDemo": "Esta es la cuenta de demostración del proyecto y no se puede eliminar. Si quieres probar el borrado, crea una cuenta propia: se elimina de verdad, con todos sus datos."
   },
   "recomendaciones": {
+    "ocio": {
+      "titulo": "Todo va bien",
+      "texto": "Todas tus categorías están en verde. No hace falta mejorar nada: estas ideas son para disfrutarlo.",
+      "otra": "Otra idea",
+      "ideas": {
+        "1": "Regálate un rato solo para ti, sin objetivo ni lista de tareas.",
+        "2": "Reserva una tarde para algo que te guste solo porque sí: una película, un paseo, un libro.",
+        "3": "Date un capricho pequeño: un masaje, un baño largo o tu comida favorita.",
+        "4": "Planea una escapada o unos días de descanso, aunque sea cerca de casa.",
+        "5": "Comparte un buen rato con alguien a quien quieras, sin más motivo que disfrutarlo.",
+        "6": "Tómate un descanso también de esta app: vuelve dentro de unas semanas, cuando te apetezca.",
+        "7": "Apunta tres cosas que estén saliendo bien, para tenerlas a mano otro día.",
+        "8": "Celebra lo que has construido: lo que tienes ahora también lo has cuidado tú."
+      }
+    },
     "ideaAnterior": "Idea anterior",
     "ideaSiguiente": "Idea siguiente",
     "ideaPosicion": "Idea {{actual}} de {{total}}",
@@ -477,7 +649,7 @@
         "1": "Si te apetece, anota durante una semana en qué se va tu dinero, sin juzgarte: solo mirarlo ya ayuda.",
         "2": "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica. Lo importante es el hábito.",
         "3": "Elige un gasto pequeño y repetido que no te aporte mucho y prueba una semana sin él, a ver cómo te sientes.",
-        "4": "Pon por escrito un objetivo de ahorro concreto y cercano, como un pequeño capricho, y cuánto te falta.",
+        "4": "Pon por escrito un objetivo concreto para tu dinero, cercano o a largo plazo, y cuánto te falta: tener claro el para qué ayuda a decidir con calma.",
         "5": "Si hablar de dinero te ayuda, comenta con alguien de confianza qué te preocupa; ponerlo en palabras ya aclara."
       },
       "vidaSocial": {
@@ -540,12 +712,40 @@
         "1": "Elige una acción pequeña relacionada con {{categoria}} que puedas hacer esta semana y anótala.",
         "2": "Piensa qué es lo que más te pesa de {{categoria}} y qué cambio pequeño lo aliviaría.",
         "3": "Pregúntate qué te ayudaría más ahora mismo en {{categoria}} y da un primer paso, por pequeño que sea."
+      },
+      "salud": {
+        "1": "Esta semana, acuéstate media hora antes una noche y mira cómo te levantas.",
+        "2": "Sal diez minutos a que te dé la luz del día, sin prisa y sin móvil.",
+        "3": "Deja una botella de agua a la vista en el sitio donde pasas más horas.",
+        "4": "Por cada hora que pases sentado, levántate y estira un minuto.",
+        "5": "Durante tres días, apunta con una sola palabra cómo te encuentras al despertar."
+      },
+      "tecnologia": {
+        "1": "Elige un rato al día sin pantallas esta semana y mira qué haces con ese tiempo.",
+        "2": "Quita las notificaciones de una app que te interrumpa a menudo y mira si la echas de menos.",
+        "3": "Aprende a hacer una cosa nueva con una herramienta que ya usas: un atajo o una función que no conocías.",
+        "4": "Deja el móvil fuera del dormitorio una noche y mira cómo te levantas.",
+        "5": "Dedica media hora a ordenar tus fotos o tus archivos: menos ruido y más fácil encontrar lo que importa."
+      },
+      "formacion": {
+        "1": "Elige algo que te apetezca aprender y busca un curso corto o un tutorial para empezar esta semana.",
+        "2": "Reserva un rato fijo a la semana, aunque sean veinte minutos, para aprender algo nuevo.",
+        "3": "Si estudias un idioma, prueba a ver una serie o escuchar un podcast en ese idioma con subtítulos.",
+        "4": "Aprende con otra persona: compartir lo que estudias ayuda a no dejarlo.",
+        "5": "Anota tres cosas que hayas aprendido este mes, aunque sean pequeñas: verlo escrito anima a seguir."
+      },
+      "voluntariado": {
+        "1": "Busca una asociación cerca de ti y pregunta cómo puedes colaborar, aunque sea unas horas al mes.",
+        "2": "Empieza con algo puntual: una recogida de alimentos, una limpieza de playa o un evento solidario.",
+        "3": "Pregunta a alguien de tu entorno si conoce un proyecto en el que ayudar y acompáñale un día.",
+        "4": "Si te gustan los animales, informa de si alguna protectora cercana necesita ayuda para pasear o cuidar.",
+        "5": "Piensa en algo que se te dé bien y que podría servir a otras personas: a veces es la mejor forma de ayudar."
       }
     },
     "dialogoTitulo": "Una idea para {{categoria}}",
     "cerrar": "Cerrar",
     "resumenTitulo": "Ideas para ti",
-    "resumenTexto": "Para las áreas con la puntuación más baja. Tú decides si te sirven.",
+    "resumenTexto": "Para las categorías con la puntuación más baja. Tú decides si te sirven.",
     "ideaPara": "Idea para {{categoria}}",
     "personalizando": "Personalizando tu idea…",
     "personalizadaConIa": "Personalizada con IA",
@@ -555,8 +755,19 @@
     "reportar": "Reportar",
     "reportada": "Gracias. La hemos ocultado.",
     "errorReportar": "No se ha podido reportar. Inténtalo de nuevo.",
+    "reportarAyuda": "«Reportar» oculta esa experiencia al momento para todo el mundo. Úsalo si no es respetuosa, da datos de alguien o no tiene que ver con la categoría; nadie sabrá que fuiste tú.",
     "avisoOtros": "Experiencias de otras personas: no son consejo profesional. Si alguna no te parece adecuada, repórtala.",
-    "limiteIa": "Has llegado al máximo de usos de IA por hoy: esta es la idea original. Mañana puedes volver a probar."
+    "limiteIa": "Has llegado al máximo de usos de IA por hoy: esta es la idea original. Mañana puedes volver a probar.",
+    "meGusta": "Me gusta",
+    "noMeGusta": "No me gusta",
+    "ideaGuardada": "Se ha guardado la idea. La tienes en Inicio.",
+    "apartadas_one": "Has apartado {{count}} idea.",
+    "apartadas_other": "Has apartado {{count}} ideas.",
+    "ocultasPorSituacion_one": "Hay {{count}} idea más que no se muestra por lo que marcaste como difícil en esta categoría.",
+    "ocultasPorSituacion_other": "Hay {{count}} ideas más que no se muestran por lo que marcaste como difícil en esta categoría.",
+    "sinIdeas": "Has apartado todas las ideas de esta categoría.",
+    "recuperar": "Volver a verlas",
+    "errorReaccion": "No se ha podido guardar el cambio. Inténtalo de nuevo."
   },
   "evolucion": {
     "titulo": "Tu evolución",
@@ -596,15 +807,16 @@
   "guia": {
     "comoFunciona": "Cómo funciona",
     "pasos": [
-      "Elige las áreas de tu vida que quieres mirar.",
+      "Elige las categorías de tu vida que quieres mirar.",
       "Puntúa cada una del 1 al 10: son unos dos minutos, y puedes dejar alguna para otro día.",
-      "Mira tu equilibrio, cómo cambia con el tiempo e ideas para las áreas que quieras mejorar."
+      "Mira tu equilibrio, cómo cambia con el tiempo e ideas para las categorías que quieras mejorar.",
+      "Si una categoría te va bien, puedes compartir de forma anónima lo que te funciona, y leer lo que les funciona a otras personas."
     ],
     "panelTitulo": "Cómo leer esta página",
     "panelPuntos": [
-      "«{{equilibrio}}»: tu última puntuación en cada área, todas juntas en la misma escala.",
-      "«{{evolucion}}»: cómo ha cambiado cada área cada vez que has actualizado tus respuestas.",
-      "«{{idea}}» aparece en las áreas con una puntuación baja: tócala para ver una sugerencia.",
+      "«{{equilibrio}}»: tu última puntuación en cada categoría, todas juntas en la misma escala.",
+      "«{{evolucion}}»: cómo ha cambiado cada categoría cada vez que has actualizado tus respuestas.",
+      "«{{idea}}» aparece en las categorías con una puntuación baja: tócala para ver una sugerencia.",
       "Cuando algo cambie en tu vida, usa «{{actualizar}}»."
     ],
     "entendido": "Entendido"
@@ -616,7 +828,8 @@
       "apps": "Apps de finanzas",
       "hablarlo": "Hablarlo con alguien de confianza",
       "aprender": "Aprender sobre dinero",
-      "ingresosExtra": "Ingresos extra"
+      "ingresosExtra": "Ingresos extra",
+      "largoPlazo": "Pensar a largo plazo"
     },
     "vidaSocial": {
       "quedarEnPersona": "Quedar en persona",
@@ -680,6 +893,38 @@
       "consultarProfesional": "Consultar a un profesional",
       "pocoAPoco": "Aportar poco a poco",
       "revisarDeVezEnCuando": "Revisar de vez en cuando"
+    },
+    "salud": {
+      "dormir": "Dormir bien",
+      "luzDelDia": "Luz del día y aire libre",
+      "moverme": "Moverme a diario",
+      "comerConCalma": "Comer con calma",
+      "descansos": "Hacer descansos",
+      "rutinas": "Tener rutinas"
+    },
+    "tecnologia": {
+      "limitarPantallas": "Poner límites a las pantallas",
+      "menosNotificaciones": "Menos notificaciones",
+      "desconectar": "Desconectar un rato",
+      "aprenderAlgoNuevo": "Aprender algo nuevo",
+      "ordenDigital": "Orden digital",
+      "crearAlgoPropio": "Crear algo propio"
+    },
+    "formacion": {
+      "cursoCorto": "Un curso corto",
+      "ratoFijo": "Un rato fijo para aprender",
+      "aprenderConOtros": "Aprender con otras personas",
+      "practicarIdioma": "Practicar un idioma",
+      "leer": "Leer",
+      "proyectoPropio": "Un proyecto propio"
+    },
+    "voluntariado": {
+      "asociacionCerca": "Una asociación cerca",
+      "pocoTiempo": "Aunque sea poco tiempo",
+      "conAmigos": "Con amigos o familia",
+      "animales": "Ayudar a animales",
+      "entorno": "Cuidar el entorno",
+      "acompanarPersonas": "Acompañar a personas"
     }
   },
   "situaciones": {
@@ -718,5 +963,177 @@
         "disponibilidad": "directorio internacional de líneas de ayuda verificadas: elige tu país."
       }
     }
+  },
+  "avatares": {
+    "titulo": "Tu avatar",
+    "ayuda": "Elige el que más te guste. Puedes cambiarlo o quitarlo cuando quieras.",
+    "quitar": "Sin avatar",
+    "generadosConIA": "Ilustraciones generadas con IA y revisadas una a una.",
+    "descripciones": {
+      "roundGlasses": "Persona de pelo oscuro, corto y rizado, con gafas redondas y jersey mostaza",
+      "tealScarf": "Persona de pelo blanco, con un pañuelo verde azulado sobre la cabeza y los hombros",
+      "longBraids": "Persona de piel oscura con dos trenzas largas y camiseta coral",
+      "highBun": "Persona de pelo negro largo recogido en un moño alto, con camisa lavanda",
+      "pinkWrap": "Persona de melena negra lisa con un pañuelo rosa anudado en la cabeza",
+      "woolBeanie": "Persona con gorro de lana con pompón y chaqueta naranja",
+      "stripedShirt": "Persona de pelo castaño corto, con gafas y camisa de rayas",
+      "longWaves": "Persona de melena larga y ondulada, de color claro, con blusa azul",
+      "blondBeard": "Persona de pelo rubio corto y barba corta, con polo verde",
+      "headphones": "Persona de piel oscura y pelo corto, con auriculares puestos y chaqueta amarilla",
+      "shavedHead": "Persona de cabeza rapada, sin barba, con camiseta gris",
+      "topKnotBeard": "Persona de piel oscura con el pelo recogido arriba y barba corta, con sudadera verde"
+    }
+  },
+  "recordatorio": {
+    "titulo": "Hace tiempo que no miras",
+    "item_one": "{{categoria}}: hace {{count}} semana",
+    "item_other": "{{categoria}}: hace {{count}} semanas",
+    "pregunta_one": "¿Sigue igual? Cuando quieras, vuelve a mirarla.",
+    "pregunta_other": "¿Siguen igual? Cuando quieras, vuelve a mirarlas."
+  },
+  "ideasGuardadas": {
+    "titulo": "Tus ideas guardadas",
+    "hecha": "Hecha",
+    "quitar": "Quitar",
+    "error": "No se ha podido guardar el cambio. Inténtalo de nuevo."
+  },
+  "planIdea": {
+    "pregunta": "¿Cuándo te apetece probarla?",
+    "unaSemana": "En una semana",
+    "unMes": "En un mes",
+    "otraFecha": "Otra fecha",
+    "sinFecha": "Sin fecha",
+    "paraEl": "Para el {{fecha}}",
+    "poner": "Poner fecha",
+    "cambiar": "Cambiar fecha",
+    "sinPresion": "Es solo una referencia para ti: puedes cambiarla o quitarla cuando quieras."
+  },
+  "calendario": {
+    "titulo": "Calendario",
+    "intro": "Lo que tienes por delante y las ideas a las que pusiste fecha. La app tiene en cuenta tus eventos sin tocar tus notas: cuando llegue el día, te invitará en Inicio a revisarlas tú.",
+    "mesAnterior": "Mes anterior",
+    "mesSiguiente": "Mes siguiente",
+    "hoy": "Hoy",
+    "anotaciones_one": "{{count}} anotación",
+    "anotaciones_other": "{{count}} anotaciones",
+    "diaVacio": "No hay nada anotado este día.",
+    "ideaGuardada": "Idea guardada",
+    "anadirTitulo": "Añadir un evento",
+    "queTienes": "¿Qué tienes?",
+    "privado": "Solo lo ves tú. No se envía a la IA ni se comparte.",
+    "dia": "Día",
+    "anadir": "Añadir",
+    "borrar": "Borrar «{{titulo}}»",
+    "error": "No se ha podido guardar el cambio. Inténtalo de nuevo.",
+    "proximamente": "Próximamente",
+    "verCalendario": "Ver el calendario",
+    "comoFue": "¿Cómo fue «{{titulo}}»?",
+    "revisaNota": "Si quieres, revisa tu nota en {{categoria}}.",
+    "revisar": "Revisar",
+    "categorias": "¿Con qué categorías tiene que ver? (opcional)",
+    "categoriasAyuda": "Si eliges alguna, el día del evento Inicio te invitará a revisar tu nota en ella.",
+    "avisoRevision": "El día del evento, Inicio te invitará a revisar tu nota en lo que has elegido, haya ido bien o mal. La app no la cambia por ti."
+  },
+  "paginasCategoria": {
+    "titulo": "Categorías",
+    "intro": "Cada categoría tendrá su propia página, con lo que has vivido en ella: recuerdos y logros que te sirvan de memoria y de motivación. Ya puedes entrar en algunas; las demás llegarán pronto.",
+    "proximamente": "Próximamente",
+    "sinPagina": "Esta categoría todavía no tiene página.",
+    "verTodas": "Ver todas las categorías",
+    "tuNota": "Tu nota ahora",
+    "puntuadaEl": "Puntuada el {{fecha}}",
+    "sinNota": "Todavía no la has puntuado.",
+    "puntuar": "Puntuar {{categoria}}",
+    "tusExperiencias": "Tus experiencias",
+    "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista.",
+    "verTodasExperiencias": "Ver todas ({{count}})",
+    "verMenos": "Ver menos",
+    "avisoMarcasTitulo": "Disclaimer",
+    "avisoMarcas": "La imagen de cabecera está generada con IA y se usa solo con fines ilustrativos en un proyecto académico, sin ánimo de lucro. Los colores o diseños que puedan recordar a marcas reales no implican ninguna relación con ellas ni su respaldo."
+  },
+  "hitos": {
+    "titulo": {
+      "aventura": "Retos superados",
+      "deporte": "Carreras, competiciones y marcas"
+    },
+    "intro": {
+      "aventura": "Lo que has conseguido: una cumbre, una travesía, ese reto que te daba respeto. Para recordarlo cuando te cueste.",
+      "deporte": "Tus carreras, competiciones y marcas personales, de cualquier año. Para recordar de lo que eres capaz."
+    },
+    "ejemplo": {
+      "aventura": "Ej.: Camino de Santiago",
+      "deporte": "Ej.: Media maratón de Valencia"
+    },
+    "anadirTitulo": "Añadir un hito",
+    "queConseguiste": "Qué conseguiste",
+    "anadir": "Añadir hito",
+    "tusHitos_one": "{{count}} hito",
+    "tusHitos_other": "{{count}} hitos",
+    "ninguno": "Todavía no has añadido ningún hito.",
+    "borrar": "Borrar «{{titulo}}» ({{fecha}})",
+    "noCambianNota": "Tus hitos son solo tuyos: no cambian tu nota, no se envían a la IA y no se comparten."
+  },
+  "viajes": {
+    "titulo": "Tus viajes",
+    "intro": "Los países que has visitado, o que estás planeando visitar, de cualquier año. Un mapa de tus recuerdos y de lo que te queda por ver.",
+    "mapaNoCarga": "No se ha podido cargar el mapa. Tus viajes siguen aquí debajo; prueba a recargar la página.",
+    "mapa": "Mapa de tus viajes",
+    "comoUsarMapa": "Los países visitados salen pintados. Pasa por encima para ver cuándo fuiste y pulsa en uno para elegirlo abajo. Acércate con Ctrl + rueda (⌘ en Mac), pellizcando o con + y −.",
+    "anadirTitulo": "Añadir un viaje",
+    "pais": "País",
+    "sinPaises": "Ningún país con ese nombre",
+    "anio": "Año",
+    "mes": "Mes (opcional)",
+    "sinMes": "No lo recuerdo",
+    "anadir": "Añadir viaje",
+    "tusViajes_one": "{{count}} viaje",
+    "tusViajes_other": "{{count}} viajes",
+    "ninguno": "Todavía no has añadido ningún viaje.",
+    "borrar": "Borrar el viaje a {{pais}} ({{fecha}})",
+    "error": "No se ha podido guardar el cambio. Inténtalo de nuevo.",
+    "noCambianNota": "Tus viajes son solo tuyos: no cambian tu nota, no se envían a la IA y no se comparten.",
+    "avisoRueda": "Usa Ctrl + rueda (⌘ + rueda en Mac) para acercar o alejar el mapa",
+    "avisoDosDedos": "Usa dos dedos para mover el mapa"
+  },
+  "avisos": {
+    "titulo": "Avisos",
+    "botonNuevos_one": "Avisos: {{count}} nuevo",
+    "botonNuevos_other": "Avisos: {{count}} nuevos",
+    "ninguno": "No tienes avisos.",
+    "evento": "¿Cómo fue «{{titulo}}»? Si quieres, revisa tu nota en {{categorias}}.",
+    "idea": "Tenías pensado probar una idea de {{categoria}} para el {{fecha}}.",
+    "revisar_one": "{{categoria}} lleva {{count}} semana sin revisarse. ¿Sigue igual?",
+    "revisar_other": "{{categoria}} lleva {{count}} semanas sin revisarse. ¿Sigue igual?",
+    "perfil": "Completa tu perfil: elige un avatar y, si quieres, tu profesión y tus aficiones, para que las ideas se ajusten más a ti."
+  },
+  "perfilIa": {
+    "titulo": "Así te ve la IA",
+    "noDisponible": "En esta instalación la IA no está disponible: las ideas son siempre las de la app.",
+    "activadas": "Las ideas con IA están activadas: la IA adapta la redacción de las ideas de la app con estos datos.",
+    "desactivadas": "Las ideas con IA están desactivadas: ahora no se envía nada a la IA.",
+    "recibe": "De tu perfil, recibe:",
+    "recibiria": "Si las activas, de tu perfil recibiría:",
+    "nadaDelPerfil": "Nada: no has indicado profesión ni aficiones.",
+    "ademas": "Y, de cada categoría no sensible, tu nota, si va a mejor o a peor y lo que marcas en «¿Qué te ayuda?».",
+    "nunca": "Nunca recibe:",
+    "nuncaLista": "Tu nombre, tu email, tu fecha de nacimiento, tu género, tus experiencias escritas ni nada de las categorías sensibles.",
+    "cambiar": "Cambiarlo en Privacidad y datos",
+    "activar": "Activarlas en Privacidad y datos"
+  },
+  "videos": {
+    "titulo": "Para inspirarte",
+    "intro": "Charlas en vídeo que pueden darte ideas o ganas. Las eligió quien hizo la app.",
+    "reproducir": "Reproducir «{{titulo}}»",
+    "aviso": "Las imágenes y los vídeos vienen de YouTube: al reproducir uno, YouTube recibe tu visita (sin cookies de seguimiento hasta que lo pulsas)."
+  },
+  "comunidad": {
+    "titulo": "De la comunidad",
+    "intro": "Lo que comparten, de forma anónima, otras personas a las que les va bien en esta área.",
+    "ninguna": "Todavía nadie ha compartido nada en esta categoría. Cuando te vaya bien, puedes compartir una experiencia desde tu diario en la entrevista."
+  },
+  "sesion": {
+    "caducadaTitulo": "Tu sesión ha caducado",
+    "caducadaTexto": "Por seguridad, la sesión se cierra tras dos días sin usar la app. Vuelve a entrar para seguir; si estabas guardando algo, repítelo después.",
+    "volverAEntrar": "Volver a entrar"
   }
 }

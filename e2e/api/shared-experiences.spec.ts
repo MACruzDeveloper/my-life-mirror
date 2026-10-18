@@ -17,40 +17,40 @@ test.describe("RF-43: compartir experiencias que funcionan", () => {
     const id = textId();
     const sharedText = `Apunto los gastos cada domingo en una libreta (${id})`;
 
-    // Quien comparte: Economía con un 9.
+    // Quien comparte: Finanzas con un 9.
     const authorContext = await browser.newContext();
     const authorPage = await authorContext.newPage();
     await new AccountPages(authorPage).register(newUser());
     const author = new InterviewPage(authorPage);
     await author.open();
-    await author.activate("Economía");
-    await author.score("Economía", 9);
-    await author.save("Economía");
+    await author.activate("Finanzas");
+    await author.score("Finanzas", 9);
+    await author.save("Finanzas");
 
     // Un teléfono no pasa los filtros: la ventana dice qué quitar y no se publica.
-    await author.addExperience("Economía", `Llamadme al 600 123 456 (${id})`);
-    await author.experience("Economía", "Llamadme").getByRole("button", { name: "Compartir de forma anónima" }).click();
+    await author.addExperience("Finanzas", `Llamadme al 600 123 456 (${id})`);
+    await author.experience("Finanzas", "Llamadme").getByRole("button", { name: "Compartir de forma anónima" }).click();
     let dialog = authorPage.getByRole("dialog", { name: "Compartir de forma anónima" });
     await dialog.getByRole("button", { name: "Compartir" }).click();
     await expect(dialog).toContainText(/no puede llevar emails, teléfonos/i);
     await dialog.getByRole("button", { name: "Cancelar" }).click();
 
-    await author.addExperience("Economía", sharedText);
-    await author.experience("Economía", sharedText).getByRole("button", { name: "Compartir de forma anónima" }).click();
+    await author.addExperience("Finanzas", sharedText);
+    await author.experience("Finanzas", sharedText).getByRole("button", { name: "Compartir de forma anónima" }).click();
     dialog = authorPage.getByRole("dialog", { name: "Compartir de forma anónima" });
     await expect(dialog).toContainText(sharedText);
     await dialog.getByRole("button", { name: "Compartir" }).click();
-    await expect(author.experience("Economía", sharedText).getByText("Compartida")).toBeVisible();
+    await expect(author.experience("Finanzas", sharedText).getByText("Compartida")).toBeVisible();
 
-    // Quien lee: Economía con un 2; la idea abre la ventana con la pestaña de otras personas.
+    // Quien lee: Finanzas con un 2; la idea abre la ventana con la pestaña de otras personas.
     const readerContext = await browser.newContext();
     const readerPage = await readerContext.newPage();
     await new AccountPages(readerPage).register(newUser());
     const reader = new InterviewPage(readerPage);
     await reader.open();
-    await reader.activate("Economía");
-    await reader.score("Economía", 2);
-    await reader.save("Economía");
+    await reader.activate("Finanzas");
+    await reader.score("Finanzas", 2);
+    await reader.save("Finanzas");
     const ideas = reader.savedIdeaDialog();
     await ideas.getByRole("tab", { name: /^De otras personas \(\d+\)$/ }).click();
     const sharedItem = ideas.getByRole("listitem").filter({ hasText: sharedText });
@@ -64,8 +64,8 @@ test.describe("RF-43: compartir experiencias que funcionan", () => {
     // Quien la compartió la ve retirada, y ya no está en Privacidad y datos.
     await authorPage.reload();
     await author.goToQuestions();
-    await expect(author.experience("Economía", sharedText).getByText("Retirada tras un reporte")).toBeVisible();
-    await expect(author.experience("Economía", sharedText).getByRole("button", { name: "Compartir de forma anónima" })).toHaveCount(0);
+    await expect(author.experience("Finanzas", sharedText).getByText("Retirada tras un reporte")).toBeVisible();
+    await expect(author.experience("Finanzas", sharedText).getByRole("button", { name: "Compartir de forma anónima" })).toHaveCount(0);
     const privacy = new DataPrivacyPage(authorPage);
     await privacy.open();
     await expect(privacy.sharedExperiences()).toContainText("No tienes ninguna experiencia compartida.");

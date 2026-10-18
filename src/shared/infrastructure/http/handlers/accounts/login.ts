@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { sessionCookie } from "#shared/infrastructure/cookies.js";
+import { sessionCookies } from "#shared/infrastructure/cookies.js";
 import { AUTH_LIMITS, MAX_EMAIL_LENGTH, MAX_PASSWORD_INPUT_LENGTH } from "#shared/infrastructure/http/authLimits.js";
 import { publicHandler } from "#shared/infrastructure/http/publicHandler.js";
 import { reply } from "#shared/infrastructure/http/sessionHandler.js";
@@ -25,6 +25,6 @@ export default publicHandler({
   execute: async ({ context, body }) => {
     const result = await context.logIn(body);
     if (!result.ok) return reply(401, { error: "Email o contraseña incorrectos" });
-    return reply(200, { id: result.value.id, email: result.value.email }, { "Set-Cookie": sessionCookie(result.value.token) });
+    return reply(200, { id: result.value.id, email: result.value.email }, { "Set-Cookie": sessionCookies(result.value) });
   },
 });
