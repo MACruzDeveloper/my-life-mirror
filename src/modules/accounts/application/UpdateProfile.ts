@@ -33,8 +33,17 @@ function sameList(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && [...a].sort().join("|") === [...b].sort().join("|");
 }
 
+/**
+ * Una zona es válida si Intl la reconoce. No basta con Intl.supportedValuesOf: solo lista las canónicas
+ * y deja fuera alias como "UTC", que es justo lo que detectan algunos navegadores.
+ */
 function isValidTimeZone(value: string): boolean {
-  return Intl.supportedValuesOf("timeZone").includes(value);
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function calculateAge(birthDate: Date, now: Date): number {
