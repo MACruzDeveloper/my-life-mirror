@@ -11,6 +11,7 @@ import { Link as RouterLink, useParams } from "react-router";
 import { useExperiences, useLatestScores } from "@modules/assessments/ui/queries";
 import { TripsSection } from "@modules/agenda/ui/trips/TripsSection";
 import { MilestonesSection } from "@modules/agenda/ui/milestones/MilestonesSection";
+import { isMilestoneCategory } from "@modules/agenda/domain/Milestone";
 import { ProtectedLayout } from "@shared/ui/components/ProtectedLayout";
 import { useCategoryLabel } from "./categoryLabels";
 import { hasCategoryPage } from "./categoryPages";
@@ -85,7 +86,9 @@ export function CategoryPage() {
   const label = categoryLabel(entry.catalogId);
   const hero = CATEGORY_HEROES[key];
   // La copia de la categoría de esta persona (activa o no): con ella se piden las experiencias compartidas.
-  const ownCategoryId = (categories.data ?? []).find((category) => category.catalogId === entry.catalogId)?.id;
+  const ownCategory = (categories.data ?? []).find((category) => category.catalogId === entry.catalogId);
+  const ownCategoryId = ownCategory?.id;
+  const isSensitive = ownCategory?.isSensitiveData === true;
   return (
     <>
     {/*
@@ -103,11 +106,11 @@ export function CategoryPage() {
         <Box aria-hidden sx={{ position: "absolute", inset: 0, background: HERO_VEIL }} />
         {/*
           Como en la portada: la imagen está generada con IA, y se dice. Abajo a la derecha de la imagen; en
-          móvil las tarjetas la tapan por abajo, así que va arriba. El asterisco remite al disclaimer del pie.
+          móvil las tarjetas la tapan por abajo, así que va arriba.
         */}
         <Typography variant="caption" sx={{ position: "absolute", top: { xs: 68, md: "auto" }, bottom: { md: 8 }, right: 16, color: "common.white", opacity: 0.75 }}>
           {t("landing.imagenIA")}
-          {hero.showsThirdPartyBrands && " *"}
+          {hero.resemblesBrands && " *"}
         </Typography>
       </Box>
       {/* El título ocupa un alto fijo, abajo del todo, justo encima de las tarjetas: empiezan siempre a la misma altura. */}
@@ -130,18 +133,23 @@ export function CategoryPage() {
         <TripsSection />
       </Box>
     )}
-    {/* Los hitos: en Aventura, después de los viajes; en Deporte, lo propio de la página. */}
-    <Box sx={{ py: SECTION_SPACING }}>
-      <MilestonesSection categoryKey={key} />
-    </Box>
+    {/* Los hitos: en Aventura, después de los viajes; en Deporte, lo propio de la página. Las demás no tienen. */}
+    {isMilestoneCategory(key) && (
+      <Box sx={{ py: SECTION_SPACING }}>
+        <MilestonesSection categoryKey={key} />
+      </Box>
+    )}
     {/* Inspiración: vídeos curados por el autor y lo que comparten otras personas (RF-43). */}
     {/* Con su propio espacio: sin vídeos, no ocupa sitio. */}
     <VideosSection categoryKey={key} />
-    <Box sx={{ py: SECTION_SPACING }}>
-      <CommunitySection categoryId={ownCategoryId} />
-    </Box>
-    {hero.showsThirdPartyBrands && (
-      // Al pie: la imagen (generada con IA) muestra marcas que no tienen relación con la app.
+    {/* Las categorías sensibles no comparten experiencias (RF-43): sin bloque de la comunidad. */}
+    {!isSensitive && (
+      <Box sx={{ py: SECTION_SPACING }}>
+        <CommunitySection categoryId={ownCategoryId} />
+      </Box>
+    )}
+    {hero.resemblesBrands && (
+      // Al pie: la imagen (generada con IA) tiene elementos que recuerdan a marcas reales, sin relación con la app.
       <Box component="aside" aria-labelledby="aviso-marcas" sx={{ maxWidth: 1100, mx: "auto", px: 2, pb: 2 }}>
         <Typography id="aviso-marcas" variant="caption" component="h2" sx={{ fontWeight: 700, display: "block" }}>
           * {t("paginasCategoria.avisoMarcasTitulo")}

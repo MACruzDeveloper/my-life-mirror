@@ -22,6 +22,8 @@ export interface CatalogLabelDto {
   key?: string;
   /** RF-45: fuera de la IA. */
   aiExcluded?: boolean;
+  /** Retirada del catálogo (ADM-02): no se ofrece, pero el historial la nombra. */
+  retired?: boolean;
   translations: Partial<Record<Locale, { name: string; description: string }>>;
 }
 

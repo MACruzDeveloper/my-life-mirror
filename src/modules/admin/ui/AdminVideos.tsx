@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { prefersReducedMotion } from "@shared/ui/motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -48,6 +49,8 @@ export function AdminVideos() {
   const labels = useCategoryLabelsQuery();
   const { categoryLabel } = useCategoryLabel();
   const [form, setForm] = useState(EMPTY_FORM);
+  const formRef = useRef<HTMLFormElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
   const [editingId, setEditingId] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>();
@@ -65,7 +68,10 @@ export function AdminVideos() {
   const filtered = (Array.isArray(videos.data) ? videos.data : [])
     .filter((video) => filter === ALL || video.categoryKey === filter)
     .sort((a, b) => categoryName(a.categoryKey).localeCompare(categoryName(b.categoryKey)) || a.locale.localeCompare(b.locale));
-  const shown = filtered.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+  // La página pedida, sin pasar de la última que existe (al borrar o cambiar el número de filas, nunca una página vacía).
+  const lastPage = Math.max(0, Math.ceil(filtered.length / rowsPerPage) - 1);
+  const currentPage = Math.min(page, lastPage);
+  const shown = filtered.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
   const complete = Object.values(form).every((value) => value.trim().length > 0);
 
   function refresh() {
@@ -82,6 +88,9 @@ export function AdminVideos() {
     setError(undefined);
     setEditingId(video.id);
     setForm({ categoryKey: video.categoryKey, locale: video.locale, youtubeUrl: video.youtubeId, title: video.title });
+    // El formulario está arriba: con la lista larga quedaba fuera de la vista y parecía que no pasaba nada.
+    formRef.current?.scrollIntoView?.({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+    titleRef.current?.focus({ preventScroll: true });
   }
 
   async function submit(submitEvent: React.FormEvent) {
@@ -134,6 +143,7 @@ export function AdminVideos() {
       {/* Media anchura para todo: categoría e idioma arriba, el título y el enlace debajo, alineados con el idioma; el botón, a la derecha del enlace. */}
       <Box
         component="form"
+        ref={formRef}
         onSubmit={submit}
         aria-label={formTitle}
         sx={{ ...ADMIN_PANEL_SX, borderColor: editingId ? "secondary.main" : "divider", p: 2, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" }, columnGap: 2, rowGap: 1.5, alignItems: "start" }}
@@ -160,7 +170,7 @@ export function AdminVideos() {
             ))}
           </TextField>
         </Box>
-        <TextField label={t("admin.videos.titulo")} size="small" required sx={{ gridColumn: 1 }} slotProps={{ htmlInput: { maxLength: MAX_TITLE } }} {...field("title")} />
+        <TextField label={t("admin.videos.titulo")} inputRef={titleRef} size="small" required sx={{ gridColumn: 1 }} slotProps={{ htmlInput: { maxLength: MAX_TITLE } }} {...field("title")} />
         <TextField label={t("admin.videos.enlace")} size="small" required placeholder="https://www.youtube.com/watch?v=…" sx={{ gridColumn: 1 }} slotProps={{ htmlInput: { maxLength: 500 } }} {...field("youtubeUrl")} />
         <Box sx={{ gridColumn: { xs: 1, md: 2 }, gridRow: { md: 4 }, display: "flex", gap: 1 }}>
           <Button type="submit" variant="contained" color="secondary" disabled={!complete || submitting}>
@@ -246,7 +256,7 @@ export function AdminVideos() {
           <TablePagination
             component="div"
             count={filtered.length}
-            page={page}
+            page={currentPage}
             onPageChange={(_, value) => setPage(value)}
             rowsPerPage={rowsPerPage}
             rowsPerPageOptions={ROWS_PER_PAGE}

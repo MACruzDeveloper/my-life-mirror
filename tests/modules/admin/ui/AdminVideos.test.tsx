@@ -68,6 +68,8 @@ describe("AdminVideos (ADM-04)", () => {
 
     fireEvent.click(within(row).getByRole("button", { name: /editar/i }));
     expect(screen.getByLabelText(/título/i)).toHaveValue("The brain-changing benefits of exercise");
+    // El cursor va al formulario (que puede estar fuera de la vista con la lista larga).
+    expect(screen.getByLabelText(/título/i)).toHaveFocus();
     fireEvent.change(screen.getByLabelText(/título/i), { target: { value: "Exercise and the brain" } });
     fireEvent.click(screen.getByRole("button", { name: /guardar cambios/i }));
 
@@ -112,5 +114,60 @@ describe("AdminVideos (ADM-04)", () => {
     choose(/filtrar por categoría/i, "Aventura");
     expect(within(table).getAllByRole("row")).toHaveLength(1 + 1);
     expect(within(table).getByText("Aventura 0")).toBeInTheDocument();
+  });
+
+  it("desde la última página, al pasar a 25 por página se ven todos (fallo encontrado por el autor)", async () => {
+    const many = Array.from({ length: 7 }, (_, index) => video(`d${index}`, "deporte", `Deporte ${index}`));
+    stubFetch({ videos: many });
+    render(withClient(<AdminVideos />));
+    const table = await screen.findByRole("table");
+
+    fireEvent.click(screen.getByRole("button", { name: /siguiente|next/i }));
+    expect(within(table).getAllByRole("row")).toHaveLength(1 + 2);
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: /por página/i }));
+    fireEvent.click(screen.getByRole("option", { name: "25" }));
+
+    expect(within(table).getAllByRole("row")).toHaveLength(1 + 7);
+  });
+
+  it("si la última página se queda sin filas (al borrar su único vídeo), vuelve a la anterior en lugar de quedarse vacía", async () => {
+    const many = Array.from({ length: 6 }, (_, index) => video(`d${index}`, "deporte", `Deporte ${index}`));
+    let current = many;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string, init?: RequestInit) => {
+        if (init?.method === "DELETE") {
+          current = current.filter((item) => !url.endsWith(`id=${item.id}`));
+          return Promise.resolve({ ok: true, status: 200, json: async () => ({ deleted: true }) });
+        }
+        const data: Record<string, unknown> = { "/api/admin/videos": current, "/api/categories/translations": LABELS };
+        return Promise.resolve({ ok: true, status: 200, json: async () => data[url] ?? [] });
+      }),
+    );
+    render(withClient(<AdminVideos />));
+    const table = await screen.findByRole("table");
+    fireEvent.click(screen.getByRole("button", { name: /siguiente|next/i }));
+    const lastRow = await rowOf("Deporte 5");
+
+    fireEvent.click(within(lastRow).getByRole("button", { name: /borrar/i }));
+
+    await waitFor(() => expect(within(table).getAllByRole("row")).toHaveLength(1 + 5));
+  });
+
+  it("al cambiar el número por página, vuelve a la primera (con 30 y 25 por página, se ven los 25 primeros, no los del final)", async () => {
+    const many = Array.from({ length: 30 }, (_, index) => video(`v${String(index).padStart(2, "0")}`, "deporte", `Deporte ${String(index).padStart(2, "0")}`));
+    stubFetch({ videos: many });
+    render(withClient(<AdminVideos />));
+    const table = await screen.findByRole("table");
+    for (let step = 0; step < 5; step++) fireEvent.click(screen.getByRole("button", { name: /siguiente|next/i }));
+    expect(within(table).getByText("Deporte 29")).toBeInTheDocument();
+
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: /por página/i }));
+    fireEvent.click(screen.getByRole("option", { name: "25" }));
+
+    expect(within(table).getAllByRole("row")).toHaveLength(1 + 25);
+    expect(within(table).getByText("Deporte 00")).toBeInTheDocument();
+    expect(within(table).queryByText("Deporte 29")).not.toBeInTheDocument();
+    expect(screen.getByText("1–25 de 30")).toBeInTheDocument();
   });
 });

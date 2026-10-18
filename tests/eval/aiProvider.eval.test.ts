@@ -140,7 +140,7 @@ interface SuggestCase {
 
 const SUGGEST_CASES: SuggestCase[] = [
   { name: "vida social: agobio y planes tranquilos", locale: "es", categoryKey: "vidaSocial", text: "Me agobian los sitios con mucha gente; estoy mucho mejor en planes tranquilos con dos o tres amigos.", expected: ["sitiosConGente", "vidaSocial.planesTranquilos"] },
-  { name: "economía: una app de gastos", locale: "es", categoryKey: "economia", text: "Desde que apunto todos mis gastos en una app del móvil llego mejor a fin de mes.", expected: ["economia.apps"] },
+  { name: "finanzas: una app de gastos", locale: "es", categoryKey: "economia", text: "Desde que apunto todos mis gastos en una app del móvil llego mejor a fin de mes.", expected: ["economia.apps"] },
   { name: "deporte: caminar por el monte", locale: "es", categoryKey: "deporte", text: "Salir a caminar por el monte los domingos me deja como nuevo.", expected: ["deporte.caminar"] },
   { name: "familia: cuesta llamar por teléfono", locale: "es", categoryKey: "familia", text: "Me cuesta muchísimo llamar por teléfono a mis padres y lo voy dejando semana tras semana.", expected: ["llamarPorTelefono"] },
   { name: "economy: avoiding the bank account", locale: "en", categoryKey: "economia", text: "I can't bring myself to open my banking app and look at my accounts; it stresses me out.", expected: ["mirarMisCuentas"] },

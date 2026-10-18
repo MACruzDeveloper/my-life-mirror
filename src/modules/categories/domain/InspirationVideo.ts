@@ -16,8 +16,10 @@ export interface InspirationVideo {
 }
 
 export const MAX_VIDEO_TITLE_LENGTH = 120;
-/** Por categoría e idioma: la página los enseña en filas de tres. */
+/** Por categoría e idioma, guardados en el panel. */
 export const MAX_VIDEOS_PER_PAGE = 6;
+/** Los que enseña la página de la categoría: una fila de tres, los más recientes. */
+export const VIDEOS_SHOWN = 3;
 
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 const YOUTUBE_HOSTS = ["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be", "www.youtube-nocookie.com", "youtube-nocookie.com"];

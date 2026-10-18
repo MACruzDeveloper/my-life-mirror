@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import ideas from "@modules/recommendations/domain/catalog/ideas.json";
 import situations from "@modules/recommendations/domain/catalog/situations.json";
 import safetyTerms from "@modules/recommendations/domain/catalog/safetyTerms.json";
-import { STANDARD_CATEGORIES } from "@modules/categories/domain/standardCategories";
+import { RETIRED_CATEGORY_KEYS, STANDARD_CATEGORIES } from "@modules/categories/domain/standardCategories";
 import i18n from "@shared/ui/i18n";
 
 // CAT-01: el contenido curado es un JSON que se edita a mano; estos tests avisan si se edita mal.
-const standardKeys = new Set(STANDARD_CATEGORIES.map(({ key }) => key));
+const standardKeys = new Set<string>([...STANDARD_CATEGORIES.map(({ key }) => key), ...RETIRED_CATEGORY_KEYS]) // las retiradas conservan su contenido para el historial;
 const ideaKeys = ideas.map((idea) => idea.key);
 
 function hasText(key: string) {

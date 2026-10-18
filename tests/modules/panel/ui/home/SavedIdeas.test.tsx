@@ -6,7 +6,7 @@ import { createTestClient, withClient } from "../../../../helpers/queryClient";
 import { SavedIdeas } from "@modules/panel/ui/home/SavedIdeas";
 import { visibleIdeaKeys } from "@modules/recommendations/ui/ideaReactions";
 
-const NAMES = { c1: "Economía", c2: "Familia" };
+const NAMES = { c1: "Finanzas", c2: "Familia" };
 const reaction = (categoryId: string, templateKey: string, kind: string) => ({ categoryId, templateKey, reaction: kind, reactedAt: "2026-10-12T10:00:00.000Z" });
 
 function stubReactions(reactions: unknown[]) {
@@ -26,7 +26,7 @@ describe("Tus ideas guardadas (RF-19)", () => {
     const section = await screen.findByRole("region", { name: /tus ideas guardadas/i });
     const items = within(section).getAllByRole("listitem");
     expect(items).toHaveLength(1);
-    expect(items[0]).toHaveTextContent("Economía");
+    expect(items[0]).toHaveTextContent("Finanzas");
     // El texto de la idea, no su clave.
     expect(items[0]).not.toHaveTextContent("economia.2");
     expect(items[0].textContent!.length).toBeGreaterThan(40);

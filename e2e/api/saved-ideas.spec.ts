@@ -10,9 +10,9 @@ test.describe("RF-19: guardar, hacer o descartar una idea", () => {
     await new AccountPages(page).register(newUser());
     await new HomePage(page).startInterviewLink().click();
     const interview = new InterviewPage(page);
-    await interview.activate("Economía");
-    await interview.score("Economía", 2);
-    await interview.save("Economía");
+    await interview.activate("Finanzas");
+    await interview.score("Finanzas", 2);
+    await interview.save("Finanzas");
 
     const dialog = interview.savedIdeaDialog();
     await dialog.getByRole("button", { name: "Me gusta", exact: true }).click();
@@ -23,7 +23,7 @@ test.describe("RF-19: guardar, hacer o descartar una idea", () => {
     await home.open();
     const saved = page.getByRole("region", { name: "Tus ideas guardadas" });
     await expect(saved.getByRole("listitem")).toHaveCount(1);
-    await expect(saved.getByRole("listitem")).toContainText("Economía");
+    await expect(saved.getByRole("listitem")).toContainText("Finanzas");
     await page.reload();
     await expect(saved.getByRole("listitem")).toHaveCount(1);
 
@@ -38,9 +38,9 @@ test.describe("RF-19: guardar, hacer o descartar una idea", () => {
     await new AccountPages(page).register(newUser());
     await new HomePage(page).startInterviewLink().click();
     const interview = new InterviewPage(page);
-    await interview.activate("Economía");
-    await interview.score("Economía", 2);
-    await interview.save("Economía");
+    await interview.activate("Finanzas");
+    await interview.score("Finanzas", 2);
+    await interview.save("Finanzas");
 
     const dialog = interview.savedIdeaDialog();
     await expect(dialog).toContainText("1 de 5");
@@ -52,7 +52,7 @@ test.describe("RF-19: guardar, hacer o descartar una idea", () => {
   test("el servidor rechaza una idea que no es de esa categoría", async ({ page }) => {
     await new AccountPages(page).register(newUser());
     const categories = await (await page.request.get("/api/categories")).json();
-    const economy = (categories as { id: string; name: string }[]).find((category) => category.name === "Economía")!;
+    const economy = (categories as { id: string; name: string }[]).find((category) => category.name === "Finanzas")!;
 
     const response = await page.request.post("/api/recommendations/reactions", { data: { categoryId: economy.id, templateKey: "familia.1", reaction: "saved" } });
 

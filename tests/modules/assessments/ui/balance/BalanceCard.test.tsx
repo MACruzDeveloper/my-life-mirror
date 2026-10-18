@@ -10,7 +10,7 @@ vi.mock("echarts/core", () => ({ use: vi.fn(), init: (...args: unknown[]) => ini
 import { BalanceCard } from "@modules/assessments/ui/balance/BalanceCard";
 
 const SCORED = [
-  { categoryId: "c1", categoryName: "Economía", score: 7 },
+  { categoryId: "c1", categoryName: "Finanzas", score: 7 },
   { categoryId: "c3", categoryName: "Deporte", score: 3 },
   { categoryId: "c4", categoryName: "Aventura", score: 9 },
 ];
@@ -25,7 +25,7 @@ describe("BalanceCard (RF-15)", () => {
     render(<BalanceCard latestScores={SCORED} />);
 
     const card = screen.getByRole("region", { name: /tu equilibrio/i });
-    expect(within(card).getByRole("img", { name: /economía[\s\S]*7[\s\S]*deporte[\s\S]*3[\s\S]*aventura[\s\S]*9/i })).toBeInTheDocument();
+    expect(within(card).getByRole("img", { name: /finanzas[\s\S]*7[\s\S]*deporte[\s\S]*3[\s\S]*aventura[\s\S]*9/i })).toBeInTheDocument();
     expect(init).toHaveBeenCalledOnce();
   });
 
@@ -56,7 +56,7 @@ describe("BalanceCard (RF-15)", () => {
     render(<BalanceCard latestScores={[...SCORED, { categoryId: "c9", categoryName: "<img src=x onerror=alert(1)>", score: 5 }]} />);
 
     const tooltip = setOption.mock.calls.at(-1)![0].tooltip.formatter();
-    expect(tooltip).toContain("Economía: <strong>7</strong>");
+    expect(tooltip).toContain("Finanzas: <strong>7</strong>");
     expect(tooltip).toContain("&lt;img src=x onerror=alert(1)&gt;: <strong>5</strong>");
     expect(tooltip).not.toContain("<img");
   });

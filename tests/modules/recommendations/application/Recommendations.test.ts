@@ -21,7 +21,7 @@ async function setup() {
   const recommendationRepository = new InMemoryRecommendationRepository();
   await createListCategories(categoryRepository, catalog)("u1");
   const categories = await categoryRepository.findByUserId("u1");
-  const finances = categories.find((c) => c.name === "Economía")!;
+  const finances = categories.find((c) => c.name === "Finanzas")!;
   const sport = categories.find((c) => c.name === "Deporte")!;
   await categoryRepository.save({ ...finances, status: "active" });
   await categoryRepository.save({ ...sport, status: "active" });
@@ -160,7 +160,7 @@ describe("ListRecommendations (RF-18)", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value).toHaveLength(1);
-      expect(result.value[0]).toMatchObject({ categoryId: economia.id, categoryName: "Economía", status: "pending" });
+      expect(result.value[0]).toMatchObject({ categoryId: economia.id, categoryName: "Finanzas", status: "pending" });
     }
   });
 

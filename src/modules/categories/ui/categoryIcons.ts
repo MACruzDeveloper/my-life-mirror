@@ -10,6 +10,8 @@ import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import HealthAndSafetyOutlinedIcon from "@mui/icons-material/HealthAndSafetyOutlined";
 import SelfImprovementOutlinedIcon from "@mui/icons-material/SelfImprovementOutlined";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
+import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
+import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import WhatshotOutlinedIcon from "@mui/icons-material/WhatshotOutlined";
 
 /** El icono de cada categoría estándar, por su clave estable. Decorativo: el nombre siempre va escrito al lado. */
@@ -25,6 +27,8 @@ const CATEGORY_ICONS: Record<string, SvgIconComponent> = {
   inversiones: TrendingUpOutlinedIcon,
   salud: HealthAndSafetyOutlinedIcon,
   tecnologia: DevicesOutlinedIcon,
+  formacion: SchoolOutlinedIcon,
+  voluntariado: VolunteerActivismOutlinedIcon,
 };
 
 /** Una categoría creada desde administración (sin clave) o sin icono propio lleva uno genérico. */

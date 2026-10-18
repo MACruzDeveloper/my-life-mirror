@@ -2,6 +2,10 @@ import adventureDesktop from "../../../assets/categories/aventura-1672.webp";
 import adventureMobile from "../../../assets/categories/aventura-828.webp";
 import sportDesktop from "../../../assets/categories/deporte-1672.webp";
 import sportMobile from "../../../assets/categories/deporte-828.webp";
+import spiritualityDesktop from "../../../assets/categories/espiritualidad-1672.webp";
+import spiritualityMobile from "../../../assets/categories/espiritualidad-828.webp";
+import volunteeringDesktop from "../../../assets/categories/voluntariado-1672.webp";
+import volunteeringMobile from "../../../assets/categories/voluntariado-828.webp";
 import type { CategoryPageKey } from "./categoryPages";
 
 /**
@@ -14,13 +18,15 @@ export interface CategoryHero {
   desktop: string;
   mobile: string;
   /**
-   * La imagen muestra marcas de terceros (generada con IA): la página lo aclara al pie. PROVISIONAL
-   * en Deporte (17 oct.), hasta generar una sin logotipos; entonces se quita.
+   * La imagen (generada con IA) tiene elementos que pueden recordar a marcas reales, aunque sin
+   * logotipos: la página lo aclara al pie. En Deporte, los colores del coche de Fórmula 1.
    */
-  showsThirdPartyBrands?: boolean;
+  resemblesBrands?: boolean;
 }
 
 export const CATEGORY_HEROES: Record<CategoryPageKey, CategoryHero> = {
   aventura: { desktop: adventureDesktop, mobile: adventureMobile },
-  deporte: { desktop: sportDesktop, mobile: sportMobile, showsThirdPartyBrands: true },
+  deporte: { desktop: sportDesktop, mobile: sportMobile, resemblesBrands: true },
+  espiritualidad: { desktop: spiritualityDesktop, mobile: spiritualityMobile },
+  voluntariado: { desktop: volunteeringDesktop, mobile: volunteeringMobile },
 };

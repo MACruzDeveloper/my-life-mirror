@@ -63,5 +63,18 @@
   {"key": "tecnologia.desconectar", "category": "tecnologia"},
   {"key": "tecnologia.aprenderAlgoNuevo", "category": "tecnologia"},
   {"key": "tecnologia.ordenDigital", "category": "tecnologia"},
-  {"key": "tecnologia.crearAlgoPropio", "category": "tecnologia"}
+  {"key": "tecnologia.crearAlgoPropio", "category": "tecnologia"},
+  {"key": "economia.largoPlazo", "category": "economia"},
+  {"key": "formacion.cursoCorto", "category": "formacion"},
+  {"key": "formacion.ratoFijo", "category": "formacion"},
+  {"key": "formacion.aprenderConOtros", "category": "formacion"},
+  {"key": "formacion.practicarIdioma", "category": "formacion"},
+  {"key": "formacion.leer", "category": "formacion"},
+  {"key": "formacion.proyectoPropio", "category": "formacion"},
+  {"key": "voluntariado.asociacionCerca", "category": "voluntariado"},
+  {"key": "voluntariado.pocoTiempo", "category": "voluntariado"},
+  {"key": "voluntariado.conAmigos", "category": "voluntariado"},
+  {"key": "voluntariado.animales", "category": "voluntariado"},
+  {"key": "voluntariado.entorno", "category": "voluntariado"},
+  {"key": "voluntariado.acompanarPersonas", "category": "voluntariado"}
 ]

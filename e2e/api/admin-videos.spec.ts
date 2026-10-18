@@ -42,6 +42,22 @@ test("administración añade un vídeo en español a Deporte, se ve en su págin
   await page.getByRole("option", { name: "Deporte" }).click();
   await expect(page.getByRole("table", { name: "Vídeos de inspiración" })).toContainText("Lo que el ejercicio hace por tu cerebro");
 
+  // Editar: cambiarle el idioma (un error al añadirlo) y volver a dejarlo como estaba.
+  const row = page.getByRole("row").filter({ hasText: "Lo que el ejercicio hace por tu cerebro" });
+  await row.getByRole("button", { name: /Editar/ }).click();
+  const editForm = page.getByRole("form", { name: "Editar el vídeo" });
+  await expect(editForm).toBeInViewport();
+  await expect(editForm.getByLabel(/Título/)).toHaveValue("Lo que el ejercicio hace por tu cerebro");
+  await editForm.getByRole("combobox", { name: /Idioma/ }).click();
+  await page.getByRole("option", { name: "Inglés" }).click();
+  await editForm.getByRole("button", { name: "Guardar cambios" }).click();
+  await expect(row).toContainText("Inglés");
+  await row.getByRole("button", { name: /Editar/ }).click();
+  await editForm.getByRole("combobox", { name: /Idioma/ }).click();
+  await page.getByRole("option", { name: "Español" }).click();
+  await editForm.getByRole("button", { name: "Guardar cambios" }).click();
+  await expect(row).toContainText("Español");
+
   await page.goto("/categorias/deporte");
   const videos = page.getByRole("region", { name: "Para inspirarte" });
   // En español hay uno: solo ese, sin los de ejemplo en inglés.

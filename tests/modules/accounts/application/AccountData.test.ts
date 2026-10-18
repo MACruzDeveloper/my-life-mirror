@@ -48,7 +48,7 @@ async function setup() {
   const recordAssessments = createRecordAssessments(assessmentRepository, categoryRepository, clock);
   const categoriesAna = (await listCategories(ana.id)).ok ? await categoryRepository.findByUserId(ana.id) : [];
   const categoriesLuis = (await listCategories(luis.id)).ok ? await categoryRepository.findByUserId(luis.id) : [];
-  const financesAna = categoriesAna.find((c) => c.name === "Economía")!;
+  const financesAna = categoriesAna.find((c) => c.name === "Finanzas")!;
   const sexAna = categoriesAna.find((c) => c.name === "Sexo")!;
   await categoryRepository.save({ ...financesAna, status: "active", experienceTags: ["economia.presupuesto"], difficultyTags: ["mirarMisCuentas"] });
   await categoryRepository.save({ ...sexAna, status: "active" });
@@ -94,27 +94,27 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     expect(data.exportedAt).toBe("2026-09-20T10:00:00.000Z");
     expect(data.account).toEqual({ id: ana.id, email: "ana@ejemplo.com" });
     expect(data.profile).toEqual({ name: "Ana", birthDate: "1996-05-20", timeZone: "Europe/Madrid" });
-    expect(data.categories.find((c) => c.name === "Economía")).toMatchObject({ status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"], difficultyTags: ["mirarMisCuentas"] });
+    expect(data.categories.find((c) => c.name === "Finanzas")).toMatchObject({ status: "active", isSensitiveData: false, experienceTags: ["economia.presupuesto"], difficultyTags: ["mirarMisCuentas"] });
     expect(data.assessments).toEqual(
       expect.arrayContaining([
-        { category: "Economía", score: 6, note: "mes justo", recordedAt: "2026-09-20T10:00:00.000Z" },
+        { category: "Finanzas", score: 6, note: "mes justo", recordedAt: "2026-09-20T10:00:00.000Z" },
         { category: "Sexo", score: 8, recordedAt: "2026-09-20T10:00:00.000Z" },
       ]),
     );
-    expect(data.recommendations).toEqual([{ category: "Economía", templateKey: "economia.1", status: "pending", createdAt: "2026-09-20T10:00:00.000Z" }]);
+    expect(data.recommendations).toEqual([{ category: "Finanzas", templateKey: "economia.1", status: "pending", createdAt: "2026-09-20T10:00:00.000Z" }]);
     expect(data.consents).toEqual([{ category: "Sexo", policyVersion: "2026-09", grantedAt: "2026-09-20T10:00:00.000Z" }]);
     // RF-40: la elección y las ideas personalizadas también son datos suyos.
     expect(data.aiIdeas).toEqual({ enabled: true, enabledAt: "2026-09-20T10:00:00.000Z" });
     expect(data.aiSuggestions).toEqual({ enabled: true, enabledAt: "2026-10-05T10:00:00.000Z" });
-    expect(data.experiences).toEqual([{ category: "Economía", text: "Este mes he ahorrado un poco", createdAt: "2026-09-21T10:00:00.000Z" }]);
-    expect(data.personalizedIdeas).toEqual([{ category: "Economía", locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: "2026-09-20T10:00:00.000Z" }]);
+    expect(data.experiences).toEqual([{ category: "Finanzas", text: "Este mes he ahorrado un poco", createdAt: "2026-09-21T10:00:00.000Z" }]);
+    expect(data.personalizedIdeas).toEqual([{ category: "Finanzas", locale: "es", templateKey: "economia.3", text: "Una idea personalizada de prueba para Ana, con suficiente longitud.", model: "fake", createdAt: "2026-09-20T10:00:00.000Z" }]);
     // RF-19: lo que decidió sobre cada idea.
-    expect(data.ideaReactions).toEqual([{ category: "Economía", templateKey: "economia.2", reaction: "saved", reactedAt: "2026-10-12T10:00:00.000Z", plannedFor: "2026-10-20" }]);
+    expect(data.ideaReactions).toEqual([{ category: "Finanzas", templateKey: "economia.2", reaction: "saved", reactedAt: "2026-10-12T10:00:00.000Z", plannedFor: "2026-10-20" }]);
     // RF-48: sus eventos, con el nombre de sus categorías (las que sigan existiendo); no los de otra persona.
     // RF-49: sus viajes.
     expect(data.trips).toEqual([{ country: "PT", year: 2015, month: 6 }]);
     expect(data.milestones).toEqual([{ category: "deporte", title: "Primer 10K", year: 2019, month: 4 }]);
-    expect(data.events).toEqual([{ title: "Boda de Marta", day: "2026-10-24", categories: ["Economía"] }]);
+    expect(data.events).toEqual([{ title: "Boda de Marta", day: "2026-10-24", categories: ["Finanzas"] }]);
   });
 
   it("RF-43: dice qué experiencias están compartidas y cuáles se retiraron tras un reporte", async () => {
@@ -125,7 +125,7 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     const result = await exportUserData({ id: ana.id, email: ana.email });
 
     expect(result.ok && result.value.experiences).toEqual([
-      { category: "Economía", text: "Este mes he ahorrado un poco", createdAt: "2026-09-21T10:00:00.000Z", sharedAt: "2026-10-05T10:00:00.000Z", reportedAt: "2026-10-06T10:00:00.000Z" },
+      { category: "Finanzas", text: "Este mes he ahorrado un poco", createdAt: "2026-09-21T10:00:00.000Z", sharedAt: "2026-10-05T10:00:00.000Z", reportedAt: "2026-10-06T10:00:00.000Z" },
     ]);
   });
 

@@ -65,14 +65,14 @@ describe("vídeos de inspiración desde administración (ADM-04)", () => {
     expect((await add(ADMIN, video({ youtubeUrl: "ZZZZZZZZZZZ" }))).ok).toBe(false);
   });
 
-  it("la página enseña los del idioma de la interfaz; si no hay ninguno, los de otro idioma; en el orden en que se añadieron", async () => {
+  it("la página enseña los del idioma de la interfaz; si no hay ninguno, los de otro idioma", async () => {
     const { add, list } = setup();
     await add(ADMIN, video({ youtubeUrl: "AAAAAAAAAAA", title: "Primero" }));
     await add(ADMIN, video({ youtubeUrl: "BBBBBBBBBBB", title: "Segundo" }));
     await add(ADMIN, video({ categoryKey: "aventura", locale: "en", youtubeUrl: "CCCCCCCCCCC", title: "Third" }));
 
     const sport = await list({ categoryKey: "deporte", locale: "es" });
-    expect(sport.ok && sport.value.map((item) => item.title)).toEqual(["Primero", "Segundo"]);
+    expect(sport.ok && sport.value.map((item) => item.title).sort()).toEqual(["Primero", "Segundo"]);
     const adventure = await list({ categoryKey: "aventura", locale: "es" });
     expect(adventure.ok && adventure.value.map((item) => ({ title: item.title, locale: item.locale }))).toEqual([{ title: "Third", locale: "en" }]);
     const none = await list({ categoryKey: "economia", locale: "es" });
@@ -109,5 +109,18 @@ describe("vídeos de inspiración desde administración (ADM-04)", () => {
     expect((await update(USER, id, video())).ok).toBe(false);
     const missing = await update(ADMIN, "no-existe", video());
     expect(!missing.ok && missing.error.code).toBe("NOT_FOUND");
+  });
+
+  it("la página enseña como mucho 3, los más recientes (los demás quedan en el panel)", async () => {
+    const repository = new InMemoryInspirationVideoRepository();
+    let minute = 0;
+    const clock = { now: () => new Date(Date.UTC(2026, 9, 18, 10, minute++)) };
+    const add = createAddInspirationVideo({ repository, clock });
+    const list = createListInspirationVideos(repository);
+    for (const [index, id] of ["AAAAAAAAAAA", "BBBBBBBBBBB", "CCCCCCCCCCC", "DDDDDDDDDDD"].entries()) await add(ADMIN, video({ youtubeUrl: id, title: `Vídeo ${index + 1}` }));
+
+    const shown = await list({ categoryKey: "deporte", locale: "es" });
+
+    expect(shown.ok && shown.value.map((item) => item.title)).toEqual(["Vídeo 4", "Vídeo 3", "Vídeo 2"]);
   });
 });

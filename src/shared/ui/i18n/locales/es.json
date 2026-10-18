@@ -452,6 +452,16 @@
       "¿Cuánto tiempo pasas con pantallas sin darte cuenta?",
       "¿La tecnología te ayuda o te agobia en tu día a día?",
       "¿Te sientes a gusto con las herramientas que usas?"
+    ],
+    "formacion": [
+      "¿Estás aprendiendo algo que te ilusione?",
+      "¿Te das tiempo para formarte o aprender idiomas?",
+      "¿Sientes que sigues creciendo en lo que sabes?"
+    ],
+    "voluntariado": [
+      "¿Dedicas algo de tu tiempo a ayudar a otras personas o causas?",
+      "¿Te gustaría colaborar con algún proyecto solidario?",
+      "¿Cómo te sientes cuando ayudas a los demás?"
     ]
   },
   "admin": {
@@ -637,7 +647,7 @@
         "1": "Si te apetece, anota durante una semana en qué se va tu dinero, sin juzgarte: solo mirarlo ya ayuda.",
         "2": "Prueba a apartar una cantidad pequeña nada más cobrar, aunque sea simbólica. Lo importante es el hábito.",
         "3": "Elige un gasto pequeño y repetido que no te aporte mucho y prueba una semana sin él, a ver cómo te sientes.",
-        "4": "Pon por escrito un objetivo de ahorro concreto y cercano, como un pequeño capricho, y cuánto te falta.",
+        "4": "Pon por escrito un objetivo concreto para tu dinero, cercano o a largo plazo, y cuánto te falta: tener claro el para qué ayuda a decidir con calma.",
         "5": "Si hablar de dinero te ayuda, comenta con alguien de confianza qué te preocupa; ponerlo en palabras ya aclara."
       },
       "vidaSocial": {
@@ -714,6 +724,20 @@
         "3": "Aprende a hacer una cosa nueva con una herramienta que ya usas: un atajo o una función que no conocías.",
         "4": "Deja el móvil fuera del dormitorio una noche y mira cómo te levantas.",
         "5": "Dedica media hora a ordenar tus fotos o tus archivos: menos ruido y más fácil encontrar lo que importa."
+      },
+      "formacion": {
+        "1": "Elige algo que te apetezca aprender y busca un curso corto o un tutorial para empezar esta semana.",
+        "2": "Reserva un rato fijo a la semana, aunque sean veinte minutos, para aprender algo nuevo.",
+        "3": "Si estudias un idioma, prueba a ver una serie o escuchar un podcast en ese idioma con subtítulos.",
+        "4": "Aprende con otra persona: compartir lo que estudias ayuda a no dejarlo.",
+        "5": "Anota tres cosas que hayas aprendido este mes, aunque sean pequeñas: verlo escrito anima a seguir."
+      },
+      "voluntariado": {
+        "1": "Busca una asociación cerca de ti y pregunta cómo puedes colaborar, aunque sea unas horas al mes.",
+        "2": "Empieza con algo puntual: una recogida de alimentos, una limpieza de playa o un evento solidario.",
+        "3": "Pregunta a alguien de tu entorno si conoce un proyecto en el que ayudar y acompáñale un día.",
+        "4": "Si te gustan los animales, informa de si alguna protectora cercana necesita ayuda para pasear o cuidar.",
+        "5": "Piensa en algo que se te dé bien y que podría servir a otras personas: a veces es la mejor forma de ayudar."
       }
     },
     "dialogoTitulo": "Una idea para {{categoria}}",
@@ -802,7 +826,8 @@
       "apps": "Apps de finanzas",
       "hablarlo": "Hablarlo con alguien de confianza",
       "aprender": "Aprender sobre dinero",
-      "ingresosExtra": "Ingresos extra"
+      "ingresosExtra": "Ingresos extra",
+      "largoPlazo": "Pensar a largo plazo"
     },
     "vidaSocial": {
       "quedarEnPersona": "Quedar en persona",
@@ -882,6 +907,22 @@
       "aprenderAlgoNuevo": "Aprender algo nuevo",
       "ordenDigital": "Orden digital",
       "crearAlgoPropio": "Crear algo propio"
+    },
+    "formacion": {
+      "cursoCorto": "Un curso corto",
+      "ratoFijo": "Un rato fijo para aprender",
+      "aprenderConOtros": "Aprender con otras personas",
+      "practicarIdioma": "Practicar un idioma",
+      "leer": "Leer",
+      "proyectoPropio": "Un proyecto propio"
+    },
+    "voluntariado": {
+      "asociacionCerca": "Una asociación cerca",
+      "pocoTiempo": "Aunque sea poco tiempo",
+      "conAmigos": "Con amigos o familia",
+      "animales": "Ayudar a animales",
+      "entorno": "Cuidar el entorno",
+      "acompanarPersonas": "Acompañar a personas"
     }
   },
   "situaciones": {
@@ -993,7 +1034,7 @@
   },
   "paginasCategoria": {
     "titulo": "Categorías",
-    "intro": "Cada categoría tendrá su propia página, con lo que has vivido en ella: recuerdos y logros que te sirvan de memoria y de motivación. Empezamos por Aventura.",
+    "intro": "Cada categoría tendrá su propia página, con lo que has vivido en ella: recuerdos y logros que te sirvan de memoria y de motivación. Ya puedes entrar en algunas; las demás llegarán pronto.",
     "proximamente": "Próximamente",
     "sinPagina": "Esta categoría todavía no tiene página.",
     "verTodas": "Ver todas las categorías",
@@ -1005,8 +1046,8 @@
     "sinExperiencias": "Aún no has anotado experiencias en esta categoría. Puedes hacerlo desde la entrevista.",
     "verTodasExperiencias": "Ver todas ({{count}})",
     "verMenos": "Ver menos",
-    "avisoMarcas": "La imagen de cabecera está generada con IA y se usa solo con fines ilustrativos en un proyecto académico, sin ánimo de lucro. Las marcas, logotipos y nombres de competiciones que puedan aparecer pertenecen a sus titulares, que no tienen relación con esta app ni la respaldan.",
-    "avisoMarcasTitulo": "Disclaimer"
+    "avisoMarcasTitulo": "Disclaimer",
+    "avisoMarcas": "La imagen de cabecera está generada con IA y se usa solo con fines ilustrativos en un proyecto académico, sin ánimo de lucro. Los colores o diseños que puedan recordar a marcas reales no implican ninguna relación con ellas ni su respaldo."
   },
   "hitos": {
     "titulo": {

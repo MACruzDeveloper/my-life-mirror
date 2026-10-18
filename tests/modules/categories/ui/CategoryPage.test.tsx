@@ -21,10 +21,12 @@ vi.mock("@modules/agenda/ui/trips/TripsMap", () => ({
 const LABELS = [
   { catalogId: "k-ave", key: "aventura", translations: { es: { name: "Aventura", description: "Nuevas experiencias y retos." } } },
   { catalogId: "k-dep", key: "deporte", translations: { es: { name: "Deporte", description: "Actividad física." } } },
+  { catalogId: "k-esp", key: "espiritualidad", translations: { es: { name: "Espiritualidad", description: "Creencias y práctica espiritual." } } },
 ];
 const CATEGORIES = [
   { id: "c-ave", catalogId: "k-ave", name: "Aventura", status: "active" },
   { id: "c-dep", catalogId: "k-dep", name: "Deporte", status: "inactive" },
+  { id: "c-esp", catalogId: "k-esp", name: "Espiritualidad", status: "inactive", isSensitiveData: true },
 ];
 
 /** Tres vídeos de ejemplo de Deporte, en inglés (ADM-04: vienen de la API). */
@@ -282,5 +284,33 @@ describe("CategoryPage: muchas experiencias", () => {
 
     expect(within(card).getByText("Experiencia 1")).toBeInTheDocument();
     expect(within(card).getByRole("button", { name: /ver menos/i })).toHaveAttribute("aria-expanded", "true");
+  });
+});
+
+describe("CategoryPage: Espiritualidad", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("tiene su página, con su imagen; sin hitos y, al ser sensible, sin 'De la comunidad' (sus experiencias no se comparten)", async () => {
+    stubApi();
+    renderPage("espiritualidad");
+
+    const hero = await screen.findByTestId("category-hero");
+    expect(within(hero).getByRole("heading", { level: 1 })).toHaveTextContent("Espiritualidad");
+    await screen.findByRole("region", { name: /tus experiencias/i });
+    expect(screen.queryByRole("region", { name: /carreras|retos/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: /de la comunidad/i })).not.toBeInTheDocument();
+  });
+
+  it("Deporte lleva al pie el disclaimer (su imagen recuerda a marcas, sin logotipos), y Espiritualidad no", async () => {
+    stubApi();
+    const { unmount } = renderPage("deporte");
+
+    await screen.findByTestId("category-hero");
+    expect(screen.getByRole("heading", { name: /disclaimer/i })).toBeInTheDocument();
+    unmount();
+
+    renderPage("espiritualidad");
+    await screen.findByTestId("category-hero");
+    expect(screen.queryByRole("heading", { name: /disclaimer/i })).not.toBeInTheDocument();
   });
 });

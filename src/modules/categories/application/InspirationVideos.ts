@@ -10,6 +10,7 @@ import {
   type InspirationVideoRepository,
   MAX_VIDEO_TITLE_LENGTH,
   MAX_VIDEOS_PER_PAGE,
+  VIDEOS_SHOWN,
   parseYoutubeId,
 } from "../domain/InspirationVideo.js";
 
@@ -98,13 +99,14 @@ export function createDeleteInspirationVideo(repository: InspirationVideoReposit
 
 /**
  * Caso de uso — RF-49: los vídeos de la página de una categoría, en el idioma
- * de la interfaz; si no hay ninguno en ese idioma, los de los demás (la página
- * dice en qué idioma están). En el orden en que se añadieron.
+ * de la interfaz; si no hay ninguno en ese idioma, los de los demás. Como mucho
+ * tres (una fila), los más recientes primero: un vídeo nuevo sustituye al más
+ * antiguo en la página, y los demás siguen en el panel.
  */
 export function createListInspirationVideos(repository: InspirationVideoRepository) {
   return async function listInspirationVideos(input: { categoryKey: string; locale: string }): Promise<Result<InspirationVideoView[], never>> {
     const ofCategory = (await repository.findByCategory(input.categoryKey)).sort(byAddedOrder);
     const inLocale = ofCategory.filter((video) => video.locale === input.locale);
-    return ok((inLocale.length > 0 ? inLocale : ofCategory).map(toView));
+    return ok((inLocale.length > 0 ? inLocale : ofCategory).reverse().slice(0, VIDEOS_SHOWN).map(toView));
   };
 }

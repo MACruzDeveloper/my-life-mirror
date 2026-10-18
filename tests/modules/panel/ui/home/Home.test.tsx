@@ -40,7 +40,7 @@ afterEach(() => {
 // entre la bienvenida de primera vez y el panel (RF-14, por ahora los resultados).
 describe("Home (RF-39 / RF-14)", () => {
   it("un usuario sin ninguna puntuación ve la bienvenida con un enlace grande a la entrevista", async () => {
-    stub([{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía" }]);
+    stub([{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas" }]);
     renderHome();
 
     const link = await screen.findByRole("link", { name: /empezar mi entrevista/i });
@@ -58,10 +58,10 @@ describe("Home (RF-39 / RF-14)", () => {
   });
 
   it("un usuario con puntuaciones va directo al panel con sus resultados", async () => {
-    stub([{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }]);
+    stub([{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }]);
     renderHome();
 
-    expect(await screen.findByText("Economía")).toBeInTheDocument();
+    expect(await screen.findByText("Finanzas")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /empezar mi entrevista/i })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /actualizar mis respuestas/i })).toHaveAttribute("href", "/perfil/entrevista");
     expect(screen.queryByText(/nueva entrevista/i)).not.toBeInTheDocument();
@@ -69,13 +69,13 @@ describe("Home (RF-39 / RF-14)", () => {
 
   it("el panel del usuario recurrente enseña la recomendación de una categoría baja", async () => {
     stub(
-      [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" }],
+      [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" }],
       true,
-      [{ id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", templateKey: "economia.1", status: "pending" }],
+      [{ id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", templateKey: "economia.1", status: "pending" }],
     );
     renderHome();
 
-    const card = await screen.findByRole("region", { name: "Economía" });
+    const card = await screen.findByRole("region", { name: "Finanzas" });
     const ideaButton = await within(card).findByRole("button", { name: /una idea para ti/i });
     expect(screen.queryByText(/en qué se va tu dinero/i)).not.toBeInTheDocument();
     fireEvent.click(ideaButton);
@@ -98,7 +98,7 @@ describe("Home (RF-39 / RF-14)", () => {
         }
         return Promise.resolve({
           ok: true,
-          json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }],
+          json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }],
         });
       }),
     );
@@ -110,28 +110,28 @@ describe("Home (RF-39 / RF-14)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /reintentar/i }));
 
-    expect(await screen.findByText("Economía")).toBeInTheDocument();
+    expect(await screen.findByText("Finanzas")).toBeInTheDocument();
   });
 
   it("el panel muestra la evolución de cada categoría activa con su puntuación actual (RF-16), no las tarjetas de Resultados", async () => {
     stub(
       [
-        { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" },
+        { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" },
         { categoryId: "c2", catalogId: "k-familia", categoryName: "Familia" },
       ],
       true,
       [],
       [
-        { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, previousScore: 3 }] },
-        { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 3 }, { categoryId: "c9", catalogId: "k-pareja", categoryName: "Pareja", score: 8 }] },
+        { recordedAt: "2026-09-18T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, previousScore: 3 }] },
+        { recordedAt: "2026-01-15T10:00:00.000Z", entries: [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 3 }, { categoryId: "c9", catalogId: "k-pareja", categoryName: "Pareja", score: 8 }] },
       ],
     );
     renderHome();
 
     expect(await screen.findByRole("heading", { name: /tu evolución/i })).toBeInTheDocument();
-    const economyCard = await screen.findByRole("region", { name: "Economía" });
+    const economyCard = await screen.findByRole("region", { name: "Finanzas" });
     expect(within(economyCard).getByText("7")).toBeInTheDocument();
-    expect(await within(economyCard).findByRole("img", { name: /evolución de economía[\s\S]*3[\s\S]*7/i })).toBeInTheDocument();
+    expect(await within(economyCard).findByRole("img", { name: /evolución de finanzas[\s\S]*3[\s\S]*7/i })).toBeInTheDocument();
     expect(within(screen.getByRole("region", { name: "Familia" })).getByText(/sin puntuar todavía/i)).toBeInTheDocument();
     // Pareja no está activa: no aparece aunque tenga historial.
     expect(screen.queryByRole("region", { name: "Pareja" })).not.toBeInTheDocument();
@@ -143,7 +143,7 @@ describe("Home (RF-39 / RF-14)", () => {
   it("el panel empieza por el equilibrio (RF-15) y sigue con la evolución (RF-16)", async () => {
     stub(
       [
-        { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" },
+        { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" },
         { categoryId: "c2", catalogId: "k-deporte", categoryName: "Deporte", score: 3, recordedAt: "2026-09-18T10:00:00.000Z" },
         { categoryId: "c3", catalogId: "k-aventura", categoryName: "Aventura", score: 9, recordedAt: "2026-09-18T10:00:00.000Z" },
       ],
@@ -161,12 +161,12 @@ describe("Home (RF-39 / RF-14)", () => {
     try {
       stub(
         [
-          { catalogId: "k-economia", categoryName: "Economía", categoryId: "c1", score: 2, recordedAt: "2026-09-18T10:00:00.000Z" },
+          { catalogId: "k-economia", categoryName: "Finanzas", categoryId: "c1", score: 2, recordedAt: "2026-09-18T10:00:00.000Z" },
           { catalogId: "k-deporte", categoryName: "Deporte", categoryId: "c2", score: 7, recordedAt: "2026-09-18T10:00:00.000Z" },
           { catalogId: "k-familia", categoryName: "Familia", categoryId: "c3", score: 8, recordedAt: "2026-09-18T10:00:00.000Z" },
         ],
         true,
-        [{ id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", templateKey: "economia.1", status: "pending" }],
+        [{ id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", templateKey: "economia.1", status: "pending" }],
       );
       renderHome();
 
@@ -174,7 +174,7 @@ describe("Home (RF-39 / RF-14)", () => {
       expect(screen.getByRole("img", { name: /finances 2[\s\S]*sport 7[\s\S]*family 8/i })).toBeInTheDocument();
       fireEvent.click(within(card).getByRole("button", { name: /an idea for you/i }));
       expect(screen.getByRole("dialog", { name: "An idea for Finances" })).toBeInTheDocument();
-      expect(screen.queryByText("Economía")).not.toBeInTheDocument();
+      expect(screen.queryByText("Finanzas")).not.toBeInTheDocument();
     } finally {
       await i18n.changeLanguage("es");
     }
@@ -182,16 +182,16 @@ describe("Home (RF-39 / RF-14)", () => {
 
   describe("resumen de ideas (UX-02)", () => {
     const SCORES = [
-      { categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" },
+      { categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 2, recordedAt: "2026-09-19T10:00:00.000Z" },
       { categoryId: "c2", catalogId: "k-familia", categoryName: "Familia", score: 9, recordedAt: "2026-09-19T10:00:00.000Z" },
     ];
 
     it("con recomendaciones abiertas, las resume arriba con un botón por categoría que abre la idea", async () => {
-      stub(SCORES, true, [{ id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", templateKey: "economia.1", status: "pending" }]);
+      stub(SCORES, true, [{ id: "r1", categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", templateKey: "economia.1", status: "pending" }]);
       renderHome();
 
       const summary = await screen.findByRole("region", { name: /ideas para ti/i });
-      const button = await within(summary).findByRole("button", { name: /idea para economía/i });
+      const button = await within(summary).findByRole("button", { name: /idea para finanzas/i });
       expect(within(summary).queryByRole("button", { name: /familia/i })).not.toBeInTheDocument();
       fireEvent.click(button);
       const dialog = screen.getByRole("dialog");
@@ -203,13 +203,13 @@ describe("Home (RF-39 / RF-14)", () => {
       stub(SCORES);
       renderHome();
 
-      await screen.findByRole("region", { name: "Economía" });
+      await screen.findByRole("region", { name: "Finanzas" });
       expect(screen.queryByRole("region", { name: /ideas para ti/i })).not.toBeInTheDocument();
     });
   });
 
   describe("guía del panel (UX-01)", () => {
-    const SCORED = [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }];
+    const SCORED = [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }];
 
     it("explica cada parte del panel, nombrando los botones con su texto real", async () => {
       stub(SCORED);
@@ -230,7 +230,7 @@ describe("Home (RF-39 / RF-14)", () => {
       firstVisit.unmount();
 
       renderHome();
-      await screen.findByText("Economía");
+      await screen.findByText("Finanzas");
       expect(screen.queryByRole("region", { name: /cómo leer esta página/i })).not.toBeInTheDocument();
 
       fireEvent.click(screen.getByRole("button", { name: /cómo leer esta página/i }));
@@ -260,7 +260,7 @@ describe("Home (RF-39 / RF-14)", () => {
         vi.fn((url: string) => {
           if (url === "/api/accounts/profile") return Promise.resolve({ ok: true, json: async () => profile });
           if (url === "/api/categories/translations") return Promise.resolve({ ok: true, json: async () => categoryLabelsFixture() });
-          if (url === "/api/assessments") return Promise.resolve({ ok: true, json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Economía", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }] });
+          if (url === "/api/assessments") return Promise.resolve({ ok: true, json: async () => [{ categoryId: "c1", catalogId: "k-economia", categoryName: "Finanzas", score: 7, recordedAt: "2026-09-19T10:00:00.000Z" }] });
           return Promise.resolve({ ok: true, json: async () => [] });
         }),
       );
@@ -295,7 +295,7 @@ describe("Home (RF-39 / RF-14)", () => {
       stub([scored(9, "economia", "c1"), scored(8, "familia", "c2"), scored(undefined, "aventura", "c3")]);
       renderHome();
 
-      expect(await screen.findByText("Economía")).toBeInTheDocument();
+      expect(await screen.findByText("Finanzas")).toBeInTheDocument();
       expect(screen.queryByRole("region", { name: "Todo va bien" })).not.toBeInTheDocument();
     });
   });

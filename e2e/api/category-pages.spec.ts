@@ -26,7 +26,7 @@ test.describe("RF-49: Categorías y viajes en Aventura", () => {
       await page.getByRole("menuitem", { name: "Categorías" }).click();
     }
     await expect(page.getByRole("heading", { level: 1, name: "Categorías" })).toBeVisible();
-    await expect(page.locator("[aria-disabled='true']").filter({ hasText: "Economía" })).toContainText("Próximamente");
+    await expect(page.locator("[aria-disabled='true']").filter({ hasText: "Finanzas" })).toContainText("Próximamente");
     await page.getByRole("link", { name: /Aventura/ }).click();
 
     await expect(page).toHaveURL(/\/categorias\/aventura$/);

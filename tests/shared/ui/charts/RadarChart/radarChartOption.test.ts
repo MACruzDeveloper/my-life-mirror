@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildRadarChartOption } from "@shared/ui/charts/RadarChart/radarChartOption";
 
 const axes = [
-  { name: "Economía", value: 7 },
+  { name: "Finanzas", value: 7 },
   { name: "Deporte", value: 3 },
   { name: "Familia", value: 9 },
 ];
@@ -13,7 +13,7 @@ describe("buildRadarChartOption (plantilla de radar)", () => {
 
   it("un eje por elemento, en el orden recibido, todos con la misma escala", () => {
     const radar = option.radar as { indicator: { name: string; min: number; max: number }[]; splitNumber: number };
-    expect(radar.indicator.map((i) => i.name)).toEqual(["Economía", "Deporte", "Familia"]);
+    expect(radar.indicator.map((i) => i.name)).toEqual(["Finanzas", "Deporte", "Familia"]);
     expect(radar.indicator.every((i) => i.min === 0 && i.max === 10)).toBe(true);
     expect(radar.splitNumber).toBe(5);
   });
@@ -29,7 +29,7 @@ describe("buildRadarChartOption (plantilla de radar)", () => {
 
   it("el tooltip recibe cada eje con su valor", () => {
     const tooltip = option.tooltip as { formatter: () => string };
-    expect(tooltip.formatter()).toBe("Economía=7;Deporte=3;Familia=9");
+    expect(tooltip.formatter()).toBe("Finanzas=7;Deporte=3;Familia=9");
   });
 
   it("sin animación si el usuario prefiere menos movimiento", () => {

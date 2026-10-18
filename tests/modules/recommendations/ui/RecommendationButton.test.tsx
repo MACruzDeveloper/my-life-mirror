@@ -11,7 +11,7 @@ import { createTestClient, withClient } from "../../../helpers/queryClient";
 
 describe("RecommendationButton (RF-18)", () => {
   it("se ve un botón destacado 'Una idea para ti', pero el texto de la idea no se muestra hasta pulsarlo", () => {
-    render(<RecommendationButton templateKey="economia.1" categoryName="Economía" />);
+    render(<RecommendationButton templateKey="economia.1" categoryName="Finanzas" />);
 
     const button = screen.getByRole("button", { name: /una idea para ti/i });
     expect(button).toHaveAttribute("aria-haspopup", "dialog");
@@ -20,11 +20,11 @@ describe("RecommendationButton (RF-18)", () => {
   });
 
   it("al pulsarlo abre una ventana con la idea, la categoría y el aviso de RES-05; y se puede cerrar", async () => {
-    render(<RecommendationButton templateKey="economia.1" categoryName="Economía" />);
+    render(<RecommendationButton templateKey="economia.1" categoryName="Finanzas" />);
 
     fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
 
-    const dialog = screen.getByRole("dialog", { name: /economía/i });
+    const dialog = screen.getByRole("dialog", { name: /finanzas/i });
     expect(within(dialog).getByText(/en qué se va tu dinero/i)).toBeInTheDocument();
     expect(within(dialog).getByText(/no sustituyen el asesoramiento/i)).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole("button", { name: /cerrar/i }));
@@ -68,7 +68,7 @@ describe("RecommendationButton (RF-18)", () => {
     }
 
     it("enseña las 5 ideas de su categoría, primero la recomendada, con su posición y el aviso siempre", () => {
-      render(<RecommendationButton templateKey="economia.3" categoryName="Economía" />);
+      render(<RecommendationButton templateKey="economia.3" categoryName="Finanzas" />);
 
       const dialog = open();
       expect(within(dialog).getByText(/un gasto pequeño y repetido/i)).toBeInTheDocument();
@@ -82,7 +82,7 @@ describe("RecommendationButton (RF-18)", () => {
     });
 
     it("'anterior' desde la primera vuelve a la última", () => {
-      render(<RecommendationButton templateKey="economia.1" categoryName="Economía" />);
+      render(<RecommendationButton templateKey="economia.1" categoryName="Finanzas" />);
 
       const dialog = open();
       fireEvent.click(within(dialog).getByRole("button", { name: "Idea anterior" }));
@@ -102,11 +102,11 @@ describe("RecommendationButton (RF-18)", () => {
 
   describe("pulso cuando cambian las ideas (RF-42)", () => {
     it("cada cambio da un pulso al botón, sin cerrar la ventana si estaba abierta", () => {
-      const view = render(<RecommendationButton templateKey="economia.1" categoryName="Economía" pulseKey={0} />);
+      const view = render(<RecommendationButton templateKey="economia.1" categoryName="Finanzas" pulseKey={0} />);
       expect(screen.getByRole("button", { name: /una idea para ti/i })).not.toHaveAttribute("data-pulse");
       fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
 
-      view.rerender(<RecommendationButton templateKey="economia.1" categoryName="Economía" pulseKey={1} />);
+      view.rerender(<RecommendationButton templateKey="economia.1" categoryName="Finanzas" pulseKey={1} />);
 
       expect(screen.getByRole("dialog")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /una idea para ti/i, hidden: true })).toHaveAttribute("data-pulse", "true");
@@ -117,7 +117,7 @@ describe("RecommendationButton (RF-18)", () => {
     function renderWithDifficulties(difficultyTags: string[]) {
       const client = createTestClient();
       client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false, difficultyTags }]);
-      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Finanzas" />, client));
       fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
       return screen.getByRole("dialog");
     }
@@ -137,7 +137,7 @@ describe("RecommendationButton (RF-18)", () => {
       // P. ej., se creó cuando todas chocaban y después se desmarcó la situación.
       const client = createTestClient();
       client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false, difficultyTags: [] }]);
-      render(withClient(<RecommendationButton categoryId="c1" categoryKey="economia" templateKey="general.2" categoryName="Economía" />, client));
+      render(withClient(<RecommendationButton categoryId="c1" categoryKey="economia" templateKey="general.2" categoryName="Finanzas" />, client));
       fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
       const dialog = screen.getByRole("dialog");
 
@@ -162,7 +162,7 @@ describe("RecommendationButton (RF-18)", () => {
       const client = createTestClient();
       client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false, difficultyTags }]);
       client.setQueryData(["idea-reactions"], []);
-      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Finanzas" />, client));
       fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
       const reactionBodies = () => fetchMock.mock.calls.filter(([url, init]) => url === "/api/recommendations/reactions" && init?.method === "POST").map(([, init]) => JSON.parse(init?.body as string));
       return { dialog: screen.getByRole("dialog"), reactionBodies };
@@ -218,7 +218,7 @@ describe("RecommendationButton (RF-18)", () => {
       );
       const client = createTestClient();
       client.setQueryData(["categories"], [{ id: "c1", catalogId: "k-economia", status: "active", isSensitiveData: false }]);
-      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />, client));
+      render(withClient(<RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Finanzas" />, client));
       fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
       const dialog = screen.getByRole("dialog");
 
@@ -230,7 +230,7 @@ describe("RecommendationButton (RF-18)", () => {
     });
 
     it("una idea suelta, sin categoría detrás, no ofrece reacciones", () => {
-      render(<RecommendationButton templateKey="economia.1" categoryName="Economía" />);
+      render(<RecommendationButton templateKey="economia.1" categoryName="Finanzas" />);
       fireEvent.click(screen.getByRole("button", { name: /una idea para ti/i }));
 
       expect(within(screen.getByRole("dialog")).queryByRole("button", { name: "Me gusta" })).not.toBeInTheDocument();
@@ -257,7 +257,7 @@ describe("RecommendationButton (RF-18)", () => {
       render(
         withClient(
           <MemoryRouter>
-            <RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Economía" />
+            <RecommendationButton categoryId="c1" templateKey="economia.1" categoryName="Finanzas" />
           </MemoryRouter>,
           client,
         ),
@@ -335,7 +335,7 @@ describe("RecommendationButton (RF-18)", () => {
     }
 
     function renderPersonalized(client = createTestClient()) {
-      return render(withClient(<RecommendationButton recommendationId="r1" categoryId="c1" templateKey="economia.1" categoryName="Economía" personalize />, client));
+      return render(withClient(<RecommendationButton recommendationId="r1" categoryId="c1" templateKey="economia.1" categoryName="Finanzas" personalize />, client));
     }
 
     function personalizeBodies(fetchMock: ReturnType<typeof stubPersonalize>) {

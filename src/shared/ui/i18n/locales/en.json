@@ -452,6 +452,16 @@
       "How much time do you spend on screens without noticing?",
       "Does technology help you or overwhelm you day to day?",
       "Do you feel comfortable with the tools you use?"
+    ],
+    "formacion": [
+      "Are you learning something that excites you?",
+      "Do you make time to study or learn languages?",
+      "Do you feel you keep growing in what you know?"
+    ],
+    "voluntariado": [
+      "Do you give some of your time to help other people or causes?",
+      "Would you like to join a charity project?",
+      "How do you feel when you help others?"
     ]
   },
   "admin": {
@@ -637,7 +647,7 @@
         "1": "If you feel like it, note down where your money goes for a week, without judging yourself: just looking already helps.",
         "2": "Try setting aside a small amount as soon as you're paid, even a symbolic one. The habit is what matters.",
         "3": "Pick a small, recurring expense that doesn't give you much and try a week without it, just to see how it feels.",
-        "4": "Write down a concrete, near savings goal, like a small treat, and how much is left to reach it.",
+        "4": "Write down a concrete goal for your money, near or long term, and how far you are from it: knowing what it's for helps you decide calmly.",
         "5": "If talking about money helps you, share what worries you with someone you trust; putting it into words already clears things up."
       },
       "vidaSocial": {
@@ -714,6 +724,20 @@
         "3": "Learn one new thing with a tool you already use: a shortcut or a feature you didn't know.",
         "4": "Leave your phone outside the bedroom for one night and see how you wake up.",
         "5": "Spend half an hour tidying your photos or files: less noise, and easier to find what matters."
+      },
+      "formacion": {
+        "1": "Pick something you'd like to learn and find a short course or tutorial to start this week.",
+        "2": "Set aside a regular time each week, even twenty minutes, to learn something new.",
+        "3": "If you're learning a language, try watching a series or listening to a podcast in it with subtitles.",
+        "4": "Learn with someone else: sharing what you study helps you keep going.",
+        "5": "Write down three things you've learned this month, however small: seeing them written down keeps you motivated."
+      },
+      "voluntariado": {
+        "1": "Look for an organisation near you and ask how you could help, even a few hours a month.",
+        "2": "Start with something one-off: a food drive, a beach clean-up or a charity event.",
+        "3": "Ask someone around you if they know a project to help with, and join them for a day.",
+        "4": "If you like animals, find out whether a nearby shelter needs help with walks or care.",
+        "5": "Think of something you're good at that could help other people: sometimes that's the best way to give."
       }
     },
     "dialogoTitulo": "An idea for {{categoria}}",
@@ -802,7 +826,8 @@
       "apps": "Money apps",
       "hablarlo": "Talking it over with someone I trust",
       "aprender": "Learning about money",
-      "ingresosExtra": "Extra income"
+      "ingresosExtra": "Extra income",
+      "largoPlazo": "Thinking long term"
     },
     "vidaSocial": {
       "quedarEnPersona": "Meeting up in person",
@@ -882,6 +907,22 @@
       "aprenderAlgoNuevo": "Learning something new",
       "ordenDigital": "Digital tidiness",
       "crearAlgoPropio": "Making something of my own"
+    },
+    "formacion": {
+      "cursoCorto": "A short course",
+      "ratoFijo": "A regular time to learn",
+      "aprenderConOtros": "Learning with others",
+      "practicarIdioma": "Practising a language",
+      "leer": "Reading",
+      "proyectoPropio": "A project of my own"
+    },
+    "voluntariado": {
+      "asociacionCerca": "An organisation nearby",
+      "pocoTiempo": "Even a little time",
+      "conAmigos": "With friends or family",
+      "animales": "Helping animals",
+      "entorno": "Caring for the environment",
+      "acompanarPersonas": "Keeping people company"
     }
   },
   "situaciones": {
@@ -993,7 +1034,7 @@
   },
   "paginasCategoria": {
     "titulo": "Categories",
-    "intro": "Each category will have its own page with what you have lived in it: memories and achievements to remember and to keep you going. We are starting with Adventure.",
+    "intro": "Each category will have its own page with what you have lived in it: memories and achievements to remember and to keep you going. Some are ready to explore; the rest are coming soon.",
     "proximamente": "Coming soon",
     "sinPagina": "This category doesn't have a page yet.",
     "verTodas": "See all categories",
@@ -1005,8 +1046,8 @@
     "sinExperiencias": "You haven't noted any experiences in this category yet. You can do it from the interview.",
     "verTodasExperiencias": "See all ({{count}})",
     "verMenos": "See less",
-    "avisoMarcas": "The header image is AI-generated and used for illustrative purposes only in a non-profit academic project. Any brands, logos or competition names that may appear belong to their owners, who are not affiliated with or endorse this app.",
-    "avisoMarcasTitulo": "Disclaimer"
+    "avisoMarcasTitulo": "Disclaimer",
+    "avisoMarcas": "The header image is AI-generated and used for illustrative purposes only in a non-profit academic project. Any colours or designs that may resemble real brands imply no affiliation with or endorsement by them."
   },
   "hitos": {
     "titulo": {

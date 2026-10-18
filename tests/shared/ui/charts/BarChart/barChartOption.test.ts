@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { barChartHeight, buildBarChartOption } from "@shared/ui/charts/BarChart/barChartOption";
 
 const bars = [
-  { name: "Economía", value: 9 },
+  { name: "Finanzas", value: 9 },
   { name: "Familia", value: 4 },
 ];
 const base = { bars, scale: { min: 0, max: 10, splitNumber: 5 }, color: "#5F929C", reducedMotion: false, formatTooltip: (bar: { name: string; value: number }) => `${bar.name}=${bar.value}` };
@@ -14,7 +14,7 @@ describe("buildBarChartOption (plantilla de barras horizontales)", () => {
     const yAxis = option.yAxis as { type: string; data: string[]; inverse: boolean };
     const xAxis = option.xAxis as { type: string; min: number; max: number; splitNumber: number };
     expect(yAxis.type).toBe("category");
-    expect(yAxis.data).toEqual(["Economía", "Familia"]);
+    expect(yAxis.data).toEqual(["Finanzas", "Familia"]);
     expect(yAxis.inverse).toBe(true);
     expect(xAxis).toMatchObject({ type: "value", min: 0, max: 10, splitNumber: 5 });
   });

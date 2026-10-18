@@ -11,12 +11,12 @@ test.describe("RF-40: ideas personalizadas con IA", () => {
     await new AccountPages(page).register(newUser());
     const interview = new InterviewPage(page);
     await interview.open();
-    await interview.activate("Economía");
-    const helps = await interview.openHelps("Economía");
+    await interview.activate("Finanzas");
+    const helps = await interview.openHelps("Finanzas");
     await helps.getByRole("button", { name: "Llevar un presupuesto" }).click();
     await expect(helps.getByRole("button", { name: "Llevar un presupuesto", pressed: true })).toBeVisible();
-    await interview.score("Economía", 2);
-    await interview.save("Economía");
+    await interview.score("Finanzas", 2);
+    await interview.save("Finanzas");
 
     const privacy = new DataPrivacyPage(page);
     await privacy.open();
@@ -26,7 +26,7 @@ test.describe("RF-40: ideas personalizadas con IA", () => {
 
     const home = new HomePage(page);
     await home.open();
-    await home.ideasSummary().getByRole("button", { name: "Idea para Economía" }).click();
+    await home.ideasSummary().getByRole("button", { name: "Idea para Finanzas" }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByText("Personalizada con IA")).toBeVisible();
     await expect(dialog).toContainText("llevar un presupuesto");
@@ -43,10 +43,10 @@ test.describe("RF-40: ideas personalizadas con IA", () => {
 
     // RF-40 v1.1: marcar otra opción de "¿Qué te ayuda?" reescribe la idea.
     await interview.open();
-    const moreHelps = await interview.openHelps("Economía");
+    const moreHelps = await interview.openHelps("Finanzas");
     await moreHelps.getByRole("button", { name: "Apps de finanzas" }).click();
     await expect(moreHelps.getByRole("button", { name: "Apps de finanzas", pressed: true })).toBeVisible();
-    await interview.question("Economía").getByRole("button", { name: /^Ideas para Economía/ }).click();
+    await interview.question("Finanzas").getByRole("button", { name: /^Ideas para Finanzas/ }).click();
     await expect(page.getByRole("dialog")).toContainText("apps de finanzas");
     await page.getByRole("dialog").getByRole("button", { name: /cerrar/i }).click();
 
@@ -54,7 +54,7 @@ test.describe("RF-40: ideas personalizadas con IA", () => {
     await privacy.aiIdeasSwitch().click();
     await expect(privacy.aiIdeasSwitch()).not.toBeChecked();
     await home.open();
-    await home.ideasSummary().getByRole("button", { name: "Idea para Economía" }).click();
+    await home.ideasSummary().getByRole("button", { name: "Idea para Finanzas" }).click();
     await expect(page.getByRole("dialog")).toContainText(/en qué se va tu dinero/i);
     await expect(page.getByRole("dialog").getByText("Personalizada con IA")).toHaveCount(0);
   });

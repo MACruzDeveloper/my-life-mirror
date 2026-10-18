@@ -6,7 +6,7 @@ function createCategory(overrides: Partial<Category> = {}): Category {
   return {
     id: "c1",
     userId: "u1",
-    name: "Economía",
+    name: "Finanzas",
     description: "...",
     type: "standard",
     status: "inactive",
@@ -28,7 +28,7 @@ describe("InMemoryCategoryRepository", () => {
     await repo.save(createCategory());
 
     expect(await repo.findByUserId("u1")).toHaveLength(1);
-    expect((await repo.findById("u1", "c1"))?.name).toBe("Economía");
+    expect((await repo.findById("u1", "c1"))?.name).toBe("Finanzas");
   });
 
   it("no mezcla categorías de usuarios distintos", async () => {
@@ -36,7 +36,7 @@ describe("InMemoryCategoryRepository", () => {
     await repo.save(createCategory({ id: "c1", userId: "u1" }));
     await repo.save(createCategory({ id: "c1", userId: "u2", name: "Otra" }));
 
-    expect((await repo.findById("u1", "c1"))?.name).toBe("Economía");
+    expect((await repo.findById("u1", "c1"))?.name).toBe("Finanzas");
     expect((await repo.findById("u2", "c1"))?.name).toBe("Otra");
   });
 

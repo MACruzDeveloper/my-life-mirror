@@ -47,7 +47,7 @@ describe("Catálogo de categorías — administración (ADM-02)", () => {
     if (!result.ok) return;
     expect(result.value).toHaveLength(STANDARD_CATEGORIES.length);
     const finances = result.value.find((category) => category.key === "economia");
-    expect(finances?.translations.es).toEqual({ name: "Economía", description: "Tus finanzas personales: ahorro, gasto, deudas." });
+    expect(finances?.translations.es).toEqual({ name: "Finanzas", description: "Tus finanzas: ahorro, gasto, deudas e inversión a largo plazo." });
     expect(finances?.translations.en?.name).toBe("Finances");
   });
 
@@ -89,9 +89,9 @@ describe("Catálogo de categorías — administración (ADM-02)", () => {
       return !result.ok && result.error.code === "CONFLICT";
     };
 
-    expect(await conflictWith({ es: { name: "economía", description: "x" } })).toBe(true);
+    expect(await conflictWith({ es: { name: "finanzas", description: "x" } })).toBe(true);
     expect(await conflictWith({ en: { name: "finances", description: "x" } })).toBe(true);
-    expect(await conflictWith({ en: { name: "Economía", description: "x" } })).toBe(true);
+    expect(await conflictWith({ en: { name: "Finanzas", description: "x" } })).toBe(true);
 
     await retire(admin, (await findByEsName(catalog, "Aventura")).id);
     expect(await conflictWith({ es: { name: "Aventura", description: "x" } })).toBe(true);
@@ -101,9 +101,9 @@ describe("Catálogo de categorías — administración (ADM-02)", () => {
     const { retire, catalog, categoryRepository, listCategories } = setup();
     const listed = await listCategories("u1");
     if (!listed.ok) throw new Error("setup falló");
-    const financesOfU1 = listed.value.find((category) => category.name === "Economía")!;
+    const financesOfU1 = listed.value.find((category) => category.name === "Finanzas")!;
     await categoryRepository.save({ ...financesOfU1, status: "active" });
-    const finances = await findByEsName(catalog, "Economía");
+    const finances = await findByEsName(catalog, "Finanzas");
 
     const result = await retire(admin, finances.id);
 
@@ -143,6 +143,7 @@ describe("ListCatalogLabels (textos de las categorías para la interfaz, RNF-10)
     const labels = await listLabels();
 
     expect(labels).toHaveLength(STANDARD_CATEGORIES.length);
-    expect(labels.find((label) => label.catalogId === adventure.id)).toEqual({ catalogId: adventure.id, key: "aventura", translations: adventure.translations });
+    // Marcada como retirada: la página de Categorías no la ofrece, pero el historial la sigue nombrando.
+    expect(labels.find((label) => label.catalogId === adventure.id)).toEqual({ catalogId: adventure.id, key: "aventura", retired: true, translations: adventure.translations });
   });
 });

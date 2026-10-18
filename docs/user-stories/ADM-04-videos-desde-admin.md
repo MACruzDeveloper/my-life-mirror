@@ -21,7 +21,8 @@ Los vídeos de "Para inspirarte" vivían en un JSON del código: cambiar uno exi
 - **La lista:** tabla con categoría, idioma, título y el enlace a YouTube (con su icono), y los iconos de **editar** y **borrar** en cada fila. Se **filtra por categoría** y se **pagina** (5, 10 o 25 por página). Editar rellena el formulario con el vídeo y guarda con las mismas reglas.
 - **Reglas:**
   - El mismo vídeo no se repite en la misma categoría e idioma.
-  - Como mucho 6 por categoría e idioma: la página los enseña en filas de tres.
+  - Como mucho 6 por categoría e idioma en el panel.
+- **En la página, como mucho 3** (una fila), los más recientes primero: un vídeo nuevo sustituye en la página al más antiguo, que sigue en el panel.
 - **En la página de la categoría:** los del idioma de la interfaz; si no hay ninguno en ese idioma, los de otro. Cada uno lleva el icono de YouTube.
 - **Solo administración:** sin sesión, 401; sin rol de administración, 403, que queda en el log. El rol sale de la sesión verificada en el servidor, nunca del cuerpo.
 - **Datos:** tabla `inspiration_videos` (**migración 0033**), solo accesible desde el servidor, con los seis vídeos de ejemplo que había en el código. Va en las funciones que ya existen: `/api/admin/videos` y `/api/categories/videos`.
@@ -56,4 +57,5 @@ Los vídeos de "Para inspirarte" vivían en un JSON del código: cambiar uno exi
 ## Historial de cambios
 
 - **v1.0 (17 oct. 2026)** — versión inicial.
+- **v1.2 (18 oct. 2026)** — la página enseña como mucho 3, los más recientes (con 4 se veían 4). Una página con el historial de vídeos de cada categoría queda como trabajo futuro (tablero).
 - **v1.1 (17 oct. 2026)** — a petición del autor: fuera "quién habla"; editar y borrar con iconos; enlace a YouTube en la tabla; filtro por categoría y paginación; en la página, el icono de YouTube en lugar de la etiqueta del idioma.

@@ -275,6 +275,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **17 oct. 2026** — *"En cuanto al audio, para que el usuario no tenga que decir nada privado podemos cambiar el enfoque … (Solo nos quedaríamos con una de las ideas)"* y *"ok probemos con la presentación"*
 → Audio de presentación en la portada, voz generada con ElevenLabs (plan gratuito) por el autor a partir de un texto fijo, con transcripción y aviso de IA. Descartadas las ideas que reconocen la voz del usuario (el audio iría a terceros). También: icono al crear categoría, como mejora futura; categorías nuevas con "Próximamente".
 
+**18 oct. 2026** — *"Idiomas debería ser parte de una categoría principal que es Formación. Economía e inversiones también deberían estar relacionadas, puedes dejar una principal que sea Finanzas. En su lugar para seguir teniendo 12, crea la categoría Voluntariado"*
+→ Sin perder datos: Economía pasa a llamarse Finanzas (misma clave), Inversiones se retira (historial conservado), Idiomas (creada desde el panel) se convierte en Formación con sus puntuaciones, y Voluntariado es nueva, con página. Migración 0034. También: la imagen de Espiritualidad se queda tal cual ("una app abierta respetando también ideas alternativas").
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

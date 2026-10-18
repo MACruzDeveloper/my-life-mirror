@@ -56,5 +56,15 @@
   {"key": "tecnologia.2", "category": "tecnologia"},
   {"key": "tecnologia.3", "category": "tecnologia"},
   {"key": "tecnologia.4", "category": "tecnologia"},
-  {"key": "tecnologia.5", "category": "tecnologia"}
+  {"key": "tecnologia.5", "category": "tecnologia"},
+  {"key": "formacion.1", "category": "formacion"},
+  {"key": "formacion.2", "category": "formacion"},
+  {"key": "formacion.3", "category": "formacion"},
+  {"key": "formacion.4", "category": "formacion"},
+  {"key": "formacion.5", "category": "formacion"},
+  {"key": "voluntariado.1", "category": "voluntariado"},
+  {"key": "voluntariado.2", "category": "voluntariado"},
+  {"key": "voluntariado.3", "category": "voluntariado"},
+  {"key": "voluntariado.4", "category": "voluntariado"},
+  {"key": "voluntariado.5", "category": "voluntariado"}
 ]

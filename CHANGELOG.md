@@ -5,6 +5,13 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (categorías)
+
+- **Economía pasa a llamarse Finanzas** e incluye la inversión; **Inversiones se retira** (deja de ofrecerse y se desactiva; sus puntuaciones se conservan en el historial).
+- **Formación**, categoría nueva (estudios, cursos, idiomas): la antigua Idiomas, creada desde el panel, pasa a ser esta y conserva sus puntuaciones.
+- **Voluntariado**, categoría nueva, con su página e imagen.
+- Cada una con sus ideas, opciones de "¿Qué te ayuda?", ejemplos e icono. Siguen siendo 12 categorías activas. **Migración 0034.**
+
 ### Añadido (presentación en audio)
 
 - **Portada:** "Escuchar la presentación", un audio de unos 50 segundos que explica la app, en español o inglés según la interfaz. Voz generada con IA (ElevenLabs) a partir de un texto fijo, sin datos de nadie; no suena sola, el archivo solo se descarga al pulsar, tiene una barra para ver por dónde va e ir adelante o atrás, y su transcripción. Lo dice: "Voz generada con IA (ElevenLabs)".
@@ -13,7 +20,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 ### Cambiado (ajustes finales)
 
 - **Vídeos por idioma, desde administración (ADM-04, primera parte):** pestaña **"Vídeos"** en el panel para añadir, editar y borrar los de "Para inspirarte" por categoría e idioma, con el enlace de YouTube (se guarda solo el identificador, validado); la tabla se filtra por categoría y se pagina. La página enseña los del idioma de la interfaz y, si no hay ninguno, los de otro, cada uno con el icono de YouTube. Los vídeos pasan del código a la base de datos, con los seis de ejemplo. **Migración 0033.**
-- **Aventura y Deporte** con su imagen de cabecera (generadas con IA y elegidas por el autor; la página lo dice). La de Deporte es provisional: muestra marcas de terceros y lleva un aviso al pie hasta sustituirla.
+- **Aventura, Deporte y Espiritualidad** con su imagen de cabecera (generadas con IA por el autor; la página lo dice). La de Deporte, regenerada sin logotipos (los dos de Nike que quedaban, tapados con el color de la prenda); como los colores del coche aún recuerdan a una escudería, lleva al pie un breve disclaimer.
+- **Página de Espiritualidad:** como las demás, sin hitos y, al ser una categoría sensible, sin "De la comunidad" (sus experiencias no se comparten).
+- **Vídeos en la página:** como mucho tres, los más recientes.
+- **Panel:** si la última página de una tabla se queda sin filas, vuelve a la anterior; al pulsar "Editar" en un vídeo, la página sube al formulario y pone el cursor en el título.
 - **Inicio, primera vez:** el botón "Empezar mi entrevista" lleva el color de acento.
 - **Landings de categoría:** título más grande y justo encima de las tarjetas, tarjetas de nota y experiencias en gris suave y más bajas, y menos espacio entre bloques. "Tus experiencias" enseña las dos más recientes y "Ver todas" despliega el resto en la misma tarjeta.
 - **Panel de administración:** pestañas con el mismo estilo que las de la ventana de ideas; todas las tablas y bloques con el mismo estilo (fondo blanco, cabecera gris azulada en negrita, títulos en negrita). Al añadir una categoría, se avisa de que su página saldrá como "Próximamente"; nombre (más estrecho) y descripción de cada idioma en una fila; los iconos de acciones, centrados en todas las tablas. "Retirar" y las acciones de los vídeos, con iconos.
