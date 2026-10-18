@@ -38,4 +38,16 @@ describe("RestablecerPassword (RF-38)", () => {
       expect(result.error.code).toBe("AUTHENTICATION_ERROR");
     }
   });
+
+  it("un fallo inesperado del proveedor se devuelve como error de validación genérico, sin detalles internos", async () => {
+    const authProvider = new InMemoryAuthProvider();
+    authProvider.resetPassword = async () => {
+      throw new Error("timeout interno de Supabase");
+    };
+
+    const result = await createResetPassword(authProvider)({ token: "cualquiera", password: "Nueva-Clave-Lluvia-47" });
+
+    expect(!result.ok && result.error.code).toBe("VALIDATION_ERROR");
+    expect(!result.ok && result.error.message).not.toContain("Supabase");
+  });
 });

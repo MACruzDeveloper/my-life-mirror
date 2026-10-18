@@ -57,4 +57,14 @@ describe("ResumeSession (SEC-05): la sesión se renueva sola", () => {
 
     expect((await resumeSession({ token: session.token, refreshToken: session.refreshToken })).ok).toBe(false);
   });
+
+  it("un fallo inesperado del proveedor al renovar no se disfraza de sesión no válida: se propaga (la plantilla lo convierte en un 500)", async () => {
+    const { authProvider, session, resumeSession } = await setup();
+    authProvider.expireAccessTokens();
+    authProvider.refreshSession = async () => {
+      throw new Error("Supabase no responde");
+    };
+
+    await expect(resumeSession({ token: session.token, refreshToken: session.refreshToken })).rejects.toThrow("Supabase no responde");
+  });
 });

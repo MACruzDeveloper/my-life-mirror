@@ -129,6 +129,26 @@ describe("ExportUserData (RF-05 / RNF-12)", () => {
     ]);
   });
 
+  it("ordena por fecha viajes, hitos, eventos, ideas guardadas y experiencias (un viaje sin mes va antes que los de ese año con mes)", async () => {
+    const { exportUserData, ana, tripRepository, milestoneRepository, eventRepository, experienceRepository, ideaReactionRepository, categoryRepository } = await setup();
+    const finances = (await categoryRepository.findByUserId(ana.id)).find((c) => c.name === "Finanzas")!;
+    await tripRepository.save({ id: "t-ana-2", userId: ana.id, countryCode: "ES", year: 2015, createdAt: new Date("2026-10-14T10:00:00Z") });
+    await tripRepository.save({ id: "t-ana-3", userId: ana.id, countryCode: "IT", year: 2012, month: 8, createdAt: new Date("2026-10-14T10:00:00Z") });
+    await milestoneRepository.save({ id: "m-ana-2", userId: ana.id, categoryKey: "deporte", title: "Media maratón", year: 2019, createdAt: new Date("2026-10-16T10:00:00Z") });
+    await eventRepository.save({ id: "ev-ana-2", userId: ana.id, title: "Cumpleaños", day: "2026-10-05", categoryIds: [], createdAt: new Date("2026-10-13T10:00:00Z") });
+    await ideaReactionRepository.save({ userId: ana.id, categoryId: finances.id, templateKey: "economia.1", reaction: "saved", reactedAt: new Date("2026-10-01T10:00:00Z") });
+    await experienceRepository.save({ id: "e-ana-0", userId: ana.id, categoryId: finances.id, text: "Primera nota", createdAt: new Date("2026-09-01T10:00:00.000Z") });
+
+    const result = await exportUserData({ id: ana.id, email: ana.email });
+    if (!result.ok) throw new Error("exportación fallida");
+
+    expect(result.value.trips.map((trip) => trip.country)).toEqual(["IT", "ES", "PT"]);
+    expect(result.value.milestones.map((milestone) => milestone.title)).toEqual(["Media maratón", "Primer 10K"]);
+    expect(result.value.events.map((event) => event.day)).toEqual(["2026-10-05", "2026-10-24"]);
+    expect(result.value.ideaReactions.map((reaction) => reaction.templateKey)).toEqual(["economia.1", "economia.2"]);
+    expect(result.value.experiences.map((experience) => experience.text)).toEqual(["Primera nota", "Este mes he ahorrado un poco"]);
+  });
+
   it("no incluye nada de otros usuarios", async () => {
     const { exportUserData, ana, luis } = await setup();
 
@@ -284,6 +304,16 @@ describe("DeleteAccount (RF-05, derecho al olvido)", () => {
       expect(result.ok).toBe(true);
       expect((await authProvider.listAllUsers()).map((user) => user.email)).toEqual(["ana@ejemplo.com"]);
     });
+  });
+
+  it("un fallo inesperado al comprobar la contraseña se propaga y no borra nada", async () => {
+    const { deleteAccount, authProvider, ana, assessmentRepository } = await setup();
+    authProvider.logIn = async () => {
+      throw new Error("Supabase no responde");
+    };
+
+    await expect(deleteAccount({ userId: ana.id, email: ana.email, password: "Bici-Azul-Lluvia-47" })).rejects.toThrow("Supabase no responde");
+    expect((await assessmentRepository.findByUserId(ana.id)).length).toBeGreaterThan(0);
   });
 
   it("la protección del último administrador se aplica antes de pedir la contraseña", async () => {

@@ -5,7 +5,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -28,6 +27,7 @@ import { getJson, HttpError } from "@shared/ui/api/getJson";
 import { DEFAULT_LOCALE, isSupportedLocale, SUPPORTED_LOCALES, type Locale } from "@shared/domain/locales";
 import { CATEGORIES_KEY } from "@modules/categories/ui/queries";
 import { ASSESSMENTS_KEY } from "@modules/assessments/ui/queries";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 interface CategoryTextDto {
   name: string;
@@ -135,9 +135,7 @@ export function AdminCategories() {
 
   if (catalog.isPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
   if (catalog.error instanceof HttpError && catalog.error.status === 403) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;

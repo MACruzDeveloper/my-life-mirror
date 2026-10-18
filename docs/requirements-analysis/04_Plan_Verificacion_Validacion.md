@@ -70,6 +70,66 @@ Otros comandos útiles:
 - `npm run dev:local` — la app completa contra el mismo Supabase local (http://localhost:5175), para probarla a mano sin cuentas de Vercel ni de Supabase. Los datos se conservan entre arranques; `npx supabase db reset` la vacía.
 - `npx supabase stop` — apaga el Supabase local y libera la memoria (sus contenedores siguen consumiendo aunque no se use). Los dos comandos anteriores lo vuelven a arrancar si hace falta.
 
+### 1.3 Cobertura por niveles: 100/80/0 (18 oct. 2026)
+
+La cobertura total del proyecto ronda el 83 %, pero ese número solo no dice nada: un 95 % puede esconder un 0 % en la función que deja entrar a quien no debe. Desde la revisión de calidad del 18 oct., la pregunta es otra: **¿qué código, si falla, hace daño de verdad?** Aquí no hay dinero en juego, pero sí datos personales y de salud (RGPD art. 9) y textos que leen otras personas. Cada nivel tiene su umbral en `vite.config.ts` y lo vigila el `pre-push` (`npm run test:coverage`, dentro de `npm run verify`).
+
+| Nivel | Qué entra | Umbral | Por qué |
+|---|---|---|---|
+| **CORE** | Contraseña y su política, sesión renovada (SEC-05), restablecer la contraseña, consentimiento (RF-04), exportar y borrar datos (RF-05), acciones de administración (ADM-03), filtros de la IA y de lo que se comparte (`ideaSafety`, `offensiveTerms`, `shareableText`, `redactPersonalData`), líneas de ayuda (RF-30) y el límite de intentos | 100 % de líneas y funciones | Un fallo aquí expone datos, deja entrar a quien no debe o difunde un texto que no debía salir |
+| **IMPORTANTE** | El resto de la lógica de negocio: `domain/` y `application/` de todos los módulos | 90 % sentencias, 80 % ramas, 95 % funciones, 95 % líneas | Si falla, la persona se frustra o ve un dato mal, pero no hay daño irreparable |
+| **INFRAESTRUCTURA** | Tipos, constantes, catálogos JSON, adaptadores de Supabase, funciones de `api/`, componentes de `ui/` | Se mide, no bloquea | TypeScript valida la forma; los catálogos tienen sus tests de integridad; los adaptadores y las pantallas los cubren los E2E contra la base real (apartado 1.2) |
+
+**Lo que se encontró al aplicarlo.** Seis archivos CORE estaban por debajo del 100 %: `ExportUserData`, `CheckConsent`, `ResetPassword`, `ResumeSession`, `AdminUserActions` y `DeleteAccount`. No eran ramas de adorno. Faltaba comprobar, por ejemplo, que un fallo inesperado del proveedor al renovar la sesión no se disfraza de "sesión no válida", que un fallo al borrar la cuenta no borra nada a medias y que la exportación ordena bien los datos de más de un elemento. Se añadieron los seis tests que faltaban, uno por archivo.
+
+**Lo que no se fuerza.** En el nivel CORE no se exige el 100 % de ramas. Las que quedan son valores por defecto defensivos (`?? []`, `?? ""`) para datos que hoy siempre existen; cubrirlas exigiría tests artificiales que no protegen nada, el anti-patrón de "inflar la cobertura". Comprobado que el patrón de archivos del umbral coincide de verdad: con un 100 % de ramas exigido, el umbral falla (86 %).
+
+**Regla para lo nuevo:** el código que maneje credenciales, datos personales que salen de la app o texto que leen otras personas entra en la lista CORE de `vite.config.ts` en la misma PR que lo crea.
+
+### 1.4 Rendimiento percibido: revisión con Lighthouse (18 oct. 2026)
+
+Tras desplegar la v1.4.0, Lighthouse dio 74 de rendimiento en la página de Aventura. La causa casi única era un **CLS (desplazamiento acumulado del diseño) de 1,043**; el umbral bueno es 0,1. LCP (0,8 s), TBT (0 ms) y Speed Index (1,1 s) ya estaban bien.
+
+Se midió el CLS de cada pantalla protegida en móvil y escritorio, con sesión y en carga en frío, con un `PerformanceObserver` de `layout-shift` lanzado desde Playwright. Así cada desplazamiento se puede atribuir a un elemento concreto, que Lighthouse no siempre señala. Hubo dos causas:
+
+1. **El indicador de carga tenía margen superior (`mt: 8`).** El margen colapsaba hasta el `body`: mientras se comprobaba la sesión, toda la página bajaba 64 px y volvía a subir. En las páginas de categoría ese salto movía la imagen de cabecera entera y sumaba 1,0. Ahora hay un `PageLoader` compartido que separa con relleno, y su test lo comprueba.
+2. **El pie "¿Necesitas ayuda ahora?" iba justo después del contenido**, y saltaba cada vez que llegaban datos. Ahora se queda al fondo de la pantalla (`ProtectedLayout`).
+
+| Página (escritorio / móvil) | CLS antes | CLS después |
+|---|---|---|
+| Aventura | 1,05 / 1,01 | 0,09 / 0,00 |
+| Deporte | 1,05 / 1,00 | 0,06 / 0,00 |
+| Categorías | 0,40 / 0,93 | 0,01 / 0,00 |
+| Entrevista | 0,70 / 0,68 | 0,09 / 0,00 |
+| Inicio | 0,30 / 0,19 | 0,03 / 0,00 |
+
+En la misma revisión, los archivos de `/assets/` llevan un hash en el nombre, así que nunca cambian; aun así se servían con `max-age=0`. Ahora se sirven con caché de un año (`immutable`, en `vercel.json`).
+
+**Presupuesto de rendimiento** (punto de partida medido el 18 oct.; se revisa en cada versión, no bloquea el build):
+
+| Medida | Límite | Hoy |
+|---|---|---|
+| CLS de cada pantalla, móvil y escritorio | < 0,1 | 0,00-0,09 |
+| LCP (Lighthouse, Aventura) | < 2,5 s | 0,8 s |
+| TBT (Lighthouse) | < 200 ms | 0 ms |
+| JavaScript inicial (comprimido) | sin límite aún | 303 kB: las pantallas no se cargan por separado (deuda en el tablero) |
+| Imagen de cabecera, tamaño escritorio | < 250 kB | 169-228 kB (WebP, con versión móvil de 55-83 kB) |
+| Audio de la portada | solo al pulsar | `preload="none"`: no se descarga con la página |
+
+No se adopta un sistema de medición con usuarios reales (RUM): ver [ADR-08](../architecture-decisions/08_Observabilidad.md), apartado 4.
+
+### 1.5 Qué vigila cada puerta de calidad
+
+| Puerta | Cuándo | Qué comprueba | Si falla |
+|---|---|---|---|
+| `pre-commit` (Husky) | Cada commit | Lint y tipos | No se crea el commit |
+| `pre-push` (Husky) | Cada push | `npm run verify`: lint, tests con los umbrales del apartado 1.3, build, `check:api` (12 funciones) y E2E sin `api/` | No se sube |
+| E2E con `api/` (GitHub Actions) | PR a `main` (a todas desde final de octubre) | Los recorridos completos contra un Supabase local, móvil y escritorio, con traza y captura de cada fallo en el informe | No se mergea |
+| *Seguridad* (GitHub Actions) | Cada PR y cada lunes | `npm audit` (altas y críticas) y CodeQL | Se revisa antes de mergear |
+| *Smoke producción* | Tras cada despliegue a producción | Rutas al recargar, funciones en Dublín y conexión con Supabase, sin crear datos | Se arregla o se revierte |
+
+El 18 oct. la puerta del E2E con `api/` paró dos veces la v1.4.0 antes de producción: una por un fallo real (un navegador con zona horaria "UTC" no podía guardar el perfil) y otra por tiempos de un runner lento. Detalle en [02_Metricas_DORA_y_Flujo.md](../project-management/02_Metricas_DORA_y_Flujo.md), apartado 7.8.
+
 ---
 
 ## 2. Técnicas de Validación seleccionadas
@@ -118,8 +178,8 @@ RF-XX — <resumen>
 
 Dado el alcance real (RES-01, RES-02):
 
-- **Se ejecuta de verdad:** peer review del documento, pruebas unitarias sobre lógica de negocio, checklist Given/When/Then manual, un usability test con n = 1 (ver apartado 2; [guion](../validation/01_Guion_Test_Usabilidad.md) y [resultados](../validation/02_Resultados_Test_Usabilidad.md)), un piloto corto con métricas básicas, y Playwright para lo que no toca `api/` (páginas públicas, ver `e2e/`, instalado 15 sept.).
-- **Se documenta como diseño/trabajo futuro, sin ejecutar a escala real:** Playwright contra flujos que sí tocan `api/` (registro, login...) — pendiente decidir cómo aislar los datos de prueba (¿proyecto de Supabase dedicado? ¿limpieza tras cada test?) antes de automatizar nada que cree cuentas reales; A/B testing con significancia estadística.
+- **Se ejecuta de verdad:** peer review del documento, pruebas unitarias sobre la lógica de negocio con cobertura por niveles (apartado 1.3), checklist Given/When/Then manual, dos pruebas de usabilidad con n = 1 (ver apartado 2; [guion](../validation/01_Guion_Test_Usabilidad.md) y [resultados](../validation/02_Resultados_Test_Usabilidad.md)), Playwright sin `api/` y con `api/` contra un Supabase local (apartado 1.2), una revisión de rendimiento con Lighthouse (apartado 1.4) y las puertas de calidad del apartado 1.5.
+- **Se documenta como diseño/trabajo futuro, sin ejecutar a escala real:** el piloto con varias personas, A/B testing con significancia estadística y la medición del rendimiento con usuarios reales (RUM).
 
 Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras funcionalidades: priorizar la demostración rigurosa del concepto y del método sobre la cobertura exhaustiva, dado el marco temporal del TFM.
 
@@ -140,3 +200,4 @@ Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras f
 - **v1.6 (3 oct. 2026)** — apartado 1.2: segunda lección de los E2E (carrera tras `db reset`, resuelta esperando a que la API vea las tablas).
 - **v1.7 (4 oct. 2026)** — apartado 1.2: tercera lección (una intermitencia que era un fallo real de la caché, y `networkidle`, que no espera a las acciones posteriores).
 - **v1.8 (11 oct. 2026)** — fecha de entrega actualizada (hacia el 20 de octubre, como máximo el 26).
+- **v1.9 (18 oct. 2026)** — revisión de calidad tras la v1.4.0: apartado 1.3, cobertura por niveles 100/80/0 con el nivel CORE en `vite.config.ts`; apartado 1.4, rendimiento con Lighthouse (CLS de 1,0 a menos de 0,1) y presupuesto de rendimiento; apartado 1.5, qué vigila cada puerta de calidad. Apartado 4 actualizado: los E2E con `api/` ya no son trabajo futuro.

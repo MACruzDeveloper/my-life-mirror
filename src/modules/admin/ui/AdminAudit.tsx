@@ -1,6 +1,5 @@
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -12,6 +11,7 @@ import { ADMIN_PANEL_SX, ADMIN_TABLE_HEAD_SX } from "./adminStyles";
 import { useTranslation } from "react-i18next";
 import { HttpError } from "@shared/ui/api/getJson";
 import { useAdminAudit, useAdminUsers } from "./adminQueries";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 /**
  * Registro de auditoría (ADM-03): quién hizo qué y cuándo. Los ids se muestran
@@ -27,9 +27,7 @@ export function AdminAudit() {
 
   if (auditoria.isPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
   if (auditoria.error instanceof HttpError && auditoria.error.status === 403) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;
