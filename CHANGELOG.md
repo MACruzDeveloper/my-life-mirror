@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Añadido (UX-14: aviso ante errores)
+
+- Si una pantalla falla al mostrarse, se ve "Algo ha fallado", con "Recargar" e "Ir al inicio", en lugar de una pantalla en blanco. El error queda en la consola del navegador; no se envía a ningún servicio.
+
 ### Cambiado (calidad)
 
 - Cobertura por niveles (100/80/0): las funciones de contraseñas, sesión, consentimiento, exportar y borrar datos, administración, filtros de la IA y de lo que se comparte y líneas de ayuda deben tener el 100 % de líneas y funciones cubiertas (`vite.config.ts`, vigilado por el `pre-push`). Seis tests nuevos para lo que faltaba; entre otros, que un fallo inesperado al renovar la sesión no se disfraza de "sesión no válida" y que un fallo al borrar la cuenta no borra nada a medias.

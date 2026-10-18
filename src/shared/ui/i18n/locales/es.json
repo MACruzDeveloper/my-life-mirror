@@ -1135,5 +1135,11 @@
     "caducadaTitulo": "Tu sesión ha caducado",
     "caducadaTexto": "Por seguridad, la sesión se cierra tras dos días sin usar la app. Vuelve a entrar para seguir; si estabas guardando algo, repítelo después.",
     "volverAEntrar": "Volver a entrar"
+  },
+  "errorApp": {
+    "titulo": "Algo ha fallado",
+    "texto": "No se ha podido mostrar esta pantalla. Lo que ya habías guardado sigue a salvo: recarga la página o vuelve al inicio.",
+    "recargar": "Recargar",
+    "irInicio": "Ir al inicio"
   }
 }

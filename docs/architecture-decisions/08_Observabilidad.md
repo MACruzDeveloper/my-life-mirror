@@ -34,11 +34,12 @@ En la revisión de calidad tras la v1.4.0 se valoró añadir un servicio de erro
 |---|---|
 | Errores del servidor | Logger JSON (apartado 2) en el visor de Vercel; las plantillas de controladores traducen cualquier excepción a un 500 y la registran |
 | Una parte de la página que no carga | `LoadErrorBoundary`: se enseña un aviso en su lugar y el resto de la página sigue |
+| Una pantalla entera que falla al pintarse | `AppErrorBoundary` en la raíz ([UX-14](../user-stories/UX-14-aviso-ante-errores.md)): "Algo ha fallado", con "Recargar" e "Ir al inicio", en lugar de una pantalla en blanco; el error queda en la consola |
 | ¿Rompe algo la versión nueva? | *Smoke producción* tras cada despliegue, y el E2E con `api/` antes (04_Plan_Verificacion_Validacion.md, apartado 1.5) |
 | Por qué falla un E2E | Traza, captura del fallo e informe HTML de Playwright, guardados como artefacto en GitHub Actions |
 | Rendimiento | Lighthouse y la medición de CLS por elemento (04_Plan_Verificacion_Validacion.md, apartado 1.4) |
 
-**Queda como deuda** (tablero): un límite de errores para toda la aplicación. Hoy un fallo al pintar fuera de las partes con `LoadErrorBoundary` deja la pantalla en blanco. **Cuándo revisarlo:** con usuarios reales fuera del piloto. Lo primero sería un RUM sin cookies ni datos de la persona (Speed Insights solo mide tiempos) y, para errores, un servicio con filtrado de URL y sin grabación de sesión.
+El límite de errores de toda la app, que la revisión encontró como hueco, se hizo el mismo día ([UX-14](../user-stories/UX-14-aviso-ante-errores.md)). **Cuándo revisar lo demás:** con usuarios reales fuera del piloto. Lo primero sería un RUM sin cookies ni datos de la persona (Speed Insights solo mide tiempos) y, para errores, un servicio con filtrado de URL y sin grabación de sesión.
 
 ---
 
@@ -49,3 +50,4 @@ En la revisión de calidad tras la v1.4.0 se valoró añadir un servicio de erro
 - **v1.2 (29 sept. 2026)** — los campos del log pasan a inglés (`level`, `message`, `route`, `userId`) con el resto del código. Las búsquedas guardadas en el visor de Vercel con los nombres antiguos (`nivel`, `mensaje`, `ruta`, `usuario`) dejan de encontrar las líneas nuevas.
 - **v1.3 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
 - **v1.4 (18 oct. 2026)** — apartado 4: no se adopta Sentry ni medición con usuarios reales por ahora (datos de categoría especial, política de contenido, volumen del piloto); tabla de qué cubre cada necesidad y cuándo revisarlo.
+- **v1.5 (18 oct. 2026)** — apartado 4: el límite de errores de toda la app deja de ser deuda (UX-14).

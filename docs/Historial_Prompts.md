@@ -281,6 +281,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **18 oct. 2026** — *"quiero pedirte una última revisión de performance … si queda alguna deuda técnica, dejarla apuntada"* y *"antes déjalo bien contemplado en la documentación, revisa los archivos que te adjunto por si te ayuda y por si encuentras algo más que nos falte aplicar. Esto sería ya como un fine-tuning o un paso de calidad del proyecto"* (lecciones del máster: cobertura 100/80/0, métricas mínimas, puertas de calidad con Husky, visibilidad con Playwright, errores y rendimiento con Sentry, testear menos frente a observar más)
 → CLS de 1,0 a menos de 0,1 (`PageLoader` con relleno, pie de ayuda al fondo) y caché de un año para `/assets/`. Cobertura por niveles con un nivel CORE al 100 % de líneas y funciones, que destapó seis ramas sin test en código de sesión, consentimiento, borrado y exportación de datos. Capturas de los fallos de los E2E. Presupuesto de rendimiento y tabla de puertas de calidad (V&V, apartados 1.3 a 1.5). No se adopta Sentry ni RUM externo por ahora, por los datos de categoría especial (ADR-08, apartado 4). Deudas anotadas: cargar cada pantalla aparte y un límite de errores para toda la aplicación.
 
+**18 oct. 2026** — *"Aplica antes el límite de errores"*
+→ [UX-14](user-stories/UX-14-aviso-ante-errores.md): `AppErrorBoundary` en la raíz, que reutiliza `LoadErrorBoundary`; aviso con "Recargar" e "Ir al inicio" y el error solo en la consola (sin servicio externo, ADR-08 apartado 4).
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*

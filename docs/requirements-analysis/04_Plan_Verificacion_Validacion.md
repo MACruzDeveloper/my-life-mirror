@@ -116,7 +116,7 @@ En la misma revisión, los archivos de `/assets/` llevan un hash en el nombre, a
 | Imagen de cabecera, tamaño escritorio | < 250 kB | 169-228 kB (WebP, con versión móvil de 55-83 kB) |
 | Audio de la portada | solo al pulsar | `preload="none"`: no se descarga con la página |
 
-No se adopta un sistema de medición con usuarios reales (RUM): ver [ADR-08](../architecture-decisions/08_Observabilidad.md), apartado 4.
+Un fallo al pintar una pantalla ya no deja la página en blanco: [UX-14](../user-stories/UX-14-aviso-ante-errores.md). No se adopta un sistema de medición con usuarios reales (RUM): ver [ADR-08](../architecture-decisions/08_Observabilidad.md), apartado 4.
 
 ### 1.5 Qué vigila cada puerta de calidad
 
