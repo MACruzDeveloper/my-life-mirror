@@ -5,6 +5,25 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.4.1] - 2026-10-18
+
+Revisión de calidad tras la entrega de la v1.4.0: estabilidad visual al cargar (Lighthouse), caché de los archivos estáticos, cobertura por niveles y un aviso en lugar de una pantalla en blanco. **Sin migraciones ni variables nuevas en Vercel.** El cambio de `vercel.json` (caché de `/assets/`) se aplica solo al desplegar.
+
+### Corregido (UX-14: aviso ante errores)
+
+- Si una pantalla falla al mostrarse, se ve "Algo ha fallado", con "Recargar" e "Ir al inicio", en lugar de una pantalla en blanco. El error queda en la consola del navegador; no se envía a ningún servicio.
+
+### Cambiado (calidad)
+
+- Cobertura por niveles (100/80/0): las funciones de contraseñas, sesión, consentimiento, exportar y borrar datos, administración, filtros de la IA y de lo que se comparte y líneas de ayuda deben tener el 100 % de líneas y funciones cubiertas (`vite.config.ts`, vigilado por el `pre-push`). Seis tests nuevos para lo que faltaba; entre otros, que un fallo inesperado al renovar la sesión no se disfraza de "sesión no válida" y que un fallo al borrar la cuenta no borra nada a medias.
+- Los E2E guardan una captura del momento de cada fallo, junto a la traza.
+
+### Cambiado (rendimiento)
+
+- Al cargar una pantalla con sesión, la página entera ya no salta 64 px: el indicador de carga (`PageLoader`, compartido) separa con relleno en lugar de margen, que colapsaba hasta el `body`. En las páginas de categoría era un CLS de 1,0 en Lighthouse; ahora queda por debajo de 0,1 en todas las pantallas.
+- El pie "¿Necesitas ayuda ahora?" se queda al fondo de la pantalla en lugar de saltar cada vez que llegan datos.
+- Los archivos de `/assets/` (con hash en el nombre) se sirven con caché de un año (`immutable`); antes el navegador los volvía a pedir en cada visita.
+
 ## [1.4.0] - 2026-10-18
 
 La versión de la entrega del TFM: páginas de categoría (Aventura con viajes y hitos, Deporte, Espiritualidad y Voluntariado), calendario y eventos, ideas para cuando todo va bien, "Guardar todo", Resultados en barras, vídeos de inspiración gestionados desde el panel, presentación en audio en la portada, sesión que se renueva sola y reorganización de categorías (Finanzas, Formación, Voluntariado). **Migraciones 0022 a 0034** (todas ya ejecutadas en producción). Sin variables nuevas en Vercel; la política de contenido de `vercel.json` admite ahora las miniaturas y el reproductor de YouTube sin cookies.

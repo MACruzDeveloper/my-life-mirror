@@ -25,8 +25,16 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
       reporter: ['text-summary', 'html'],
+      // Cobertura por niveles (100/80/0, revisión de calidad del 18 oct.; 04_Plan_Verificacion_Validacion.md, apartado 1.3).
       thresholds: {
+        // IMPORTANTE: toda la lógica de negocio.
         'src/**/{domain,application}/**': { statements: 90, branches: 80, functions: 95, lines: 95 },
+        // CORE: lo que, si falla, expone datos, deja entrar a quien no debe o difunde un texto que no
+        // debía salir (contraseñas, sesión, consentimiento, exportar y borrar datos, filtros de la IA y
+        // de lo que se comparte, líneas de ayuda). Ninguna línea ni función sin ejecutar; las ramas que
+        // quedan son valores por defecto defensivos (`?? []`), que no se fuerzan con tests artificiales.
+        '{src/modules/accounts/domain/{Password,passwordPolicy,UserRole}.ts,src/modules/accounts/application/{ResumeSession,ResetPassword,RequestPasswordReset,DeleteAccount,EraseUser,ExportUserData,AdminUserActions}.ts,src/modules/consent/{domain,application}/*.ts,src/modules/recommendations/domain/{ideaSafety,offensiveTerms,shareableText,redactPersonalData}.ts,src/modules/wellbeing/{domain,application}/*.ts,src/shared/domain/AttemptLimiter.ts}':
+          { functions: 100, lines: 100 },
       },
     },
   },

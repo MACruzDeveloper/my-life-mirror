@@ -4,7 +4,6 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -29,6 +28,7 @@ import { useOptionalSession } from "@shared/ui/context/SessionContext";
 import { ADMIN_AUDIT_KEY, ADMIN_USERS_KEY, postAdmin, useAdminUsers, type AdminUserDto } from "./adminQueries";
 
 import { USER_ROLES } from "@modules/accounts/domain/UserRole";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 type ActionType = "role" | "email" | "name" | "suspend" | "delete" | "recovery";
 
@@ -162,9 +162,7 @@ export function AdminUsers() {
 
   if (users.isPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
   if (noPermission) return <Alert severity="warning">{t("admin.sinPermiso")}</Alert>;

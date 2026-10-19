@@ -20,6 +20,27 @@ Un logger pequeño ([src/shared/infrastructure/logger.ts](../../src/shared/infra
 
 Los dos endpoints de `api/` usan `logger.error` en su bloque catch. Se amplía a otros endpoints/casos de uso según se vayan construyendo — no se instala nada adicional (métricas, tracing) hasta que el proyecto lo pida de verdad.
 
+## 4. Errores y rendimiento en el navegador: sin Sentry ni RUM externo (18 oct. 2026)
+
+En la revisión de calidad tras la v1.4.0 se valoró añadir un servicio de errores y rendimiento con usuarios reales (Sentry, o la medición de Vercel, Speed Insights). **No se adopta por ahora**, por tres razones:
+
+- **Datos de categoría especial.** Un informe de error del navegador lleva la URL, el recorrido previo y a veces el estado de la pantalla. Aquí eso puede incluir una categoría de salud o de sexualidad. Enviarlo a un tercero exige un encargado del tratamiento, ampliar la política de privacidad y filtrar cada evento. Es mucho riesgo para un piloto (RES-03).
+- **Política de contenido.** Cada servicio externo amplía `connect-src` y `script-src` en `vercel.json` (AGENTS.md: "pensárselo antes").
+- **Volumen.** Con un piloto de pocas personas no hay datos para que un panel de rendimiento real diga algo que no diga ya Lighthouse.
+
+**Lo que cubre el hueco hoy:**
+
+| Necesidad | Cómo se cubre |
+|---|---|
+| Errores del servidor | Logger JSON (apartado 2) en el visor de Vercel; las plantillas de controladores traducen cualquier excepción a un 500 y la registran |
+| Una parte de la página que no carga | `LoadErrorBoundary`: se enseña un aviso en su lugar y el resto de la página sigue |
+| Una pantalla entera que falla al pintarse | `AppErrorBoundary` en la raíz ([UX-14](../user-stories/UX-14-aviso-ante-errores.md)): "Algo ha fallado", con "Recargar" e "Ir al inicio", en lugar de una pantalla en blanco; el error queda en la consola |
+| ¿Rompe algo la versión nueva? | *Smoke producción* tras cada despliegue, y el E2E con `api/` antes (04_Plan_Verificacion_Validacion.md, apartado 1.5) |
+| Por qué falla un E2E | Traza, captura del fallo e informe HTML de Playwright, guardados como artefacto en GitHub Actions |
+| Rendimiento | Lighthouse y la medición de CLS por elemento (04_Plan_Verificacion_Validacion.md, apartado 1.4) |
+
+El límite de errores de toda la app, que la revisión encontró como hueco, se hizo el mismo día ([UX-14](../user-stories/UX-14-aviso-ante-errores.md)). **Cuándo revisar lo demás:** con usuarios reales fuera del piloto. Lo primero sería un RUM sin cookies ni datos de la persona (Speed Insights solo mide tiempos) y, para errores, un servicio con filtrado de URL y sin grabación de sesión.
+
 ---
 
 ## Historial de cambios
@@ -28,3 +49,5 @@ Los dos endpoints de `api/` usan `logger.error` en su bloque catch. Se amplía a
 - **v1.1 (20 sept. 2026)** — la auditoría de acciones de administración (ADM-03) va a una tabla de base de datos, no a estos logs: los logs de Vercel Hobby se conservan poco y no están protegidos contra modificación (OWASP A09). Aquí solo queda el aviso operativo `Acceso de administración denegado`.
 - **v1.2 (29 sept. 2026)** — los campos del log pasan a inglés (`level`, `message`, `route`, `userId`) con el resto del código. Las búsquedas guardadas en el visor de Vercel con los nombres antiguos (`nivel`, `mensaje`, `ruta`, `usuario`) dejan de encontrar las líneas nuevas.
 - **v1.3 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
+- **v1.4 (18 oct. 2026)** — apartado 4: no se adopta Sentry ni medición con usuarios reales por ahora (datos de categoría especial, política de contenido, volumen del piloto); tabla de qué cubre cada necesidad y cuándo revisarlo.
+- **v1.5 (18 oct. 2026)** — apartado 4: el límite de errores de toda la app deja de ser deuda (UX-14).

@@ -1,6 +1,5 @@
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
@@ -12,6 +11,7 @@ import { useRecommendations } from "@modules/recommendations/ui/queries";
 import { HistoryTimeline } from "./HistoryTimeline";
 import { ScoreBars } from "./ScoreBars";
 import { useLatestScores } from "./queries";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 /**
  * Resultados (dentro de Mi perfil): la última puntuación de cada categoría
@@ -29,9 +29,7 @@ export function ResultsPage() {
 
   if (isPending || labelsPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 

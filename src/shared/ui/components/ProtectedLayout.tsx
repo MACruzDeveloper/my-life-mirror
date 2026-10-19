@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Box from "@mui/material/Box";
 import { useNavigate } from "react-router";
 import { Breadcrumbs, type BreadcrumbItem, PAGE_MAX_WIDTH, WIDE_PAGE_MAX_WIDTH } from "./Breadcrumbs";
 import { Header } from "./Header";
@@ -39,13 +40,17 @@ export function ProtectedLayout({ breadcrumbs, wide = false, overlayHeader = fal
   }
 
   return (
-    <>
-      {/* name (RF-03) tiene prioridad sobre el email en cuanto existe — ver api/sesion.ts. */}
-      <Header displayName={name ?? email} avatarKey={avatarKey} onLogout={handleLogout} isAdmin={rol === "admin"} overlay={overlayHeader} />
-      {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" maxWidth={wide ? WIDE_PAGE_MAX_WIDTH : PAGE_MAX_WIDTH} /> : null}
-      {children}
+    // El pie, siempre al fondo de la pantalla: si iba justo después del contenido, saltaba cada vez que
+    // llegaban datos (Lighthouse, 18 oct.). El contenido va en un bloque normal, no como hijo flex.
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
+      <Box sx={{ flexGrow: 1 }}>
+        {/* name (RF-03) tiene prioridad sobre el email en cuanto existe — ver api/sesion.ts. */}
+        <Header displayName={name ?? email} avatarKey={avatarKey} onLogout={handleLogout} isAdmin={rol === "admin"} overlay={overlayHeader} />
+        {breadcrumbs ? <Breadcrumbs items={breadcrumbs} align="start" maxWidth={wide ? WIDE_PAGE_MAX_WIDTH : PAGE_MAX_WIDTH} /> : null}
+        {children}
+      </Box>
       {/* RF-30: en toda pantalla protegida, igual para todo el mundo. */}
       <HelpFooter />
-    </>
+    </Box>
   );
 }

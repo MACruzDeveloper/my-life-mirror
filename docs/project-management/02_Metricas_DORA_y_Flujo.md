@@ -163,6 +163,18 @@ Dos, como pedía apartado 4 (añadidos a las "Reglas de flujo" del [tablero](01_
 
 Lección, con la regla 2 del apartado 7.6: el fallo era invisible para todos los controles, porque Vite (desarrollo y E2E) sirve las rutas de la app sin esa configuración. Se añade el control que lo cubre: `npm run smoke:prod`, ejecutado solo tras cada despliegue de producción (workflow *Smoke producción*).
 
+### 7.8 La v1.4.0: dos paradas antes de producción (18 oct. 2026)
+
+La PR de `develop` a `main` de la versión de entrega falló dos veces en el E2E con `api/`. Ninguno de los dos fallos llegó a producción:
+
+| Ejecución | Qué falló | Causa | Tipo | Arreglo |
+|---|---|---|---|---|
+| 1.ª (17:38) | 6 tests que guardan el perfil, móvil y escritorio | El Chrome de GitHub Actions empezó a detectar la zona horaria "UTC", y el servidor solo aceptaba las de `Intl.supportedValuesOf`, que la excluye. Un navegador así en producción no habría podido guardar su perfil | **Fallo real** | PR #54 (15 min desde el fallo hasta el merge): se acepta cualquier zona que reconozca `Intl`, con su test |
+| 2.ª (18:02) | 5 tests largos, por tiempo (30 s) | El runner fue más lento (11 min frente a 9); esos recorridos ya rondaban los 26 s | Del entorno de pruebas | PR #55 (11 min): 60 s por test solo en CI |
+| 3.ª (18:24) | — | — | — | Merge a `main`, despliegue y *Smoke producción* en verde (18:34) |
+
+**Lectura:** desde que falló la 1.ª ejecución (17:47) hasta producción en verde (18:34) pasaron 47 minutos. La tasa de fallo de cambios en producción de esta entrega es 0: la puerta paró lo que debía. Que el fallo real lo destapara un cambio del navegador del runner, y no un test escrito para ello, es un argumento para ejecutar los E2E en dos dispositivos y en un entorno que no es el del autor. La segunda parada no era un fallo de la app, pero cuesta lo mismo: si los recorridos siguen creciendo, conviene partirlos (deuda en el tablero).
+
 ---
 
 ## Historial de cambios
@@ -171,3 +183,4 @@ Lección, con la regla 2 del apartado 7.6: el fallo era invisible para todos los
 - **v1.1 (19 sept. 2026)** — decisiones abiertas resueltas (producción = `main` al completar el MVP; DORA-proxy por PR a `develop`), simulación con línea base reconstruida de git y hallazgo sobre commits grandes.
 - **v1.2 (29 sept. 2026)** — primera revisión (apartado 7): datos de las 11 PRs, el único fallo que llegó a `develop` (funciones que no arrancaban en Vercel, 8 días sin detectar, 20 minutos en arreglarse), DORA simulado, métricas de flujo por historia y dos ajustes a las reglas de flujo.
 - **v1.3 (29 sept. 2026)** — apartado 7.7: primeras entregas reales a producción (1.0.0 con un fallo de rutas detectado en ~10 minutos; 1.0.1 lo corrige) y el control nuevo que lo cubre.
+- **v1.4 (18 oct. 2026)** — apartado 7.8: la v1.4.0 paró dos veces en el E2E con `api/` antes de producción (un fallo real de zona horaria y una de tiempos del runner); menos de una hora hasta producción en verde.

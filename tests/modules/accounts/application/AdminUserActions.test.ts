@@ -326,4 +326,14 @@ describe("Gestión de usuarios por el admin (ADM-03)", () => {
       expect(r.ok && r.value.map((e) => e.action)).toEqual(["user.recovery.sent", "user.reactivated"]);
     });
   });
+
+  it("un fallo inesperado al cambiar el email se propaga y no deja anotación de un cambio que no ocurrió", async () => {
+    const { actions, admin, ana, authProvider, auditRepository } = await setup();
+    authProvider.changeEmail = async () => {
+      throw new Error("Supabase no responde");
+    };
+
+    await expect(actions.updateEmail({ actor: admin, userId: ana.id, email: "ana.nueva@ejemplo.com", password: "adminpass1" })).rejects.toThrow("Supabase no responde");
+    expect(await recordedActions(auditRepository)).not.toContain("user.email.changed");
+  });
 });

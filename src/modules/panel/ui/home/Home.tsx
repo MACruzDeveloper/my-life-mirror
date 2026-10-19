@@ -1,9 +1,8 @@
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import { useLatestScores } from "@modules/assessments/ui/queries";
 import { Dashboard } from "./Dashboard";
 import { FirstTimeWelcome } from "./FirstTimeWelcome";
 import { LoadErrorState } from "./LoadErrorState";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 /**
  * Página de inicio tras el login (RF-39). Solo decide qué mostrar; cada
@@ -19,9 +18,7 @@ export function Home() {
 
   if (isPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 

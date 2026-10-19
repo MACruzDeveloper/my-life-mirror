@@ -1,7 +1,6 @@
 import { useId, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
@@ -20,6 +19,7 @@ import { VideosSection } from "./landing/VideosSection";
 import { SECTION_SPACING } from "./landing/landingLayout";
 import { CommunitySection } from "./landing/CommunitySection";
 import { useCategories, useCategoryLabelsQuery } from "./queries";
+import { PageLoader } from "@shared/ui/components/PageLoader";
 
 /**
  * La ruta de una página de categoría. Sin migas de pan: la página es una
@@ -63,9 +63,7 @@ export function CategoryPage() {
 
   if (labels.isPending) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 
