@@ -12,7 +12,9 @@ test("dos notas cambiadas se guardan de una vez, siguen tras recargar, y la barr
   for (const name of ["Finanzas", "Familia", "Aventura"]) await interview.activate(name);
 
   await interview.goToQuestions();
-  const saveAll = page.getByRole("button", { name: /^Guardar todo/ });
+  // El de la barra que se ve: al bajar, la normal se oculta y aparece la compacta fija (en móvil, con las
+  // burbujas más altas, pasa ya al puntuar). Si coinciden un instante, la compacta, que es la que queda.
+  const saveAll = page.getByRole("button", { name: /^Guardar todo/ }).filter({ visible: true }).last();
   await expect(saveAll).toBeDisabled();
   await interview.score("Finanzas", 7);
   await interview.score("Familia", 6);
