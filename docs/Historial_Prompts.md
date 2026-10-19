@@ -290,6 +290,9 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **19 oct. 2026** — *"revisa toda la documentación por si ves algo que sobra o podemos borrar. Por ejemplo puedes borrar los historiales de cambios, es interesante pero tenemos que optimizar lo máximo posible para que el profesor no se vuelva loco leyendo todo"*
 → Fuera los historiales de cambios de todos los documentos (cambia la convención del 6 sept.; ahora el registro es Git, con los historiales completos en la etiqueta `v1.4.1`). Antes, lo que solo estaba en un historial y importaba (resultados de la IA, lecciones de fallos reales) pasó al cuerpo. No se borra ningún documento entero: el guion largo de usabilidad queda marcado como opcional, y los diagramas de septiembre ya avisan de que son el análisis inicial.
 
+**19 oct. 2026** — *"añade CodeRabbit, lo usamos con los días de prueba para revisar todo el código"*
+→ Consta en el plan de V&V (técnicas de verificación) y en el guion del vídeo: la revisión de código del Ciclo 2 (6 oct.) se hizo con CodeRabbit, en su periodo de prueba; 10 hallazgos, 7 reales, corregidos en la v1.2.1. Presentación y vídeo (YouTube, no listado) enlazados en el README.
+
 ---
 
 *Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje. Es un registro: las versiones de documentos que cita (v1.1, v2.0…) son las de entonces, ya fuera de los documentos.*
