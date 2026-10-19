@@ -62,9 +62,3 @@ Para tener el control sobre la información personal que he dejado en la aplicac
 - **Caso de uso en `accounts`, datos de otros módulos por sus puertos:** `ExportUserData` y `DeleteAccount` orquestan los repositorios de perfil, categorías, consentimientos y evaluaciones (mismo patrón que `ActivateCategory` con el consentimiento).
 - **Función serverless:** las dos acciones (`export-data`, `delete-account`) van en `api/accounts/[action].ts`; no añaden funciones (ADR-03 apartado 6.1).
 - **Caché del frontend:** al eliminar se vacía entera (`queryClient.clear()`).
-
-## Historial de cambios
-
-- **v1.0 (20 sept. 2026)** — versión inicial.
-- **v1.1 (20 sept. 2026)** — regla del último administrador (criterios 8 y 9) y aclaración de que la excepción a RF-12 es solo el borrado de cuenta.
-- **v1.2 (20 sept. 2026)** — el módulo de recomendaciones (RF-18) entra en la exportación y en el borrado (`recommendations`, con `deleteByUserId`).

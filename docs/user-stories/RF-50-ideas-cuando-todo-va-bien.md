@@ -39,8 +39,3 @@ Para disfrutar de lo que ya tengo
 5. Given el catálogo
    When se comprueba
    Then cada idea tiene texto en español y en inglés, y ninguna usa palabras de consejo médico, financiero o psicológico
-
-## Historial de cambios
-
-- **v1.0 (15 oct. 2026)** — versión inicial.
-- **v1.1 (15 oct. 2026)** — tras probarlo el autor: el aviso en la entrevista al llegar a "todo en verde", con enlace a Inicio.

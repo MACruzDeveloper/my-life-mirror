@@ -45,8 +45,3 @@ Para pedir ayuda real sin tener que buscarla fuera
 5. Given el catálogo de líneas
    When se ejecutan los tests
    Then cada línea tiene teléfono o enlace y texto en los dos idiomas
-
-## Historial de cambios
-
-- **v1.0 (6 oct. 2026)** — versión inicial. La lógica (`getCrisisHelplines`) existía desde el Ciclo 1 sin pantalla.
-- **v1.1 (6 oct. 2026)** — tras probarla el autor ("ahora no se puede salir de ahí"): cabecera y migas según haya sesión; el pie no enlaza a la propia ayuda.

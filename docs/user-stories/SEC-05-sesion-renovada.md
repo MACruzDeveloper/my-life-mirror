@@ -50,7 +50,3 @@ La cookie de sesión guardaba el token de Supabase, que dura una hora, y nada lo
 6. Given una sesión abierta
    When se cierra sesión
    Then se borran las dos cookies
-
-## Historial de cambios
-
-- **v1.0 (16 oct. 2026)** — versión inicial.

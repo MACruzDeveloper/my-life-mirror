@@ -16,7 +16,3 @@ Para acceder a mi cuenta
 2. Given credenciales incorrectas (email inexistente o contraseña equivocada)
    When el usuario envía el formulario
    Then el sistema rechaza el intento con un mensaje genérico ("email o contraseña incorrectos"), sin indicar cuál de los dos falló
-
-## Historial de cambios
-
-- **v1.0 (13 sept. 2026)** — versión inicial, documentada junto con la implementación (debería haberse escrito antes, per SDD Nivel 2).

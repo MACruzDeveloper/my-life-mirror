@@ -1,7 +1,7 @@
 # Historia: Cuenta de prueba para la entrega (TFM-01)
 
 **Nivel:** 2 — Spec Anchored ([10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md))
-**Referencias:** requisitos de entrega del máster (usuario y contraseña de prueba), RF-05 (eliminar la cuenta), RF-43 (experiencias compartidas), RF-40/RF-45 (IA), RNF-13 (roles), decisión del autor del 11 oct.
+**Referencias:** requisitos de entrega del máster (usuario y contraseña de prueba), RF-05 (eliminar la cuenta), RF-43 (experiencias compartidas), RF-40/RF-45 (IA), RNF-13 (roles), decisiones del autor del 11 y del 19 oct.
 
 Como persona que evalúa el TFM
 Quiero entrar con una cuenta que ya tenga contenido
@@ -9,7 +9,7 @@ Para ver la app funcionando (gráficos, ideas, diario, IA, experiencias de otras
 
 ## Alcance
 
-- **Una cuenta de prueba en producción**, con email y contraseña publicados en el README. Sin rol de administrador (gestiona usuarios reales; la administración se enseña en el vídeo y se prueba en local).
+- **Una cuenta de prueba en producción, con rol de administración** (desde el 19 oct., decisión del autor): así quien evalúa ve también el panel (usuarios, categorías, vídeos y auditoría). El email está en el README; **la contraseña no**: el autor la entrega en privado, porque con ese rol se ven y se gestionan las cuentas reales. Por lo mismo, la contraseña cumple la política de contraseñas (SEC-01), aunque la cuenta se cree con el script. Tras la evaluación, el autor elimina la cuenta.
 - **Contenido con el que llega:**
   - seis áreas activas (ninguna sensible) y **un año de historial**, una evaluación al mes, con trayectorias distintas (una que mejora, otras que bajan, una estable);
   - tres áreas por debajo del umbral, con sus **ideas abiertas**;
@@ -18,9 +18,9 @@ Para ver la app funcionando (gráficos, ideas, diario, IA, experiencias de otras
   - un área con 8 o más y una experiencia sin compartir, para poder probar "Compartir de forma anónima";
   - los dos interruptores de IA activados.
 - **Una segunda cuenta, "otra persona"**, sin contraseña publicada, con puntuaciones altas y experiencias ya compartidas en español y en inglés: así la cuenta de prueba ve la pestaña "De otras personas" en sus ideas.
-- **Restaurable:** `npm run demo:reset` borra las dos cuentas (solo esas, por su email exacto) y las vuelve a crear con el mismo contenido. Se ejecuta a mano, con las credenciales del `.env`, y pide confirmación expresa (`-- --yes`) porque escribe en la base de datos real. La contraseña de la cuenta de prueba sale de `DEMO_USER_PASSWORD`, para que la del README siga valiendo tras restaurar.
+- **Restaurable:** `npm run demo:reset` borra las dos cuentas (solo esas, por su email exacto) y las vuelve a crear con el mismo contenido. Se ejecuta a mano, con las credenciales del `.env`, y pide confirmación expresa (`-- --yes`) porque escribe en la base de datos real. La contraseña de la cuenta de prueba sale de `DEMO_USER_PASSWORD`, para que la entregada siga valiendo tras restaurar; el rol de administración se vuelve a poner al restaurar.
 - **Protegida contra el borrado:** si `DEMO_USER_EMAIL` está definida en el servidor, esa cuenta no se puede eliminar desde la app: se explica que es una cuenta de demostración. El resto de lo que haga quien la pruebe (puntuar, escribir, compartir, reportar) se deshace al restaurar.
-- **Fuera de alcance:** restaurarla automáticamente (exigiría la clave de servicio en GitHub Actions), impedir que se cambien sus datos, una cuenta de administrador pública.
+- **Fuera de alcance:** restaurarla automáticamente (exigiría la clave de servicio en GitHub Actions), impedir que se cambien sus datos, publicar la contraseña de una cuenta con rol de administración.
 
 ## Criterios de aceptación
 
@@ -40,6 +40,6 @@ Para ver la app funcionando (gráficos, ideas, diario, IA, experiencias de otras
    When la cuenta de prueba intenta eliminarse con su contraseña
    Then no se elimina y se explica que es una cuenta de demostración; cualquier otra cuenta se elimina como siempre
 
-## Historial de cambios
-
-- **v1.0 (11 oct. 2026)** — versión inicial. Decisiones del autor: `demo@example.com` (dominio reservado, no recibe correo) y protección contra el borrado.
+5. Given el sembrado
+   When se crea la cuenta de prueba
+   Then tiene rol de administración y su contraseña cumple la política de contraseñas; con una débil, el sembrado se niega y no crea nada

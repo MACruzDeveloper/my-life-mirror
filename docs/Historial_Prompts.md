@@ -284,6 +284,12 @@ Registro cronológico de los prompts/instrucciones más relevantes recibidos dur
 **18 oct. 2026** — *"Aplica antes el límite de errores"*
 → [UX-14](user-stories/UX-14-aviso-ante-errores.md): `AppErrorBoundary` en la raíz, que reutiliza `LoadErrorBoundary`; aviso con "Recargar" e "Ir al inicio" y el error solo en la consola (sin servicio externo, ADR-08 apartado 4).
 
+**19 oct. 2026** — *"No hay problema porque el profesor vea todo, después de que lo revise borraré la cuenta de demo, pero haz que tenga permisos de admin. Le pasaré la contraseña por privado"*
+→ [TFM-01](user-stories/TFM-01-cuenta-de-prueba.md) v1.1: la cuenta de prueba tiene rol de administración (cambia la decisión del 11 oct.). Por eso su contraseña sale del README y pasa a cumplir la política de contraseñas; el autor la entrega en privado y elimina la cuenta tras la evaluación. También: en la entrevista en móvil, el avatar encima de cada burbuja (pregunta al 90 %, respuesta al 100 %).
+
+**19 oct. 2026** — *"revisa toda la documentación por si ves algo que sobra o podemos borrar. Por ejemplo puedes borrar los historiales de cambios, es interesante pero tenemos que optimizar lo máximo posible para que el profesor no se vuelva loco leyendo todo"*
+→ Fuera los historiales de cambios de todos los documentos (cambia la convención del 6 sept.; ahora el registro es Git, con los historiales completos en la etiqueta `v1.4.1`). Antes, lo que solo estaba en un historial y importaba (resultados de la IA, lecciones de fallos reales) pasó al cuerpo. No se borra ningún documento entero: el guion largo de usabilidad queda marcado como opcional, y los diagramas de septiembre ya avisan de que son el análisis inicial.
+
 ---
 
-*Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje.*
+*Este archivo se actualiza cada vez que un prompt fija una decisión de diseño, proceso o alcance — no en cada mensaje. Es un registro: las versiones de documentos que cita (v1.1, v2.0…) son las de entonces, ya fuera de los documentos.*

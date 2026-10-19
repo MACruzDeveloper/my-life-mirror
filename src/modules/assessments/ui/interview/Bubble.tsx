@@ -16,11 +16,21 @@ export function PendingBadge({ label }: { label: string }) {
   );
 }
 
-/** Burbuja de conversación — el entrevistador a la izquierda, el usuario a la derecha. */
+/**
+ * Burbuja de conversación — el entrevistador a la izquierda, el usuario a la derecha. En móvil el avatar
+ * va encima de su burbuja, para no quitarle ancho: la pregunta ocupa el 90 % y la respuesta, el 100 %.
+ */
 export function Bubble({ children, side, avatar, alt, band }: { children: React.ReactNode; side: "left" | "right"; avatar: string; alt: string; band?: ScoreBand }) {
   const isLeft = side === "left";
   return (
-    <Box sx={{ display: "flex", flexDirection: isLeft ? "row" : "row-reverse", alignItems: "flex-start", gap: 1.5 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", sm: isLeft ? "row" : "row-reverse" },
+        alignItems: { xs: isLeft ? "flex-start" : "flex-end", sm: "flex-start" },
+        gap: { xs: 1, sm: 1.5 },
+      }}
+    >
       <Avatar src={avatar} alt={alt} sx={{ width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, flexShrink: 0 }} />
       <Box
         data-band={band}
@@ -34,7 +44,9 @@ export function Bubble({ children, side, avatar, alt, band }: { children: React.
           px: 2,
           py: 1.5,
           minWidth: 0,
-          flex: isLeft ? "0 1 auto" : 1,
+          boxSizing: "border-box",
+          width: { xs: isLeft ? "90%" : "100%", sm: "auto" },
+          flex: { xs: "none", sm: isLeft ? "0 1 auto" : 1 },
         }}
       >
         <BandBackground band={band} />

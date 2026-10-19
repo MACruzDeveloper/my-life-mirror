@@ -1,6 +1,6 @@
 # Matriz de Trazabilidad — Fase 2
 
-**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.5
+**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md)
 **Fecha:** 5 de septiembre de 2026 (actualizado tras cerrar Hallazgos 1 y 2)
 **Objetivo:** verificar que cada Requisito de Negocio/Usuario (RN) esté cubierto por al menos un Requisito Funcional (RF), y dejar visible su relación con Requisitos No Funcionales (RNF), Restricciones (RES) y Requisitos de Datos (RD) relevantes.
 
@@ -53,16 +53,3 @@ En sentido inverso, hay RF/RNF que no cuelgan de ningún RN concreto — esto **
 
 ## 4. Nota sobre RN-11 (premium)
 La cobertura parcial de RN-11 es esperada: ya documentamos en RN-11/RD-10 que las ventajas concretas del plan premium se definirán más adelante. No es un gap que haya que resolver ahora — se resolverá cuando decidáis el contenido del plan premium.
-
----
-## Historial de cambios
-
-- **v1.0 (5 sept. 2026)** — versión inicial, hallazgos 1 y 2 identificados y luego cerrados (ver apartado 2).
-- **v1.1 (7 sept. 2026)** — se añade RF-34 (historial de recomendaciones) a la fila de RN-02, derivado de `09_Diagrama_Estados_Recomendacion.md`. Se corrige el enlace/versión de cabecera tras la renumeración de archivos.
-- **v1.2 (10 sept. 2026)** — se añaden RF-35 (RN-02), RF-36 (RN-03) y RF-37 (RN-08), la nueva sección 2.11 de funcionalidades asistidas por IA. Ver [05_Fundamentos_IA.md](../architecture-decisions/05_Fundamentos_IA.md).
-- **v1.3 (14 sept. 2026)** — se añaden RF-38 y RF-39 como infraestructura de cuenta transversal (apartado 3).
-- **v1.4 (27 sept. 2026)** — RF-40 (recomendaciones personalizadas con IA) en la fila de RN-02.
-- **v1.5 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
-- **v1.5 (29 sept. 2026)** — RF-41 en la fila de RN-02.
-- **v1.6 (3 oct. 2026)** — RF-42 y RF-43 en la fila de RN-02.
-- **v1.7 (5 oct. 2026)** — RF-44 y RF-45 en la fila de RN-02.

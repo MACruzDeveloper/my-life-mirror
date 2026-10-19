@@ -10,7 +10,7 @@ Aplicación web para evaluar cómo va tu vida por áreas (finanzas, familia, dep
 | Recurso | Dónde |
 |---|---|
 | Aplicación desplegada | https://my-life-mirror.vercel.app |
-| Usuario de prueba | `demo@example.com` / `DemoUser123!` (ver [Usuario de prueba](#usuario-de-prueba)) |
+| Usuario de prueba | `demo@example.com`, con rol de administración; la contraseña se entrega en privado (ver [Usuario de prueba](#usuario-de-prueba)) |
 | Presentación (slides) | ⏳ Pendiente |
 | Vídeo explicativo | ⏳ Pendiente |
 | Código fuente | Este repositorio (público) |
@@ -103,13 +103,13 @@ Español por defecto; el interruptor con las banderas, arriba a la derecha, camb
 
 ## Usuario de prueba
 
-Una cuenta en producción que ya tiene contenido, para ver la app sin tener que rellenarla:
+Una cuenta en producción que ya tiene contenido, para ver la app sin tener que rellenarla. Tiene **rol de administración**, para que también se pueda ver el panel:
 
 | | |
 |---|---|
 | Dirección | https://my-life-mirror.vercel.app |
 | Email | `demo@example.com` |
-| Contraseña | `DemoUser123!` |
+| Contraseña | Se entrega en privado con el TFM: con rol de administración se ven y se gestionan las cuentas reales, así que no se publica |
 
 **Qué trae:** seis áreas con un año de historial (el radar y la evolución), tres ideas abiertas, opciones marcadas en "¿Qué te ayuda?" y "¿Qué te lo pone difícil?", experiencias en el diario, la IA activada y experiencias compartidas por otra persona en la ventana de ideas.
 
@@ -122,8 +122,9 @@ Una cuenta en producción que ya tiene contenido, para ver la app sin tener que 
 - En Aventura, pulsa "Sugerir opciones con IA" en la experiencia del diario.
 - En Familia (un 8), "Compartir de forma anónima" una experiencia.
 - *Mi perfil → Privacidad y datos*: descargar los datos.
+- *Administración* (en la cabecera): usuarios, catálogo de categorías, vídeos de inspiración por idioma y registro de auditoría.
 
-Puedes cambiar lo que quieras: la cuenta se restaura con `npm run demo:reset`. Lo único que no permite es eliminarla (es compartida); para probar el borrado, crea tu propia cuenta: el registro está abierto y no pide confirmar el email. La administración no se ofrece en producción porque gestiona usuarios reales; se puede probar en local, como se explica arriba.
+Puedes cambiar lo que quieras: la cuenta se restaura con `npm run demo:reset`. Lo único que no permite es eliminarla (es compartida); para probar el borrado, crea tu propia cuenta: el registro está abierto y no pide confirmar el email. La cuenta se eliminará cuando acabe la evaluación del TFM.
 
 ---
 

@@ -56,9 +56,3 @@ Pistas breves en los tres momentos donde la participante necesitó ayuda. **Sin 
 - `DashboardGuide` en `src/modules/panel/ui/home/`, siguiendo la división del panel en subcomponentes.
 - Los textos que nombran otros elementos ("Una idea para ti", "Actualizar mis respuestas", "Guardar") los interpolan desde su propia clave: si un botón cambia de nombre, la guía no se queda desfasada.
 - `localStorage` y no el perfil: es una preferencia de interfaz, sin valor para el usuario entre dispositivos; guardarla en el servidor costaría una columna y una llamada más.
-
-## Historial de cambios
-
-- **v1.0 (27 sept. 2026)** — versión inicial, a partir del problema 1 de la validación.
-- **v1.1 (3 oct. 2026)** — el tercer paso nombra el "Guardar" de cada categoría (UX-05).
-- **v1.2 (4 oct. 2026)** — con UX-07, la primera entrevista va por pasos: los tres pasos de la burbuja se leen en el paso 1 y el primero dice que las categorías se eligen en el siguiente.

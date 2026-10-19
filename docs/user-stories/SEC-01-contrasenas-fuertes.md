@@ -64,7 +64,3 @@ El mensaje neutro quita la confirmación explícita, pero **no impide del todo**
 9. Given un administrador que crea un usuario
    When recibe la contraseña temporal
    Then cumple la regla
-
-## Historial de cambios
-
-- **v1.0 (11 oct. 2026)** — versión inicial. Decisiones del autor: combinar longitud, tipos de caracteres y comprobaciones contra contraseñas previsibles; mensajes solo en el registro; mensaje neutro para el email ya registrado.

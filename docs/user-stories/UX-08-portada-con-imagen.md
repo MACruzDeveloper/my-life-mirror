@@ -51,12 +51,3 @@ Para decidir si me quedo, antes de leer nada
 6. Given la portada
    When se baja
    Then "Cómo funciona" aparece sobre la segunda imagen, y nada se sale de la pantalla a lo ancho
-
-## Historial de cambios
-
-- **v1.0 (12 oct. 2026)** — versión inicial. Decisiones del autor: imagen fija en lugar de vídeo, de fondo y con una capa oscura suave encima.
-- **v1.1 (12 oct. 2026)** — primera vista a pantalla completa y segunda imagen que aparece al bajar, con "Cómo funciona" encima (a petición del autor, como prueba del efecto). La segunda imagen es provisional.
-- **v1.2 (12 oct. 2026)** — capa oscura más ligera (el texto lleva una sombra para leerse sobre las zonas claras de la imagen), selector de idioma de texto, flecha para bajar, y botón principal en claro sobre la imagen.
-- **v1.3 (12 oct. 2026)** — imágenes nuevas con más fondo (ya sin la provisional), flecha junto a los botones, portada sin barra de desplazamiento visible, e imagen de fondo fija también en Inicio (provisional).
-- **v1.4 (12 oct. 2026)** — texto en la parte baja y capa más ligera arriba; segunda imagen nueva; cerrar sesión lleva a la portada; se descarta la imagen de fondo en Inicio.
-- **v1.5 (12 oct. 2026)** — sin sombra en el texto y capa algo más densa a cambio; botones en azul noche y gris azulado. Medido sobre capturas: el texto blanco tiene, en el punto más claro de la imagen que le queda detrás, 4,5:1 (descripción) y 3,4:1 (título, texto grande, donde se piden 3:1); en el resto, más de 13:1.

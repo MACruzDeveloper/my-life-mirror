@@ -53,9 +53,3 @@ Los vídeos de "Para inspirarte" vivían en un JSON del código: cambiar uno exi
 6. Given un vídeo en la lista del panel
    When se edita su título
    Then la página de la categoría muestra el título nuevo
-
-## Historial de cambios
-
-- **v1.0 (17 oct. 2026)** — versión inicial.
-- **v1.2 (18 oct. 2026)** — la página enseña como mucho 3, los más recientes (con 4 se veían 4). Una página con el historial de vídeos de cada categoría queda como trabajo futuro (tablero).
-- **v1.1 (17 oct. 2026)** — a petición del autor: fuera "quién habla"; editar y borrar con iconos; enlace a YouTube en la tabla; filtro por categoría y paginación; en la página, el icono de YouTube en lugar de la etiqueta del idioma.

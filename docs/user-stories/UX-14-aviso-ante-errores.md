@@ -38,7 +38,3 @@ React desmonta toda la aplicación cuando un componente falla al pintarse. Hoy s
 4. Given ningún fallo
    When se usa la app
    Then no cambia nada
-
-## Historial de cambios
-
-- **v1.0 (18 oct. 2026)** — versión inicial.

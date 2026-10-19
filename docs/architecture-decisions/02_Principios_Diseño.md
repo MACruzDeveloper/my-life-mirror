@@ -88,13 +88,3 @@ Según [10_Enfoque_SDD.md](../requirements-analysis/10_Enfoque_SDD.md), cada his
 
 
 Este archivo rige el código escrito a partir de las historias de usuario del Ciclo 1. Edítalo directamente cuando una regla resulte estar mal planteada o falte algo para este proyecto — no hace falta pedir permiso para añadidos pequeños, basta con anotarlos abajo.
-
----
-
-## Historial de cambios
-
-- **v1.0 (9 sept. 2026)** — versión inicial (en inglés): SOLID adaptado a funciones/hooks/módulos, DRY/KISS/YAGNI, tabla de anti-patrones, patrones de diseño acotados a necesidades reales del proyecto + tabla de alternativas nativas.
-- **v1.1 (9 sept. 2026)** — traducción completa al español tras mover el archivo de la raíz del repo a `docs/`; enlaces relativos corregidos a la nueva ubicación.
-- **v1.2 (9 sept. 2026)** — renombrado de `AGENTS.md` a `ADR-02: Principios de Diseño y Buenas Prácticas de Código`, movido a `docs/architecture-decisions/02_Principios_Diseño.md`. El nombre "AGENTS.md" se reserva para un futuro archivo operativo más breve (comandos de build/test/lint, estructura de carpetas) si hace falta uno cuando arranque la implementación — este documento es una guía de principios de diseño, no ese tipo de archivo.
-- **v1.3 (12 sept. 2026)** — se corrige la referencia obsoleta a Firebase/Supabase en el ejemplo de Repository (ya es MongoDB, ADR-04); se añade un ejemplo real de "comprobar la alternativa nativa" tomado del propio Sprint 0 (vite-tsconfig-paths → resolución nativa de Vite).
-- **v1.4 (29 sept. 2026)** — se renombra el apartado "Próximo paso" a "Mantenimiento": lo que contiene es una regla de uso del documento, no un paso pendiente.

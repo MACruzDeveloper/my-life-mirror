@@ -49,7 +49,3 @@ Para que un fallo en una capa no baste para comprometer mis datos (defensa en pr
 6. Given cualquier respuesta de la API, también un error
    When se leen sus cabeceras
    Then lleva `Cache-Control: no-store`
-
-## Historial de cambios
-
-- **v1.0 (11 oct. 2026)** — versión inicial. Criterio 2 verificado con los E2E sobre el build de producción servido con las cabeceras de `vercel.json`.

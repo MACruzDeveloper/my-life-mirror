@@ -25,8 +25,6 @@ Para volver a acceder a mi cuenta sin contactar con soporte
 
 El flujo estándar de Supabase espera que el cliente JS del navegador complete el reset. Aquí no: mantenemos la disciplina ya establecida (AGENTS.md) de que el SDK de Supabase solo se usa en `api/`, nunca en el cliente. El enlace del email lleva un token de recuperación en la URL; el frontend lo lee y lo envía a `/api/restablecer-password`, que lo valida contra Supabase (`auth.getUser(token)`) y aplica el cambio con `auth.admin.updateUserById` — todo en el servidor.
 
-## Historial de cambios
+## Lección: el enlace del correo (11 oct. 2026)
 
-- **v1.0 (14 sept. 2026)** — versión inicial.
-- **v1.1 (11 oct. 2026)** — la contraseña ya no es "al menos 8 caracteres": la política está en [SEC-01](SEC-01-contrasenas-fuertes.md); el inicio de sesión no da pistas y los intentos están contados ([SEC-02](SEC-02-limite-de-intentos.md)).
-- **v1.2 (11 oct. 2026)** — fallo real en producción: el enlace del correo llevaba a la portada y no a elegir la contraseña. Supabase descarta la dirección de vuelta si no coincide letra a letra con su lista y usa la portada. Dos arreglos: la portada reconoce un enlace de recuperación (con su token o con su error de caducado) y lleva a la pantalla correcta; y `APP_URL` se limpia de barras finales y espacios antes de construir la dirección.
+Fallo real en producción: el enlace del correo llevaba a la portada y no a elegir la contraseña. Supabase descarta la dirección de vuelta si no coincide letra a letra con su lista y usa la portada. Dos arreglos: la portada reconoce un enlace de recuperación (con su token o con su error de caducado) y lleva a la pantalla correcta; y `APP_URL` se limpia de barras finales y espacios antes de construir la dirección.

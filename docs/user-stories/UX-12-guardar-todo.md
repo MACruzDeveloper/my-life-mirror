@@ -50,8 +50,3 @@ UX-05 cambió el botón único del final por un "Guardar" en cada categoría: el
 6. Given la página de la entrevista
    When se baja por las preguntas y la barra sale por arriba
    Then aparece la versión compacta pegada a la cabecera, con un solo "Guardar todo" (la normal queda oculta), y desaparece al volver arriba
-
-## Historial de cambios
-
-- **v1.0 (15 oct. 2026)** — versión inicial.
-- **v1.1 (15 oct. 2026)** — a petición del autor: un resumen con todos los avisos en lugar de solo las ideas ("que el usuario no pierda información"), y la barra pasa a una versión compacta fija pegada a la cabecera, a todo lo ancho, al bajar.
