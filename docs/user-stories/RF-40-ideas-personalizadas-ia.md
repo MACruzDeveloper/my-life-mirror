@@ -140,11 +140,3 @@ Sustituye al *Fake* en producción, para RF-40 (ideas) y RF-45 (sugerencias desd
 12. Given el proveedor *Fake*
     When se usa la IA en local o en los tests
     Then no se cuenta el uso ni se llama a ningún servicio externo
-
-## Historial de cambios
-
-- **v1.0 (2 oct. 2026)** — versión inicial (PR 3 del plan del Ciclo 2).
-- **v1.1 (3 oct. 2026)** — con el carrusel de UX-05, la IA reescribe la idea que el usuario está viendo (ya no elige entre las 5): `templateKey` en la petición, ideas guardadas por (recomendación, plantilla, idioma) y reescritas si cambian las opciones de "¿Qué te ayuda?". Petición del autor: "si luego selecciono algo en qué te ayuda debería ofrecerme otras ideas basadas en la respuesta".
-- **v1.2 (5 oct. 2026)** — con RF-43, la ventana de ideas pasa a pestañas: la personalizada en "Con IA" (la que se abre primero) y la original en "De la app", en lugar del enlace "Ver la idea original".
-- **v1.3 (11 oct. 2026)** — RF-40b: el modelo real (Claude Haiku 5.5), salida estructurada, tope diario por usuario y evaluación con el modelo.
-- **v1.4 (11 oct. 2026)** — con el tope diario agotado, la ventana enseña la idea original y dice por qué; ante un fallo del proveedor sigue enseñando solo la idea original, como antes.

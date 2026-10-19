@@ -50,8 +50,3 @@ Aunque el diagrama de clases modela estos campos sobre la propia entidad `Usuari
 ## Nota de diseño — sin política de edad mínima
 
 RF-03 no especifica una edad mínima de uso, y no hay ningún RN/RES existente sobre menores de edad — se valida que la fecha de nacimiento dé una edad razonable (0-120) por sanidad de datos, no como una verificación de mayoría de edad. Si se quiere una política real de edad mínima (relevante de cara a RGPD y consentimiento parental), es una decisión de negocio pendiente de definir explícitamente, no asumida aquí.
-
-## Historial de cambios
-
-- **v1.0 (14 sept. 2026)** — versión inicial: perfil con `edad` (entero) como campo obligatorio junto con `nombre`/`zonaHoraria`, todo en un único `ConfigurarPerfil` que exigía todos los campos a la vez.
-- **v2.0 (14 sept. 2026)** — `edad` sustituida por `birthDate` (selector de fecha nativo); `name` se mueve al registro (RF-01); `ConfigurarPerfil`/`ObtenerPerfil` se renombran a `UpdateProfile`/`GetProfile` (inglés en código, AGENTS.md) y `UpdateProfile` pasa a ser upsert parcial en vez de exigir todos los campos juntos.

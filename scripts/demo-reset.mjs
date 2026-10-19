@@ -6,11 +6,14 @@
 //   npm run demo:reset -- --local   contra el Supabase local en Docker (para probar o sacar capturas)
 //   npm run demo:reset -- --yes     contra la base REAL del .env (producción); pide el --yes a propósito
 //
-// La contraseña sale de DEMO_USER_PASSWORD (en .env): así la del README sigue valiendo tras
-// restaurar. El email, de DEMO_USER_EMAIL (por defecto demo@example.com).
+// La contraseña sale de DEMO_USER_PASSWORD (en .env): así la que se entregó en privado sigue
+// valiendo tras restaurar. Tiene rol de administración, así que debe cumplir la política de
+// contraseñas. El email, de DEMO_USER_EMAIL (por defecto demo@example.com).
 import { createServer, createServerModuleRunner } from "vite";
 import { ensureLocalSupabase } from "./local-supabase.mjs";
 
+// Solo para el Supabase local: no es la de producción.
+const LOCAL_PASSWORD = "Faro-Verde-Marea-83";
 const args = process.argv.slice(2);
 const local = args.includes("--local");
 const confirmed = args.includes("--yes");
@@ -18,7 +21,7 @@ const confirmed = args.includes("--yes");
 if (local) {
   const { studioUrl: _studio, mailUrl: _mail, ...env } = ensureLocalSupabase({ appUrl: "http://localhost:5175" });
   Object.assign(process.env, env);
-  process.env.DEMO_USER_PASSWORD ??= "demo-local-1234";
+  process.env.DEMO_USER_PASSWORD ??= LOCAL_PASSWORD;
 } else {
   try {
     process.loadEnvFile(".env");
@@ -43,7 +46,7 @@ if (!host) {
   process.exit(1);
 }
 if (!password) {
-  console.error("Falta DEMO_USER_PASSWORD en .env: es la contraseña (pública) de la cuenta de prueba, de 8 caracteres o más.");
+  console.error("Falta DEMO_USER_PASSWORD en .env: es la contraseña (privada) de la cuenta de prueba, que tiene rol de administración y debe cumplir la política de contraseñas.");
   process.exit(1);
 }
 
@@ -73,7 +76,7 @@ try {
   const summary = await seedDemoAccount(createAppContext(), { email, password });
   await runner.close();
   console.log(`Hecho: ${summary.assessments} evaluaciones, ${summary.experiences} experiencias en el diario y ${summary.sharedExperiences} compartidas por "otra persona".`);
-  console.log(`Entra con ${email} y la contraseña ${local && password === "demo-local-1234" ? '"demo-local-1234"' : "de DEMO_USER_PASSWORD"}.\n`);
+  console.log(`Entra con ${email} y la contraseña ${local && password === LOCAL_PASSWORD ? `"${LOCAL_PASSWORD}"` : "de DEMO_USER_PASSWORD"}.\n`);
 } catch (error) {
   console.error(`\nNo se pudo completar: ${error instanceof Error ? error.message : String(error)}`);
   process.exitCode = 1;

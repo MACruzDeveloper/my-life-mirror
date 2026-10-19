@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createAppContext } from "@shared/infrastructure/container";
 import { seedDemoAccount } from "@shared/infrastructure/demo/seedDemoAccount";
 
-const DEMO = { email: "demo@example.com", password: "una-clave-publica" };
+const DEMO = { email: "demo@example.com", password: "Faro-Verde-Marea-83" };
 
 /** La app entera en memoria: los mismos casos de uso que en producción. */
 async function seeded() {
@@ -89,7 +89,21 @@ describe("seedDemoAccount (TFM-01): la cuenta de prueba de la entrega", () => {
     expect(await context.assessmentRepository.findByUserId(first.demoUserId)).toHaveLength(first.demoUserId === second.demoUserId ? 6 * 13 : 0);
   });
 
-  it("exige una contraseña de al menos 8 caracteres (va a ser pública, pero tiene que servir para entrar)", async () => {
-    await expect(seedDemoAccount(createAppContext("test"), { email: "demo@example.com", password: "corta" })).rejects.toThrow(/contraseña/i);
+  it("la cuenta de prueba tiene rol de administración (para que quien evalúa vea el panel); 'otra persona', no", async () => {
+    const { context, summary } = await seeded();
+
+    const users = await context.authProvider.listAllUsers();
+
+    expect(users.find((user) => user.id === summary.demoUserId)?.rol).toBe("admin");
+    expect(users.find((user) => user.id === summary.donorUserId)?.rol).toBe("usuario");
+  });
+
+  it("con rol de administración, la contraseña debe cumplir la política (SEC-01): con una débil no crea nada", async () => {
+    const context = createAppContext("test");
+
+    for (const password of ["corta", "una-clave-publica", "Password1234!"]) {
+      await expect(seedDemoAccount(context, { email: "demo@example.com", password })).rejects.toThrow(/contraseña/i);
+    }
+    expect((await context.authProvider.listAllUsers()).some((user) => user.email === "demo@example.com")).toBe(false);
   });
 });

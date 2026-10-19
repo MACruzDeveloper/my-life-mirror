@@ -34,7 +34,3 @@ Para no tener que buscar lo que la app ya sabe decirme
 - Los textos de las bandas pasan de `ScoreCards` a `scoreBand.ts` (`BAND_LABEL_KEYS`), para que Resultados e Inicio usen los mismos.
 - `RecommendationButton` acepta una etiqueta opcional: el mismo botón y la misma ventana en la tarjeta y en el resumen.
 - `IdeasSummary` en `panel/ui/home/`, compuesto en `Dashboard` como el resto del panel.
-
-## Historial de cambios
-
-- **v1.0 (27 sept. 2026)** — versión inicial, a partir del problema 3 de la validación.

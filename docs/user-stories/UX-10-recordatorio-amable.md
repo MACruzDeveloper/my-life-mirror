@@ -32,7 +32,3 @@ Para no dar por hecha una que iba bien
 4. Given todas las categorías puntuadas en el último mes
    When se abre Inicio
    Then no hay tarjeta
-
-## Historial de cambios
-
-- **v1.0 (12 oct. 2026)** — versión inicial.

@@ -30,7 +30,3 @@ Para no tener que ir a Inicio a buscarlo
 3. Given ningún aviso
    When abre la campana
    Then lo dice
-
-## Historial de cambios
-
-- **v1.0 (14 oct. 2026)** — versión inicial.

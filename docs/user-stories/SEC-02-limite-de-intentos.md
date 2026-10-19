@@ -53,7 +53,3 @@ Para que una contraseña buena no acabe cayendo por insistencia
 6. Given la tabla de contadores
    When se lee
    Then no contiene ningún email ni ninguna IP
-
-## Historial de cambios
-
-- **v1.0 (11 oct. 2026)** — versión inicial.

@@ -70,8 +70,3 @@ Para atender casos reales: alguien que da problemas, alguien que no consigue reg
 - Endpoints en una única función `api/admin/[action].ts` (`users`, `audit`, `user-role`, `user-suspend`, `user-reactivate`, `user-delete`, `user-email`, `user-name`, `user-create`, `user-recovery`); solo `POST` las de escritura; respuestas con `Cache-Control: no-store`.
 - Interfaz: `/admin` con pestañas Usuarios (menú de acciones por fila, crear usuario, cuadros de confirmación), Categorías y Auditoría.
 - **Límite conocido:** la anotación de auditoría se escribe *después* de la acción; si fallara la escritura de la anotación, la acción ya estaría hecha y el error se vería (500). Se prefirió eso a ocultarlo.
-
-## Historial de cambios
-
-- **v1.0 (20 sept. 2026)** — diseño propuesto a partir de la petición de que el admin pueda crear, modificar y eliminar usuarios, con la regla de que siempre exista un administrador.
-- **v1.1 (20 sept. 2026)** — implementada; decisiones confirmadas (suspender y eliminar, contraseña temporal, editar email, auditoría en tabla según OWASP A09).

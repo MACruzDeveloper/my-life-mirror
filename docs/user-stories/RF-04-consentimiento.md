@@ -34,9 +34,3 @@ Cubre el módulo `consent` (dominio + aplicación): la entidad `Consent` y los c
 ## Nota de diseño — por qué la versión de política forma parte de la clave
 
 Un consentimiento no es una casilla que se marca una vez para siempre: cubre una política concreta. Si el texto legal cambia de forma sustancial (nueva versión), el consentimiento previo no debería contar como válido para la nueva — de ahí que `versionPolitica` sea parte de la búsqueda en `ConsentRepository.buscar`, no solo un campo informativo (RD-05).
-
-## Historial de cambios
-
-- **v1.0 (14 sept. 2026)** — versión inicial: alcance de Sprint 1 (dominio + aplicación), disparador real diferido a Sprint 2 (RF-07).
-- **v2.0 (15 sept. 2026)** — disparador real conectado (`ActivateCategory`, RF-06/RF-07): `api/grant-consent.ts`, primer endpoint de esta historia. Persistencia real en Supabase desde el principio (antes en memoria).
-- **v2.1 (6 oct. 2026)** — Deporte deja de ser sensible (decisión del autor, migración 0018): ya no pide consentimiento. Los consentimientos ya dados se conservan como historial. El E2E de esta historia pasa a usar Espiritualidad.
