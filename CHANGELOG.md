@@ -5,6 +5,11 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+### Cambiado (documentación de la entrega)
+
+- README: enlaces públicos a la presentación y al vídeo.
+- Plan de V&V: la revisión de código del Ciclo 2 se hizo con CodeRabbit.
+
 ## [1.4.2] - 2026-10-19
 
 Últimos ajustes para la entrega: cuenta de prueba con rol de administración, burbujas de la entrevista a todo el ancho en móvil y documentación más ligera. **Sin migraciones ni variables nuevas en Vercel.** Tras desplegar: poner en `DEMO_USER_PASSWORD` (`.env`) una contraseña nueva que cumpla la política y ejecutar `npm run demo:reset -- --yes`.

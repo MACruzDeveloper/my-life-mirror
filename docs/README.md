@@ -71,6 +71,7 @@ Una por funcionalidad, con criterios Given/When/Then, antes de programarla: `RF-
 - [Historial de prompts](Historial_Prompts.md): las peticiones que fijaron una decisión, con qué se decidió. El rastro del trabajo con IA.
 - [CHANGELOG](../CHANGELOG.md): qué cambió en cada versión.
 - [Presentación del TFM](https://claude.ai/artifact/HiVp8AhXmQk9i75Dt2Z15B): 19 diapositivas con notas del orador, con dos diagramas del análisis de septiembre.
+- [Vídeo del TFM](https://youtu.be/jByPmsKAlOI): la explicación del proyecto, con la app en directo.
 
 ## Cómo crece esta documentación
 
