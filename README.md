@@ -11,8 +11,8 @@ Aplicación web para evaluar cómo va tu vida por áreas (finanzas, familia, dep
 |---|---|
 | Aplicación desplegada | https://my-life-mirror.vercel.app |
 | Usuario de prueba | `demo@example.com`, con rol de administración; la contraseña se entrega en privado (ver [Usuario de prueba](#usuario-de-prueba)) |
-| Presentación (slides) | ⏳ Pendiente |
-| Vídeo explicativo | ⏳ Pendiente |
+| Presentación (slides) | https://claude.ai/artifact/HiVp8AhXmQk9i75Dt2Z15B (19 diapositivas, con notas del orador) |
+| Vídeo explicativo | https://youtu.be/jByPmsKAlOI (14 minutos: la app en directo, decisiones, arquitectura, calidad, IA y límites) |
 | Código fuente | Este repositorio (público) |
 
 **Contenido:** [Así se ve](#así-se-ve) · [Funcionalidades](#funcionalidades-principales) · [Stack](#stack-tecnológico) · [Probarla en tu ordenador](#probarla-en-tu-ordenador-sin-cuentas) · [Usuario de prueba](#usuario-de-prueba) · [Estructura](#estructura-del-proyecto) · [Tests](#tests) · [Despliegue](#despliegue) · [Desarrollo con IA](#desarrollo-con-ia) · [Estado](#estado-del-proyecto) · [Licencia](#licencia) · [Documentación](#documentación)
