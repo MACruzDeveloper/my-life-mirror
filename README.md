@@ -236,7 +236,7 @@ El proyecto se ha construido con un asistente de IA (Claude Code) como compañer
 
 ## Estado del proyecto
 
-Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.4.1), con más de 1000 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
+Funcionalidad del MVP y del Ciclo 2 terminada y en producción (v1.4.2), con más de 1000 tests. Entrega prevista del TFM: hacia el 20 de octubre de 2026 (como máximo, el 26).
 
 - **IA:** el modelo real (RF-40b) funciona en producción desde la v1.3.0, con crédito de prepago y un tope diario por usuario ([evaluación](docs/architecture-decisions/05_Fundamentos_IA.md), apartado 4.3.4). En local y en los tests se usa un proveedor simulado, para no gastar crédito.
 - **Para la entrega:** presentación y vídeo.
