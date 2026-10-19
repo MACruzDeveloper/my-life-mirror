@@ -49,7 +49,3 @@ Hasta ahora, la primera entrevista lo enseñaba todo a la vez: la introducción,
 7. Given un usuario con respuestas guardadas
    When abre la entrevista
    Then no ve los pasos: entra directamente a actualizar (UX-06)
-
-## Historial de cambios
-
-- **v1.0 (4 oct. 2026)** — versión inicial, a partir de la propuesta del autor del 4 oct. ("no me gusta que cuando selecciono los checkboxes el usuario no ve que se están añadiendo o eliminando preguntas abajo").

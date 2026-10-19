@@ -52,10 +52,3 @@ Para sentir el espacio como mío, sin subir una foto
 7. Given una persona con avatar
    When exporta sus datos o elimina su cuenta
    Then la elección aparece en la exportación y desaparece con la cuenta
-
-## Historial de cambios
-
-- **v1.0 (11 oct. 2026)** — versión inicial, primera tarea de la fase de mejoras. Hecho: catálogo de descripciones, script de generación y parte del servidor. Pendiente: generar y revisar las imágenes (necesita la cuenta de HuggingFace del autor) y, con ellas, la pantalla.
-- **v1.1 (11 oct. 2026)** — confirmado por el autor: se elige en el perfil, y las 12 descripciones valen por ahora. Migración 0022 ejecutada en producción. La generación con la capa gratuita de HuggingFace no ha sido posible (sin crédito incluido): pendiente de decidir cómo se generan.
-- **v1.2 (12 oct. 2026)** — generación en local con SDXL base tras descartar la API de HuggingFace (de pago) y el modelo rápido (sesgo de tono de piel). Catálogo ajustado: siete de la primera tanda y cinco nuevas (dos personas rubias, una con pelo afro, una con barba blanca y una de cabeza rapada); salen del catálogo las de pelo pelirrojo y rastas plateadas. Pantalla hecha: selector en el perfil, avatar en la cabecera y en la entrevista.
-- **v1.3 (12 oct. 2026)** — los doce avatares, revisados y publicados por el autor (`public/avatars/`, 116 KB en total). Las claves y los textos alternativos se reescriben según lo que muestra cada imagen: en cinco casos el modelo dibujó algo distinto de lo pedido (por ejemplo, sin audífono, o con un pañuelo en la cabeza). El de barba blanca no se generó: el razonamiento vio en la combinación de rasgos el estereotipo del "abuelo bonachón"; lo sustituye uno de cabeza rapada. Comprobado con capturas en móvil y escritorio; el E2E (`e2e/api/avatars.spec.ts`) está escrito y pendiente de ejecutarse con Docker abierto.

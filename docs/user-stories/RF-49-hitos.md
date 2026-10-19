@@ -48,7 +48,3 @@ RF-49 abrió las páginas de categoría con los viajes de Aventura. Una sección
 6. Given la página de Categorías
    When se mira la tarjeta de Deporte
    Then enlaza a su página, ya no dice "Próximamente"
-
-## Historial de cambios
-
-- **v1.0 (16 oct. 2026)** — versión inicial.

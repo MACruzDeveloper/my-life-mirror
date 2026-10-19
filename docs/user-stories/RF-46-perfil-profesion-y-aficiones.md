@@ -44,8 +44,6 @@ Para que las ideas se parezcan más a mi vida
    When guarda
    Then el perfil queda sin ellas
 
-## Historial de cambios
+## Resultado con el modelo real (13 oct. 2026)
 
-- **v1.0 (13 oct. 2026)** — versión inicial. El autor pidió la profesión como desplegable con profesiones de ejemplo, en lugar de la lista de "cómo es tu día" que se le propuso (podía parecer un cuestionario de salud).
-- **v1.1 (13 oct. 2026)** — implementada: 23 profesiones y 20 aficiones de ejemplo. La profesión también se envía a la IA, con una regla expresa en el prompt: puede servir de contexto o ejemplo, pero no se supone nada de la persona a partir de ella (horario, ingresos, estrés, salud). El revisor recibe los mismos datos para no tomarlos por inventados.
-- **v1.2 (13 oct. 2026)** — evaluación con el modelo real hecha (ADR-05, historial v1.18): 8 de 10 ideas con perfil llegarían al usuario y el revisor para todos los borradores que abusan del perfil; es algo más estricto de la cuenta con los buenos (cae a la idea original, que es segura).
+8 de 10 ideas con perfil llegarían al usuario y el revisor para todos los borradores que abusan del perfil. Es algo más estricto de la cuenta con los buenos: cae a la idea original, que es segura ([ADR-05](../architecture-decisions/05_Fundamentos_IA.md), apartado 4.3).

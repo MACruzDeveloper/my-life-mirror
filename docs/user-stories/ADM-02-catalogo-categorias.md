@@ -51,10 +51,3 @@ Hoy cada usuario tiene su copia de las categorías, sembrada desde una lista fij
 1. **Retirar = ocultar, no borrar** (borrar destruiría evaluaciones; contradice RF-12).
 2. **Una categoría sensible nueva** nace inactiva y pide consentimiento al activarla, sin excepciones.
 3. **Aviso a usuarios:** se deja para RF-23 (correo/notificación, con consentimiento a comunicaciones); mientras, la categoría nueva aparece al abrir la entrevista.
-
-## Historial de cambios
-
-- **v1.0 (19 sept. 2026)** — diseño propuesto a partir de la petición de poder añadir y retirar categorías; aviso por correo anotado como idea dependiente de RF-23.
-- **v1.1 (19 sept. 2026)** — implementada: catálogo global, sincronización al listar, retirada con desactivación global, endpoints `api/admin/categories`, pestaña en `/admin`. Decisiones confirmadas.
-- **v1.2 (27 sept. 2026)** — creación bilingüe: nombre y descripción en inglés obligatorios, guardados en el catálogo y en la copia de cada usuario (migración 0008); columna "Nombre en inglés" en la tabla.
-- **v1.3 (27 sept. 2026)** — sustituye el modelo de v1.2 (una columna por idioma no escala: con 20 idiomas serían 40 columnas y un campo por idioma en cada DTO). Traducciones en la tabla `category_translations`, resueltas por id de catálogo en la interfaz; mismo modelo para estándar y creadas por el admin (migración 0009, que migra los datos de 0008 y borra sus columnas).

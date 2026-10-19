@@ -38,8 +38,3 @@ Para que no se quede en una lista que nunca miro
 5. Given una idea que se marca como hecha o descartada
    When la petición lleva una fecha
    Then se rechaza: la fecha es de una idea guardada. Al marcar hecha una idea con fecha, la fecha desaparece
-
-## Historial de cambios
-
-- **v1.0 (13 oct. 2026)** — versión inicial.
-- **v1.1 (13 oct. 2026)** — al implementarla: los atajos se llaman "En una semana" y "En un mes" (dicen lo que hacen: hoy más 7 y más 30 días); el criterio 5 se concreta con el contrato real (una sola petición guarda y fecha).

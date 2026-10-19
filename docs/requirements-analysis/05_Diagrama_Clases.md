@@ -2,7 +2,7 @@
 
 > **Análisis inicial (5-12 sept. 2026), no el diseño actual.** Es el modelo conceptual previo al código y se conserva como parte del proceso del TFM. Usa los nombres del análisis; en el código son: `Usuario` → `User` (módulo `accounts`), `Evaluacion` → `Assessment`, "check-in" → la entrevista (RF-10), `Recomendacion` → `Recommendation`, `Consentimiento` → `Consent`, `Categoria` → `Category`. `Conexion` y `Suscripcion` no están construidas (Ciclo 3 o posterior). El diseño real: [ADR-03](../architecture-decisions/03_Arquitectura_Software.md), las [historias de usuario](../user-stories/) y `src/modules/`.
 
-**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.3, sección 5 (RD-01 a RD-11)
+**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md), sección 5 (RD-01 a RD-11)
 **Fecha:** 7 de septiembre de 2026
 **Formato:** Mermaid (texto plano, versionable en git, editable directamente en este archivo — pensado para crecer en próximas fases sin rehacer nada desde cero).
 
@@ -101,11 +101,3 @@ Igual que con la matriz de trazabilidad, dibujar el modelo sacó a la luz dos co
 - Añadir una entidad nueva (por ejemplo, si en el Ciclo 3 se decide separar "plantilla de recomendación" de "recomendación asignada") es añadir un bloque `class` más y una línea de relación — no rehacer el diagrama.
 - Vive en el propio repositorio como texto: se versiona con git igual que el código, y GitHub lo renderiza automáticamente al ver el archivo.
 - Puedo regenerarlo contigo en segundos cada vez que cambie el modelo de datos, igual que cualquier otro documento de esta carpeta.
-
----
-## Historial de cambios
-
-- **v1.0 (7 sept. 2026)** — versión inicial del diagrama de clases a partir de RD-01 a RD-11. Se detectan dos hallazgos (campo `usuario` faltante en RD-04, inconsistencia de estados entre RD-04 y RF-19).
-- **v1.1 (7 sept. 2026)** — hallazgos resueltos: `Recomendación` incluye usuario destinatario; estados alineados a `pendiente de respuesta/hecha/descartada/pospuesta`, reflejado también en `02_Requisitos_Fase1.md` v0.4.
-- **v1.2 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
-- **v1.3 (29 sept. 2026)** — nota inicial: es el análisis de septiembre, no el diseño actual, con la equivalencia de nombres.

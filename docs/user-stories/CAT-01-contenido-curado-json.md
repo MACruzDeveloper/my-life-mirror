@@ -33,7 +33,3 @@ Para corregirlo sin leer TypeScript y que moverlo a la base de datos (ADM-04) se
 3. Given el código del servidor
    When se compilan y cargan las funciones (`check:api`)
    Then leen los JSON igual que en Vercel
-
-## Historial de cambios
-
-- **v1.0 (5 oct. 2026)** — versión inicial.

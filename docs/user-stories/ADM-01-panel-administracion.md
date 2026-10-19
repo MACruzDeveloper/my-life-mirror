@@ -53,8 +53,3 @@ El servidor decide, la interfaz solo se adapta:
 - **Catálogo de categorías gestionable (añadir/quitar)** → ver [ADM-02](ADM-02-catalogo-categorias.md), ya implementada. Contexto: cada usuario tiene su propia copia sembrada desde una lista fija en código ([RF-06-RF-07-categorias.md](RF-06-RF-07-categorias.md)). Que el admin pueda añadir o quitar categorías exige un **catálogo global en base de datos** (tabla propia) y que las de cada usuario apunten a él. Decisiones abiertas: qué pasa con las categorías ya activadas cuando el admin retira una (propuesta: se *retira* del catálogo —no se borra— y desaparece para nuevas activaciones, conservando las evaluaciones históricas), y cómo llegan las categorías nuevas a usuarios existentes. Es un cambio de modelo (ADR + migración), no un formulario.
 - Cambiar el rol de un usuario desde la página (hoy es SQL manual): mutación sensible, con registro de auditoría.
 - Métricas de uso agregadas (sin datos personales).
-
-## Historial de cambios
-
-- **v1.0 (19 sept. 2026)** — versión inicial: primer corte (lista de usuarios) y diseño del control de acceso.
-- **v1.1 (19 sept. 2026)** — la página `/admin` gana la pestaña Categorías (ADM-02); el control de acceso se reutiliza (`requireAdmin` en `shared/domain/Actor.ts`).

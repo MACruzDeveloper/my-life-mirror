@@ -39,8 +39,3 @@ Las tarjetas dicen el número de cada categoría, pero para comparar hay que lee
 4. Given la pantalla en inglés
    When se abren los resultados
    Then el gráfico usa el nombre traducido de cada categoría
-
-## Historial de cambios
-
-- **v1.0 (16 oct. 2026)** — versión inicial.
-- **v1.1 (16 oct. 2026)** — a petición del autor: con ECharts y todas las barras del color de los gráficos (los colores de las bandas no encajaban con la paleta ni con la entrevista). La banda pasa al tooltip, la descripción y la tabla; las ideas, a una lista bajo el gráfico.

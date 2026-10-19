@@ -55,8 +55,3 @@ Para no haberla olvidado al día siguiente
 7. Given una persona con reacciones
    When exporta sus datos o elimina su cuenta
    Then aparecen en la exportación y desaparecen con la cuenta
-
-## Historial de cambios
-
-- **v1.0 (12 oct. 2026)** — versión inicial. La usuaria de la prueba pedía "me gusta / no me gusta"; se convierte en guardar y descartar, que es lo que resuelve su problema (olvidar la idea) sin poner nota a nada.
-- **v1.1 (13 oct. 2026)** — tras verla el autor: botones "Me gusta" / "No me gusta" con mensaje al guardar, en lugar de "Guardar idea" / "No me sirve" (el efecto es el mismo: guardar y apartar); ventana más ancha, de altura fija, con pestañas y flechas como botones; aviso de cuántas ideas no se ven y por qué.

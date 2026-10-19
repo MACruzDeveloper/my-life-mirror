@@ -24,9 +24,3 @@ Para poder empezar a usar la app
 ## Nota "spec viva"
 
 El login (con sesión JWT) es una historia aparte. **Excepción de flujo:** al registrarse con éxito el servidor deja también la sesión iniciada (misma cookie httpOnly que el login) y el usuario va directo a `/inicio` (bienvenida de primera vez, RF-39); pedirle otra vez el email y la contraseña que acaba de escribir era fricción sin ganancia de seguridad. Si esa segunda parte fallara, la cuenta ya existe y se le ofrece iniciar sesión a mano.
-
-## Historial de cambios
-
-- **v1.0 (13 sept. 2026)** — versión inicial.
-- **v1.1 (19 sept. 2026)** — el registro deja la sesión iniciada y lleva a `/inicio`.
-- **v1.2 (11 oct. 2026)** — la contraseña ya no es "al menos 8 caracteres": la política está en [SEC-01](SEC-01-contrasenas-fuertes.md); el inicio de sesión no da pistas y los intentos están contados ([SEC-02](SEC-02-limite-de-intentos.md)).

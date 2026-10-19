@@ -51,8 +51,3 @@ Para darme cuenta de qué áreas de mi vida están más equilibradas y cuáles m
 - Se carga en diferido junto a los demás gráficos (solo en Inicio); ECharts queda en un bloque compartido por ambos gráficos.
 - **Seguridad:** es el primer gráfico cuyo tooltip lleva nombres de categoría, y ECharts pinta los tooltips como HTML. Como el admin puede crear categorías (ADM-02), un nombre como `<img src=x onerror=…>` se ejecutaría en el navegador de cada usuario: los nombres pasan por `escapeHtml` (`shared/ui/charts/`), con test.
 - **Móvil:** con 9 ejes, "Espiritualidad" se cortaba en pantallas de 360 px. La plantilla tiene un modo compacto (radio y fuente menores) por debajo de `sm`; comprobado en navegador real que ninguna etiqueta se sale del gráfico.
-
-## Historial de cambios
-
-- **v1.0 (26 sept. 2026)** — versión inicial.
-- **v1.1 (26 sept. 2026)** — implementada; escape de nombres en el tooltip y modo compacto en móvil tras la revisión en navegador.

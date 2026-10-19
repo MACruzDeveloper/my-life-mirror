@@ -159,9 +159,3 @@ Misma escala de 1 a 5:
   - **0-1 → se anota** como trabajo futuro.
   - Cualquier problema que toque **RN-04** (sentirse juzgada o vigilada) sube como mínimo a 3, sea cual sea su tamaño: es el requisito de mayor riesgo del proyecto.
 - Lo que se corrija se **vuelve a comprobar** con la participante si es posible (una segunda sesión corta), y se anota en la hoja.
-
-## Historial de cambios
-
-- **v1.0 (26 sept. 2026)** — versión inicial para el test del MVP (Ciclo 1).
-- **v1.1 (26 sept. 2026)** — enlace a la versión corta en inglés, que es la que se usa en la sesión.
-- **v1.2 (3 oct. 2026)** — el *keep-alive* de Supabase se ejecuta cada 5 días (antes, a diario).

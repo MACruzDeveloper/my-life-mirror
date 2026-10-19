@@ -31,7 +31,3 @@ Para no tener cinco botones apretados en 360 px
 4. Given una pantalla ancha
    When se muestra la cabecera
    Then se ve como antes, sin botón de menú
-
-## Historial de cambios
-
-- **v1.0 (27 sept. 2026)** — versión inicial (tarea del tablero "Menú de la cabecera en móvil").

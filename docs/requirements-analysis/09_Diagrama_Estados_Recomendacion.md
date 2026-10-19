@@ -2,7 +2,7 @@
 
 > **Análisis inicial (5-12 sept. 2026), no el diseño actual.** Es el modelo conceptual previo al código y se conserva como parte del proceso del TFM. Usa los nombres del análisis; en el código son: `Usuario` → `User` (módulo `accounts`), `Evaluacion` → `Assessment`, "check-in" → la entrevista (RF-10), `Recomendacion` → `Recommendation`, `Consentimiento` → `Consent`, `Categoria` → `Category`. `Conexion` y `Suscripcion` no están construidas (Ciclo 3 o posterior). El diseño real: [ADR-03](../architecture-decisions/03_Arquitectura_Software.md), las [historias de usuario](../user-stories/) y `src/modules/`.
 
-**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) v0.4 (RD-04, RF-18, RF-19, RF-20, RF-21)
+**Basado en:** [02_Requisitos_Fase1.md](02_Requisitos_Fase1.md) (RD-04, RF-18, RF-19, RF-20, RF-21)
 **Fecha:** 7 de septiembre de 2026
 **Formato:** Mermaid (`stateDiagram-v2`).
 
@@ -47,12 +47,3 @@ Al razonar sobre qué pasa con las recomendaciones a lo largo del tiempo, surge 
 > **RF-34** | El sistema debe permitir al usuario consultar el historial completo de sus recomendaciones (en cualquier estado: pendiente de respuesta, hecha, descartada, pospuesta), con filtros por estado, categoría y rango de fechas. | Should
 
 Ya reflejado en `02_Requisitos_Fase1.md` v0.5 y en la matriz de trazabilidad (asociado a RN-02, ya que es una extensión natural de "el sistema genera recomendaciones" hacia "y permite revisarlas").
-
----
-
-## Historial de cambios
-
-- **v1.0 (7 sept. 2026)** — versión inicial: estados `pendiente_respuesta/hecha/descartada/pospuesta`, transiciones desde pospuesta a estados finales, notas sobre RF-20/RF-21 y una idea a validar (pospuestas en el resumen mensual).
-- **v1.1 (7 sept. 2026)** — se añade transición "cerrar modal sin responder → Pospuesta" (comportamiento por defecto). Se deriva y documenta RF-34 (historial de recomendaciones con filtros), que cubre gran parte de la idea pendiente del punto 3.
-- **v1.2 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
-- **v1.3 (29 sept. 2026)** — nota inicial: es el análisis de septiembre, no el diseño actual, con la equivalencia de nombres.

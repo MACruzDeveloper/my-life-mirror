@@ -60,10 +60,3 @@ Para centrarme en lo que quiero cambiar, también en el móvil
 9. Given cualquier pantalla protegida
    When baja por la página
    Then la cabecera sigue arriba, más compacta, y vuelve a su tamaño al subir
-
-## Historial de cambios
-
-- **v1.0 (4 oct. 2026)** — versión inicial. Las categorías en acordeón y el `Drawer` los pide el autor tras probar UX-05; el progreso ya llegó con UX-05.
-- **v1.1 (4 oct. 2026)** — tras probarla: separador entre la introducción y las preguntas, la categoría recién añadida la primera y con animación, *breadcrumbs* a la izquierda en las pantallas protegidas y sin margen superior en la entrevista.
-- **v1.2 (4 oct. 2026)** — fondos distintos para la introducción y las preguntas (en lugar del separador), la columna derecha entera fija, la cabecera oscura, fija y compacta al bajar, y corregido el salto al reactivar una categoría (salía "sin responder" un segundo).
-- **v1.3 (4 oct. 2026)** — el progreso pasa a acordeón (abierto por defecto) y el menú lateral queda por debajo de la cabecera fija al desplazarse.

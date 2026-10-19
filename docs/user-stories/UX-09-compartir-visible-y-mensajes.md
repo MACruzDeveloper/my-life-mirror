@@ -54,7 +54,3 @@ Para no pasar de largo lo que la usuaria de la prueba consideró lo mejor de la 
 7. Given la portada o la bienvenida
    When se lee "Cómo funciona"
    Then un paso explica que se puede compartir de forma anónima lo que funciona
-
-## Historial de cambios
-
-- **v1.0 (12 oct. 2026)** — versión inicial, a partir de la segunda prueba con una usuaria.

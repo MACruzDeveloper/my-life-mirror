@@ -104,7 +104,3 @@ POST  /api/categories/shared { id }                         → 200 { reported: 
 8. Given experiencias compartidas
    When exporta sus datos o borra la cuenta (RF-05)
    Then la exportación dice cuáles están compartidas / se borran con la cuenta
-
-## Historial de cambios
-
-- **v1.0 (5 oct. 2026)** — versión inicial. El autor reescribe RF-43: en lugar de un agregado anónimo de opciones, quien va bien comparte experiencias de forma altruista ("no pasa nada si por casualidad un usuario reconoce a quién pertenece") y se leen en la ventana de ideas, en pestañas junto a las de la app y las de la IA. Sin interruptor general (cada experiencia se comparte por separado) y sin tamaño mínimo de grupo.

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Result } from "#shared/domain/Result.js";
 import { CURRENT_POLICY_VERSION } from "#modules/consent/domain/CurrentPolicy.js";
+import { Password } from "#modules/accounts/domain/Password.js";
 import type { AppContext } from "#shared/infrastructure/container.js";
 import data from "./demoAccount.json" with { type: "json" };
 
@@ -17,7 +18,6 @@ export interface SeedSummary {
   sharedExperiences: number;
 }
 
-const MIN_PASSWORD_LENGTH = 8;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 interface CategorySeed {
@@ -55,7 +55,10 @@ function monthsAgo(now: Date, months: number): Date {
  */
 export async function seedDemoAccount(context: AppContext, credentials: DemoCredentials): Promise<SeedSummary> {
   const email = credentials.email.trim().toLowerCase();
-  if (credentials.password.length < MIN_PASSWORD_LENGTH) throw new Error(`La contraseña de la cuenta de prueba necesita al menos ${MIN_PASSWORD_LENGTH} caracteres`);
+  // Tiene rol de administración (TFM-01 v1.1): su contraseña, que se entrega en privado, cumple la
+  // política de contraseñas como cualquier otra. Se comprueba antes de borrar nada.
+  const password = Password.create(credentials.password, { email, name: data.demo.name });
+  if (!password.ok) throw new Error(`La contraseña de la cuenta de prueba no cumple la política de contraseñas (${password.error.rules.join(", ")})`);
   const now = context.clock.now();
   const donorEmail = data.donor.email;
 
@@ -69,9 +72,8 @@ export async function seedDemoAccount(context: AppContext, credentials: DemoCred
   let sharedExperiences = 0;
 
   async function seedUser(userEmail: string, password: string, name: string, categories: CategorySeed[]): Promise<string> {
-    // Directo al proveedor, sin la política de contraseñas del registro (SEC-01): la de
-    // la cuenta de prueba es pública a propósito (está en el README), así que exigirle
-    // que sea difícil de adivinar no protege nada. Nadie más se registra por aquí.
+    // Directo al proveedor, sin el caso de uso de registro: la contraseña de la cuenta de
+    // prueba ya se comprobó con la política al empezar, y la de "otra persona" es aleatoria.
     const user = await context.authProvider.register(userEmail, password);
     ensure(await context.updateProfile({ userId: user.id, name }), `guardar el perfil de ${userEmail}`);
     const own = ensure(await context.listCategories(user.id), "listar las categorías");
@@ -114,6 +116,8 @@ export async function seedDemoAccount(context: AppContext, credentials: DemoCred
   }
 
   const demoUserId = await seedUser(email, credentials.password, data.demo.name, data.demo.categories);
+  // Para que quien evalúa vea también el panel de administración (decisión del autor del 19 oct.).
+  await context.authProvider.changeRole(demoUserId, "admin");
   ensure(await context.setAiIdeas({ userId: demoUserId, enabled: true }), "activar las ideas con IA");
   ensure(await context.setAiSuggestions({ userId: demoUserId, enabled: true }), "activar las sugerencias con IA");
 

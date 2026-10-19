@@ -40,14 +40,3 @@ En la revisión de calidad tras la v1.4.0 se valoró añadir un servicio de erro
 | Rendimiento | Lighthouse y la medición de CLS por elemento (04_Plan_Verificacion_Validacion.md, apartado 1.4) |
 
 El límite de errores de toda la app, que la revisión encontró como hueco, se hizo el mismo día ([UX-14](../user-stories/UX-14-aviso-ante-errores.md)). **Cuándo revisar lo demás:** con usuarios reales fuera del piloto. Lo primero sería un RUM sin cookies ni datos de la persona (Speed Insights solo mide tiempos) y, para errores, un servicio con filtrado de URL y sin grabación de sesión.
-
----
-
-## Historial de cambios
-
-- **v1.0 (13 sept. 2026)** — versión inicial: logger estructurado en JSON, sin SaaS externo, usado en los endpoints de `api/`.
-- **v1.1 (20 sept. 2026)** — la auditoría de acciones de administración (ADM-03) va a una tabla de base de datos, no a estos logs: los logs de Vercel Hobby se conservan poco y no están protegidos contra modificación (OWASP A09). Aquí solo queda el aviso operativo `Acceso de administración denegado`.
-- **v1.2 (29 sept. 2026)** — los campos del log pasan a inglés (`level`, `message`, `route`, `userId`) con el resto del código. Las búsquedas guardadas en el visor de Vercel con los nombres antiguos (`nivel`, `mensaje`, `ruta`, `usuario`) dejan de encontrar las líneas nuevas.
-- **v1.3 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
-- **v1.4 (18 oct. 2026)** — apartado 4: no se adopta Sentry ni medición con usuarios reales por ahora (datos de categoría especial, política de contenido, volumen del piloto); tabla de qué cubre cada necesidad y cuándo revisarlo.
-- **v1.5 (18 oct. 2026)** — apartado 4: el límite de errores de toda la app deja de ser deuda (UX-14).

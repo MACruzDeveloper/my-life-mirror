@@ -5,6 +5,22 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.4.2] - 2026-10-19
+
+Últimos ajustes para la entrega: cuenta de prueba con rol de administración, burbujas de la entrevista a todo el ancho en móvil y documentación más ligera. **Sin migraciones ni variables nuevas en Vercel.** Tras desplegar: poner en `DEMO_USER_PASSWORD` (`.env`) una contraseña nueva que cumpla la política y ejecutar `npm run demo:reset -- --yes`.
+
+### Cambiado (documentación)
+
+- Los documentos de `docs/` ya no llevan historial de cambios (unas 840 líneas menos), para aligerar la lectura del TFM. Lo que cambió sigue en Git; los historiales completos, en la etiqueta `v1.4.1`. Antes de retirarlos, las lecciones y los resultados que solo estaban ahí pasaron al cuerpo de su documento (la evaluación de la IA del 13 oct., el fallo de los imports en Vercel, el del enlace de recuperar la contraseña, la caché sin caducidad, entre otros). Guion de la demo y presentación puestos al día.
+
+### Cambiado (TFM-01: cuenta de prueba)
+
+- La cuenta de prueba tiene rol de administración, para que quien evalúa vea también el panel. Su contraseña ya no se publica en el README (se entrega en privado) y debe cumplir la política de contraseñas: `npm run demo:reset` se niega con una débil. **Antes de restaurarla en producción**, poner en `DEMO_USER_PASSWORD` (`.env`) una contraseña nueva que cumpla la política.
+
+### Corregido (entrevista en móvil)
+
+- En móvil, el avatar va encima de su burbuja en lugar de al lado: la pregunta ocupa el 90 % del ancho y la respuesta, el 100 %. Antes quedaban demasiado estrechas.
+
 ## [1.4.1] - 2026-10-18
 
 Revisión de calidad tras la entrega de la v1.4.0: estabilidad visual al cargar (Lighthouse), caché de los archivos estáticos, cobertura por niveles y un aviso en lugar de una pantalla en blanco. **Sin migraciones ni variables nuevas en Vercel.** El cambio de `vercel.json` (caché de `/assets/`) se aplica solo al desplegar.

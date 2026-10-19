@@ -1,6 +1,6 @@
 # Enfoque de Spec-Driven Development (SDD) para este proyecto
 
-**Basado en:** *Introducción a Spec Driven Development* (material del máster, BIG School), [01_Justificacion_Ciclo_Vida.md](01_Justificacion_Ciclo_Vida.md) v1.1
+**Basado en:** *Introducción a Spec Driven Development* (material del máster, BIG School), [01_Justificacion_Ciclo_Vida.md](01_Justificacion_Ciclo_Vida.md)
 **Fecha:** 8 de septiembre de 2026
 
 ---
@@ -89,9 +89,3 @@ En este nivel, si mañana decides que el texto de la recomendación sí puede ge
 ## 7. Responsabilidad humana (no se pierde con SDD)
 
 El documento del máster lo remarca: usar IA no exime de responsabilidad — el humano sigue siendo quien valida que el código cumple lo definido. Esto ya está cubierto por lo que definimos en [04_Plan_Verificacion_Validacion.md](04_Plan_Verificacion_Validacion.md): cada criterio Given/When/Then de una spec Nivel 2/3 es precisamente lo que se ejecuta manualmente o vía Playwright para esa validación.
-
----
-## Historial de cambios
-
-- **v1.0 (8 sept. 2026)** — versión inicial a partir del material del máster: los 3 niveles, por qué Nivel 1 no gobierna el proyecto, granularidad adoptada (Nivel 2 por defecto, Nivel 3 selectivo), ejemplo completo sobre RF-18 en ambos niveles.
-- **v1.1 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).

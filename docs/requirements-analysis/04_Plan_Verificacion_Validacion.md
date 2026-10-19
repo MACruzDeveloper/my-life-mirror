@@ -1,6 +1,6 @@
 # Plan de Verificación y Validación (V&V) — Fase 2
 
-**Basado en:** [01_Requisitos_Fase1.md](01_Requisitos_Fase1.md) v0.3
+**Basado en:** [01_Requisitos_Fase1.md](01_Requisitos_Fase1.md)
 **Fecha:** 5 de septiembre de 2026
 **Alcance:** técnicas realistas para un TFM desarrollado por una persona, con entrega hacia el 20 de octubre de 2026 y, como máximo, el 26 (RES-01, RES-02). No se pretende cobertura exhaustiva tipo producto real, sino un conjunto mínimo defendible que genere evidencia real para la memoria.
 
@@ -182,22 +182,3 @@ Dado el alcance real (RES-01, RES-02):
 - **Se documenta como diseño/trabajo futuro, sin ejecutar a escala real:** el piloto con varias personas, A/B testing con significancia estadística y la medición del rendimiento con usuarios reales (RUM).
 
 Esto es coherente con lo que ya aceptamos en RES-10 para el contenido de otras funcionalidades: priorizar la demostración rigurosa del concepto y del método sobre la cobertura exhaustiva, dado el marco temporal del TFM.
-
----
-## Historial de cambios
-
-- **v1.0 (5 sept. 2026)** — versión inicial: técnicas de verificación (peer review, tests unitarios/integración, UAT Given/When/Then, criterios ejecutables opcionales) y validación (demos, usability testing 5 personas, piloto 5-10 personas, métricas, A/B documental).
-- **v1.1 (6 sept. 2026)** — ajustes tras revisión:
-  - Peer review marcado en espera (sin acceso a tutor/compañeros por ahora).
-  - Usability testing y pilot testing ajustados a la disponibilidad real (n=1, mi pareja), documentando la limitación frente a la muestra ideal.
-  - Automatización con Playwright de los criterios de aceptación pasa de "opcional" a prioridad Alta, específicamente para todos los RF de prioridad Must.
-- **v1.1 (14 sept. 2026)** — apartado 1.1: caso real de un límite estructural de Vitest (no detecta que los datos no sobreviven entre funciones serverless distintas) encontrado al implementar RF-03.
-- **v1.2 (15 sept. 2026)** — Playwright instalado de verdad (apartado 1, apartado 4): primer test cubre solo páginas públicas. Automatizar RF-01 (registro/login) — el caso que motivó apartado 1.1 — queda pendiente de decidir aislamiento de datos de prueba en Supabase.
-- **v1.3 (26 sept. 2026)** — apartado 4 corregido: decía "usability test de 5 personas", contradiciendo el ajuste a n = 1 de apartado 2. Enlaces al guion y a la hoja de resultados del test del MVP.
-- **v1.4 (27 sept. 2026)** — nueva apartado 1.2: E2E con `api/` contra Supabase local en Docker, con un servidor propio en Vite (no `vercel dev`, que carga siempre la base real) y aislamiento entre funciones que mantiene cubierto el fallo de apartado 1.1. Primera batería de 9 tests × 2 dispositivos.
-- **v1.5 (28 sept. 2026)** — apartado 1.2: workflow de GitHub Actions en cada PR y nuevo apartado 1.2.1 "Cómo ver que funciona" (modos `--headed`, `--ui`, informe HTML, Studio local, `npm run dev:local`). Los apartados "1bis/1ter" pasan a numeración decimal (1.1, 1.2), igual que en el resto de documentos.
-- **v1.6 (29 sept. 2026)** — se elimina el apartado "Próximo paso": era una nota de la conversación de trabajo y lo pendiente vive en el [tablero](../project-management/01_Backlog_MVP.md).
-- **v1.6 (3 oct. 2026)** — apartado 1.2: segunda lección de los E2E (carrera tras `db reset`, resuelta esperando a que la API vea las tablas).
-- **v1.7 (4 oct. 2026)** — apartado 1.2: tercera lección (una intermitencia que era un fallo real de la caché, y `networkidle`, que no espera a las acciones posteriores).
-- **v1.8 (11 oct. 2026)** — fecha de entrega actualizada (hacia el 20 de octubre, como máximo el 26).
-- **v1.9 (18 oct. 2026)** — revisión de calidad tras la v1.4.0: apartado 1.3, cobertura por niveles 100/80/0 con el nivel CORE en `vite.config.ts`; apartado 1.4, rendimiento con Lighthouse (CLS de 1,0 a menos de 0,1) y presupuesto de rendimiento; apartado 1.5, qué vigila cada puerta de calidad. Apartado 4 actualizado: los E2E con `api/` ya no son trabajo futuro.

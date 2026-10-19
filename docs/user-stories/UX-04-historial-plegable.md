@@ -32,8 +32,3 @@ Para centrarme en contestar y mirar atrás solo si me interesa
 4. Given ningún guardado
    When abre la entrevista
    Then ve "Todavía no has guardado nada." sin botón
-
-## Historial de cambios
-
-- **v1.0 (29 sept. 2026)** — versión inicial (PR 1 del plan del Ciclo 2).
-- **v1.1 (3 oct. 2026)** — UX-05 lleva el historial a Resultados (en la entrevista queda la última actualización de cada categoría) y lo agrupa por día: N pasa a ser el número de días con guardados. Sigue plegado.

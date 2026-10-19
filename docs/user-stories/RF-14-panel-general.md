@@ -56,9 +56,3 @@ Si en el futuro el panel crece (RF-15/RF-16/RF-31) y la composición en la panta
 6. Given un fallo al cargar las recomendaciones (pero las puntuaciones sí cargan)
    When entra en `/inicio`
    Then el panel se ve igualmente, sin recomendaciones y sin bloquear nada (son secundarias)
-
-## Historial de cambios
-
-- **v1.0 (26 sept. 2026)** — versión inicial: se documenta y cierra RF-14 formalizando lo ya construido durante RF-18 (composición en pantalla, no un caso de uso combinado) y corrigiendo la confusión entre error de carga y primera vez.
-- **v1.1 (26 sept. 2026)** — el botón pasa de "Nueva entrevista" a "Actualizar mis respuestas".
-- **v1.2 (26 sept. 2026)** — las tarjetas de Inicio pasan a incluir el gráfico de evolución (RF-16); las de detalle se quedan en Resultados.
