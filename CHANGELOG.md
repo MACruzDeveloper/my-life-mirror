@@ -5,6 +5,10 @@ Este proyecto sigue [Versionado Semántico](https://semver.org/lang/es/). Hasta 
 
 ## [Sin publicar]
 
+## [1.4.2] - 2026-10-19
+
+Últimos ajustes para la entrega: cuenta de prueba con rol de administración, burbujas de la entrevista a todo el ancho en móvil y documentación más ligera. **Sin migraciones ni variables nuevas en Vercel.** Tras desplegar: poner en `DEMO_USER_PASSWORD` (`.env`) una contraseña nueva que cumpla la política y ejecutar `npm run demo:reset -- --yes`.
+
 ### Cambiado (documentación)
 
 - Los documentos de `docs/` ya no llevan historial de cambios (unas 840 líneas menos), para aligerar la lectura del TFM. Lo que cambió sigue en Git; los historiales completos, en la etiqueta `v1.4.1`. Antes de retirarlos, las lecciones y los resultados que solo estaban ahí pasaron al cuerpo de su documento (la evaluación de la IA del 13 oct., el fallo de los imports en Vercel, el del enlace de recuperar la contraseña, la caché sin caducidad, entre otros). Guion de la demo y presentación puestos al día.
